@@ -49,7 +49,7 @@ val (x, l) = Code_Target.produce_code @{theory} consts "Haskell" NONE "Tree" []
 
 *}
 ML{*
-val app = Code_Thingol.lookup_const naming List.append;
+val app = Code_Thingol.lookup_const naming "List.append";
 *}
 
 
