@@ -1,7 +1,7 @@
 theory Tree
 imports Main
-(*uses "HipSpec.ML"
-*)
+uses "../HipSpec.ML"
+
 begin
 
 datatype 'a Tree = 
@@ -36,18 +36,19 @@ ML{*
 val filepath = "~/TheoremProvers/IsaHip/";
 val hipspecifyer_cmd = filepath^"HipSpecifyer";
 val modulenm = "Tree";
-val consts = ["Tree.mirror","Tree.map", "Tree.toList"];
+val consts = ["Tree.mirror","Tree.map"];
 *}
 
 
 ML{*
-val (names_cs, (naming, program)) = Code_Thingol.consts_program @{theory} false consts;
-
+(*
 val (x, l) = Code_Target.produce_code @{theory} consts "Haskell" NONE "Tree" [] 
-
-(*HipSpec.hipspec @{theory} hipspecifyer_cmd filepath modulenm consts;*)
+*)
+HipSpec.call_hipspec @{theory} consts;
 
 *}
+
+
 ML{*
 val app = Code_Thingol.lookup_const naming "List.append";
 *}

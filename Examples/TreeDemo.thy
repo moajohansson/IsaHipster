@@ -1,7 +1,6 @@
 theory TreeDemo
-(*imports Main *)
 imports HOL_IsaP
-uses "HipSpec.ML"
+uses "../HipSpec.ML"
 
 begin
 
@@ -14,16 +13,16 @@ where
   "mirror (Leaf x) = Leaf x"
 | "mirror (Node l r) = Node (mirror r) (mirror l)"
 
-fun tmap :: "('a => 'b) => 'a Tree => 'b Tree"
+fun map :: "('a => 'b) => 'a Tree => 'b Tree"
 where
-  "tmap f (Leaf x) = Leaf (f x)"
-| "tmap f (Node l r) = Node (tmap f l) (tmap f r)" 
+  "map f (Leaf x) = Leaf (f x)"
+| "map f (Node l r) = Node (tmap f l) (tmap f r)" 
 
 
 
 ML{*
 
-val consts = ["mirror","tmap"];
+val consts = ["TreeDemo.mirror","TreeDemo.tmap"];
 
 val s = Context.theory_name @{theory}
 *}
