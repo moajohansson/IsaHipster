@@ -5,6 +5,9 @@ struct
 
 
 
+(* Assuming everything right of . is the constant name, and the rest is theory name *)
+fun drop_thy_nm const_nm =
+    Substring.string (Substring.taker (fn c => c <> #".") (Substring.full const_nm));
 
 
 
@@ -12,15 +15,14 @@ struct
 fun compute_renamings thy const_nms =
     let
        val thynm = Context.theory_name thy;
-
-       (* Assuming everything right of . is the constant name, and the rest is theory name *)
-       fun drop_thy_nm const_nm =
-           Substring.string (Substring.taker (fn c => c <> #".") (Substring.full const_nm));
-
+    
        (* Note: currently assumes conjecture only contains user-defined functions. Functions that gets
        mapped to library functions get NONE in the below list. *)
       val (_,opt_list) = Code_Target.produce_code thy const_nms "Haskell" NONE thynm [];
-      val renamings = map_filter (fn (isanm,hsnm) => case hsnm of NONE => NONE | SOME nm => SOME(isanm, drop_thy_nm nm)) 
+      val renamings = map_filter 
+                        (fn (isanm,hsnm) => case hsnm of 
+                                              NONE => NONE 
+                                            | SOME nm => SOME(isanm, drop_thy_nm nm)) 
                                  (const_nms~~opt_list) 
     in
       renamings
@@ -92,8 +94,37 @@ fun try_dest_imp t =
     handle TERM _ => NONE;
 
 fun dest_prop (Const ("prop", _)$t) = t ;
-                                      
 
+                                      
+(* Replace a substring src by dest everywhere *)
+fun matchat n src s =
+      (Substring.compare (Substring.substring (s, n, size src),
+                          Substring.full src) = EQUAL)
+      handle _ => false (* might raise Subscript *)
+
+fun findat n src s =
+      if (size s - n) < size src then NONE
+      else if matchat n src s then SOME n
+           else findat (n + 1) src s
+
+fun replace src dest s = 
+    let
+      fun collect n = 
+          if (n > String.size s)
+          then []
+          else
+            case (findat n src s) of
+              (* What remains of s is smaller than src, just get the last bit of s. *)
+              NONE => [String.substring(s, n, String.size s - n)]
+            | SOME ind => (* ind is the index where first match start. *)
+              (* Get the stuff from n to before the match*)
+              String.substring(s, n, ind - n) ::
+              dest :: (* Insert the replacement string *)
+              collect (ind + size src) (* Replace in the rest of the string *)
+    in
+      case (String.size src) of 0 => s
+                       | _ => String.concat (collect 0)
+    end;
 
 fun hipspec_prop_of_thm thm = 
     let
@@ -101,11 +132,20 @@ fun hipspec_prop_of_thm thm =
       val trm = HOLogic.dest_Trueprop (dest_prop (Thm.concl_of thm));
       val ctxt = Proof_Context.init_global (Thm.theory_of_thm thm);
 
-      val renamings = compute_renamings thy [] (*consts_of_term trm *);
+          (* FIXME: Lookup the constants in this term *)
+      val renamings = Symtab.make (compute_renamings thy ["TreeDemo.map","TreeDemo.mirror"]) (*consts_of_term trm *);
 
-      val toString = Syntax.string_of_term ctxt;
+      (* Note: Keys are prefixed by thynm, remove this. *)
+      fun replace_renamings (isanm,hsnm) s = replace (drop_thy_nm isanm) hsnm s;
+      
+      (* Turn a term into a string, replacing renamed Haskell constants, first droppig references to 
+       theory-names.*)    
+      fun toString t = 
+          Symtab.fold replace_renamings renamings 
+                      (replace ((Context.theory_name thy)^".") "" (Syntax.string_of_term ctxt t));
+
       val hs_eq = " =:= ";
-      val hs_imp = " =:> ";
+      val hs_imp = " ==> ";
       val hs_eq_True = " =:= True";
     in
     case (try_dest_eq trm) of
@@ -128,24 +168,6 @@ fun hipspec thm =
       Seq.single thm
     end;
 
-(*
-fun hipspec_goal thy hipspecifyer_cmd path modulenm const_nms goal_term = 
-    let
-      val path_opt = SOME (Path.explode path);
-      val outfile = path^modulenm^"_hipspec";
-      (* *)
-      val hipspec_cmd = "hipspec " ^ outfile;
-      val goal_str = "" (* Is there a way of translating so I know what names are used in Haskell?*)
-      val _ = Code_Target.export_code thy const_nms [((("Haskell",modulenm),path_opt),[])];
-
-      val r (* (output,r) *) = Isabelle_System.bash (* Isabelle_System.bash_output *)
-                         (hipspecifyer_cmd ^" HG "^ goal_str ^ " " ^ path^modulenm^".hs " ^outfile^".hs;"
-                          ^"ghc -threaded -fforce-recomp "^outfile^".hs;"
-                          ^hipspec_cmd ^ "--explore-theory" (* ^"  > "^outfile^"_result.txt" *));
-     in
-      r
-    end;
-*)
 
 fun quickspec thy quickspec_cmd path modulenm const_nms = 
     let 

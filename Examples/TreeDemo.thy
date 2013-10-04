@@ -16,7 +16,7 @@ where
 fun map :: "('a => 'b) => 'a Tree => 'b Tree"
 where
   "map f (Leaf x) = Leaf (f x)"
-| "map f (Node l r) = Node (tmap f l) (tmap f r)" 
+| "map f (Node l r) = Node (map f l) (map f r)" 
 
 
 
@@ -24,11 +24,12 @@ ML{*
 
 val consts = ["TreeDemo.mirror","TreeDemo.tmap"];
 
+
 val s = Context.theory_name @{theory}
 *}
 
 
-lemma "map_mirror": "tmap a (mirror a1) = mirror (tmap a a1)"
+lemma "map_mirror": "map a (mirror a1) = mirror (map a a1)"
     apply (tactic {* fn thm => let val _ = (Trm.MLSerialise.print_term (Thm.concl_of thm)) in Seq.single thm end;  *})
 
   apply (tactic {* HipSpec.hipspec *})
@@ -37,9 +38,22 @@ done
 
 
 (*by (induct a1, simp_all) *)
-ML{* val thm = Thm.concl_of @{thm "map_mirror"}; 
-val s=  (Syntax.string_of_term @{context} thm);
-writeln s;
+ML{* 
+
+val thm =  @{thm "map_mirror"};
+val t = Thm.concl_of thm;
+val renamings = Symtab.make (HipSpec.compute_renamings @{theory} ["TreeDemo.map","TreeDemo.mirror"]);
+
+*}
+ML{*
+
+Symtab.lookup renamings "TreeDemo.map";
+replace_renamings renamings "TreeDemo.map";
+
+(*
+val s = HipSpec.hipspec_prop_of_thm @{thm "map_mirror"};
+writeln s; 
+*)
 *}
 
 
