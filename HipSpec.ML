@@ -5,13 +5,14 @@ struct
 
 
 
+
+(*------------------------------------------------------------------------------------*)
+(* HipSpec realted stuff *)
+(*------------------------------------------------------------------------------------*)
+
 (* Assuming everything right of . is the constant name, and the rest is theory name *)
-fun drop_thy_nm const_nm =
-    Substring.string (Substring.taker (fn c => c <> #".") (Substring.full const_nm));
-
-
-
- 
+val drop_thy_nm = Long_Name.base_name;
+   (* Substring.string (Substring.taker (fn c => c <> #".") (Substring.full const_nm)); *)
 
 
 (* FIXME: Default to Isabelle Contrib or something more sensible *)
@@ -74,6 +75,8 @@ fun compute_renamings thy const_nms =
        (* Note: currently assumes conjecture only contains user-defined functions. Functions that gets
        mapped to library functions get NONE in the below list. *)
       val (_,opt_list) = Code_Target.produce_code thy const_nms "Haskell" NONE thynm [];
+
+          (* FIXME: Use Isabelle's association list perhaps *)
       val renamings = map_filter 
                         (fn (isanm,hsnm) => case hsnm of 
                                               NONE => NONE 
@@ -83,9 +86,6 @@ fun compute_renamings thy const_nms =
       renamings
     end; 
 
-
-(*fun hipspec_term renamings t =
-*)
 fun try_dest_eq t = 
     SOME (HOLogic.dest_eq t)
     handle TERM _ => NONE;
