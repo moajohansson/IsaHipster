@@ -6,20 +6,10 @@ begin
 (* uses "../HipSpec.ML"
 *)
 
-
 datatype 'a Tree = 
   Leaf 'a 
   | Node "'a Tree""'a Tree"
-ML{*
-InductDTac.induct_tac;
-InductDTac.inductable_things_in_term;
-val trm = @{term "x :: 'a Tree"};
 
-val vs = ProofTools.inductable_things_in_term @{theory} trm;
-
-val (x,ty) = Term.dest_Free trm;
-val s = x ^ " :: ";
-*}
 
 definition unit :: "'a => 'a Tree"
 where
@@ -44,15 +34,30 @@ where
   "toList (Leaf a) = [a]"
   | "toList (Node l r) = (toList l) @ (toList r)"
 
+
+
+
+ML{*
+val c = ProofTools.mk_conjs @{context} ["[x] = toList(Leaf x)", "mirror(mirror x) = x"];
+val x  = ProofTools.hipspec_loop c;
+*}
+
 ML{*
 val thy = @{theory};
 val ctxt = @{context};
 val trm = @{term "mirror(mirror x) = x"};
 
 val conj = (Goal.init o (Thm.cterm_of thy) o (Syntax.read_prop ctxt)) "mirror(mirror x) = x";
+
+
+
 val conj2 = (Goal.init o (Thm.cterm_of thy) o (Syntax.read_prop ctxt)) "x @ y = y @ x";
+
 val vars = map fst (fst (ProofTools.inductable_things_in_sg 1 conj2));
-InductDTac.induct_tac NONE [hd vars] conj2
+
+val [t] = Seq.list_of(ProofTools.induct_tac NONE ["x"] conj);
+val [t2] = Seq.list_of(ProofTools.prove @{simpset} t);
+Goal.finish @{context} t2;
 (*
 val s1 = Seq.list_of((InductDTac.induct_tac NONE vars conj2));
 
@@ -64,11 +69,6 @@ Goal.finish @{context} t2;
 *)
 *}
 
-
-ML{*
-val c = ProofTools.mk_conjs @{context} ["[x] = toList(Leaf x)", "[] = toList(Leaf x)"];
-val x  = ProofTools.hipspec_loop c;
-*}
 
 ML{*
 val (ProofTools.ConjQ x) = the x;
