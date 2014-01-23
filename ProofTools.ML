@@ -3,7 +3,8 @@
    loop into the Isabelle setting. *)
 (*------------------------------------------------------------------------------------*)
 
-
+(* TODO: Inspect what comes out of HipSpec, and throw away things that follow only
+from simp. Try to use some suitable heuristic to get things in nice order! *)
 
 structure ProofTools =
 struct
@@ -142,7 +143,7 @@ fun mk_conjs ctxt lemma_strs =
       ConjQ{open_conjs = conjs, failed = [], proved = [], simps = Simplifier.simpset_of ctxt, progress = false}
     end;
 
-fun try_nxt_conj (ConjQ q) =
+fun try_nxt_conj ctxt (ConjQ q) =
     case (#open_conjs q) of
       (*retry open_conjs if we have some new proved since last time.*)
       [] => if (#progress q) 
@@ -165,7 +166,7 @@ fun try_nxt_conj (ConjQ q) =
          SOME (ConjQ{open_conjs = cs,
                      failed = (#failed q),
                      proved = proved_thm::(#proved q),
-                     simps = Simplifier.add_simp proved_thm (#simps q),
+                     simps = Simplifier.add_simp (Goal.finish ctxt proved_thm) (#simps q),
                      progress = true})
        | NONE => SOME (ConjQ{open_conjs = cs,
                              failed = c::(#failed q),
@@ -176,9 +177,16 @@ fun try_nxt_conj (ConjQ q) =
       end;
 
 (* Run the hipspec-loop: try proving conjectures until done or no more progress can be made" *)
-fun hipspec_loop (ConjQ q) = 
-    case (try_nxt_conj (ConjQ q)) of
-      NONE => rev (#proved q)
-    | SOME q' => hipspec_loop q';
+fun hipspec_loop ctxt lemmas =
+    let 
+      val conjs =  mk_conjs ctxt (Library.split_lines (Library.trim_line lemmas))
+
+      fun recf (ConjQ q) = 
+          case (try_nxt_conj ctxt (ConjQ q)) of
+            NONE => (rev (#proved q), (#simps q), rev (#failed q))
+          | SOME q' => recf q'
+    in
+      recf conjs
+    end;
 
 end; (* struct *)

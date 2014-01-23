@@ -1,18 +1,32 @@
 (* Call HipSpec from Isabelle *)
+use "../ProofTools.ML";
 
 structure HipSpec =
 struct
 
 
-
-
-(*------------------------------------------------------------------------------------*)
-(* HipSpec realted stuff *)
-(*------------------------------------------------------------------------------------*)
-
 (* Assuming everything right of . is the constant name, and the rest is theory name *)
-val drop_thy_nm = Long_Name.base_name;
-   (* Substring.string (Substring.taker (fn c => c <> #".") (Substring.full const_nm)); *)
+fun drop_thy_nm const_nm =
+    Substring.string (Substring.taker (fn c => c <> #".") (Substring.full const_nm));
+
+
+
+(* Get info about Isabelle and Haskell names of constants *)
+fun compute_renamings thy const_nms =
+    let
+       val thynm = Context.theory_name thy;
+    
+       (* Note: currently assumes conjecture only contains user-defined functions. Functions that gets
+       mapped to library functions get NONE in the below list. *)
+      val (_,opt_list) = Code_Target.produce_code thy const_nms "Haskell" NONE thynm [];
+      val renamings = map_filter 
+                        (fn (isanm,hsnm) => case hsnm of 
+                                              NONE => NONE 
+                                            | SOME nm => SOME(isanm, drop_thy_nm nm)) 
+                                 (const_nms~~opt_list) 
+    in
+      renamings
+    end;  
 
 
 (* FIXME: Default to Isabelle Contrib or something more sensible *)
@@ -33,29 +47,28 @@ fun call_hipspec thy const_nms outfile hipspec_cmd =
      
       (* THINK: What if we use functions imported from other theories? Are they translated? How? *)
       val _ = Code_Target.export_code thy const_nms [((("Haskell",thynm), path_opt), [])];
-               
-      val r  = Isabelle_System.bash (*Isabelle_System.bash_output *)
-                         (hipspecifyer_cmd ^" H "^ filepath^thynm^".hs " ^outfile^";"
-                         (* ^"ghc -threaded -fforce-recomp "^outfile^";" *)
-                          ^hipspec_cmd (* ^"  > "^outfile^"_result.txt" *));
+      val _ = Isabelle_System.bash (hipspecifyer_cmd ^" H "^ filepath^thynm^".hs " ^outfile);    
+      val (result,_) = Isabelle_System.bash_output hipspec_cmd;
      in
-      r
+      ProofTools.hipspec_loop (Proof_Context.init_global thy) result
     end;
 
-fun hipspec_explore thy renamings const_nms =
+fun hipspec_explore thy const_nms =
     let
+      val renamings = compute_renamings thy const_nms
       val outfile = filepath^ (Context.theory_name thy) ^"_hipspec.hs";
-      val add_funs = Symtab.fold (fn (_,nm) => fn s => "--extra-trans "^nm^ " "^s) renamings " ";
-      val hipspec_cmd = "hipspec "^ " --auto " ^ add_funs  ^ outfile ;
+      val add_funs = List.foldl (fn ((_,nm),s) => "--extra-trans "^nm^ " "^s) " " renamings;
+      val hipspec_cmd = "hipspec "^ "--isabelle-mode " ^ add_funs  ^ outfile ;
     in
       call_hipspec thy const_nms outfile hipspec_cmd
     end;
 
-fun hipspec_goal thy renamings const_nms conj =
+fun hipspec_goal thy const_nms conj =
      let
+      val renamings = compute_renamings thy const_nms
       val outfile = filepath^ (Context.theory_name thy) ^"_hipspec.hs";
 
-      (* val add_funs = Symtab.foldl (fn ((_,nm),s) => "--extra-trans "^nm^ " "^s) " " renamings; *)
+      (* val add_funs = List.foldl (fn ((_,nm),s) => "--extra-trans "^nm^ " "^s) " " renamings; *)
       val add_conjs = "" 
       val hipspec_cmd = "hipspec "^ " --conj " ^ add_conjs  ^ outfile ;
     in
@@ -67,25 +80,8 @@ fun hipspec_goal thy renamings const_nms conj =
 (* ---------------------------------------------------------------------------------*)
 
 (* Rename constants to their haskell names and make into string *)
-(* Get info about Isabelle and Haskell names of constants *)
-fun compute_renamings thy const_nms =
-    let
-       val thynm = Context.theory_name thy;
-    
-       (* Note: currently assumes conjecture only contains user-defined functions. Functions that gets
-       mapped to library functions get NONE in the below list. *)
-      val (_,opt_list) = Code_Target.produce_code thy const_nms "Haskell" NONE thynm [];
-
-          (* FIXME: Use Isabelle's association list perhaps *)
-      val renamings = map_filter 
-                        (fn (isanm,hsnm) => case hsnm of 
-                                              NONE => NONE 
-                                            | SOME nm => SOME(isanm, drop_thy_nm nm)) 
-                                 (const_nms~~opt_list) 
-    in
-      renamings
-    end; 
-
+(*fun hipspec_term renamings t =
+*)
 fun try_dest_eq t = 
     SOME (HOLogic.dest_eq t)
     handle TERM _ => NONE;
@@ -127,29 +123,23 @@ fun replace src dest s =
                        | _ => String.concat (collect 0)
     end;
 
-fun constnames_of t = 
-        (Zipper.mktop t)
-        |> ZipperSearch.leaves_lr
-        |> Seq.map_filter (fn zl => case (Zipper.trm zl) of 
-                                     Const(nm,ty) => SOME nm
-                                     | _ => NONE)
-        |> Seq.list_of
-        |> Library.distinct (op =);
-
-fun hipspec_prop_of_thm renamings thm = 
+fun hipspec_prop_of_thm thm = 
     let
       val thy = Thm.theory_of_thm thm;
       val trm = HOLogic.dest_Trueprop (dest_prop (Thm.concl_of thm));
-     (* val ctxt = Proof_Context.init_global (Thm.theory_of_thm thm); *)
+      val ctxt = Proof_Context.init_global (Thm.theory_of_thm thm);
+
+          (* FIXME: Lookup the constants in this term *)
+      val renamings = Symtab.make (compute_renamings thy ["TreeDemo.map","TreeDemo.mirror"]) (*consts_of_term trm *);
 
       (* Note: Keys are prefixed by thynm, remove this. *)
       fun replace_renamings (isanm,hsnm) s = replace (drop_thy_nm isanm) hsnm s;
-
+      
       (* Turn a term into a string, replacing renamed Haskell constants, first droppig references to 
        theory-names.*)    
       fun toString t = 
           Symtab.fold replace_renamings renamings 
-                      (replace ((Context.theory_name thy)^".") "" (Syntax.string_of_term_global thy t));
+                      (replace ((Context.theory_name thy)^".") "" (Syntax.string_of_term ctxt t));
 
       val hs_eq = " =:= ";
       val hs_imp = " ==> ";
@@ -168,18 +158,22 @@ fun hipspec_prop_of_thm renamings thm =
 fun hipspec thm = 
     let
       val thy = Thm.theory_of_thm thm;
-      val trm = HOLogic.dest_Trueprop (dest_prop (Thm.concl_of thm));
-      val consts = constnames_of trm;
-     (* FIXME: Lookup the constants in this term. This only supports goals only mentioning
-           constants defined in this theory, clearly unsatisfactory! *)
-      val renamings = Symtab.make (compute_renamings thy consts);
-
-      val conj = hipspec_prop_of_thm renamings thm;
-      val _ =  hipspec_goal thy renamings consts conj;
+          (* TODO: generate HipSpec property to go in Haskell file from this. *)
+      val conj_str = hipspec_prop_of_thm thm;
+      (*val _ = writeln (hipspec_prop_of_thm thm) *)
+      val _ =  hipspec_goal thy [] conj_str;
     in
       Seq.single thm
     end;
 
+(* Need to extract constants!*)
+fun hipspec_explore_tac const_nms thm = 
+    let
+      val thy = Thm.theory_of_thm thm;
+      val _ =  hipspec_explore thy const_nms;
+    in
+      Seq.single thm
+    end;
 
 fun quickspec thy quickspec_cmd path modulenm const_nms = 
     let 
