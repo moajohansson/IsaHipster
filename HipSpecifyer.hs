@@ -11,6 +11,10 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set  
+import Data.List
+import Data.Data
+import Data.Typeable
+import Data.Maybe
 
 process mode m =  
   if (mode == "Q") then (quickspecify m) 
@@ -22,7 +26,7 @@ process mode m =
 hipspecify (ParseFailed loc err_msg) = error err_msg
 hipspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
   Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
-  (enumA:(concatMap add_decls decls) ++ [add_main decls True])
+  (enumA:(concatMap (add_decls funs) decls) ++ [add_main decls True, defaultRecordDecl funs])
     where
       imports = map mk_importDecl ["HipSpec","Data.Typeable","Test.Feat"] 
       imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing 
@@ -31,11 +35,23 @@ hipspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
       enumA = SpliceDecl noLoc (App (Con (UnQual (Ident "deriveEnumerable"))) ((TypQuote (UnQual (Ident "A")))))
       mk_importDecl moduleName = 
         ImportDecl noLoc (ModuleName moduleName) False False Nothing Nothing Nothing
+      funs = nub (concat [ [ (name, typ) | name <- names ] | TypeSig _ names typ <- decls ])
+
+defaultRecordDecl :: [(Name, Type)] -> Decl
+defaultRecordDecl funs =
+  DataDecl nowhere DataType [] (Ident "Default") [] [decl] []
+  where
+    decl = QualConDecl nowhere [] [] (RecDecl (Ident "Default") decls)
+    decls = zipWith mkDecl [0..] funs
+    mkDecl i (name, ty) = ([Ident ("default" ++ show i)], UnBangedTy ty)
+
+nowhere :: SrcLoc
+nowhere = SrcLoc "" 0 0
 
 quickspecify (ParseFailed loc err_msg) = error err_msg
 quickspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
   Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
-  (enumA:(concatMap add_decls decls) ++ [add_main decls False])
+  (enumA:(concatMap (add_decls []) decls) ++ [add_main decls False])
     where
       imports = map mk_importDecl ["Test.QuickCheck.Arbitrary","Test.QuickSpec","Data.Typeable", "HipSpec", "Test.Feat"] 
       imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing 
@@ -45,7 +61,7 @@ quickspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
       mk_importDecl moduleName = 
         ImportDecl noLoc (ModuleName moduleName) False False Nothing Nothing Nothing
         
-add_decls dec = 
+add_decls funs dec =
   case dec of 
     DataDecl loc dataOrNew context name tyVarBnds qualConDecls decls ->
       [DataDecl loc dataOrNew context name tyVarBnds qualConDecls (new_ders++decls),
@@ -76,8 +92,27 @@ add_decls dec =
               KindedVar nm _ -> TyVar nm
               UnkindedVar nm -> TyVar nm    
           rhs = App (Con (UnQual (Ident "sized"))) (Con (UnQual (Ident "uniform")))   
+    TypeSig loc names ty -> [TypeSig loc names (TyFun (TyCon (UnQual (Ident "Default"))) ty)]
+    FunBind matches -> [FunBind (map (add_match funs) matches ++ [default_case funs matches])]
     _ -> [dec]
-    
+
+add_match funs (Match loc name pats Nothing rhs binds) =
+  add_expr funs (Match loc name (PVar (Ident "defaultVar"):pats) Nothing rhs binds)
+
+default_case funs (Match _ name pats _ _ _:_) =
+  let Just i = elemIndex name (map fst funs)
+      vars = map makeVar [0..length pats-1]
+      makeVar n = Ident ("v" ++ show n)
+      rhs = foldl App (App (Var (UnQual (Ident ("default" ++ show i)))) (Var (UnQual (Ident "defaultVar")))) (map (Var . UnQual) vars)
+  in  Match nowhere name (map PVar (Ident "defaultVar":vars)) Nothing (UnGuardedRhs rhs) (BDecls [])
+
+add_expr :: Data a => [(Name, Type)] -> a -> a
+add_expr funs expr =
+  case cast expr of
+    Just e@(Var (UnQual name)) | name `elem` map fst funs ->
+      fromJust (cast (App e (Var (UnQual (Ident "defaultVar")))))
+    _ ->
+      gmapT (add_expr funs) expr
  
 -- HipSpec doesnt need a main anymore so we just add a dummy main function.   
 add_main decls is_hipspec = 
