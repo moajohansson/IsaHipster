@@ -103,7 +103,8 @@ fun induct_on_var_tac rule var i goalthm =
 datatype ConjQueue = ConjQ of {open_conjs : Thm.thm list, (* left to prove *)
                                failed : Thm.thm list,     (* Have tried once but failed *)
                                proved : Thm.thm list,     (* proved *)
-                               simps : simpset, (* the HOL simpset + stuff we have proved *)      
+                               simps : simpset, (* the HOL simpset + stuff we have proved *) 
+                               ctxt : Proof.context,
                                progress : bool};          (* have we proved at least something this iteration *)
 
 (* Apply simp to all subgoals *)
@@ -135,12 +136,14 @@ fun induct_on_goal simpset i thm =
 (* Assmume get list of strings from HipSpec, which can be directly parsed as Isabelle terms*)
 fun mk_conjs ctxt lemma_strs = 
     let
-      val thy = Proof_Context.theory_of ctxt;
+      val thy = Proof_Context.theory_of ctxt
       val conjs = map (Goal.init o (Thm.cterm_of thy) o (Syntax.read_prop ctxt)) lemma_strs;
+      (* val conjs = map (Syntax.read_prop ctxt) lemma_strs; *)
     in
       (* NOTE: Isabelle2013-2 use contexts instead of simpsets. Nicer, if we also can get things
        to work with bloody JEdit. *)
-      ConjQ{open_conjs = conjs, failed = [], proved = [], simps = Simplifier.simpset_of ctxt, progress = false}
+      ConjQ{open_conjs = conjs, failed = [], proved = [], ctxt = ctxt, 
+            simps = Simplifier.simpset_of ctxt, progress = false}
     end;
 
 fun try_nxt_conj ctxt (ConjQ q) =
@@ -149,31 +152,56 @@ fun try_nxt_conj ctxt (ConjQ q) =
       [] => if (#progress q) 
             then SOME (ConjQ{open_conjs = (#failed q),
                        failed = [],
-                       proved = (#proved q),
+                       proved = #proved q,
+                       ctxt = #ctxt q,
                        simps = #simps q,
                        progress = false}) 
             else NONE
 
     | (c::cs) => (* try proving next open conj *) 
       let 
-        val res = (prove_by_simp (#simps q)
-                    ORELSE 
-                    (ALLGOALS (induct_on_goal (#simps q)))) c;
+        val r = prove_by_simp (#simps q) c
       in
-        (* Only care about first proof found *)
-        (case Seq.pull res of 
-         SOME (proved_thm, _) => 
-         SOME (ConjQ{open_conjs = cs,
-                     failed = (#failed q),
-                     proved = proved_thm::(#proved q),
-                     simps = Simplifier.add_simp (Goal.finish ctxt proved_thm) (#simps q),
-                     progress = true})
-       | NONE => SOME (ConjQ{open_conjs = cs,
-                             failed = c::(#failed q),
-                             proved = (#proved q),
-                             simps = #simps q,
-                             progress = #progress q})
-        )
+      case (Seq.pull r) of (* Discard this, it is trivial *)
+        SOME _ => 
+        let val _ = writeln "discarded something"
+        in
+        SOME 
+          (ConjQ{open_conjs = cs,
+                 failed = #failed q,
+                 proved = #proved q,
+                 ctxt =  #ctxt q,
+                 simps = #simps q,
+                 progress = #progress q})
+        end
+      | NONE =>
+        let
+          val res = (ALLGOALS (induct_on_goal (#simps q))) c;
+        in
+          (* Only care about first proof found *)
+          (case Seq.pull res of 
+             SOME (proved_thm, _) => 
+             let 
+               (* BUG: Doesn't lift variables to meta-vars! 
+                How do I do this? *)
+               val final_thm = Goal.finish ctxt proved_thm
+             in
+               SOME (ConjQ{open_conjs = cs,
+                         failed = (#failed q),
+                         proved = final_thm::(#proved q),
+                         ctxt =  #ctxt q,
+                         simps = Simplifier.add_simp final_thm (#simps q),
+                         progress = true})
+             end
+           (* NONE indicates that the tactic failed to prove c *)
+           | NONE => SOME (ConjQ{open_conjs = cs,
+                                 failed = c::(#failed q),
+                                 proved = (#proved q),
+                                 ctxt =  #ctxt q,
+                                 simps = #simps q,
+                                 progress = #progress q})
+          )
+        end
       end;
 
 (* Run the hipspec-loop: try proving conjectures until done or no more progress can be made" *)
