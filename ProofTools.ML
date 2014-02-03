@@ -3,14 +3,13 @@
    loop into the Isabelle setting. *)
 (*------------------------------------------------------------------------------------*)
 
-(* TODO: Inspect what comes out of HipSpec, and throw away things that follow only
-from simp. Try to use some suitable heuristic to get things in nice order! *)
+(* TODO:  Try to use some suitable heuristic to get things in nice order! *)
 
 structure ProofTools =
 struct
 
 (*------------------------------------------------------------------------------------*)
-(* Figure out what we can do induction on. Stolen from IsaPlanner... *)
+(* Term mainipulation stuff, stolen from IsaPlanner... *)
 (*------------------------------------------------------------------------------------*)
 
 fun add_term_frees (t, frees: Term.term list) = 
@@ -20,7 +19,22 @@ fun add_term_frees (t, frees: Term.term list) =
       | f$t =>  add_term_frees (f, add_term_frees(t, frees))
       | _ => frees;
 
+fun add_typ_tfrees (Type(_,Ts),fs) = List.foldr add_typ_tfrees fs Ts
+      | add_typ_tfrees(TFree(f),fs) = insert (op =) f fs
+      | add_typ_tfrees(TVar(_),fs) = fs;
+
 fun frees_of t = map Term.dest_Free (add_term_frees (t,[]));
+fun typ_tfrees_of ty = add_typ_tfrees(ty,[]);
+
+(* Get a pair of (type-frees, term frees) without dups. *)
+fun frees_and_tfrees_of_thm thm = 
+    let 
+      val t = Thm.concl_of thm
+    in (map fst (typ_tfrees_of (Term.fastype_of t)), map fst (frees_of t)) end;
+
+(*------------------------------------------------------------------------------------*)
+(* Figure out what we can do induction on. Stolen from IsaPlanner... *)
+(*------------------------------------------------------------------------------------*)
 
 (* find an element, but keep the rest also *)
 fun pull_elem f l = 
@@ -182,15 +196,15 @@ fun try_nxt_conj ctxt (ConjQ q) =
           (case Seq.pull res of 
              SOME (proved_thm, _) => 
              let 
-               (* BUG: Doesn't lift variables to meta-vars! 
-                How do I do this? *)
+               (* Thm used by simp need to be lifted so it use meta-variables *)
                val final_thm = Goal.finish ctxt proved_thm
+               val simp_thm = Drule.generalize (frees_and_tfrees_of_thm final_thm) final_thm
              in
                SOME (ConjQ{open_conjs = cs,
                          failed = (#failed q),
                          proved = final_thm::(#proved q),
                          ctxt =  #ctxt q,
-                         simps = Simplifier.add_simp final_thm (#simps q),
+                         simps = Simplifier.add_simp simp_thm (#simps q),
                          progress = true})
              end
            (* NONE indicates that the tactic failed to prove c *)
