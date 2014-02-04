@@ -139,11 +139,17 @@ fun try_induct_on simpset rule vars i  =
           (induct_and_simp simpset rule v i)
           ORELSE 
           (try_induct_on simpset rule vs i);
+
+(* Shall we try to prove the symmetric version too?*)
 fun induct_on_goal simpset i thm = 
     let
       val vars = map fst (fst (inductable_things_in_sg i thm))
     in
-      try_induct_on simpset NONE vars i thm
+      ((try_induct_on simpset NONE vars i)
+        ORELSE
+        ((rtac sym i)
+           THEN 
+           (try_induct_on simpset NONE vars i))) thm
     end;
 
 
@@ -160,16 +166,21 @@ fun mk_conjs ctxt lemma_strs =
             simps = Simplifier.simpset_of ctxt, progress = false}
     end;
 
-fun try_nxt_conj ctxt (ConjQ q) =
+fun try_nxt_conj (ConjQ q) =
     case (#open_conjs q) of
       (*retry open_conjs if we have some new proved since last time.*)
       [] => if (#progress q) 
-            then SOME (ConjQ{open_conjs = (#failed q),
+            then 
+              let 
+               (* val _ = writeln "LOOPING" *)
+              in 
+                SOME (ConjQ{open_conjs = (#failed q),
                        failed = [],
                        proved = #proved q,
                        ctxt = #ctxt q,
                        simps = #simps q,
                        progress = false}) 
+              end
             else NONE
 
     | (c::cs) => (* try proving next open conj *) 
@@ -178,7 +189,8 @@ fun try_nxt_conj ctxt (ConjQ q) =
       in
       case (Seq.pull r) of (* Discard this, it is trivial *)
         SOME _ => 
-        let val _ = writeln "discarded something"
+        let 
+          (* val _ = writeln ("discarded " ^ (Pretty.str_of(Syntax.pretty_term (#ctxt q) (Thm.concl_of c)))) *)
         in
         SOME 
           (ConjQ{open_conjs = cs,
@@ -197,7 +209,7 @@ fun try_nxt_conj ctxt (ConjQ q) =
              SOME (proved_thm, _) => 
              let 
                (* Thm used by simp need to be lifted so it use meta-variables *)
-               val final_thm = Goal.finish ctxt proved_thm
+               val final_thm = Goal.finish (#ctxt q) proved_thm
                val simp_thm = Drule.generalize (frees_and_tfrees_of_thm final_thm) final_thm
              in
                SOME (ConjQ{open_conjs = cs,
@@ -224,7 +236,7 @@ fun hipspec_loop ctxt lemmas =
       val conjs =  mk_conjs ctxt (Library.split_lines (Library.trim_line lemmas))
 
       fun recf (ConjQ q) = 
-          case (try_nxt_conj ctxt (ConjQ q)) of
+          case (try_nxt_conj (ConjQ q)) of
             NONE => (rev (#proved q), (#simps q), rev (#failed q))
           | SOME q' => recf q'
     in
