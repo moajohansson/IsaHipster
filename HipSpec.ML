@@ -14,8 +14,7 @@ fun drop_thy_nm const_nm =
 (* Get info about Isabelle and Haskell names of constants *)
 fun compute_renamings thy const_nms =
     let
-       val thynm = Context.theory_name thy;
-    
+      val thynm = Context.theory_name thy
        (* Note: currently assumes conjecture only contains user-defined functions. Functions that gets
        mapped to library functions get NONE in the below list. *)
       val (_,opt_list) = Code_Target.produce_code thy const_nms "Haskell" NONE thynm [];
@@ -40,39 +39,55 @@ val hipspecifyer_cmd = basepath^"HipSpecifyer";
 (* 'modulemn' is the name of the module in the generated Haskell-file. Its the same as the thy  *)
 (* 'const_nms' are the name of the constants we wish to include in the Haskell 
    file. They must be prefixed by the theory name. *)   
-fun call_hipspec thy const_nms outfile hipspec_cmd = 
+fun call_hipspec ctxt const_nms outfile hipspec_cmd = 
     let
-      val thynm = Context.theory_name thy;
+      val thy = Proof_Context.theory_of ctxt
+      val thynm = Context.theory_name thy
+      (* val ctxt = (Proof_Context.init_global thy); *) (* why do we have a thy type here??? *)
       val path_opt = SOME (Path.explode filepath);
      
       (* THINK: What if we use functions imported from other theories? Are they translated? How? *)
       val _ = Code_Target.export_code thy const_nms [((("Haskell",thynm), path_opt), [])];
       val _ = Isabelle_System.bash (hipspecifyer_cmd ^" H "^ filepath^thynm^".hs " ^outfile);    
       val (result,_) = Isabelle_System.bash_output hipspec_cmd;
+
+      (* Really dodgy way of getting definfing eqs, but how do we do this otherwise??? *)
+      val specs = List.foldl (fn (const,specs) => Spec_Rules.retrieve ctxt const@specs) 
+                             [] (map (fn nm => Syntax.read_term ctxt nm) const_nms)
+      val def_rules = 
+          List.foldl (fn ((spec,(_,rules)), rs) =>
+                         case spec of Spec_Rules.Equational => (rules@rs)
+                                    | _ => rs)
+                     [] specs
      in
-      ProofTools.hipspec_loop (Proof_Context.init_global thy) result
+      ProofTools.hipspec_loop ctxt def_rules result
     end;
 
-fun hipspec_explore thy const_nms =
+fun hipspec_explore ctxt const_nms =
     let
+      val thy = Proof_Context.theory_of ctxt
       val renamings = compute_renamings thy const_nms
       val outfile = filepath^ (Context.theory_name thy) ^"_hipspec.hs";
+
+      (*val outfile = filepath^ (Context.theory_name thy) ^"_hipspec.hs"; *)
       val add_funs = List.foldl (fn ((_,nm),s) => "--extra-trans "^nm^ " "^s) " " renamings;
       val hipspec_cmd = "hipspec "^ "--isabelle-mode " ^ add_funs  ^ outfile ;
     in
-      call_hipspec thy const_nms outfile hipspec_cmd
+      call_hipspec ctxt const_nms outfile hipspec_cmd
     end;
 
-fun hipspec_goal thy const_nms conj =
+fun hipspec_goal ctxt const_nms conj =
      let
+      val thy = Proof_Context.theory_of ctxt
       val renamings = compute_renamings thy const_nms
+
       val outfile = filepath^ (Context.theory_name thy) ^"_hipspec.hs";
 
-      (* val add_funs = List.foldl (fn ((_,nm),s) => "--extra-trans "^nm^ " "^s) " " renamings; *)
+      val add_funs = List.foldl (fn ((_,nm),s) => "--extra-trans "^nm^ " "^s) " " renamings; 
       val add_conjs = "" 
       val hipspec_cmd = "hipspec "^ " --conj " ^ add_conjs  ^ outfile ;
     in
-      call_hipspec thy const_nms outfile hipspec_cmd
+      call_hipspec ctxt const_nms outfile hipspec_cmd
     end;
 
 (* ---------------------------------------------------------------------------------*)
@@ -122,7 +137,7 @@ fun replace src dest s =
       case (String.size src) of 0 => s
                        | _ => String.concat (collect 0)
     end;
-
+(*
 fun hipspec_prop_of_thm thm = 
     let
       val thy = Thm.theory_of_thm thm;
@@ -152,27 +167,35 @@ fun hipspec_prop_of_thm thm =
             SOME (A, B) => (toString A) ^ hs_imp ^ (toString B)
           | NONE =>  (toString trm) ^ hs_eq_True)
     end;
-
+*)
 
 (* Dummy tactic for hipspec *)
-fun hipspec thm = 
+(*fun hipspec ctxt thm = 
     let
-      val thy = Thm.theory_of_thm thm;
           (* TODO: generate HipSpec property to go in Haskell file from this. *)
-      val conj_str = hipspec_prop_of_thm thm;
+       val conj_str = hipspec_prop_of_thm thm;
       (*val _ = writeln (hipspec_prop_of_thm thm) *)
-      val _ =  hipspec_goal thy [] conj_str;
+      val _ =  hipspec_goal ctxt [] conj_str;
     in
       Seq.single thm
     end;
+*)
+(*
+fun mk_proof_str lemmas =
+    let
+      val tac_str = "ProofTools.induct_and_metis @{context}" 
+*)
 
 (* Need to extract constants!*)
-fun hipspec_explore_tac const_nms thm = 
+fun hipspec_explore_tac ctxt const_nms thm = 
     let
-      val thy = Thm.theory_of_thm thm;
-      val _ =  hipspec_explore thy const_nms;
+      (* val thy = Thm.theory_of_thm thm; *)
+      val (lemmas,_,_) =  hipspec_explore ctxt const_nms; (* Should probably return the new context too here!*)
+      val facts = (maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")) const_nms)
+                    @ lemmas
     in
-      Seq.single thm
+      (* Seq.single thm *)
+      ALLGOALS (ProofTools.timed_metis_tac ctxt facts) thm
     end;
 
 fun quickspec thy quickspec_cmd path modulenm const_nms = 

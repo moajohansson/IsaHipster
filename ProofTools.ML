@@ -125,31 +125,57 @@ datatype ConjQueue = ConjQ of {open_conjs : Thm.thm list, (* left to prove *)
 fun simp_all simpset = ALLGOALS (Simplifier.asm_full_simp_tac simpset);
  
 (* Fails if all there are some subgoals left after application of simp *)
-fun prove_by_simp simpset conj = SOLVE (simp_all simpset) conj;
+fun prove_by_simp simpset = SOLVE (simp_all simpset);
 
 (* Apply induction and try to prove all cases by simp *)
 fun induct_and_simp simpset rule var i = 
      (induct_on_var_tac rule var i) THEN (prove_by_simp simpset);
 
+fun SOLVE_TIMEOUT seconds tac t = 
+    let
+      val res = TimeLimit.timeLimit (Time.fromSeconds seconds)
+                 (fn () => SINGLE (SOLVE tac) t) ()
+                 handle TimeLimit.TimeOut => NONE
+                      | ERROR _ => NONE
+    in
+      case res of
+        NONE => Seq.empty
+      | SOME t' => Seq.single t'
+    end;
+
+(* Apply simp, if that doesn't work try metis.  *)
+fun timed_metis_tac ctxt lemmas i =
+    SOLVE_TIMEOUT 1
+    (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.metis_default_lam_trans ctxt lemmas i);
+
+fun simp_or_metis ctxt simpset lemmas = 
+    SOLVE((ALLGOALS (Simplifier.asm_full_simp_tac simpset))
+            THEN
+            IF_UNSOLVED 
+            (ALLGOALS (timed_metis_tac ctxt lemmas)));
+
+fun induct_and_smash ctxt simpset lemmas rule var i = 
+    (induct_on_var_tac rule var i) THEN (simp_or_metis ctxt simpset lemmas);
+
 (* Try induction on each variable until we find one that works *)
-fun try_induct_on simpset rule vars i  =
+fun try_induct_on ctxt simpset lemmas rule vars i  =
     case vars 
        of [] => no_tac 
         | (v :: vs) =>  
-          (induct_and_simp simpset rule v i)
+          (induct_and_smash ctxt simpset lemmas rule v i)
           ORELSE 
-          (try_induct_on simpset rule vs i);
+          (try_induct_on ctxt simpset lemmas rule vs i);
 
 (* Shall we try to prove the symmetric version too?*)
-fun induct_on_goal simpset i thm = 
+fun induct_on_goal ctxt simpset (lemmas : Thm.thm list) i thm = 
     let
       val vars = map fst (fst (inductable_things_in_sg i thm))
     in
-      ((try_induct_on simpset NONE vars i)
-        ORELSE
+      (try_induct_on ctxt simpset lemmas NONE vars i) thm
+       (* ORELSE
         ((rtac sym i)
            THEN 
-           (try_induct_on simpset NONE vars i))) thm
+           (try_induct_on simpset NONE vars i))) *) 
     end;
 
 
@@ -166,7 +192,8 @@ fun mk_conjs ctxt lemma_strs =
             simps = Simplifier.simpset_of ctxt, progress = false}
     end;
 
-fun try_nxt_conj (ConjQ q) =
+(* def_eqs are the defining theorems for the given consts *)
+fun try_nxt_conj def_eqs (ConjQ q) =
     case (#open_conjs q) of
       (*retry open_conjs if we have some new proved since last time.*)
       [] => if (#progress q) 
@@ -185,9 +212,10 @@ fun try_nxt_conj (ConjQ q) =
 
     | (c::cs) => (* try proving next open conj *) 
       let 
-        val r = prove_by_simp (#simps q) c
+        val r = (*SINGLE (prove_by_simp (#simps q)) c *)
+            SINGLE (ALLGOALS (timed_metis_tac (#ctxt q) (def_eqs @ (#proved q)))) c
       in
-      case (Seq.pull r) of (* Discard this, it is trivial *)
+      case r of (* Discard this, it is trivial *)
         SOME _ => 
         let 
           (* val _ = writeln ("discarded " ^ (Pretty.str_of(Syntax.pretty_term (#ctxt q) (Thm.concl_of c)))) *)
@@ -202,21 +230,25 @@ fun try_nxt_conj (ConjQ q) =
         end
       | NONE =>
         let
-          val res = (ALLGOALS (induct_on_goal (#simps q))) c;
+          val res = (SINGLE 
+                       (ALLGOALS 
+                          (induct_on_goal (#ctxt q) (#simps q) (def_eqs@(#proved q))))) c;
         in
           (* Only care about first proof found *)
-          (case Seq.pull res of 
-             SOME (proved_thm, _) => 
+          (case res of 
+             SOME proved_thm => 
              let 
                (* Thm used by simp need to be lifted so it use meta-variables *)
-               val final_thm = Goal.finish (#ctxt q) proved_thm
-               val simp_thm = Drule.generalize (frees_and_tfrees_of_thm final_thm) final_thm
+               (* Pass the previosuly proved theorems plus defs to metis *)
+               val final_thm = proved_thm 
+                                 |> (Drule.generalize (frees_and_tfrees_of_thm proved_thm))
+                                 |> Goal.finish (#ctxt q) 
              in
                SOME (ConjQ{open_conjs = cs,
                          failed = (#failed q),
                          proved = final_thm::(#proved q),
                          ctxt =  #ctxt q,
-                         simps = Simplifier.add_simp simp_thm (#simps q),
+                         simps = Simplifier.add_simp final_thm (#simps q),
                          progress = true})
              end
            (* NONE indicates that the tactic failed to prove c *)
@@ -231,12 +263,12 @@ fun try_nxt_conj (ConjQ q) =
       end;
 
 (* Run the hipspec-loop: try proving conjectures until done or no more progress can be made" *)
-fun hipspec_loop ctxt lemmas =
+fun hipspec_loop ctxt def_eqs lemmas =
     let 
       val conjs =  mk_conjs ctxt (Library.split_lines (Library.trim_line lemmas))
 
       fun recf (ConjQ q) = 
-          case (try_nxt_conj (ConjQ q)) of
+          case (try_nxt_conj def_eqs (ConjQ q)) of
             NONE => (rev (#proved q), (#simps q), rev (#failed q))
           | SOME q' => recf q'
     in

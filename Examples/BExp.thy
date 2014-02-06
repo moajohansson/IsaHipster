@@ -1,6 +1,6 @@
 theory BExp
 imports Main
-uses "HipSpec.ML"
+uses "../HipSpec.ML" 
 
 begin
 
@@ -35,14 +35,26 @@ where
 
 
 
+
+ML {* val consts = ["BExp.value", "BExp.valif", "BExp.bool2if" ] ; *}
+
+ML {* 
+val lemma_strs = HipSpec.hipspec_explore @{theory} consts;
+*}
 ML{*
-val filepath = "~/TheoremProvers/IsaHip/";
-val hipspecifyer_cmd = filepath^"HipSpecifyer";
-val modulenm = "BExp";
-val consts = map (fn x => modulenm^"."^x) ["value", "valif", "bool2if"];
+(* This fails because in Haskell, the constructor IF has been renamed If, so
+when conjectures are read back in, it goes wrong, and Isabelle thinks it refers to
+an actual if-statement. *)
+val [c1,c2,c3,c4,c5,c6,c7] =  (Library.split_lines (Library.trim_line lemma_strs));
 
-HipSpec.hipspec @{theory} hipspecifyer_cmd filepath modulenm consts;
 
+(*
+val conjs = map (Goal.init o (Thm.cterm_of @{theory}) o (Syntax.read_prop @{context})) conjs1;
+*)
+*}
+
+ML {*
+map Pretty.writeln (map ((Syntax.pretty_term @{context}) o prop_of) thms);
 *}
 
 end

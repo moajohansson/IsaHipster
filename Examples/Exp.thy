@@ -1,10 +1,10 @@
 theory Exp
 imports Main
-uses "HipSpec.ML"
+uses "../HipSpec.ML"
 
 begin
 
-(* The HipSpecifier can't deal with this, as it can't generate instances Arbitrary instances etc for 
+(* The HipSpecifier can't deal with this, as it can't generate Arbitrary instances etc for 
 higher-order datatypes like expr *)
 type_synonym 'v binop = "'v \<Rightarrow> 'v \<Rightarrow> 'v"
 
@@ -40,12 +40,9 @@ primrec compile :: "('a,'v) expr \<Rightarrow> ('a,'v) instr list"
 
 
 ML{*
-val filepath = "~/TheoremProvers/IsaHip/";
-val hipspecifyer_cmd = filepath^"HipSpecifyer";
-val modulenm = "Exp";
-val consts = map (fn x => modulenm^"."^x) ["value", "exec", "compile"];
+val consts = ["Exp.value", "Exp.exec", "Exp.compile"];
 
-HipSpec.hipspec @{theory} hipspecifyer_cmd filepath modulenm consts;
+HipSpec.hipspec_explore @{theory} consts;
 *}
 
 end

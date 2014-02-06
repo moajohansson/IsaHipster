@@ -1,5 +1,5 @@
 theory TreeDemo
-imports HOL_IsaP
+imports Main
 uses "../HipSpec.ML"
 
 begin
@@ -18,6 +18,20 @@ where
   "map f (Leaf x) = Leaf (f x)"
 | "map f (Node l r) = Node (map f l) (map f r)" 
 
+datatype Unit = Unit
+
+lemma "Unit=hd([])" 
+sledgehammer
+by (metis (full_types) Unit.exhaust)
+
+lemma "mirror_mirror": "mirror (mirror a) = a"
+apply (induct a)
+sledgehammer
+apply (metis mirror.simps(1))
+sledgehammer
+by (metis mirror.simps(2))
+
+by (induct a, simp_all)
 
 lemma "map_mirror": "map a (mirror a1) = mirror (map a a1)"
   apply (tactic {* HipSpec.hipspec *})
@@ -35,8 +49,6 @@ val r = HipSpec.call_hipspec @{theory} hipspecifyer_cmd consts;
 
 
 
-lemma "mirror_mirror": "mirror (mirror a) = a"
-by (induct a, simp_all)
 
  
 

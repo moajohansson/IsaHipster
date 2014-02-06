@@ -1,5 +1,4 @@
 theory ListDemo
-(* imports HOL_IsaP *)
 imports Main
 uses "../HipSpec.ML" 
 
@@ -30,14 +29,51 @@ where
 | "qrev (Cons x xs) a = qrev xs (Cons x a)"
 
 
-ML {* val consts = ["ListDemo.app", "ListDemo.rev" (*, "ListDemo.qrev" *)] ; *}
+ML {* val consts = ["ListDemo.app", "ListDemo.rev", "ListDemo.qrev" ] ; *}
+
+lemma "rev xs = qrev xs Emp"
+apply (tactic {* HipSpec.hipspec_explore_tac @{context} consts *})
+done
+
+
 ML {* 
+
 val (thms,s, fails) = HipSpec.hipspec_explore @{theory} consts;
+
+map Pretty.writeln (map ((Syntax.pretty_term @{context}) o prop_of) thms);
+*}
+lemma "rev(rev xs) = xs"
+apply (tactic {* ProofTools.timed_metis_tac @{context} (@{thms rev.simps} @ @{thms app.simps} @ thms) 1 *})
+done
+
+lemma "app xs (app ys zs) = app (app xs ys) zs"
+apply (tactic {* ProofTools.timed_metis_tac @{context} (@{thms rev.simps} @ @{thms app.simps} @ thms) 1 *})
+done
+
+lemma "rev xs = qrev xs Emp"
+apply (tactic {* ProofTools.timed_metis_tac @{context} (@{thms rev.simps} @ @{thms app.simps} @ thms) 1 *})
+done
+
+
+ML{*
+
+Pretty.str_of;
+map Pretty.writeln (map ((Syntax.pretty_term @{context}) o prop_of) thms);
+
 *}
 ML{*
-val mymetis = Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.metis_default_lam_trans;
+(* map (Sledgehammer_Util.thms_of_name @{context}) consts; *)
+
 *}
+lemma "rev(rev xs) = xs"
+apply (induct xs)
+apply simp
+apply simp
+apply (tactic {* mymetis @{context} (@{thms rev.simps} @ @{thms app.simps} @ thms) 1 *})
+
+
 lemma app_nil[simp]: "app xs Emp = xs"
+apply (tactic {* timed_metis_tac @{context} [@{thm ListDemo.rev.simps(2)}, @{thm app.simps(2)}] 1 *})
 apply (induct xs)
 apply simp_all
 done
@@ -52,9 +88,10 @@ ML{*
 lemma rev_app_2: "app (rev ys) (rev xs) =  rev (app xs ys)"
 apply (induct xs)
 apply simp
-apply (metis rev.simps app.simps app_assoc)
+apply (tactic {* mymetis @{context} [@{thm ListDemo.rev.simps(2)}, @{thm app.simps(2)}, @{thm app_assoc}] 1*} )
+ (* apply (metis rev.simps app.simps app_assoc)
 apply (drule sym)
-apply simp
+apply simp *)
 done
 
 lemma "rev(rev xs) = xs"
@@ -63,23 +100,7 @@ apply simp
 apply (simp add:rev_app_2)
 apply (metis rev.simps app.simps app_assoc rev_app_2)
 
-ML{* 
-val [f] = fails;
 
-
-val f4 = Seq.hd (rtac (sym) 1 f); 
-
-val res = (ALLGOALS (ProofTools.induct_on_goal s)) f4;
-Seq.pull res;
-*}
-
-ML{*
-
-Pretty.str_of;
-map Pretty.writeln (map ((Syntax.pretty_term @{context}) o prop_of) thms);
-
-*}
-thm sym
 
 theorem "mythm" : "app (app x y) z = app x (app y z)"
 apply (rule sym)
@@ -96,19 +117,5 @@ apply simp
 sorry
 
 
-lemma "app x Emp = x"
-
-apply (tactic {*ProofTools.prove_by_simp s*})
-done
-
-ML{*
- Isabelle_System.bash;
-val lemmas = 
-"qrev x Emp = rev x\napp x Emp = x\n qrev (qrev x y) z = qrev y (app x z)\n qrev (app x y) z = qrev y (qrev x z)\n app (qrev x y) z = qrev x (app y z)\n";
-
-val lem_list = Library.split_lines lemmas;
-
-ProofTools.hipspec_loop @{context} lemmas;
-*}
 
 end
