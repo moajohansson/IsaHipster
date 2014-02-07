@@ -1,6 +1,5 @@
 theory ListDemo
-imports Main
-uses "../HipSpec.ML" 
+imports "../IsaHipster"
 
 begin
 
@@ -31,7 +30,46 @@ where
 
 ML {* val consts = ["ListDemo.app", "ListDemo.rev", "ListDemo.qrev" ] ; *}
 
+(* NOTE: Want to replace the below slow command, with something faster, i.e. Metis with given
+lemmas. Need to name lemmas and export them to the outer context to do this I think? Or,
+store them in some Theory_Data structure? *)
+ML{*
+val ctxt = @{context};
+val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")) consts
+val (lems0, ctxt', fails) = HipSpec.hipspec_explore ctxt facts consts;
+
+val [l1,l2,l3] = lems0;
+val lems = [Thm.put_name_hint "hipspec1" l1, 
+  Thm.put_name_hint "hipspec2" l2, Thm.put_name_hint "hipspec3" l3];
+*}
+ML{* 
+Context.Proof;
+Proof_Context.export ctxt' ctxt lems; *}
+
+ML {* 
+Context.Proof;
+Proof_Context.export;
+Context.theory_map;
+Global_Theory.add_thms_dynamic;
+Config.put_global;
+HipsterRules.add_thm;
+Context.>>;
+Thm.put_name_hint;
+*}
+
+
+
+ML{*
+val f = fn thy => (Library.foldl (fn (thy,thm) => Context.theory_map (HipsterRules.add_thm thm) thy) (thy,lems));
+
+Context.>>
+*}
+
+thm hipster_thms
+
 lemma "rev xs = qrev xs Emp"
+apply (tactic {* ProofTools.timed_metis_tac @{context} @{thms hipster_thms} 1 *})
+
 apply (tactic {* HipSpec.hipspec_explore_tac @{context} consts *})
 done
 

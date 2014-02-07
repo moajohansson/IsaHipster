@@ -263,13 +263,13 @@ fun try_nxt_conj def_eqs (ConjQ q) =
       end;
 
 (* Run the hipspec-loop: try proving conjectures until done or no more progress can be made" *)
-fun hipspec_loop ctxt def_eqs lemmas =
+fun hipspec_loop ctxt facts cand_lemmas =
     let 
-      val conjs =  mk_conjs ctxt (Library.split_lines (Library.trim_line lemmas))
+      val conjs =  mk_conjs ctxt (Library.split_lines (Library.trim_line cand_lemmas))
 
       fun recf (ConjQ q) = 
-          case (try_nxt_conj def_eqs (ConjQ q)) of
-            NONE => (rev (#proved q), (#simps q), rev (#failed q))
+          case (try_nxt_conj facts (ConjQ q)) of
+            NONE => (rev (#proved q), (#ctxt q), rev (#failed q))
           | SOME q' => recf q'
     in
       recf conjs
