@@ -53,6 +53,8 @@ fun call_hipspec ctxt facts const_nms outfile hipspec_cmd =
       ProofTools.hipspec_loop ctxt facts result
     end;
 
+(* FIXME: If we are to deal with renamings, we need to also do so when getting conjectures
+back from the Haskell world *)
 fun hipspec_explore ctxt facts const_nms =
     let
       val thy = Proof_Context.theory_of ctxt
@@ -66,6 +68,47 @@ fun hipspec_explore ctxt facts const_nms =
       call_hipspec ctxt facts const_nms outfile hipspec_cmd
     end;
 
+fun mk_output_str ctxt (lemma,name) = 
+    let
+      (* bit of a ugly unsafe hack, assuming there are only Vars in the term,
+       so no chance of name capture. To be fixed... *)
+      fun vars_to_frees (t1$t2) = (vars_to_frees t1)$(vars_to_frees t2)
+        | vars_to_frees (Var((nm,i),ty)) = Free(nm^(Library.string_of_int i), ty)
+        | vars_to_frees (Abs(s,ty,t)) = Abs(s,ty, vars_to_frees t)
+        | vars_to_frees t = t
+
+      (* Disables silly Isabelle YXML markup for printing *)
+      val str_of_term = Sledgehammer_Util.with_vanilla_print_mode (Syntax.string_of_term ctxt)
+      val lemma_str = Library.quote (str_of_term (vars_to_frees (Thm.concl_of lemma)))
+    in
+      ("lemma " ^ name ^" : "^ lemma_str ^ "\nsorry")
+    end;
+                                                                   
+
+(* A function which can be wrapped in Isabelle's setup command from a theory file.
+   It should add the discovered lemmas to the Theory_Data HipsterRules. *)
+fun explore ctxt const_nms =
+    let
+      val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")) const_nms
+      val (thms,_,_) = hipspec_explore ctxt facts const_nms
+      val names = Name.invent Name.context "lemma_a" (List.length thms)
+      val output = Library.cat_lines (map (mk_output_str ctxt) (thms~~names))
+    in
+      Output.urgent_message (Active.sendback_markup output)
+    end;
+
+fun setup_exploration const_nms thy0 =
+    let
+      val ctxt = Proof_Context.init_global thy0
+      val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")) const_nms
+      val (thms,_,_) = hipspec_explore ctxt facts const_nms
+    in
+      Library.foldl 
+        (fn (thy,thm) => Context.theory_map (HipsterRules.add_thm thm) thy) 
+        (thy0,thms)
+    end;
+
+(*
 fun hipspec_goal ctxt facts const_nms conj =
      let
       val thy = Proof_Context.theory_of ctxt
@@ -78,6 +121,31 @@ fun hipspec_goal ctxt facts const_nms conj =
       val hipspec_cmd = "hipspec "^ " --conj " ^ add_conjs  ^ outfile ;
     in
       call_hipspec ctxt facts const_nms outfile hipspec_cmd
+    end;
+*)
+
+(* Need to extract constants!*)
+
+(* How should this work? 
+
+In tactic mode:
+1) We trigger theory exploration and store the lemmas discovered in the Theory Data.
+2) We check that the proof goes through using these lemmas.
+3) We Paste in another proof-command, including the auxillary lemmas it also needs to prove,
+   so we don't need to do the search again.
+
+In Exploration mode:
+1) As above.
+2) Paste in several lemmas in the theory file, so we don't repeat the search 
+for them over and over again. I.e. can a set-up style command replace itself with text?
+
+*)
+fun hipster_induct_tac ctxt const_nms thm = 
+    let
+      val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")) const_nms
+      val _ = explore ctxt const_nms
+    in
+      ALLGOALS (ProofTools.timed_metis_tac ctxt (facts @ (@{thms hipster_thms}))) thm
     end;
 
 (* ---------------------------------------------------------------------------------*)
@@ -176,17 +244,6 @@ fun mk_proof_str lemmas =
       val tac_str = "ProofTools.induct_and_metis @{context}" 
 *)
 
-
-(* Need to extract constants!*)
-fun hipspec_explore_tac ctxt const_nms thm = 
-    let
-      (* val thy = Thm.theory_of_thm thm; *)
-      val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")) const_nms
-      val (lemmas, ctxt', fails) = hipspec_explore ctxt facts const_nms; 
-    in
-      (* Seq.single thm *)
-      ALLGOALS (ProofTools.timed_metis_tac ctxt' (facts@lemmas)) thm
-    end;
 
 fun quickspec thy quickspec_cmd path modulenm const_nms = 
     let 

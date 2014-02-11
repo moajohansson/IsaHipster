@@ -148,11 +148,14 @@ fun timed_metis_tac ctxt lemmas i =
     SOLVE_TIMEOUT 1
     (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.metis_default_lam_trans ctxt lemmas i);
 
-fun simp_or_metis ctxt simpset lemmas = 
-    SOLVE((ALLGOALS (Simplifier.asm_full_simp_tac simpset))
+(* First simp, and if nessecary, let Metis deal with the rest *)
+(* TODO: Explore other tacs, for example how does auto/blast do on this? *)
+fun simp_or_metis ctxt simpset facts = 
+    SOLVE((ALLGOALS ((Simplifier.asm_full_simp_tac simpset))
             THEN
             IF_UNSOLVED 
-            (ALLGOALS (timed_metis_tac ctxt lemmas)));
+            (ALLGOALS (timed_metis_tac ctxt facts))));
+ (*   (prove_by_simp simpset) ORELSE (ALLGOALS(timed_metis_tac ctxt facts)) *)
 
 fun induct_and_smash ctxt simpset lemmas rule var i = 
     (induct_on_var_tac rule var i) THEN (simp_or_metis ctxt simpset lemmas);
@@ -188,8 +191,13 @@ fun mk_conjs ctxt lemma_strs =
     in
       (* NOTE: Isabelle2013-2 use contexts instead of simpsets. Nicer, if we also can get things
        to work with bloody JEdit. *)
-      ConjQ{open_conjs = conjs, failed = [], proved = [], ctxt = ctxt, 
-            simps = Simplifier.simpset_of ctxt, progress = false}
+      ConjQ{open_conjs = conjs, failed = [], proved = [],
+            ctxt = ctxt, 
+            (* Include previously proved hipster theorems *)
+            simps = Library.foldl (fn (ss,thm) => Simplifier.add_simp thm ss)
+                                  (Simplifier.simpset_of ctxt, @{thms hipster_thms}),
+            (*Simplifier.simpset_of ctxt, *) (* Add previously proved hipster thms *)
+            progress = false}
     end;
 
 (* def_eqs are the defining theorems for the given consts *)
@@ -213,7 +221,8 @@ fun try_nxt_conj def_eqs (ConjQ q) =
     | (c::cs) => (* try proving next open conj *) 
       let 
         val r = (*SINGLE (prove_by_simp (#simps q)) c *)
-            SINGLE (ALLGOALS (timed_metis_tac (#ctxt q) (def_eqs @ (#proved q)))) c
+            SINGLE (simp_or_metis (#ctxt q)  (#simps q) (def_eqs @ (@{thms hipster_thms}) @ (#proved q))) c
+            (*SINGLE (ALLGOALS (timed_metis_tac (#ctxt q) (def_eqs @ (#proved q)))) c *)
       in
       case r of (* Discard this, it is trivial *)
         SOME _ => 
@@ -232,7 +241,8 @@ fun try_nxt_conj def_eqs (ConjQ q) =
         let
           val res = (SINGLE 
                        (ALLGOALS 
-                          (induct_on_goal (#ctxt q) (#simps q) (def_eqs@(#proved q))))) c;
+                          (induct_on_goal (#ctxt q) (#simps q) 
+                                          (def_eqs @ (@{thms hipster_thms}) @(#proved q))))) c;
         in
           (* Only care about first proof found *)
           (case res of 
@@ -265,6 +275,7 @@ fun try_nxt_conj def_eqs (ConjQ q) =
 (* Run the hipspec-loop: try proving conjectures until done or no more progress can be made" *)
 fun hipspec_loop ctxt facts cand_lemmas =
     let 
+      (* Need to check if anything is in hipster_thms already! *)
       val conjs =  mk_conjs ctxt (Library.split_lines (Library.trim_line cand_lemmas))
 
       fun recf (ConjQ q) = 

@@ -1,16 +1,15 @@
 theory ListDemo
 imports "../IsaHipster"
-
 begin
-
 datatype 'a Lst = 
   Emp
   | Cons "'a" "'a Lst"
 
+(*
 primrec hd :: "'a Lst \<Rightarrow> 'a"
 where
   "hd (Cons x xs) = x"
-
+*)
 fun app :: "'a Lst \<Rightarrow> 'a Lst \<Rightarrow> 'a Lst" 
 where 
   "app Emp xs = xs"
@@ -30,14 +29,47 @@ where
 
 ML {* val consts = ["ListDemo.app", "ListDemo.rev", "ListDemo.qrev" ] ; *}
 
-(* NOTE: Want to replace the below slow command, with something faster, i.e. Metis with given
-lemmas. Need to name lemmas and export them to the outer context to do this I think? Or,
-store them in some Theory_Data structure? *)
+ML{*
+HipSpec.explore @{context} ["ListDemo.app"];
+*}
+lemma lemma_a : "app x2 Emp = x2"
+sorry
+lemma lemma_b : "app (app x2 y2) z2 = app x2 (app y2 z2)"
+sorry
+
+thm hipster_thms
+
+(* Note: If you do this, you are likely to get slightly different results 
+  than if you call it with all constants at once *)
+setup{*
+HipSpec.explore consts;
+*}
+
+thm hipster_thms
+ML {*
+Output.urgent_message (Active.sendback_markup "tjoop");
+
+Active.sendback_markup;
+(*
+   Output.urgent_message
+     ("HipSpec found this proof: " ^
+      Active.sendback_markup [Markup.padding_command] "by (metis rev.simps(2))" ^ ".")
+*)
+   *}
+
+
+
+lemma "rev xs = qrev xs Emp"
+apply (metis hipster_thms app.simps rev.simps qrev.simps)
+done
+
 ML{*
 val ctxt = @{context};
 val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")) consts
 val (lems0, ctxt', fails) = HipSpec.hipspec_explore ctxt facts consts;
 
+*}
+ML{*
 val [l1,l2,l3] = lems0;
 val lems = [Thm.put_name_hint "hipspec1" l1, 
   Thm.put_name_hint "hipspec2" l2, Thm.put_name_hint "hipspec3" l3];
@@ -46,31 +78,10 @@ ML{*
 Context.Proof;
 Proof_Context.export ctxt' ctxt lems; *}
 
-ML {* 
-Context.Proof;
-Proof_Context.export;
-Context.theory_map;
-Global_Theory.add_thms_dynamic;
-Config.put_global;
-HipsterRules.add_thm;
-Context.>>;
-Thm.put_name_hint;
-*}
 
-
-
-ML{*
-val f = fn thy => (Library.foldl (fn (thy,thm) => Context.theory_map (HipsterRules.add_thm thm) thy) (thy,lems));
-
-Context.>>
-*}
-
-thm hipster_thms
 
 lemma "rev xs = qrev xs Emp"
 apply (tactic {* ProofTools.timed_metis_tac @{context} @{thms hipster_thms} 1 *})
-
-apply (tactic {* HipSpec.hipspec_explore_tac @{context} consts *})
 done
 
 
