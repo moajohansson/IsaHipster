@@ -1,6 +1,7 @@
 theory ListDemo
 imports "../IsaHipster"
 begin
+
 datatype 'a Lst = 
   Emp
   | Cons "'a" "'a Lst"
@@ -26,30 +27,33 @@ where
   "qrev Emp a = a"
 | "qrev (Cons x xs) a = qrev xs (Cons x a)"
 
+ML{*HipSpec.explore @{context} ["ListDemo.app"];
+ *}
+lemma lemma_a [thy_expl] : "app x2 Emp = x2"
+by (tactic {* ProofTools.induct_and_metis @{context} (@{thms ListDemo.app.simps} @ []) *})
 
-ML {* val consts = ["ListDemo.app", "ListDemo.rev", "ListDemo.qrev" ] ; *}
+lemma lemma_b [thy_expl] : "app (app x2 y2) z2 = app x2 (app y2 z2)"
+by (tactic {* ProofTools.induct_and_metis @{context} (@{thms ListDemo.app.simps} @ [@{thm lemma_a}]) *})
+
+ML{* val [t1,t2] = @{thms thy_expl};
+Thm.get_tags t1;
+Long_Name.base_name(Thm.get_name_hint t1); (* This is prefixed by theory *)
+*}
+
+ML {* val consts = ["ListDemo.app", "ListDemo.rev" ] ; *}
 
 ML{*
-HipSpec.explore @{context} ["ListDemo.app"];
+HipSpec.explore @{context} consts;
+
 *}
-lemma lemma_a : "app x2 Emp = x2"
-sorry
-lemma lemma_b : "app (app x2 y2) z2 = app x2 (app y2 z2)"
-sorry
+lemma lemma_c [thy_expl] : "app (ListDemo.rev x5) (ListDemo.rev y5) = ListDemo.rev (app y5 x5)"
+by (tactic {* ProofTools.induct_and_metis @{context} (@{thms ListDemo.app.simps} @ @{thms ListDemo.rev.simps} @ []) *})
 
-thm hipster_thms
+lemma lemma_d [thy_expl] : "ListDemo.rev (ListDemo.rev x5) = x5"
+by (tactic {* ProofTools.induct_and_metis @{context} (@{thms ListDemo.app.simps} @ @{thms ListDemo.rev.simps} @ [@{thm lemma_c}]) *})
 
-(* Note: If you do this, you are likely to get slightly different results 
-  than if you call it with all constants at once *)
-setup{*
-HipSpec.explore consts;
-*}
-
-thm hipster_thms
-ML {*
-Output.urgent_message (Active.sendback_markup "tjoop");
-
-Active.sendback_markup;
+ML{*
+HipsterRules.get @{context};
 (*
    Output.urgent_message
      ("HipSpec found this proof: " ^

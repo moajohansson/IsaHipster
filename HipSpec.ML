@@ -68,7 +68,7 @@ fun hipspec_explore ctxt facts const_nms =
       call_hipspec ctxt facts const_nms outfile hipspec_cmd
     end;
 
-fun mk_output_str ctxt (lemma,name) = 
+fun mk_output_str ctxt (lemma,name,tac_str) = 
     let
       (* bit of a ugly unsafe hack, assuming there are only Vars in the term,
        so no chance of name capture. To be fixed... *)
@@ -81,22 +81,44 @@ fun mk_output_str ctxt (lemma,name) =
       val str_of_term = Sledgehammer_Util.with_vanilla_print_mode (Syntax.string_of_term ctxt)
       val lemma_str = Library.quote (str_of_term (vars_to_frees (Thm.concl_of lemma)))
     in
-      ("lemma " ^ name ^" : "^ lemma_str ^ "\nsorry")
+      ("lemma " ^ name ^" [thy_expl] : "^ lemma_str ^ "\n" ^tac_str)
     end;
                                                                    
-
-(* A function which can be wrapped in Isabelle's setup command from a theory file.
-   It should add the discovered lemmas to the Theory_Data HipsterRules. *)
+(* Allows to paste in snippets of proof script with the discovered lemmas *)
+(* FIXME: Paste in the right lemmas needed for the proof *)
 fun explore ctxt const_nms =
     let
       val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")) const_nms
-      val (thms,_,_) = hipspec_explore ctxt facts const_nms
-      val names = Name.invent Name.context "lemma_a" (List.length thms)
-      val output = Library.cat_lines (map (mk_output_str ctxt) (thms~~names))
+      val (thms,_,open_conjs) = hipspec_explore ctxt facts const_nms
+      val used_names = map (fn thm => Long_Name.base_name(Thm.get_name_hint thm)) (HipsterRules.get ctxt)
+      val named_thms = thms~~(Name.invent (Name.make_context used_names) "lemma_a" (List.length thms))
+        (* Note: Need to store and avoid names for conjs as well...*)
+      val named_conjs = open_conjs~~(Name.invent Name.context "conj_a" (List.length open_conjs))
+      
+      val facts_str = (Library.space_implode " @ " 
+                                             (map (fn c => "@{thms "^c^".simps}") const_nms))
+      fun lemmas_strf (thm,nm) strs  = 
+          let 
+            val lemmas_str = Library.enclose "[" "]" (Library.space_implode ", " strs)
+            val tac_str = "by (tactic {* ProofTools.induct_and_metis @{context} " 
+                    ^ Library.enclose "(" ")" (facts_str ^" @ "^lemmas_str) ^" *})"
+          in
+            ((thm,nm,tac_str), strs @["@{thm " ^nm ^"}"])
+          end
+
+      val (named_thms',_) = fold_map lemmas_strf named_thms []
+
+      val output = Library.space_implode "\n\n"
+                     ((map (mk_output_str ctxt) named_thms') 
+                      @ (map (mk_output_str ctxt) 
+                             (map (fn (conj,nm) => (conj,nm,"oops")) named_conjs)))
+
     in
       Output.urgent_message (Active.sendback_markup output)
     end;
 
+(* A function which can be wrapped in Isabelle's setup command from a theory file.
+   It should add the discovered lemmas to the Theory_Data HipsterRules. *)
 fun setup_exploration const_nms thy0 =
     let
       val ctxt = Proof_Context.init_global thy0
@@ -145,7 +167,7 @@ fun hipster_induct_tac ctxt const_nms thm =
       val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")) const_nms
       val _ = explore ctxt const_nms
     in
-      ALLGOALS (ProofTools.timed_metis_tac ctxt (facts @ (@{thms hipster_thms}))) thm
+      ALLGOALS (ProofTools.timed_metis_tac ctxt (facts @ (HipsterRules.get ctxt))) thm
     end;
 
 (* ---------------------------------------------------------------------------------*)

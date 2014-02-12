@@ -3,7 +3,10 @@
    loop into the Isabelle setting. *)
 (*------------------------------------------------------------------------------------*)
 
-(* TODO:  Try to use some suitable heuristic to get things in nice order! *)
+(* TODO:  Functorise, parameters should be a "routine" tactic (now simp and metis)
+ and a tactic for "difficult" proofs, now induction. *)
+
+(* TODO: Get information from Metis about which lemmas it actually needed *)
 
 structure ProofTools =
 struct
@@ -181,6 +184,14 @@ fun induct_on_goal ctxt simpset (lemmas : Thm.thm list) i thm =
            (try_induct_on simpset NONE vars i))) *) 
     end;
 
+(* This is the tactic to paste into the proof-script afterwards *)
+fun induct_and_metis ctxt lemmas thm = 
+    let
+      val simps = Library.foldl (fn (ss,thm) => Simplifier.add_simp thm ss)
+                                  (Simplifier.simpset_of ctxt, lemmas)
+    in
+      ALLGOALS(induct_on_goal ctxt simps lemmas) thm
+    end
 
 (* Assmume get list of strings from HipSpec, which can be directly parsed as Isabelle terms*)
 fun mk_conjs ctxt lemma_strs = 
@@ -195,7 +206,7 @@ fun mk_conjs ctxt lemma_strs =
             ctxt = ctxt, 
             (* Include previously proved hipster theorems *)
             simps = Library.foldl (fn (ss,thm) => Simplifier.add_simp thm ss)
-                                  (Simplifier.simpset_of ctxt, @{thms hipster_thms}),
+                                  (Simplifier.simpset_of ctxt, HipsterRules.get ctxt),
             (*Simplifier.simpset_of ctxt, *) (* Add previously proved hipster thms *)
             progress = false}
     end;
@@ -221,7 +232,7 @@ fun try_nxt_conj def_eqs (ConjQ q) =
     | (c::cs) => (* try proving next open conj *) 
       let 
         val r = (*SINGLE (prove_by_simp (#simps q)) c *)
-            SINGLE (simp_or_metis (#ctxt q)  (#simps q) (def_eqs @ (@{thms hipster_thms}) @ (#proved q))) c
+            SINGLE (simp_or_metis (#ctxt q) (#simps q) (def_eqs @ (HipsterRules.get (#ctxt q)) @ (#proved q))) c
             (*SINGLE (ALLGOALS (timed_metis_tac (#ctxt q) (def_eqs @ (#proved q)))) c *)
       in
       case r of (* Discard this, it is trivial *)
@@ -242,7 +253,7 @@ fun try_nxt_conj def_eqs (ConjQ q) =
           val res = (SINGLE 
                        (ALLGOALS 
                           (induct_on_goal (#ctxt q) (#simps q) 
-                                          (def_eqs @ (@{thms hipster_thms}) @(#proved q))))) c;
+                                          (def_eqs @ (HipsterRules.get (#ctxt q)) @(#proved q))))) c;
         in
           (* Only care about first proof found *)
           (case res of 

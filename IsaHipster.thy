@@ -20,7 +20,7 @@ end;
 
 ML{*
 structure HipsterRules = Named_Thms
-(val name = @{binding "hipster_thms"} 
+(val name = @{binding "thy_expl"} 
  val description = "Theorems discovered by theory exploration")
 *}
 setup {* HipsterRules.setup;*}
