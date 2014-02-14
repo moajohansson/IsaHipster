@@ -11,29 +11,6 @@
 structure ProofTools =
 struct
 
-(*------------------------------------------------------------------------------------*)
-(* Term mainipulation stuff, stolen from IsaPlanner... *)
-(*------------------------------------------------------------------------------------*)
-
-fun add_term_frees (t, frees: Term.term list) = 
-    case t of
-      Free   _ => Ord_List.insert Term_Ord.term_ord t frees
-      | Abs (_,_,body) => add_term_frees(body,frees)
-      | f$t =>  add_term_frees (f, add_term_frees(t, frees))
-      | _ => frees;
-
-fun add_typ_tfrees (Type(_,Ts),fs) = List.foldr add_typ_tfrees fs Ts
-      | add_typ_tfrees(TFree(f),fs) = insert (op =) f fs
-      | add_typ_tfrees(TVar(_),fs) = fs;
-
-fun frees_of t = map Term.dest_Free (add_term_frees (t,[]));
-fun typ_tfrees_of ty = add_typ_tfrees(ty,[]);
-
-(* Get a pair of (type-frees, term frees) without dups. *)
-fun frees_and_tfrees_of_thm thm = 
-    let 
-      val t = Thm.concl_of thm
-    in (map fst (typ_tfrees_of (Term.fastype_of t)), map fst (frees_of t)) end;
 
 (*------------------------------------------------------------------------------------*)
 (* Figure out what we can do induction on. Stolen from IsaPlanner... *)
@@ -81,7 +58,7 @@ fun inductable_things_in_term thry t =
       (* Return frees and forall quantified vars (if any) *)
       (* Split into those we can do structural induction over, and the rest *)
        List.partition (datatype_chk o snd) 
-                     ((frees_of t) @ 
+                     ((Hipster_Utils.frees_of t) @ 
                      (Term.strip_all_vars t))
     end;
 
@@ -122,6 +99,7 @@ datatype ConjQueue = ConjQ of {open_conjs : Thm.thm list, (* left to prove *)
                                proved : Thm.thm list,     (* proved *)
                                simps : simpset, (* the HOL simpset + stuff we have proved *) 
                                ctxt : Proof.context,
+                               used_thm_names : Name.context, (* keeping track of names of theorems we generate. *)
                                progress : bool};          (* have we proved at least something this iteration *)
 
 (* Apply simp to all subgoals *)
@@ -185,7 +163,7 @@ fun induct_on_goal ctxt simpset (lemmas : Thm.thm list) i thm =
     end;
 
 (* This is the tactic to paste into the proof-script afterwards *)
-fun induct_and_metis ctxt lemmas thm = 
+fun induct_simp_metis ctxt lemmas thm = 
     let
       val simps = Library.foldl (fn (ss,thm) => Simplifier.add_simp thm ss)
                                   (Simplifier.simpset_of ctxt, lemmas)
@@ -206,7 +184,10 @@ fun mk_conjs ctxt lemma_strs =
             ctxt = ctxt, 
             (* Include previously proved hipster theorems *)
             simps = Library.foldl (fn (ss,thm) => Simplifier.add_simp thm ss)
-                                  (Simplifier.simpset_of ctxt, HipsterRules.get ctxt),
+                                  (Simplifier.simpset_of ctxt, Hipster_Rules.get ctxt),
+            used_thm_names = Name.make_context 
+                               (map (fn thm => Long_Name.base_name(Thm.get_name_hint thm))
+                                    (Hipster_Rules.get ctxt)),
             (*Simplifier.simpset_of ctxt, *) (* Add previously proved hipster thms *)
             progress = false}
     end;
@@ -225,6 +206,7 @@ fun try_nxt_conj def_eqs (ConjQ q) =
                        proved = #proved q,
                        ctxt = #ctxt q,
                        simps = #simps q,
+                       used_thm_names = #used_thm_names q,
                        progress = false}) 
               end
             else NONE
@@ -232,7 +214,7 @@ fun try_nxt_conj def_eqs (ConjQ q) =
     | (c::cs) => (* try proving next open conj *) 
       let 
         val r = (*SINGLE (prove_by_simp (#simps q)) c *)
-            SINGLE (simp_or_metis (#ctxt q) (#simps q) (def_eqs @ (HipsterRules.get (#ctxt q)) @ (#proved q))) c
+            SINGLE (simp_or_metis (#ctxt q) (#simps q) (def_eqs @ (Hipster_Rules.get (#ctxt q)) @ (#proved q))) c
             (*SINGLE (ALLGOALS (timed_metis_tac (#ctxt q) (def_eqs @ (#proved q)))) c *)
       in
       case r of (* Discard this, it is trivial *)
@@ -246,6 +228,7 @@ fun try_nxt_conj def_eqs (ConjQ q) =
                  proved = #proved q,
                  ctxt =  #ctxt q,
                  simps = #simps q,
+                 used_thm_names = #used_thm_names q,
                  progress = #progress q})
         end
       | NONE =>
@@ -253,7 +236,7 @@ fun try_nxt_conj def_eqs (ConjQ q) =
           val res = (SINGLE 
                        (ALLGOALS 
                           (induct_on_goal (#ctxt q) (#simps q) 
-                                          (def_eqs @ (HipsterRules.get (#ctxt q)) @(#proved q))))) c;
+                                          (def_eqs @ (Hipster_Rules.get (#ctxt q)) @(#proved q))))) c;
         in
           (* Only care about first proof found *)
           (case res of 
@@ -261,15 +244,18 @@ fun try_nxt_conj def_eqs (ConjQ q) =
              let 
                (* Thm used by simp need to be lifted so it use meta-variables *)
                (* Pass the previosuly proved theorems plus defs to metis *)
+               val (new_nm, used_names') = Name.variant "lemma_a" (#used_thm_names q) 
                val final_thm = proved_thm 
-                                 |> (Drule.generalize (frees_and_tfrees_of_thm proved_thm))
+                                 |> (Drule.generalize (Hipster_Utils.frees_and_tfrees_of_thm proved_thm))
                                  |> Goal.finish (#ctxt q) 
+                                 |> Thm.put_name_hint (new_nm)
              in
                SOME (ConjQ{open_conjs = cs,
                          failed = (#failed q),
                          proved = final_thm::(#proved q),
                          ctxt =  #ctxt q,
                          simps = Simplifier.add_simp final_thm (#simps q),
+                         used_thm_names = used_names',
                          progress = true})
              end
            (* NONE indicates that the tactic failed to prove c *)
@@ -278,6 +264,7 @@ fun try_nxt_conj def_eqs (ConjQ q) =
                                  proved = (#proved q),
                                  ctxt =  #ctxt q,
                                  simps = #simps q,
+                                 used_thm_names = #used_thm_names q,
                                  progress = #progress q})
           )
         end
@@ -288,7 +275,7 @@ fun hipspec_loop ctxt facts cand_lemmas =
     let 
       (* Need to check if anything is in hipster_thms already! *)
       val conjs =  mk_conjs ctxt (Library.split_lines (Library.trim_line cand_lemmas))
-
+      
       fun recf (ConjQ q) = 
           case (try_nxt_conj facts (ConjQ q)) of
             NONE => (rev (#proved q), (#ctxt q), rev (#failed q))
