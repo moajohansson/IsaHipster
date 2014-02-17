@@ -19,20 +19,20 @@ struct
 fun routine_tac ctxt = 
      let
        val prev_thms = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-       val ss = Library.foldl (fn (ss,thm) => Simplifier.add_simp thm ss)
-                                  (Simplifier.simpset_of ctxt, prev_thms)
+       val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                 (ctxt, prev_thms)
      in
-       Hipster_Tacs.simp_or_metis ctxt ss (prev_thms @ (ThyExpl_Data.facts_of_ctxt ctxt))
+       Hipster_Tacs.simp_or_metis ctxt' (prev_thms @ (ThyExpl_Data.facts_of_ctxt ctxt'))
      end; 
 
 fun hard_tac ctxt = 
     let
       val prev_thms = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-      val ss = Library.foldl (fn (ss,thm) => Simplifier.add_simp thm ss)
-                                  (Simplifier.simpset_of ctxt, prev_thms)
+      val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                  (ctxt, prev_thms)
     in
-      ALLGOALS (Hipster_Tacs.try_inductable_vars ctxt ss 
-                                                 (prev_thms @ (ThyExpl_Data.facts_of_ctxt ctxt)))
+      ALLGOALS (Hipster_Tacs.try_inductable_vars ctxt' 
+                                                 (prev_thms @ (ThyExpl_Data.facts_of_ctxt ctxt')))
     end; 
 
 (* The fact_nms are names of extra theorems that we want to refer to in the output *)

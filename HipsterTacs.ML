@@ -3,10 +3,10 @@
 signature HIPSTER_TACS =
 sig 
   val timed_metis_tac : Proof.context -> Thm.thm list -> int -> tactic
-  val simp_or_metis : Proof.context -> simpset -> thm list -> tactic 
+  val simp_or_metis : Proof.context -> thm list -> tactic 
   val induct_simp_metis : Proof.context -> Thm.thm list -> tactic
-  val induct_and_simp : simpset -> Thm.thm list option -> string -> int -> tactic
-  val try_inductable_vars : Proof.context -> simpset -> thm list -> int -> tactic
+  val induct_and_simp : Proof.context -> Thm.thm list option -> string -> int -> tactic
+  val try_inductable_vars : Proof.context -> thm list -> int -> tactic
 end
 
 structure Hipster_Tacs : HIPSTER_TACS =
@@ -19,10 +19,10 @@ struct
 
 
 (* Apply simp to all subgoals *)
-fun simp_all simpset = ALLGOALS (Simplifier.asm_full_simp_tac simpset);
+fun simp_all ctxt = ALLGOALS (Simplifier.asm_full_simp_tac ctxt);
  
 (* Fails if all there are some subgoals left after application of simp *)
-fun prove_by_simp simpset = SOLVE (simp_all simpset);
+fun prove_by_simp ctxt = SOLVE (simp_all ctxt);
 
 
 (*-----------------------------------------------------------------------------------------*)
@@ -47,8 +47,8 @@ fun timed_metis_tac ctxt facts i =
     (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.metis_default_lam_trans ctxt facts i);
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
-fun simp_or_metis ctxt simpset facts = 
-    SOLVE((ALLGOALS ((Simplifier.asm_full_simp_tac simpset))
+fun simp_or_metis ctxt facts = 
+    SOLVE((ALLGOALS ((Simplifier.asm_full_simp_tac ctxt))
             THEN
             IF_UNSOLVED 
             (ALLGOALS (timed_metis_tac ctxt facts))));
@@ -137,38 +137,38 @@ fun induct_on_var_tac rule var i goalthm =
 (*-----------------------------------------------------------------------------------------*)
 
 (* Apply induction on var and try to prove all cases by simp *)
-fun induct_and_simp simpset rule var i = 
-     (induct_on_var_tac rule var i) THEN (prove_by_simp simpset);
+fun induct_and_simp ctxt rule var i = 
+     (induct_on_var_tac rule var i) THEN (prove_by_simp ctxt);
 
 (* Induction on var, then try to prove resulting subgoals by simp or metis *)
-fun induct_simp_or_metis ctxt simpset facts rule var i = 
-    (induct_on_var_tac rule var i) THEN (simp_or_metis ctxt simpset facts);
+fun induct_simp_or_metis ctxt facts rule var i = 
+    (induct_on_var_tac rule var i) THEN (simp_or_metis ctxt facts);
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
-fun try_induct_on ctxt simpset facts rule vars i  =
+fun try_induct_on ctxt facts rule vars i  =
     case vars 
        of [] => no_tac 
         | (v :: vs) =>  
-          (induct_simp_or_metis ctxt simpset facts rule v i)
+          (induct_simp_or_metis ctxt facts rule v i)
           ORELSE 
-          (try_induct_on ctxt simpset facts rule vs i);
+          (try_induct_on ctxt facts rule vs i);
 
 (* Find the variables we can induct on *)
-fun try_inductable_vars ctxt simpset facts i thm = 
+fun try_inductable_vars ctxt facts i thm = 
     let
       val vars = map fst (fst (inductable_things_in_sg i thm))
     in
-      (try_induct_on ctxt simpset facts NONE vars i) thm
+      (try_induct_on ctxt facts NONE vars i) thm
     end;
 
 
 (* An induction tactic to paste into the proof-script afterwards *)
 fun induct_simp_metis ctxt lemmas thm = 
     let
-      val simps = Library.foldl (fn (ss,thm) => Simplifier.add_simp thm ss)
-                                  (Simplifier.simpset_of ctxt, lemmas)
+      val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                (ctxt, lemmas)
     in
-      ALLGOALS(try_inductable_vars ctxt simps lemmas) thm
+      ALLGOALS(try_inductable_vars ctxt' lemmas) thm
     end
 
 

@@ -119,7 +119,7 @@ fun explore ctxt const_nms =
                              (map (fn conj => (conj,"oops")) (ThyExpl_Data.failed_of_ctxt res_ctxt)))))
     in
        (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
-         (Active.sendback_markup output)
+         (Active.sendback_markup [Markup.padding_command] output)
     end;
 
 
