@@ -39,7 +39,7 @@ hipspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
 
 defaultRecordDecl :: [(Name, Type)] -> [Decl]
 defaultRecordDecl funs =
-  [DataDecl nowhere DataType [] (Ident "Default") [] [decl] [],
+  [DataDecl nowhere DataType [] (Ident "Default") [] [decl] [(UnQual (Ident "Typeable"), [])],
    InstDecl nowhere [] (UnQual (Ident "Arbitrary")) [TyCon (UnQual (Ident "Default"))] [InsDecl arb],
    InstDecl nowhere [] (UnQual (Ident "Names")) [TyCon (UnQual (Ident "Default"))] [InsDecl names]]
   where
