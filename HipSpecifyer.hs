@@ -28,8 +28,8 @@ hipspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
   Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
   (defaultRecordDecl funs ++ (concatMap (add_decls funs) decls) ++ (concatMap add_derEnum decls) ++ enumA:[add_main decls True])
     where
-      imports = map mk_importDecl ["HipSpec","Data.Typeable","Test.Feat","Test.QuickCheck.Gen","Test.QuickCheck.Gen.Unsafe"]
-      imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing 
+      imports = map mk_importDecl ["HipSpec","Data.Typeable","Test.Feat","Test.QuickCheck.Gen.Unsafe"]
+      imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing
                 (Just (False, [IAbs (Ident "Ord"),IAbs (Ident "Show")]))
       pragma = LanguagePragma noLoc (map Ident ["DeriveDataTypeable", "TemplateHaskell"]) 
       enumA = SpliceDecl noLoc (App (Con (UnQual (Ident "deriveEnumerable"))) ((TypQuote (UnQual (Ident "A")))))
