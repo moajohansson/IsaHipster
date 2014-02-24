@@ -26,23 +26,42 @@ fun qrev :: "'a Lst \<Rightarrow> 'a Lst \<Rightarrow> 'a Lst"
 where 
   "qrev Emp a = a"
 | "qrev (Cons x xs) a = qrev xs (Cons x a)"
-
+ML{*Hipster_Explore.explore @{context} ["ListDemo.app", "ListDemo.rev", "ListDemo.qrev"];
+ *}
 lemma lemma_a [thy_expl]: "app x2 Emp = x2"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.rev.simps ListDemo.app.simps ListDemo.qrev.simps thy_expl} *})
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
 
 lemma lemma_aa [thy_expl]: "qrev (qrev x2 y2) z2 = qrev y2 (app x2 z2)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.rev.simps ListDemo.app.simps ListDemo.qrev.simps thy_expl} *})
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
+
+lemma lemma_ab [thy_expl]: "qrev (ListDemo.rev x5) y5 = app x5 y5"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
+thm thy_expl
+
+
+setup {* Hipster_Explore.setup_exploration ["ListDemo.app", "ListDemo.rev", "ListDemo.qrev"];
+ *}
+
+thm thy_expl
+
 
 theorem rev_qrev : "rev xs = qrev xs Emp"
 apply (induct xs)
 apply simp
 apply simp
-
+by (metis thy_expl qrev.simps(1))
+(*
 apply (tactic {* Hipster_Explore.explore_goal @{context} ["ListDemo.rev", "ListDemo.app", "ListDemo.qrev"] *}) 
+*)
+ML {* *}
+
+
+
+
 
 (*
-ML{*Hipster_Explore.explore @{context} ["ListDemo.app", "ListDemo.rev", "ListDemo.qrev"];
- *}
+
+
 
 lemma lemma_a [thy_expl]: "app x2 Emp = x2"
 by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
@@ -94,4 +113,7 @@ qed
 
 
 *)
+lemma lemma_ab [thy_expl]: "qrev x5 Emp = ListDemo.rev x5"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
+
 end

@@ -26,9 +26,9 @@ process mode m =
 hipspecify (ParseFailed loc err_msg) = error err_msg
 hipspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
   Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
-  (enumA:(concatMap (add_decls funs) decls) ++ [add_main decls True] ++ defaultRecordDecl funs)
+  (defaultRecordDecl funs ++ (concatMap (add_decls funs) decls) ++ (concatMap add_derEnum decls) ++ enumA:[add_main decls True])
     where
-      imports = map mk_importDecl ["HipSpec","Data.Typeable","Test.Feat","Test.QuickCheck.Gen"]
+      imports = map mk_importDecl ["HipSpec","Data.Typeable","Test.Feat","Test.QuickCheck.Gen","Test.QuickCheck.Gen.Unsafe"]
       imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing 
                 (Just (False, [IAbs (Ident "Ord"),IAbs (Ident "Show")]))
       pragma = LanguagePragma noLoc (map Ident ["DeriveDataTypeable", "TemplateHaskell"]) 
@@ -50,7 +50,7 @@ defaultRecordDecl funs =
     arb =
       FunBind [Match nowhere (Ident "arbitrary") [] Nothing (UnGuardedRhs (Do body)) (BDecls [])]
     body =
-      [ Generator nowhere (PApp (UnQual (Ident "Delay")) [PVar ident]) (Var (UnQual (Ident "delay'"))) | ident <- idents ] ++
+      [ Generator nowhere (PApp (UnQual (Ident "Capture")) [PVar ident]) (Var (UnQual (Ident "capture"))) | ident <- idents ] ++
       [ Qualifier (App (Var (UnQual (Ident "return")))
                    (foldl App (Con (UnQual (Ident "Default"))) (map (arbFrom . Var . UnQual) idents))) ]
     arbFrom e = App e (Var (UnQual (Ident "arbitrary")))
@@ -63,7 +63,7 @@ nowhere = SrcLoc "" 0 0
 quickspecify (ParseFailed loc err_msg) = error err_msg
 quickspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
   Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
-  (enumA:(concatMap (add_decls []) decls) ++ [add_main decls False])
+  ((concatMap (add_decls []) decls) ++ (concatMap add_derEnum decls) ++ enumA:[add_main decls False])
     where
       imports = map mk_importDecl ["Test.QuickCheck.Arbitrary","Test.QuickSpec","Data.Typeable", "HipSpec", "Test.Feat"] 
       imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing 
@@ -72,12 +72,16 @@ quickspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
       enumA = SpliceDecl noLoc (App (Con (UnQual (Ident "deriveEnumerable"))) ((TypQuote (UnQual (Ident "A")))))
       mk_importDecl moduleName = 
         ImportDecl noLoc (ModuleName moduleName) False False Nothing Nothing Nothing
-        
+
+add_derEnum dec = 
+  case dec of
+     DataDecl loc dataOrNew context name tyVarBnds qualConDecls decls ->
+      [SpliceDecl noLoc (App (Con (UnQual (Ident "deriveEnumerable"))) ((TypQuote (UnQual name))))]
+     _ -> []     
 add_decls funs dec =
   case dec of 
     DataDecl loc dataOrNew context name tyVarBnds qualConDecls decls ->
       [DataDecl loc dataOrNew context name tyVarBnds qualConDecls (new_ders++decls),
-       SpliceDecl noLoc (App (Con (UnQual (Ident "deriveEnumerable"))) ((TypQuote (UnQual name)))),
        InstDecl noLoc (ctxt tyVarBnds) (UnQual (Ident "Arbitrary")) 
                 [foldr build_typApp (TyCon (UnQual name)) tyVarBnds] 
                 [InsDecl (FunBind [Match noLoc (Ident "arbitrary") [] Nothing (UnGuardedRhs rhs) (BDecls [])])],
@@ -181,7 +185,7 @@ arby (TyForall (Just as) ctx ty) = TyForall (Just as) (ctx' ++ ctx) (arby ty)
   where
     ctx' = concatMap arb as
     arb x = [ ClassA (UnQual (Ident ident)) [TyVar (name x)]
-            | ident <- ["Arbitrary", "Show", "Enumerable"] ]
+            | ident <- ["Arbitrary", "CoArbitrary", "Show", "Enumerable"] ]
     name (KindedVar x _) = x
     name (UnkindedVar x) = x
 arby (TyFun t u) = TyFun t (arby u)

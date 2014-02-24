@@ -1,38 +1,37 @@
 theory Exp
-imports Main
-uses "../HipSpec.ML"
+imports "../IsaHipster"
 
 begin
 
 (* The HipSpecifier can't deal with this, as it can't generate Arbitrary instances etc for 
 higher-order datatypes like expr *)
-type_synonym 'v binop = "'v \<Rightarrow> 'v \<Rightarrow> 'v"
+(* type_synonym 'v binop = "'v \<Rightarrow> 'v \<Rightarrow> 'v" *)
 
-datatype ('a,'v) expr = 
+datatype ('a,'v, 'b) expr = 
   Cex 'v | 
   Vex 'a | 
-  Bex "'v binop" "('a,'v) expr" "('a,'v) expr"
+  Bex "'b" "('a,'v,'b) expr" "('a,'v,'b) expr"
 
-primrec "value" :: "('a,'v) expr \<Rightarrow> ('a \<Rightarrow> 'v) \<Rightarrow> 'v" 
+primrec "value" :: "('b \<Rightarrow> 'v \<Rightarrow> 'v \<Rightarrow> 'v) \<Rightarrow> ('a,'v,'b) expr \<Rightarrow> ('a \<Rightarrow> 'v) \<Rightarrow> 'v" 
 where
-  "value (Cex v) env = v" |
-  "value (Vex a) env = env a" |
-  "value (Bex f e1 e2) env = f (value e1 env) (value e2 env)"
+  "value i (Cex v) env = v" |
+  "value i (Vex a) env = env a" |
+  "value i (Bex f e1 e2) env = (i f) (value i e1 env) (value i e2 env)"
 
-datatype ('a,'v) instr = 
+datatype ('a,'v, 'b) instr = 
   Const 'v
   | Load 'a
-  | Apply "'v binop"
+  | Apply "'b"
 
-primrec exec :: "('a,'v) instr list \<Rightarrow> ('a \<Rightarrow> 'v) \<Rightarrow> 'v list \<Rightarrow> 'v list"
+primrec exec :: "('b \<Rightarrow> 'v \<Rightarrow> 'v \<Rightarrow> 'v) \<Rightarrow> ('a,'v,'b) instr list \<Rightarrow> ('a \<Rightarrow> 'v) \<Rightarrow> 'v list \<Rightarrow> 'v list"
 where
-  "exec [] s vs = vs" |
-  "exec (i#is) s vs = (case i of Const v \<Rightarrow> exec is s (v#vs)
-                                | Load a \<Rightarrow> exec is s ((s a)#vs)
-                                | Apply f \<Rightarrow> exec is s ((f (hd vs) (hd(tl vs)))#(tl(tl vs))))"
+  "exec j [] s vs = vs" |
+  "exec j (i#is) s vs = (case i of Const v \<Rightarrow> exec j is s (v#vs)
+                                  | Load a \<Rightarrow> exec j is s ((s a)#vs)
+                                  | Apply f \<Rightarrow> exec j is s ((j f (hd vs) (hd(tl vs)))#(tl(tl vs))))"
 
 
-primrec compile :: "('a,'v) expr \<Rightarrow> ('a,'v) instr list" 
+primrec compile :: "('a,'v,'b) expr \<Rightarrow> ('a,'v,'b) instr list" 
   where
   "compile (Cex v) = [Const v]" |
   "compile (Vex a) = [Load a]" |
@@ -42,7 +41,7 @@ primrec compile :: "('a,'v) expr \<Rightarrow> ('a,'v) instr list"
 ML{*
 val consts = ["Exp.value", "Exp.exec", "Exp.compile"];
 
-HipSpec.hipspec_explore @{theory} consts;
+Hipster_Explore.explore @{context} consts;
 *}
 
 end
