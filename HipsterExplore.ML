@@ -33,7 +33,8 @@ fun try_nxt_conj ctxt =
           (case res of 
              SOME proved_thm => 
              let                
-               val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt (*"lemma_a" (#used_thm_names q)   *)                             (* Thm used by simp need to be lifted so it use meta-variables *)
+               val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt 
+               (* Thm used by simp need to be lifted so it use meta-variables *)
                val final_thm = proved_thm 
                                  |> (Drule.generalize (Hipster_Utils.frees_and_tfrees_of_thm proved_thm))
                                  |> Goal.finish ctxt' 
@@ -52,19 +53,46 @@ fun try_nxt_conj ctxt =
         end
       end;
 
+fun try_prove_priority_goal ctxt goal =
+    let
+      (* val res = SINGLE (Expl_Tacs.hard_tac ctxt) goal *)
+      val res = SINGLE (Expl_Tacs.routine_tac ctxt) goal
+    in 
+      case res of
+        SOME _ => SOME (ThyExpl_Data.set_priority_goal_ctxt NONE ctxt)
+      | NONE => NONE
+    end;
 
-fun proof_loop ctxt facts cand_lemmas_str =
+fun proof_loop_w_prio ctxt facts prio_goal_opt cand_lemmas_str =
     let 
-      val ctxt' = ThyExpl_Data.init_expl ctxt facts 
+      val ctxt' = ThyExpl_Data.init_expl ctxt facts prio_goal_opt
+                                          (Library.split_lines (Library.trim_line cand_lemmas_str))     
+      fun recf ctxt = 
+          case (try_nxt_conj ctxt) of
+            NONE => NONE (*ctxt *) (* No more lemmas to prove, not proved prio goal, fail. *)
+          | SOME ctxt' => 
+            (case (ThyExpl_Data.priority_goal_of_ctxt ctxt')
+              of NONE => NONE (* There is no prio goals, so nothing to do! *)
+            | SOME goal => 
+              (case (try_prove_priority_goal ctxt' goal) of
+                 NONE => recf ctxt'
+               | SOME ctxt'' => SOME ctxt'') (* Proved the priority goal, we're done! *)
+            )
+    in
+      recf ctxt'
+    end
+
+fun proof_loop ctxt facts cand_lemmas_str = 
+     let 
+      val ctxt' = ThyExpl_Data.init_expl ctxt facts NONE
                                           (Library.split_lines (Library.trim_line cand_lemmas_str))     
       fun recf ctxt = 
           case (try_nxt_conj ctxt) of
             NONE => ctxt
           | SOME ctxt' => recf ctxt'
-    in
+     in
       recf ctxt'
-    end
-
+     end
 
 (*-----------------------------------------------------------------------------------------*)
 (* Call HipSpec to generate a list of conjectures and produce suitable output to paste into
@@ -79,6 +107,8 @@ fun hipspec_explore ctxt const_nms =
       val thy = Proof_Context.theory_of ctxt
       val thynm = Context.theory_name thy
       val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^"_hipspec.hs";
+      (* Do we always want to have the --extra-trans flag? this means extra funs gets picked up, if they
+         are in the def of any of the given const-nms *)                                                         
       val add_funs = List.foldl (fn (nm,s) => "--extra-trans "^(Long_Name.base_name nm)^ " "^s) " " const_nms;
       val hipspec_cmd = "hipspec "^ "--isabelle-mode " ^ add_funs  ^ outfile;
 
@@ -122,8 +152,6 @@ fun explore ctxt const_nms =
          (Active.sendback_markup [Markup.padding_command] output)
     end;
 
-
-
 (* A function which can be wrapped in Isabelle's setup command from a theory file.
    It adds the discovered lemmas to the Theory_Data Hipster_Rules. *)
 fun setup_exploration const_nms thy0 =
@@ -135,6 +163,39 @@ fun setup_exploration const_nms thy0 =
       Library.foldl 
         (fn (thy,thm) => Context.theory_map (Hipster_Rules.add_thm thm) thy) 
         (thy0, ThyExpl_Data.proved_of_ctxt res_ctxt)
+    end;
+
+(* A tactic which picks up the constants from a subgoal, and applies theory exploration on these
+   The aim is to find lemma(s) which allows for the goal to be proved. *)
+fun explore_goal ctxt const_nms thm =
+     let
+      val thy = Proof_Context.theory_of ctxt
+      (*val const_nms = Hipster_Utils.thy_consts_of (Context.theory_name (Thm.theory_of_thm thm)) thm *)
+          (* FIXME: No simps for constant symbols, e.g. datatype constructors.
+             FIXME: Won't pick up all the simps it needs, e.g. from functions defined in terms of *)
+      val facts_nms = map (fn c => c^".simps") const_nms
+      val facts = maps (fn nm => Sledgehammer_Util.thms_of_name ctxt nm) facts_nms 
+      val res_ctxt = proof_loop_w_prio ctxt facts (SOME thm) (hipspec_explore ctxt const_nms)
+    in
+      case res_ctxt of
+        NONE => 
+        let val _ = Output.urgent_message ("Failed to find lemmas which will prove goal.")
+        in no_tac thm end
+      | SOME ctxt' => (* Success, provided the explored lemmas, the thm can be proved by metis *)
+        let
+          val tac_str = Expl_Tacs.final_tactic_str ctxt' facts_nms
+          val lemmas = Library.space_implode "\n\n"
+                       (map (mk_lemma_str ctxt') 
+                           (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt ctxt')))
+          val str_of_thm = (Sledgehammer_Util.with_vanilla_print_mode Syntax.string_of_term ctxt')
+                             (Thm.concl_of thm)
+          val _ = Output.urgent_message 
+                    ("Try first proving lemmas:\n\n" ^ lemmas ^ "\n\n" ^
+                     "then prove the open goal "^ str_of_thm ^ " " ^ 
+                     Expl_Tacs.routine_tac_str)
+        in
+          Seq.single thm
+        end
     end;
 
 

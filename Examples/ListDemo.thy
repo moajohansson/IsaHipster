@@ -27,39 +27,59 @@ where
   "qrev Emp a = a"
 | "qrev (Cons x xs) a = qrev xs (Cons x a)"
 
-ML{*Hipster_Explore.explore @{context} ["ListDemo.app"];
- *}
 lemma lemma_a [thy_expl]: "app x2 Emp = x2"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps thy_expl} *})
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.rev.simps ListDemo.app.simps ListDemo.qrev.simps thy_expl} *})
 
-lemma lemma_aa [thy_expl]: "app (app x2 y2) z2 = app x2 (app y2 z2)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps thy_expl} *})
+lemma lemma_aa [thy_expl]: "qrev (qrev x2 y2) z2 = qrev y2 (app x2 z2)"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.rev.simps ListDemo.app.simps ListDemo.qrev.simps thy_expl} *})
 
-ML{*
-Hipster_Explore.explore @{context}  ["ListDemo.app", "ListDemo.rev"];
-*}
-lemma lemma_ab [thy_expl]: "app (ListDemo.rev x5) (ListDemo.rev y5) = ListDemo.rev (app y5 x5)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps thy_expl} *})
+theorem rev_qrev : "rev xs = qrev xs Emp"
+apply (induct xs)
+apply simp
+apply simp
 
-lemma lemma_ac [thy_expl]: "ListDemo.rev (ListDemo.rev x5) = x5"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps thy_expl} *})
+apply (tactic {* Hipster_Explore.explore_goal @{context} ["ListDemo.rev", "ListDemo.app", "ListDemo.qrev"] *}) 
+
+(*
+ML{*Hipster_Explore.explore @{context} ["ListDemo.app", "ListDemo.rev", "ListDemo.qrev"];
+ *}
+
+lemma lemma_a [thy_expl]: "app x2 Emp = x2"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
+
+lemma lemma_aa [thy_expl]: "qrev (qrev x2 y2) z2 = qrev y2 (app x2 z2)"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
+
+lemma lemma_ab [thy_expl]: "qrev (ListDemo.rev x5) y5 = app x5 y5"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
+
+
+lemma rev_qrev: "rev xs = qrev xs Emp"
+sledgehammer
+by (metis lemma_a lemma_aa lemma_ab)
+
+lemma rev_rev : "rev(rev xs) = xs"
+sledgehammer
+by (metis lemma_a lemma_ab rev_qrev)
+
 
 ML{* Hipster_Explore.explore @{context} ["ListDemo.qrev", "ListDemo.rev"]; *}
-lemma lemma_ad [thy_expl]: "app (qrev x2 y2) z2 = qrev x2 (app y2 z2)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.qrev.simps ListDemo.rev.simps thy_expl} *})
-
-lemma lemma_ae [thy_expl]: "qrev (app x2 y2) z2 = qrev y2 (qrev x2 z2)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.qrev.simps ListDemo.rev.simps thy_expl} *})
-
-lemma lemma_af [thy_expl]: "qrev (qrev x2 y2) z2 = qrev y2 (app x2 z2)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.qrev.simps ListDemo.rev.simps thy_expl} *})
-
-lemma lemma_ag [thy_expl]: "qrev x5 (ListDemo.rev y5) = ListDemo.rev (app y5 x5)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.qrev.simps ListDemo.rev.simps thy_expl} *})
 
 
-ML{* Hipster_Explore.explore @{context} ["ListDemo.app","ListDemo.qrev", "ListDemo.rev"]; *}
-(* At this point HipSpec is done! *)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 lemma f
  explore
@@ -72,20 +92,6 @@ proof -
     proof
 qed
 
-ML{*
-open Active;
-Active.sendback_markup;
-*}
 
-
-ML{*
-HipsterRules.get @{context};
-(*
-   Output.urgent_message
-     ("HipSpec found this proof: " ^
-      Active.sendback_markup [Markup.padding_command] "by (metis rev.simps(2))" ^ ".")
 *)
-   *}
-
-
 end

@@ -6,6 +6,7 @@ reasoning. *)
 signature THY_EXPL_TACS =
 sig
   val routine_tac : Proof.context -> tactic
+  val routine_tac_str : string
   val hard_tac : Proof.context -> tactic
   val final_tactic_str : Proof.context -> string list -> string
 end
@@ -24,6 +25,7 @@ fun routine_tac ctxt =
      in
        Hipster_Tacs.simp_or_metis ctxt' (prev_thms @ (ThyExpl_Data.facts_of_ctxt ctxt'))
      end; 
+val routine_tac_str = "by (tactic {*Simp_Metis_Tacs.routine_tac @{context}*})"; 
 
 fun hard_tac ctxt = 
     let
