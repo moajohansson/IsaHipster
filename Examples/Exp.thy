@@ -52,6 +52,7 @@ Hipster_Explore.explore @{context} consts;
 
 *}
 
+
 lemma lemma_a [thy_expl]: "sequence x4 Done = x4"
 by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Exp.value.simps Exp.exec.simps Exp.compile.simps Exp.sequence.simps thy_expl} *})
 

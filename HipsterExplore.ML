@@ -116,6 +116,9 @@ fun hipspec_explore ctxt const_nms =
       val _ = Code_Target.export_code thy const_nms [((("Haskell",thynm), path_opt), [])];
       val _ = Isabelle_System.bash (Hipster_Setup.hipspecifyer_cmd ^" H "^ 
                                     Hipster_Setup.filepath^thynm^".hs " ^outfile);
+
+
+     
     in
       fst (Isabelle_System.bash_output hipspec_cmd)
     end;
