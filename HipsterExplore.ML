@@ -22,6 +22,9 @@ fun try_nxt_conj ctxt =
     | (c::cs) => (* try proving next open conj *) 
       let 
         val r = SINGLE (Expl_Tacs.routine_tac ctxt) c
+        val lemma_str = (Syntax.string_of_term ctxt (Thm.concl_of c))
+          val _ = (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
+                ("Proving: " ^ lemma_str)
       in
       case r of (* Discard this, it is trivial *)
         SOME _ => SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
@@ -99,6 +102,13 @@ fun proof_loop ctxt facts cand_lemmas_str =
    proof script for discovered lemmas  *) 
 (*-----------------------------------------------------------------------------------------*)
 
+(* TO DO: Implement properly *)
+val haskell_consts = [("List.rev","reverse"),("List.append","++")]
+
+fun map_to_haskell isa_nm = 
+    case (Library.find_first (fn (nm,_) => nm=isa_nm) haskell_consts)
+         of NONE => isa_nm
+          | SOME (_,hask_nm) => hask_nm;
 
 (* 'const_nms' are the name of the constants we wish to include in the Haskell 
    file. They must be prefixed by the theory name. *)   
@@ -106,20 +116,18 @@ fun hipspec_explore ctxt const_nms =
     let
       val thy = Proof_Context.theory_of ctxt
       val thynm = Context.theory_name thy
-      val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^"_hipspec.hs";
+      val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^"_hipspec.hs"
+      val const_nms' = map map_to_haskell const_nms
       (* Do we always want to have the --extra-trans flag? this means extra funs gets picked up, if they
          are in the def of any of the given const-nms *)                                                         
-      val add_funs = List.foldl (fn (nm,s) => "--extra-trans "^(Long_Name.base_name nm)^ " "^s) " " const_nms;
+      val add_funs = List.foldl (fn (nm,s) => "--extra-trans "^(Long_Name.base_name nm)^ " "^s) " " const_nms';
       val hipspec_cmd = "hipspec "^ "--isabelle-mode " ^ add_funs  ^ outfile;
 
       val path_opt = SOME (Path.explode Hipster_Setup.filepath);    
       val _ = Code_Target.export_code thy const_nms [((("Haskell",thynm), path_opt), [])];
       val _ = Isabelle_System.bash (Hipster_Setup.hipspecifyer_cmd ^" H "^ 
                                     Hipster_Setup.filepath^thynm^".hs " ^outfile);
-
-
-     
-    in
+    in 
       fst (Isabelle_System.bash_output hipspec_cmd)
     end;
 
@@ -136,7 +144,17 @@ fun mk_lemma_str ctxt (lemma,tac_str) =
     in
       ("lemma " ^ name ^" [thy_expl]: "^ lemma_str ^ "\n" ^tac_str)
     end;
-                                                                   
+
+fun prep_conjs ctxt conjs =
+    let
+      val thy = Proof_Context.theory_of ctxt
+      val thynm = Context.theory_name thy
+    in
+      if (Config.get ctxt thy_interesting = false)
+      then conjs (* Want eqs about all functions, also those not about funs def in this thy *)
+      else filter (fn c => (not((Hipster_Utils.thy_consts_of thynm c) = []))) conjs
+    end;
+                                                                 
 (* Outputs snippets of proof script with the discovered lemmas that can be pasted into the theory file. *)
 fun explore ctxt const_nms =
     let
@@ -144,15 +162,17 @@ fun explore ctxt const_nms =
       val facts = maps (fn n => Sledgehammer_Util.thms_of_name ctxt n) facts_nms
       val tac_str = Expl_Tacs.final_tactic_str ctxt facts_nms
                         
-      val res_ctxt = proof_loop ctxt facts (hipspec_explore ctxt const_nms)
+      val conjs = hipspec_explore ctxt const_nms;
+
+      val res_ctxt = proof_loop ctxt facts conjs
       val output = Library.space_implode "\n\n"
-                     ((map (mk_lemma_str ctxt) 
+                     ((map (mk_lemma_str res_ctxt) 
                            (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt res_ctxt)) 
-                      @ (map (mk_lemma_str ctxt) 
+                      @ (map (mk_lemma_str res_ctxt) 
                              (map (fn conj => (conj,"oops")) (ThyExpl_Data.failed_of_ctxt res_ctxt)))))
     in
-       (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
-         (Active.sendback_markup [Markup.padding_command] output)
+      (res_ctxt, (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
+         (Active.sendback_markup [Markup.padding_command] output))
     end;
 
 (* A function which can be wrapped in Isabelle's setup command from a theory file.

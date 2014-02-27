@@ -7,6 +7,7 @@ structure Hipster_Setup =
 struct
 
 (* FIXME: Default to Isabelle Contrib or something more sensible *)
+(* Set these to your path to the Hipster directory *)
 val basepath = "~/TheoremProvers/IsaHipster/";
 val filepath = basepath^"GenCode/";
 
@@ -22,6 +23,11 @@ ML {*
 structure Hipster_Rules = Named_Thms
 (val name = @{binding "thy_expl"} 
  val description = "Theorems discovered by theory exploration")
+*}
+ML{*
+(* A flag which tells Hipster that it should disregard equations
+   which *only* feature functions defined in another theory, i.e. a library. *)
+val thy_interesting = Attrib.setup_config_bool @{binding thy_interesting} (K true)
 *}
 
 setup {* Hipster_Rules.setup;*}
