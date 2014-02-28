@@ -51,27 +51,17 @@
 \maketitle
 
 \begin{abstract}
-Theory exploration is a technique for automatically discovering novel and interesting lemmas in a given mathematical theory development. This paper describes Hipster, a system integrating theory exploration with the proof assistant Isabelle with the intention of increasing automation for inductive proofs. 
-Existing Isabelle-tools like Sledgehammer can automatically pick from the existing lemma library those that are required for automation of many proofs. Hipster is an extension of this approach which also allows for discovery of new or missing lemmas which require induction, thus increasing the number of proofs that can be automated.
-Hipster can be used in two main ways, either in exploratory mode to automatically generate basic lemmas about a given set of function symbols in a new theory development, or in proof mode for a particular proof attempt, trying to discover lemmas that would allow the current goal to be proved. 
+Theory exploration is a technique for automatically discovering novel and interesting lemmas in a given mathematical theory development. This paper describes Hipster, a system integrating theory exploration with the proof assistant Isabelle.
+Existing Isabelle-tools like Sledgehammer can automatically select existing lemmas from the libraries that are likely to be needed for automation of many proofs. Hipster is an extension of this approach which also allows for discovery of new or missing lemmas which require induction, thus increasing the number of proofs that can be automated.
+Hipster can be used in two main ways, either in exploratory mode to automatically generate basic lemmas about a given set of datatypes and functions in a new theory development, or in proof mode, for a particular proof attempt, trying to discover the missing lemmas which would allow the current goal to be proved. 
 
 \end{abstract}
 
-\section{Introduction}
-%\input{Introduction}
-
-What is theory exploration an why we want it in an interactive prover. 
-
-Which is because we can improve on Sledgehammer-style interactions in cases when the required lemmas simply are not available, so Sledgehammer would fail. 
-
-We improve on theory exploration like HipSpec by allowing the user more control, of for instance which symbols that gets sent to the exploration system, i.e. if we have a very large theory the user chooses suitable subsets of functions to explore together.
-
-A third contribution is the Blanchette variables, as Isabelle and Haskell deal with partial functions and their semantics in different ways.  
-
-By integrating it in Isabelle, we add a new layer on top of Haskell-HipSpec which allows us to record and store results for later use.
+\input{Introduction}
 
 \section{Background}
-Short description of HipSpec to go in here.
+\label{sec:background}
+Short description of HipSpec and QuickSpec to go in here.
 
 \section{Hipster}
 This section shows a bunch of examples and explains how it all works.
@@ -81,14 +71,17 @@ This section shows a bunch of examples and explains how it all works.
 %\input{PartialFunctions}
 Nick or Dan to write a section on the differences in semantics between Isabelle and Haskell and explain how we solve the problem.
 
-\section{Evaluation}
-Some form of evaluation????
+\section{Use Cases}
+Some form of evaluation or merge with Hipster section????
 
 \section{Related Work}
 %\input{RelatedWork}
+Other systems not integrated in the workflow of a proof-assistant. 
+
 
 \section{Conclusion and Further Work}
 %\input{Conclusion}
+Conditionals, analogy between different datastructures when similar lemmas has been found about them. 
 
 \bibliographystyle{plain}
 \bibliography{bibfile}

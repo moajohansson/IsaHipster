@@ -1,0 +1,21 @@
+\section{Introduction}
+\label{sec:intro}
+The concept of theory exploration was first introduced by Buchberger \cite{buchberger2000theory}. He argues that as a contrast to  automated theorem provers that focus on proving one theorem at the time in isolation, mathematicians instead typically proceed by exploring entire theories, by conjecturing and proving layers of increasingly complex propositions. For each layer, appropriate proof methods are identified, and previously proved lemmas may be used to prove later conjectures. When a new concept (e.g. a new function) is introduced, we should prove a set of new conjectures which, ideally, "completely" relates the new with the old, after which other propositions in this layer can be proved easily by easy "routine" reasoning. Mathematical software should be designed to support this workflow.
+
+In some sense this layered approach is what many interactive proof assistants, such as Theorema \cite{theorema} and Isabelle \cite{isabelle}, support. However, they leave the generation of new conjectures relating different concepts largely to the user. Recently, a number of different systems have been implemented to address also this aspect of theory exploration \cite{McCasland2006,isacosy,isascheme,hipspecCADE}.  In this work, we take this one step further by integrating the discovery and proof of new conjectures in the workflow of the interactive theorem prover Isabelle. Our system, called Hipster, is based on our previous work on HipSpec \cite{hipspecCADE}, a theory exploration for Haskell programs. Computation and evaluation in Haskell is used to efficiently generate generate interesting conjectures, which are then imported back into Isabelle and proved by automated tactics. 
+
+
+
+  
+
+
+Which is because we can improve on Sledgehammer-style interactions in cases when the required lemmas simply are not available, so Sledgehammer would fail. 
+
+
+We improve on theory exploration like HipSpec by allowing the user more control, of for instance which symbols that gets sent to the exploration system, i.e. if we have a very large theory the user chooses suitable subsets of functions to explore together. Become a tool in an interactive environement, to assist the user of the proof-assistant, rather than aim for full automation.
+
+Combination of computation/evaluation in Haskell and symbolic reasoning and proof in Isabelle.
+
+A third contribution is the Blanchette variables, as Isabelle and Haskell deal with partial functions and their semantics in different ways.  
+
+By integrating it in Isabelle, we add a new layer on top of Haskell-HipSpec which allows us to record and store results for later use.
