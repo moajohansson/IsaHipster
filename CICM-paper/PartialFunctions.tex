@@ -1,0 +1,20 @@
+Isabelle is a logic of total functions. Nonetheless, we can define
+apparently partial functions, such as \verb|hd|:
+\begin{verbatim}
+fun hd :: "'a list => 'a" where
+  "hd (x#xs) = x"
+\end{verbatim}
+
+How do we reconcile \verb|hd| being partial with Isabelle functions
+being total? The answer is that in Isabelle, \verb|hd| is total, but
+the behaviour of \verb|hd []| is unspecified: it returns some
+arbitrary value of type \verb|'a|. Meanwhile in Haskell, \verb|head|
+is partial, but the behaviour of \verb|head []| is specified: it
+crashes.
+
+Isabelle and Haskell give different semantics to partial functions. We
+must respect this difference when translating Isabelle to Haskell,
+otherwise HipSpec might find equations which are not true in Isabelle
+or miss equations which are not true in Haskell.\footnote{As all our
+lemmas are proved in Isabelle, at least we do not risk unsoundness.}
+For example, EXAMPLE.
