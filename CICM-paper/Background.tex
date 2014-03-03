@@ -1,0 +1,12 @@
+\section{Background}
+\label{sec:background}
+
+In this section we give a brief overview of the HipSpec system which we use as a backend for generating conjectures. HipSpec is a state of the art inductive theorem prover and theory exploration system for Haskell. In \cite{hipspecCADE} we showed for instance that HipSpec is able to discover and prove the kind of equational lemmas present in Isabelle's list library.
+
+HipSpec work by first generating a set of conjectures about the functions at hand.
+It's power comes from its capability to automatically discover lemmas, which after they have been proved may be used in subsequent proofs. For this work, we are not interested in the proving capabilities of HipSpec, as the proofs must be run through Isabelle's trusted kernel anyway (say why, LCF style prover, small core of trusted tactics), but rather its subsystem QuickSpec \cite{quickspec} which efficiently generates equations about given functions and datatypes. 
+
+QuickSpec takes a set of functions and constants as input, and proceeds to generate all type-correct terms up to a given limit (usually up to depth three). The generated terms are then divided into equivalence classes using the QuickCheck testing framework \cite{quickcheck}. QuickCheck generate values (something about generators...) for the variables occurring in the terms and evaluate the resulting ground terms.  Initially, all terms are in the same equivalence class, but after testing and evaluation, those that evaluate to different values are separated. This process is repeated until the equivalence classes stabilise, and resulting equations can be read off from each equivalence class. This means that the conjectures generated are, although not yet proved, fairly likely to be true.
+
+Example, if we have space? 
+ 
