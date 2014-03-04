@@ -16,7 +16,7 @@ crashes. If we naively translate Isabelle's \verb|hd| into Haskell's
 Hipster translates each Isabelle function into a semantically
 equivalent, total Haskell function. We do this by adding
 a \emph{default argument} that specifies the return value when no case
-matches. For example, we will translate \verb|hd| into:
+matches. For example, we will translate \verb|hd| into:\footnote{This is a lie (see next footnote).}
 \begin{verbatim}
 hd :: a -> [a] -> a
 hd _ (x:xs) = x
@@ -45,8 +45,7 @@ in Isabelle, which returns an unspecified value whenever its argument
 has length 1, but might return a different value for different arguments.
 The default argument must therefore be a random \emph{function}
 of the same type as the original function, which we call whenever the
-original function is unspecified. Thus we really have:\footnote{We lied
-about the type of \texttt{hd} above.}
+original function is unspecified. Thus we really have:\footnote{This is the truth (see previous footnote).}
 \begin{verbatim}
 second :: ([a] -> a) -> [a] -> a
 second def (x:y:xs) = y
@@ -112,3 +111,6 @@ every occurrence of \verb|def|, to get
 This erasure is sound because, if the Haskell equation holds
 regardless of which default values we choose, then the Isabelle
 equation, in which the default values are unspecified, must also hold.
+As far as QuickSpec is concerned, \verb|def| is the only term of type
+\verb|Default|, so there is no risk of getting several default records
+in one equation (which would make erasure unsound).
