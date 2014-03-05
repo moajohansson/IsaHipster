@@ -22,10 +22,38 @@ Depending on the theory and application we can change these tactics to suit our 
 The order in which Hipster tries to prove things matter. As we mentioned, it will try more general conjectures first, with the hope that they will be useful to filter out many more specific routine results. Occasionally though, a proof will fail as a not yet proved lemma is required. In this case, the failed conjecture is added back into the list of open conjectures and retried later, provided that at least one new lemma has been proved in the meantime to ensure progress and termination. Hipster terminates when it either runs out of open conjectures, or when it does not make any more progress. 
 
 \subsection{Theory Exploration Mode}
-
-In this example we consider a theory about binary trees, with data stored at the leaves. 
+In this example we look at a theory about binary trees, with data stored at the leaves:
+\begin{verbatim}
+datatype 'a Tree = 
+  Leaf 'a 
+  | Node 'a Tree  'a Tree
+\end{verbatim}
 
  
-example 1: Theory exploration mode: the tree example. Exploring the connections between datatypes. 
-
 \subsection{Proof Mode}
+The following example is about a compiler to a stack machine for a toy language with generic types of expressions\footnote{This example a slight variation of that in \S3.3 in the Isabelle tutorial \cite{isabelle}. It had to be modified as our generators on the Haskell side does not support generation of values for datatype constructors involving higher-order arguments)}. Expressions in the language are built from constants (\texttt{Cex}), values (\texttt{Vex}) and binary operators (\texttt{Bex}): 
+\begin{verbatim}
+datatype ('c, 'v, 'b) expr =
+  Cex 'c |
+  Vex 'v |
+  Bex "'b" "('c,'v,'b) expr" "('c,'v,'b) expr"
+\end{verbatim}
+The types of variables, values and binary operators are not fixed, but given by type parameters \texttt{'c}, \texttt{'v} and \texttt{'b}. 
+To evaluate an expression, we define a function \texttt{value}, parametrised by a lookup function for binary operators and an environment mapping variables to values:
+\begin{verbatim}
+fun value::('b =>'c =>'c =>'c) => ('v =>'c) => ('c,'v,'b) expr =>'c
+where
+  "value getBinop env (Cex c) = c" |
+  "value getBinop env (Vex v) = env v" |
+  "value getBinop env (Bex b e1 e2) = 
+    (getBinop b) (value getBinop env e1) (value getBinop env e2)"
+\end{verbatim}
+A program for our stack machine consists of four instructions:
+\begin{verbatim}
+datatype ('c, 'v, 'b) program =
+  Done
+  | Const 'c "('c, 'v, 'b) program"
+  | Load 'v  "('c, 'v, 'b) program"
+  | Apply 'b "('c, 'v, 'b) program"
+\end{verbatim}
+A program is either empty (\texttt{Done}), or consists of one of the instructions \texttt{Const}, \texttt{Load} or \texttt{Apply}, followed by the remaining program. 
