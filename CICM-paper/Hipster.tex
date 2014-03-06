@@ -21,22 +21,84 @@ Depending on the theory and application we can change these tactics to suit our 
 
 The order in which Hipster tries to prove things matter. As we mentioned, it will try more general conjectures first, with the hope that they will be useful to filter out many more specific routine results. Occasionally though, a proof will fail as a not yet proved lemma is required. In this case, the failed conjecture is added back into the list of open conjectures and retried later, provided that at least one new lemma has been proved in the meantime to ensure progress and termination. Hipster terminates when it either runs out of open conjectures, or when it does not make any more progress. 
 
+Below we give two typical use cases for Hipster. In both examples, Hipster has been instantiated with a routine reasoning tactic which applies simplification followed by Metis, and 
+
 \subsection{Exploring a Theory of Binary Trees}
 In this example we look at a theory about binary trees, with data stored at the leaves:
 \begin{verbatim}
 datatype 'a Tree = 
-  Leaf 'a 
+    Leaf 'a 
   | Node 'a Tree  'a Tree
 \end{verbatim}
+Let's define some function over our trees. \texttt{mirror} swaps the left and right subtrees everywhere, and \texttt{tmap} applies a function to each element in the tree:
+\begin{verbatim}
+fun mirror :: "'a Tree => 'a Tree"
+where
+  "mirror (Leaf x) = Leaf x"
+| "mirror (Node l r) = Node (mirror r) (mirror l)"
+
+fun tmap :: "('a => 'b) => 'a Tree => 'b Tree"
+where
+  "tmap f (Leaf x) = Leaf (f x)"
+| "tmap f (Node l r) = Node (tmap f l) (tmap f r)" 
+\end{verbatim} 
+Now, let's call theory exploration to discover some properties about these two functions. Hipster quickly finds the two expected lemmas:  
+\begin{verbatim}
+lemma lemma_a [thy_expl]: "mirror (tmap x y) = tmap x (mirror y)"
+by (tactic {* Hipster_Tacs.induct_simp_metis . . .*})
+
+lemma lemma_aa [thy_expl]: "mirror (mirror x) = x"
+by (tactic {* Hipster_Tacs.induct_simp_metis . . . *})
+\end{verbatim}
+The output produced by Hipster can be automatically pasted into the proof script by a mouseclick. Recall that Hipster discards all lemmas that can be proved by routine reasoning (here, without induction). The tactic \texttt{induct\_simp\_metis} appearing in the proof script output is the current instantiation of "difficult" reasoning. Note that the lemmas discovered have been tagged with the attribute \texttt{thy\_expl}, which tells Hipster which lemmas it has discovered so far. If theory exploration is called several times, we can use these lemmas in proofs and avoid rediscovering the same things. The user can also inspect what theory exploration has found so far by executing the Isabelle command \texttt{thm thy\_expl}.
+
+Now, let's also define two functions extracting the leftmost and rightmost element of the tree:
+\begin{verbatim}
+fun rightmost :: "'a Tree => 'a"
+where 
+  "rightmost (Leaf x) = x"
+|  "rightmost (Node l r) = rightmost r"
+
+fun leftmost :: "'a Tree => 'a"
+where 
+  "leftmost (Leaf x) = x"
+|  "leftmost (Node l r) = leftmost l"
+\end{verbatim}
+Asking Hipster for lemmas about all the functions defined so far, it provides one additional lemma, namely:
+\begin{verbatim}
+leftmost (mirror x) = rightmost x
+\end{verbatim}
+Finally, we define a function flattening trees to lists:
+\begin{verbatim}
+fun flat_tree :: "'a Tree => 'a list"
+where
+  "flat_tree (Leaf x) = Cons x []"
+| "flat_tree (Node l r) = (flat_tree l) @ (flat_tree r)"
+\end{verbatim}
+We can now ask Hipster to explore the relationships between the functions on trees and the corresponding functions on lists, such as \texttt{rev}, \texttt{map} and \texttt{hd}. Hipster produce four new lemmas:
+\begin{verbatim}
+flat_tree (tmap x y) = map x (flat_tree y)
+flat_tree (mirror x) = rev (flat_tree x)
+map x (rev xs) = rev (map x xs)
+hd (xs @ xs) = hd xs
+\end{verbatim}
+The latter two are perhaps not of much interest, as they relate only functions on lists. In fact, the third lemma is already in Isabelle's list library, but is not labelled as a simplification rule, why Hipster rediscovers it. The last lemma is a specialisation of a conditional library-lemma, with the side-condition that \texttt{xs} is non-empty. Hipster can however not discover conditional lemmas. In addition to the four lemmas which have been proved, Hipster also outputs one conjecture which it failed to prove:
+\begin{verbatim}
+lemma unknown: "hd (flat_tree x) = leftmost x"
+oops
+\end{verbatim}
+This conjecture needs to use the lemma that as the trees store data at the leaves, \texttt{flat\_tree} will always produce a non-empty list: \texttt{flat\_tree t $\neq$ []}. Again, this is not an equation so not discovered by Hipster\footnote{Unless we also give it the constant $False$ as an input, however, that would also increase the size of the search space}. 
+ 
+This example shows that Hipster indeed can find most of the basic lemmas we would expect in a new theory. The user has to provide the constants Hipster should explore, and the rest is fully automatic, thus speeding up theory development. Theory exploration in this example takes just a few seconds, no longer that it takes to run tools like Sledgehammer. 
 
 \subsection{Proving Correctness of a Small Compiler}
 The following example is about a compiler to a stack machine for a toy language with generic types of expressions\footnote{This example a slight variation of that in \S3.3 in the Isabelle tutorial \cite{isabelle}. It had to be modified as our generators on the Haskell side does not support generation of values for datatype constructors involving higher-order arguments}. We show how theory exploration can be used to unblock a proof on which automated tactics otherwise fail due to a missing lemma.
 Expressions in the language are built from constants (\texttt{Cex}), values (\texttt{Vex}) and binary operators (\texttt{Bex}): 
 \begin{verbatim}
 datatype ('c, 'v, 'b) expr =
-  Cex 'c |
-  Vex 'v |
-  Bex "'b" "('c,'v,'b) expr" "('c,'v,'b) expr"
+    Cex 'c 
+  | Vex 'v 
+  | Bex "'b" "('c,'v,'b) expr" "('c,'v,'b) expr"
 \end{verbatim}
 The types of variables, values and binary operators are not fixed, but given by type parameters \texttt{'c}, \texttt{'v} and \texttt{'b}. 
 To evaluate an expression, we define a function \texttt{value}, parametrised by a lookup function for binary operators and an environment mapping variables to values:
@@ -106,4 +168,5 @@ Pasting these into our proof script we can try Sledgehammer on our theorem again
 %theorem "exec getBinop env (compile e) [] = [value getBinop env e]"
 %by (metis lemma_ab)
 %\end{verbatim}
+
 
