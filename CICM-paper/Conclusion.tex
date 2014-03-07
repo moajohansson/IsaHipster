@@ -1,0 +1,9 @@
+\section{Conclusion and Further Work}
+\label{sec:concl}
+
+Hipster integrates lemma discovery by theory exploration in the proof assistant Isabelle. We demonstrated two typical use cases of how this can help and speed up theory development: by generating interesting basic lemmas in \emph{exploration mode} or as a lemma suggestion mechanism for a stuck proof attempt in \emph{proof mode}. Hipster thus becomes a complement to tools like Sledgehammer, by discovery of missing lemmas, more proofs can be tackled automatically. 
+
+The lemma discovery is currently limited to equational lemmas. We plan to extend the term generation and evaluation on the Haskell side to also take side conditions into account. For example, if theory exploration is called in the middle of a proof attempt, there may be assumptions associated with the current sub-goal, which should be taken into account when evaluating terms and dividing them into equivalence classes. 
+
+
+%Conditionals, analogy between different datastructures when similar lemmas has been found about them. 
