@@ -91,7 +91,7 @@ tl def xs = default_tl def xs
 
 nth :: Default -> Int -> [a] -> [a]
 nth def 0 xs = hd def xs
-nth (n+1) xs = nth def (tl def xs)
+nth def (n+1) xs = nth def (tl def xs)
 \end{verbatim}
 Here, \verb|hd| and \verb|tl| extract their default implementations
 from the record, while \verb|nth| simply passes the record to \verb|hd|
