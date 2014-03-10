@@ -1,7 +1,7 @@
 \section{Hipster: Implementation and Use}
 \label{sec:hipster}
 
-In this section we give an overview of Hipster, and show how it can be used both in theory exploration mode and in proof mode, to find lemmas relevant for a particular proof attempt. An overview of Hipster is shown in figure \ref{fig:hipster}. 
+In this section we give an overview of Hipster, and show how it can be used both in theory exploration mode and in proof mode, to find lemmas relevant for a particular proof attempt. An overview of Hipster is shown in figure \ref{fig:hipster}. The source code and examples are available online\footnote{\url{https://github.com/moajohansson/IsaHipster}}.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -16,14 +16,15 @@ Starting from an Isabelle theory, Hipster calls Isabelle's code generator \cite{
 
 Once the Haskell program is in place, we run theory exploration and generate a set of equational conjectures, which HipSpec orders according to generality. More general equations are preferred, as we expect these to be more widely applicable as lemmas. In previous work on HipSpec, the system would at this stage apply induction on the conjectures and send them off to some external prover. Here, we instead import them back into Isabelle as we wish to produce checkable LCF-style proofs for our conjectures. 
 
-The proof procedure in Hipster is parametrised by two tactics, one for easy or \emph{routine reasoning} and one for \emph{difficult reasoning}. In the examples below, we use Isabelle's simplifier followed by first-order reasoning by Metis as \emph{routine reasoning}, and a tactic performing structural induction followed by simplification and first-order reasoning as \emph{difficult reasoning}. Both tactics have access to the theorems proved so far, and hence gets stronger as the proof procedure proceed through the list of conjectures. As there are rather many conjectures produced by theory exploration, we do not want to present them all to the user, but rather select the most interesting ones, which are difficult to prove. Those that follow only by routine reasoning are filtered out. 
+The proof procedure in Hipster is parametrised by two tactics, one for easy or \emph{routine reasoning} and one for \emph{difficult reasoning}. In the examples below, we use Isabelle's simplifier followed by first-order reasoning by Metis as \emph{routine reasoning}, and a tactic performing structural induction followed by simplification and first-order reasoning as \emph{difficult reasoning}. If there are several possible variables to apply induction to, we may backtrack if the first choice fails. Both tactics have access to the theorems proved so far, and hence gets stronger as the proof procedure proceed through the list of conjectures. As there are rather many conjectures produced by theory exploration, we do not want to present them all to the user, but rather select the most interesting ones, which are difficult to prove. Those that follow only by routine reasoning are filtered out. 
 Depending on the theory and application we can change these tactics to suit our needs. If we want Hipster to produce fewer or more lemmas, we can choose a stronger or weaker tactic, allowing for flexibility.  
 
 The order in which Hipster tries to prove things matter. As we mentioned, it will try more general conjectures first, with the hope that they will be useful to filter out many more specific routine results. Occasionally though, a proof will fail as a not yet proved lemma is required. In this case, the failed conjecture is added back into the list of open conjectures and retried later, provided that at least one new lemma has been proved in the meantime to ensure progress and termination. Hipster terminates when it either runs out of open conjectures, or when it does not make any more progress. 
 
-Below we give two typical use cases for Hipster. In both examples, Hipster has been instantiated with a routine reasoning tactic which applies simplification followed by Metis, and 
+Below we give two typical use cases for Hipster. In both examples, Hipster has been instantiated with the  same routine- and difficult reasoning tactics, described above.
 
 \subsection{Exploring a Theory of Binary Trees}
+\label{sec:tree}
 In this example we look at a theory about binary trees, with data stored at the leaves:
 \begin{verbatim}
 datatype 'a Tree = 
@@ -92,6 +93,7 @@ This conjecture needs to use the lemma that as the trees store data at the leave
 This example shows that Hipster indeed can find most of the basic lemmas we would expect in a new theory. The user has to provide the constants Hipster should explore, and the rest is fully automatic, thus speeding up theory development. Theory exploration in this example takes just a few seconds, no longer that it takes to run tools like Sledgehammer. 
 
 \subsection{Proving Correctness of a Small Compiler}
+\label{sec:comp-ex}
 The following example is about a compiler to a stack machine for a toy language with generic types of expressions\footnote{This example a slight variation of that in \S3.3 in the Isabelle tutorial \cite{isabelle}. It had to be modified as our generators on the Haskell side does not support generation of values for datatype constructors involving higher-order arguments}. We show how theory exploration can be used to unblock a proof on which automated tactics otherwise fail due to a missing lemma.
 Expressions in the language are built from constants (\texttt{Cex}), values (\texttt{Vex}) and binary operators (\texttt{Bex}): 
 \begin{verbatim}
