@@ -2,16 +2,20 @@
 
 signature HIPSTER_TACS =
 sig 
+  type hardtac
+  val prove_by_simp : Proof.context -> tactic
   val timed_metis_tac : Proof.context -> Thm.thm list -> int -> tactic
   val simp_or_metis : Proof.context -> thm list -> tactic 
   val induct_simp_metis : Proof.context -> Thm.thm list -> tactic
-  val induct_and_simp : Proof.context -> Thm.thm list option -> string -> int -> tactic
-  val try_inductable_vars : Proof.context -> thm list -> int -> tactic
+  val induct_and_simp : Proof.context -> Thm.thm list -> Thm.thm list option -> string -> int -> tactic
+  val try_inductable_vars : Proof.context -> thm list -> hardtac -> int -> tactic
+  val induct_simp_or_metis : Proof.context -> thm list -> thm list option -> string -> int -> tactic
 end
 
 structure Hipster_Tacs : HIPSTER_TACS =
 struct
 
+type hardtac = Proof.context -> thm list -> thm list option -> string -> int -> tactic
 
 (*-----------------------------------------------------------------------------------------*)
 (* Simp tactics *) 
@@ -137,7 +141,7 @@ fun induct_on_var_tac rule var i goalthm =
 (*-----------------------------------------------------------------------------------------*)
 
 (* Apply induction on var and try to prove all cases by simp *)
-fun induct_and_simp ctxt rule var i = 
+fun induct_and_simp ctxt facts rule var i = 
      (induct_on_var_tac rule var i) THEN (prove_by_simp ctxt);
 
 (* Induction on var, then try to prove resulting subgoals by simp or metis *)
@@ -145,20 +149,21 @@ fun induct_simp_or_metis ctxt facts rule var i =
     (induct_on_var_tac rule var i) THEN (simp_or_metis ctxt facts);
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
-fun try_induct_on ctxt facts rule vars i  =
+fun try_induct_on ctxt facts rule strat vars i  =
     case vars 
        of [] => no_tac 
         | (v :: vs) =>  
-          (induct_simp_or_metis ctxt facts rule v i)
+          (*(induct_simp_or_metis ctxt facts rule v i)*)
+          strat ctxt facts rule v i
           ORELSE 
-          (try_induct_on ctxt facts rule vs i);
+          (try_induct_on ctxt facts rule strat vs i);
 
 (* Find the variables we can induct on *)
-fun try_inductable_vars ctxt facts i thm = 
+fun try_inductable_vars ctxt facts strat i thm = 
     let
       val vars = map fst (fst (inductable_things_in_sg i thm))
     in
-      (try_induct_on ctxt facts NONE vars i) thm
+      (try_induct_on ctxt facts NONE strat vars i) thm
     end;
 
 
@@ -168,7 +173,16 @@ fun induct_simp_metis ctxt lemmas thm =
       val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                 (ctxt, lemmas)
     in
-      ALLGOALS(try_inductable_vars ctxt' lemmas) thm
+      ALLGOALS(try_inductable_vars ctxt' lemmas induct_simp_or_metis) thm
+    end
+
+(* An induction tactic to paste into the proof-script afterwards *)
+fun induct_simp_tac ctxt lemmas thm = 
+    let
+      val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                (ctxt, lemmas)
+    in
+      ALLGOALS(try_inductable_vars ctxt' lemmas induct_and_simp) thm
     end
 
 

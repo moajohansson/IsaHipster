@@ -225,3 +225,4 @@ fun explore_goal ctxt const_nms thm =
 end
 
 structure Hipster_Explore = Hipster_Explore_Fun(Simp_Metis_Tacs);
+structure Hipster_Explore_Simp = Hipster_Explore_Fun(Simp_Tacs);
