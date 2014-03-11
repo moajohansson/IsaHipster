@@ -80,7 +80,7 @@ fun final_tactic_str _ fact_nms =
     let
       val facts_str = "@{thms "^ (Library.space_implode " " fact_nms) ^ " thy_expl}" 
     in 
-      "by (tactic {* Hipster_Tacs.induct_simp_metis @{context} " 
+      "by (tactic {* Hipster_Tacs.induct_simp_tac @{context} " 
       ^ facts_str ^" *})"
     end;
 end

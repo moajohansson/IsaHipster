@@ -158,7 +158,7 @@ datatype ('c, 'v, 'b) program =
 A program is either empty (\texttt{Done}), or consists of one of the instructions \texttt{Const}, \texttt{Load} or \texttt{Apply}, followed by the remaining program. We further define a function \texttt{sequence} for combining programs:
 \begin{small}
 \begin{verbatim}
-fun sequence::('c,'v,'b) program => ('c,'v,'b) program =>
+fun sequence :: ('c,'v,'b) program => ('c,'v,'b) program =>
  ('c,'v,'b) program
 where
     sequence Done p = p
@@ -170,7 +170,7 @@ where
 Program execution is modelled by the function \texttt{exec}, which given a lookup function for binary operators, a store for variables and a program, returns the values on the stack after execution.
 \begin{small}
 \begin{verbatim}
-fun exec::('b =>'c =>'c =>'c) => ('v =>'c) => ('c,'v,'b) program =>
+fun exec :: ('b =>'c =>'c =>'c) => ('v =>'c) => ('c,'v,'b) program =>
 								 'c list =>'c list
 where
     exec getBinop env Done stack = stack
@@ -184,7 +184,7 @@ where
 We finally define a function \texttt{compile}, which specifies how expressions are compiled into programs:
 \begin{small}
 \begin{verbatim}
-fun compile::('c,'v,'b) expr => ('c,'v,'b) program
+fun compile :: ('c,'v,'b) expr => ('c,'v,'b) program
   where
     compile (Cex c) =  Const c Done
   | compile (Vex v) =  Load v Done
@@ -196,9 +196,11 @@ Now, we wish to prove correctness of the compiler, namely that executing a compi
 \begin{verbatim}
 theorem "exec getBinop env (compile e) [] = [value getBinop env e]"
 \end{verbatim}
-If we try to apply induction on \texttt{e}, Isabelle's simplifier solves the base-case but neither the simplifier nor Sledgehammer succeeds in proving the step-case. At this stage, we can apply Hipster's theory exploration tactic. It will generate a set of conjectures, and interleave proving these with trying to prove the open sub-goal. Once it succeeds, it presents the user with a list of lemmas it has proved, in this case:
+If we try to apply induction on \texttt{e}, Isabelle's simplifier solves the base-case but neither the simplifier nor Sledgehammer succeeds in proving the step-case. At this stage, we can apply Hipster's theory exploration tactic. It will generate a set of conjectures, and interleave proving these with trying to prove the open sub-goal. Once Hipster succeeds in finding a set of lemmas which allow the open goal to be proved by routine reasoning, it presents the user with a list of lemmas it has proved, in this case:
 \begin{small}
 \begin{verbatim}
+Try first proving lemmas:
+
 lemma lemma_a: "sequence x Done = x"
 by (tactic {* Hipster_Tacs.induct_simp_metis . . . *})
 
@@ -214,5 +216,4 @@ Pasting these into our proof script we can try Sledgehammer on our theorem again
 theorem "exec getBinop env (compile e) [] = [value getBinop env e]"
 by (metis lemma_ab)
 \end{verbatim}
-
 
