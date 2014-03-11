@@ -21,8 +21,25 @@ is its conjecture synthesis system QuickSpec \cite{quickspec},
 which efficiently generates equations about given functions and
 datatypes.
 
+QuickSpec takes a set of functions as input, and proceeds to generate all
+type-correct terms up to a given limit (usually up to depth three), with
+variables (usually three per type).  It first assumes that all terms the same
+type are equivalent, and are initially put in the same equivalence class.  By
+generating random values for the variables (using QuickCheck\cite{quickcheck}), the terms are repeatedly evaluated and their equivalence
+classes are separated according to the evaluation results.  This process is
+repeated until the equivalence classes stabilise, and resulting equations can
+be read off from each equivalence class.  This means that the conjectures
+generated are, although not yet proved, fairly likely to be true.
 
+As an example, we tell QuickSpec to explore the theory with list append,
+\verb~@~, the empty list, \verb~[]~, and three list variables \verb~xs~,
+\verb~ys~, \verb~zs~. Some of all the terms it will generate are these:
+\verb~(xs@ys)@zs~, \verb~xs@(ys@zs)~, \verb~xs@[]~ and simply \verb~xs~.
+Initially, all four will be assumed to be in the same equivalence class.
+Before soon, it will generate non-empty lists for \verb~ys~ and \verb~zs~.
+Evaluating the terms with such assignments will split this equivalence class
+into two: one with the former two and one with the latter. After this, more
+values will be generated for these lists variables, but no evaluation will make
+them split again. Eventually, QuickSpec stops and the equations for
+associativity and right identity can be read off.
 
-QuickSpec takes a set of functions and constants as input, and proceeds to generate all type-correct terms up to a given limit (usually up to depth three). The generated terms are then divided into equivalence classes using the QuickCheck testing framework \cite{quickcheck}. QuickCheck generate values (something about generators...) for the variables occurring in the terms and evaluate the resulting ground terms.  Initially, all terms are in the same equivalence class, but after testing and evaluation, those that evaluate to different values are separated. This process is repeated until the equivalence classes stabilise, and resulting equations can be read off from each equivalence class. This means that the conjectures generated are, although not yet proved, fairly likely to be true.
-
-Example, if we have space? 
