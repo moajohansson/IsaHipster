@@ -75,21 +75,20 @@ add_decls funs dec =
   case dec of 
     DataDecl loc dataOrNew context name tyVarBnds qualConDecls decls ->
       [DataDecl loc dataOrNew context name tyVarBnds qualConDecls (new_ders++decls),
-       InstDecl noLoc (ctxt tyVarBnds) (UnQual (Ident "Arbitrary")) 
-                [foldr build_typApp (TyCon (UnQual name)) tyVarBnds] 
-                [InsDecl (FunBind [Match noLoc (Ident "arbitrary") [] Nothing (UnGuardedRhs rhs) (BDecls [])])],
-       InstDecl noLoc (ctxt tyVarBnds) (UnQual (Ident "CoArbitrary")) 
-                [foldr build_typApp (TyCon (UnQual name)) tyVarBnds] 
-                 [InsDecl (FunBind [Match noLoc (Ident "coarbitrary") [] Nothing 
-                                    (UnGuardedRhs (Con (UnQual (Ident "genericCoarbitrary")))) (BDecls [])])]
-          
-      ]
+       generic "Arbitrary" "arbitrary" "genericArbitrary",
+       generic "CoArbitrary" "coarbitrary" "genericCoarbitrary",
+       generic "Observe" "observe" "genericObserve"]
         where 
-          new_ders = map ((\x -> (x,[])) . UnQual . Ident) ["Eq", "Ord", "Typeable", "Generic"]
+          generic cls fun impl =
+            InstDecl noLoc (ctxt tyVarBnds) (UnQual (Ident cls))
+            [foldr build_typApp (TyCon (UnQual name)) tyVarBnds]
+            [InsDecl (FunBind [Match noLoc (Ident fun) [] Nothing
+                               (UnGuardedRhs (Con (UnQual (Ident impl)))) (BDecls [])])]
+          new_ders = map ((\x -> (x,[])) . UnQual . Ident) ["Typeable", "Generic"]
           ctxt tybnds =
             [ ClassA (UnQual (Ident cls)) [tybinds2vars tybnd]
             | tybnd <- tybnds,
-              cls <- ["Arbitrary", "CoArbitrary", "Typeable"] ]
+              cls <- ["Arbitrary", "CoArbitrary", "Observe", "Typeable"] ]
           build_typApp tybind ty =
             case tybind of 
               KindedVar nm _ -> TyApp ty (TyVar nm)
@@ -98,7 +97,6 @@ add_decls funs dec =
             case tybind of 
               KindedVar nm _ -> TyVar nm
               UnkindedVar nm -> TyVar nm    
-          rhs = Con (UnQual (Ident "genericArbitrary"))
     TypeSig loc names ty -> [TypeSig loc names (arby (tyFun (TyCon (UnQual (Ident "Default"))) ty))]
     FunBind matches -> [FunBind (map (add_match funs) matches ++ [default_case funs matches])]
     _ -> [dec]
@@ -176,7 +174,7 @@ arby (TyForall (Just as) ctx ty) = TyForall (Just as) (ctx' ++ ctx) (arby ty)
   where
     ctx' = concatMap arb as
     arb x = [ ClassA (UnQual (Ident ident)) [TyVar (name x)]
-            | ident <- ["Arbitrary", "CoArbitrary", "Typeable"] ]
+            | ident <- ["Arbitrary", "CoArbitrary", "Typeable", "Observe"] ]
     name (KindedVar x _) = x
     name (UnkindedVar x) = x
 arby (TyFun t u) = TyFun t (arby u)

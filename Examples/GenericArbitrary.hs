@@ -1,10 +1,16 @@
-{-# LANGUAGE DeriveFunctor, FlexibleInstances, TypeOperators, ScopedTypeVariables, FlexibleContexts #-}
-module GenericArbitrary where
+{-# LANGUAGE DeriveFunctor, FlexibleInstances, TypeOperators, ScopedTypeVariables, FlexibleContexts, GADTs #-}
+module GenericArbitrary(genericArbitrary, genericCoarbitrary, Observe(..), genericObserve, obs0, obs1, obs2, obs3, obs4, obs5) where
 
+import Prelude hiding (Either(..))
 import Test.QuickCheck
+import Test.QuickCheck.Gen.Unsafe
 import GHC.Generics
 import Data.Typeable
 import Control.Monad
+import Test.QuickSpec.Signature hiding (observe, ord)
+import Test.QuickSpec.Term
+import Test.QuickSpec
+import Data.Monoid
 
 -- Generate a value generically.
 genericArbitrary :: forall a. (Typeable a, Arbitrary a, Generic a, GArbitrary (Rep a)) => Gen a
@@ -102,3 +108,112 @@ instance GCoarbitrary U1 where
 
 instance GCoarbitrary f => GCoarbitrary (M1 i c f) where
   gcoarbitrary (M1 x) = gcoarbitrary x
+
+-- A type class of things that can be randomly tested for equality.
+class Observe a where
+  observe :: a -> Gen Observation
+
+data Observation where
+  Base :: (Typeable a, Ord a) => a -> Observation
+  Pair :: Observation -> Observation -> Observation
+  Left :: Observation -> Observation
+  Right :: Observation -> Observation
+
+ord :: (Typeable a, Ord a) => a -> Gen Observation
+ord x = return (Base x)
+
+instance Eq Observation where
+  x == y = x `compare` y == EQ
+
+instance Ord Observation where
+  Base x `compare` Base y = x' `compare` y
+    where
+      Just x' = cast x
+  Pair x y `compare` Pair x' y' =
+    case x `compare` x' of
+      LT -> LT
+      GT -> GT
+      EQ -> y `compare` y'
+  Left x `compare` Left y = x `compare` y
+  Right x `compare` Right y = x `compare` y
+  Left _ `compare` Right _ = LT
+  Right _ `compare` Left _ = GT
+
+instance Observe Int where
+  observe = ord
+
+instance Observe A where
+  observe = ord
+
+instance (Arbitrary a, Observe b) => Observe (a -> b) where
+  observe f = do
+    x <- arbitrary
+    observe (f x)
+
+instance Observe a => Observe [a] where
+  observe = genericObserve
+
+-- Now for Observe...
+genericObserve :: (Generic a, GObserve (Rep a)) => a -> Gen Observation
+genericObserve = gobserve . from
+
+class GObserve f where
+  gobserve :: f a -> Gen Observation
+
+instance (GObserve f, GObserve g) => GObserve (f :*: g) where
+  gobserve (x :*: y) = liftM2 Pair (gobserve x) (gobserve y)
+
+instance (GObserve f, GObserve g) => GObserve (f :+: g) where
+  gobserve (L1 x) = fmap Left (gobserve x)
+  gobserve (R1 x) = fmap Right (gobserve x)
+
+instance Observe a => GObserve (K1 i a) where
+  gobserve (K1 x) = observe x
+
+instance GObserve U1 where
+  gobserve U1 = ord ()
+
+instance GObserve f => GObserve (M1 i c f) where
+  gobserve (M1 x) = gobserve x
+
+obs0 :: (Observe a, Typeable a) => String -> a -> Sig
+obs0 x f = blind0 x f
+           `mappend` observer f
+
+-- | A unary function.
+obs1 :: (Typeable a,
+         Typeable b, Observe b) =>
+        String -> (a -> b) -> Sig
+obs1 x f = blind1 x f
+           `mappend` observer (f undefined)
+
+-- | A binary function.
+obs2 :: (Typeable a, Typeable b,
+         Typeable c, Observe c) =>
+        String -> (a -> b -> c) -> Sig
+obs2 x f = blind2 x f
+           `mappend` observer (f undefined undefined)
+
+-- | A ternary function.
+obs3 :: (Typeable a, Typeable b, Typeable c,
+         Typeable d, Observe d) =>
+        String -> (a -> b -> c -> d) -> Sig
+obs3 x f = blind3 x f
+           `mappend` observer (f undefined undefined undefined)
+
+-- | A function of four arguments.
+obs4 :: (Typeable a, Typeable b, Typeable c, Typeable d,
+         Typeable e, Observe e) =>
+        String -> (a -> b -> c -> d -> e) -> Sig
+obs4 x f = blind4 x f
+           `mappend` observer (f undefined undefined undefined undefined)
+
+-- | A function of five arguments.
+obs5 :: (Typeable a, Typeable b, Typeable c, Typeable d,
+         Typeable e, Typeable f, Observe f) =>
+        String -> (a -> b -> c -> d -> e -> f) -> Sig
+obs5 x f = blind5 x f
+           `mappend` observer (f undefined undefined undefined undefined undefined)
+
+observer :: (Observe a, Typeable a) => a -> Sig
+observer x = observerSig (Observer (pgen (promote observe)) `observing` x)
