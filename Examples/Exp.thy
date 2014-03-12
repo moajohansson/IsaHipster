@@ -3,12 +3,12 @@ imports "../IsaHipster"
 
 begin
 
-type_synonym 'v binop = "'v \<Rightarrow> 'v \<Rightarrow> 'v"
+type_synonym 'c binop = "'c \<Rightarrow> 'c \<Rightarrow> 'c"
 
 datatype ('c, 'v) expr =
   Cex 'c |
   Vex 'v |
-  Bex "'v binop" "('c,'v) expr" "('c,'v) expr"
+  Bex "'c binop" "('c,'v) expr" "('c,'v) expr"
 
 fun "value" :: "('v \<Rightarrow> 'c) \<Rightarrow> ('c,'v) expr \<Rightarrow> 'c"
 where
@@ -16,13 +16,13 @@ where
   "value env (Vex v) = env v" |
   "value env (Bex b e1 e2) = b (value env e1) (value env e2)"
 
-datatype ('c, 'v, 'b) program =
+datatype ('c, 'v) program =
   Done
-  | Const 'c "('c, 'v, 'b) program"
-  | Load 'v "('c, 'v, 'b) program"
-  | Apply 'b "('c, 'v, 'b) program"
+  | Const 'c "('c, 'v) program"
+  | Load 'v "('c, 'v) program"
+  | Apply "'c binop" "('c, 'v) program"
 
-fun sequence :: "('c, 'v, 'b) program => ('c, 'v, 'b) program => ('c, 'v, 'b) program"
+fun sequence :: "('c, 'v) program => ('c, 'v) program => ('c, 'v) program"
 where
   "sequence Done p = p"
   | "sequence (Const c p) p' = Const c (sequence p p')"
