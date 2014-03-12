@@ -123,7 +123,7 @@ To illustrate the effects of choosing a slightly different tactic for routine an
 
 \subsection{Proving Correctness of a Small Compiler}
 \label{sec:comp-ex}
-The following example is about a compiler to a stack machine for a toy language with generic types of expressions\footnote{This example a slight variation of that in \S3.3 in the Isabelle tutorial \cite{isabelle}. It had to be modified as our generators on the Haskell side does not support generation of values for datatype constructors involving higher-order arguments}. We show how theory exploration can be used to unblock a proof on which automated tactics otherwise fail due to a missing lemma.
+The following example is about a compiler to a stack machine for a toy language with generic types of expressions\footnote{This example a slight variation of that in \S3.3 in the Isabelle tutorial \cite{isabelle}. It had to be modified as the FEAT generators we chose to use do not support generation of values involving higher-order arguments}. We show how theory exploration can be used to unblock a proof on which automated tactics otherwise fail due to a missing lemma.
 Expressions in the language are built from constants (\texttt{Cex}), values (\texttt{Vex}) and binary operators (\texttt{Bex}): 
 \begin{small}
 \begin{verbatim}
