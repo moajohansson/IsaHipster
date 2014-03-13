@@ -26,13 +26,12 @@ process mode m =
 hipspecify (ParseFailed loc err_msg) = error err_msg
 hipspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
   Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
-  (defaultRecordDecl funs ++ (concatMap (add_decls funs) decls) ++ (concatMap add_derEnum decls) ++ enumA:[add_main decls True])
+  (defaultRecordDecl funs ++ (concatMap (add_decls funs) decls) ++ [add_main decls True])
     where
-      imports = map mk_importDecl ["HipSpec","Data.Typeable","Test.Feat","Test.QuickCheck.Gen.Unsafe"]
+      imports = map mk_importDecl ["HipSpec","Data.Typeable","Test.QuickCheck.Gen.Unsafe","GenericArbitrary","GHC.Generics"]
       imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing
                 (Just (False, [IAbs (Ident "Ord"),IAbs (Ident "Show")]))
-      pragma = LanguagePragma noLoc (map Ident ["DeriveDataTypeable", "TemplateHaskell"]) 
-      enumA = SpliceDecl noLoc (App (Con (UnQual (Ident "deriveEnumerable"))) ((TypQuote (UnQual (Ident "A")))))
+      pragma = LanguagePragma noLoc (map Ident ["DeriveDataTypeable", "DeriveGeneric"]) 
       mk_importDecl moduleName = 
         ImportDecl noLoc (ModuleName moduleName) False False Nothing Nothing Nothing
       funs = nub (concat [ [ (name, typ) | name <- names ] | TypeSig _ names typ <- decls ])
@@ -63,42 +62,33 @@ nowhere = SrcLoc "" 0 0
 quickspecify (ParseFailed loc err_msg) = error err_msg
 quickspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
   Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
-  ((concatMap (add_decls []) decls) ++ (concatMap add_derEnum decls) ++ enumA:[add_main decls False])
+  ((concatMap (add_decls []) decls) ++ [add_main decls False])
     where
       imports = map mk_importDecl ["Test.QuickCheck.Arbitrary","Test.QuickSpec","Data.Typeable", "HipSpec", "Test.Feat"] 
       imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing 
                 (Just (False, [IAbs (Ident "Ord"), IAbs (Ident "Show")]))
-      pragma = LanguagePragma noLoc (map Ident ["DeriveDataTypeable", "TemplateHaskell"]) 
-      enumA = SpliceDecl noLoc (App (Con (UnQual (Ident "deriveEnumerable"))) ((TypQuote (UnQual (Ident "A")))))
+      pragma = LanguagePragma noLoc (map Ident ["DeriveDataTypeable"]) 
       mk_importDecl moduleName = 
         ImportDecl noLoc (ModuleName moduleName) False False Nothing Nothing Nothing
 
-add_derEnum dec = 
-  case dec of
-     DataDecl loc dataOrNew context name tyVarBnds qualConDecls decls ->
-      [SpliceDecl noLoc (App (Con (UnQual (Ident "deriveEnumerable"))) ((TypQuote (UnQual name))))]
-     _ -> []     
 add_decls funs dec =
   case dec of 
     DataDecl loc dataOrNew context name tyVarBnds qualConDecls decls ->
       [DataDecl loc dataOrNew context name tyVarBnds qualConDecls (new_ders++decls),
-       InstDecl noLoc (ctxt tyVarBnds) (UnQual (Ident "Arbitrary")) 
-                [foldr build_typApp (TyCon (UnQual name)) tyVarBnds] 
-                [InsDecl (FunBind [Match noLoc (Ident "arbitrary") [] Nothing (UnGuardedRhs rhs) (BDecls [])])],
-       InstDecl noLoc (ctxt2 tyVarBnds) (UnQual (Ident "CoArbitrary")) 
-                [foldr build_typApp (TyCon (UnQual name)) tyVarBnds] 
-                 [InsDecl (FunBind [Match noLoc (Ident "coarbitrary") [] Nothing 
-                                    (UnGuardedRhs (Con (UnQual (Ident "coarbitraryShow")))) (BDecls [])])]
-          
-      ]
+       generic "Arbitrary" "arbitrary" "genericArbitrary",
+       generic "CoArbitrary" "coarbitrary" "genericCoarbitrary",
+       generic "Observe" "observe" "genericObserve"]
         where 
-          new_ders = map ((\x -> (x,[])) . UnQual . Ident) ["Eq", "Ord", "Typeable", "Show"]
-          ctxt tybnds = case tybnds of 
-            [] -> [] 
-            _ -> map (\v -> ClassA (UnQual (Ident "Enumerable")) [v]) (map tybinds2vars tybnds)
-          ctxt2 tybnds = case tybnds of 
-            [] -> [] 
-            _ -> map (\v -> ClassA (UnQual (Ident "Show")) [v]) (map tybinds2vars tybnds)  
+          generic cls fun impl =
+            InstDecl noLoc (ctxt tyVarBnds) (UnQual (Ident cls))
+            [foldr build_typApp (TyCon (UnQual name)) tyVarBnds]
+            [InsDecl (FunBind [Match noLoc (Ident fun) [] Nothing
+                               (UnGuardedRhs (Con (UnQual (Ident impl)))) (BDecls [])])]
+          new_ders = map ((\x -> (x,[])) . UnQual . Ident) ["Typeable", "Generic"]
+          ctxt tybnds =
+            [ ClassA (UnQual (Ident cls)) [tybinds2vars tybnd]
+            | tybnd <- tybnds,
+              cls <- ["Arbitrary", "CoArbitrary", "Observe", "Typeable"] ]
           build_typApp tybind ty =
             case tybind of 
               KindedVar nm _ -> TyApp ty (TyVar nm)
@@ -107,7 +97,6 @@ add_decls funs dec =
             case tybind of 
               KindedVar nm _ -> TyVar nm
               UnkindedVar nm -> TyVar nm    
-          rhs = App (Con (UnQual (Ident "sized"))) (Con (UnQual (Ident "uniform")))   
     TypeSig loc names ty -> [TypeSig loc names (arby (tyFun (TyCon (UnQual (Ident "Default"))) ty))]
     FunBind matches -> [FunBind (map (add_match funs) matches ++ [default_case funs matches])]
     _ -> [dec]
@@ -185,7 +174,7 @@ arby (TyForall (Just as) ctx ty) = TyForall (Just as) (ctx' ++ ctx) (arby ty)
   where
     ctx' = concatMap arb as
     arb x = [ ClassA (UnQual (Ident ident)) [TyVar (name x)]
-            | ident <- ["Arbitrary", "CoArbitrary", "Show", "Enumerable"] ]
+            | ident <- ["Arbitrary", "CoArbitrary", "Typeable", "Observe"] ]
     name (KindedVar x _) = x
     name (UnkindedVar x) = x
 arby (TyFun t u) = TyFun t (arby u)
