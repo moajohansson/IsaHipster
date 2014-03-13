@@ -159,7 +159,8 @@ fun prep_conjs ctxt conjs =
 fun explore ctxt const_nms =
     let
       val facts_nms = map (fn c => c^".simps") const_nms
-      val facts = maps (fn n => Sledgehammer_Util.thms_of_name ctxt n) facts_nms
+      val facts = maps (fn n => Sledgehammer_Util.thms_of_name ctxt n
+                       handle _ => []) facts_nms
       val tac_str = Expl_Tacs.final_tactic_str ctxt facts_nms
                         
       val conjs = hipspec_explore ctxt const_nms;
@@ -180,7 +181,8 @@ fun explore ctxt const_nms =
 fun setup_exploration const_nms thy0 =
     let
       val ctxt = Proof_Context.init_global thy0
-      val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")) const_nms
+      val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")
+                       handle _ => []) const_nms
       val res_ctxt = proof_loop ctxt facts (hipspec_explore ctxt const_nms)
     in
       Library.foldl 
@@ -197,7 +199,8 @@ fun explore_goal ctxt const_nms thm =
           (* FIXME: No simps for constant symbols, e.g. datatype constructors.
              FIXME: Won't pick up all the simps it needs, e.g. from functions defined in terms of *)
       val facts_nms = map (fn c => c^".simps") const_nms
-      val facts = maps (fn nm => Sledgehammer_Util.thms_of_name ctxt nm) facts_nms 
+      val facts = maps (fn nm => Sledgehammer_Util.thms_of_name ctxt nm 
+                                 handle _ => []) facts_nms 
       val res_ctxt = proof_loop_w_prio ctxt facts (SOME thm) (hipspec_explore ctxt const_nms)
     in
       case res_ctxt of
