@@ -51,12 +51,13 @@
 \maketitle
 
 \begin{abstract}
-Theory exploration is a technique for automatically discovering novel and interesting lemmas in a given mathematical theory development. This paper describes Hipster, a system integrating theory exploration with the proof assistant Isabelle.
-%Existing Isabelle-tools like Sledgehammer can automatically select existing lemmas from the libraries that are likely to be needed for automation of many proofs. Hipster is an extension of this approach which also allows for discovery of new or missing lemmas which require induction, thus increasing the number of proofs that can be automated.
-Hipster improves on the automation of Isabelle by allowing for discovery of new missing lemmas, required for the proof to go through using existing tactics. We show how this can be used to fully automate inductive proofs in Isabelle.
-Hipster can be used in two main ways, either in exploratory mode to automatically generate basic lemmas about a given set of datatypes and functions in a new theory development, or in proof mode, for a particular proof attempt, trying to discover the missing lemmas which would allow the current goal to be proved. 
 
+This paper describes Hipster, a system integrating theory exploration with the proof assistant Isabelle. Theory exploration is a technique for automatically discovering new interesting lemmas in a given theory development.
+Hipster can be used in two main modes. The first is {\em exploratory mode}, used for automatically generating basic lemmas about a given set of datatypes and functions in a theory development. The second is {\em proof mode}, used in a particular proof attempt, trying to discover the missing lemmas which would allow the current goal to be proved. Hipster's proof mode complements and boosts existing proof automation techniques that rely on automatically selecting existing lemmas, by inventing new lemmas that need induction to be proved. We show example uses of both modes.
 \end{abstract}
+
+% removed from the abstract:
+%Existing Isabelle-tools like Sledgehammer can automatically select existing lemmas from the libraries that are likely to be needed for automation of many proofs.
 
 \input{Introduction}
 
