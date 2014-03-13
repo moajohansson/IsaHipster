@@ -12,7 +12,10 @@ In this section we give an overview of Hipster, and show how it can be used both
 \end{center}
 \end{figure}
 
-Starting from an Isabelle theory, Hipster calls Isabelle's code generator \cite{codegen} to translate the given functions into a Haskell program. In order to use the testing framework from QuickCheck, as described in the previous section, we must however also post-process the Haskell file, adding \emph{generators}, which are responsible for producing arbitrary values used for evaluation and testing. We use generators automatically deduced by the Feat package \cite{feat}. Another important issue that need to be addressed at this stage is the differences in semantics for partial functions in Isabelle and Haskell. In order to avoid HipSpec missing equations that hold in Isabelle, but not in Haskell, we had to modify the translation of partial functions. This is explained in more detail in section \ref{sec:partial}.
+Starting from an Isabelle theory, Hipster calls Isabelle's code generator \cite{codegen} to translate the given functions into a Haskell program. In order to use the testing framework from QuickCheck, as described in the previous section, we must however also post-process the Haskell file, adding \emph{generators}, which are responsible for producing arbitrary values used for evaluation and testing. 
+% Does anyone want to expand on exctly what we do?
+%We use generators automatically deduced by the Feat package \cite{feat}. 
+Another important issue that need to be addressed at this stage is the differences in semantics for partial functions in Isabelle and Haskell. In order to avoid HipSpec missing equations that hold in Isabelle, but not in Haskell, we had to modify the translation of partial functions. This is explained in more detail in section \ref{sec:partial}.
 
 Once the Haskell program is in place, we run theory exploration and generate a set of equational conjectures, which HipSpec orders according to generality. More general equations are preferred, as we expect these to be more widely applicable as lemmas. In previous work on HipSpec, the system would at this stage apply induction on the conjectures and send them off to some external prover. Here, we instead import them back into Isabelle as we wish to produce checkable LCF-style proofs for our conjectures. 
 
@@ -94,16 +97,16 @@ where
 We can now ask Hipster to explore the relationships between the functions on trees and the corresponding functions on lists, such as \texttt{rev}, \texttt{map} and \texttt{hd}. Hipster produce four new lemmas and one open conjecture:
 \begin{small}
 \begin{verbatim}
-lemma lemma_ac [thy_expl]: "flat_tree (tmap x2 y2) = map x2 (flat_tree y2)"
+lemma lemma_ac [thy_expl]: "flat_tree (tmap x y) = map x (flat_tree y)"
 by (tactic {* Hipster_Tacs.induct_simp_metis . . . *})
 
-lemma lemma_ad [thy_expl]: "map x2 (rev xs2) = rev (map x2 xs2)"
+lemma lemma_ad [thy_expl]: "map x (rev xs) = rev (map x xs)"
 by (tactic {* Hipster_Tacs.induct_simp_metis . . . *})
 
-lemma lemma_ae [thy_expl]: "flat_tree (mirror x2) = rev (flat_tree x2)"
+lemma lemma_ae [thy_expl]: "flat_tree (mirror x) = rev (flat_tree x)"
 by (tactic {* Hipster_Tacs.induct_simp_metis . . . *})
 
-lemma lemma_af [thy_expl]: "hd (xs2 @ xs2) = hd xs2"
+lemma lemma_af [thy_expl]: "hd (xs @ xs) = hd xs"
 by (tactic {* Hipster_Tacs.induct_simp_metis . . . *})
 
 lemma unknown: "hd (flat_tree x) = leftmost x"
@@ -119,84 +122,82 @@ Lemmas \texttt{ad} and \texttt{af} are perhaps not of much interest, as they onl
 This example shows that Hipster indeed can find most of the basic lemmas we would expect in a new theory. The user has to provide the constants Hipster should explore, and the rest is fully automatic, thus speeding up theory development.  Theory exploration in this example takes just a few seconds, no longer that it takes to run tools like Sledgehammer. Even if Hipster fail to prove some properties, these can still be interesting, and the user can choose to prove them interactively.
 
 \subsubsection*{Exploring with different tactics.}
-To illustrate the effects of choosing a slightly different tactic for routine and difficult reasoning, we also experimented with an instantiation using only Isabelle's simplifier as routine reasoning and induction followed by simplification as difficult reasoning. The advantage of this instantiation is that the simplifier generally is faster than Metis, but less powerful. However, for this theory, it turns out that the simplifier is sufficient to prove the same lemmas as above. Hipster also suggests one extra lemma, namely \texttt{rightmost (mirror x2) = leftmost x2}, which is the dual to lemma \texttt{ab} above. When we used Metis, this lemma could be proved without induction, by routine reasoning, and was thus discarded. Using only the simplifier, difficult reasoning and induction is required to find a proof, and the lemma is therefore presented to the user. 
+To illustrate the effects of choosing a slightly different tactic for routine and difficult reasoning, we also experimented with an instantiation using only Isabelle's simplifier as routine reasoning and induction followed by simplification as difficult reasoning. The advantage of this instantiation is that the simplifier generally is faster than Metis, but less powerful. However, for this theory, it turns out that the simplifier is sufficient to prove the same lemmas as above. Hipster also suggests one extra lemma, namely \texttt{rightmost (mirror x) = leftmost x}, which is the dual to lemma \texttt{ab} above. When we used Metis, this lemma could be proved without induction, by routine reasoning, and was thus discarded. Using only the simplifier, difficult reasoning and induction is required to find a proof, and the lemma is therefore presented to the user. 
 
 \subsection{Proving Correctness of a Small Compiler}
 \label{sec:comp-ex}
-The following example is about a compiler to a stack machine for a toy language with generic types of expressions\footnote{This example a slight variation of that in \S3.3 in the Isabelle tutorial \cite{isabelle}. It had to be modified as our generators on the Haskell side does not support generation of values for datatype constructors involving higher-order arguments}. We show how theory exploration can be used to unblock a proof on which automated tactics otherwise fail due to a missing lemma.
+The following example is about a compiler to a stack machine for a toy language with generic types of expressions\footnote{This example a slight variation of that in \S3.3 in the Isabelle tutorial \cite{isabelle}. }. We show how theory exploration can be used to unblock a proof on which automated tactics otherwise fail due to a missing lemma.
 Expressions in the language are built from constants (\texttt{Cex}), values (\texttt{Vex}) and binary operators (\texttt{Bex}): 
 \begin{small}
 \begin{verbatim}
-datatype ('c, 'v, 'b) expr =
-    Cex 'c 
-  | Vex 'v 
-  | Bex "'b" "('c,'v,'b) expr" "('c,'v,'b) expr"
+type_synonym 'c binop = 'c => 'c => 'c
+
+datatype ('c, 'v) expr =
+  Cex 'c |
+  Vex 'v |
+  Bex "'c binop" "('c,'v) expr" "('c,'v) expr
 \end{verbatim}
 \end{small}
-The types of variables, values and binary operators are not fixed, but given by type parameters \texttt{'c}, \texttt{'v} and \texttt{'b}. 
+The types of variables, values and binary operators are not fixed, but given by type parameters \texttt{'c} and \texttt{'v}.
 To evaluate an expression, we define a function \texttt{value}, parametrised by a lookup function for binary operators and an environment mapping variables to values:
 \begin{small}
 \begin{verbatim}
-fun value :: ('b =>'c =>'c =>'c) => ('v =>'c) => ('c,'v,'b) expr =>'c
+fun value :: ('v => 'c) => ('c,'v) expr => 'c
 where
-   value getBinop env (Cex c) = c
- | value getBinop env (Vex v) = env v
- | value getBinop env (Bex b e1 e2) = 
-    (getBinop b) (value getBinop env e1) (value getBinop env e2)
+    value env (Cex c) = c 
+  | value env (Vex v) = env v
+  | value env (Bex b e1 e2) = b (value env e1) (value env e2)
 \end{verbatim}
 \end{small}
 A program for our stack machine consists of four instructions:
 \begin{small}
 \begin{verbatim}
-datatype ('c, 'v, 'b) program =
-    Done
-  | Const 'c "('c, 'v, 'b) program
-  | Load 'v  "('c, 'v, 'b) program
-  | Apply 'b "('c, 'v, 'b) program
+datatype ('c, 'v) program =
+  Done
+  | Const 'c "('c, 'v) program
+  | Load 'v "('c, 'v) program"
+  | Apply "'c binop" "('c, 'v) program"
 \end{verbatim}
 \end{small}
 A program is either empty (\texttt{Done}), or consists of one of the instructions \texttt{Const}, \texttt{Load} or \texttt{Apply}, followed by the remaining program. We further define a function \texttt{sequence} for combining programs:
 \begin{small}
 \begin{verbatim}
-fun sequence :: ('c,'v,'b) program => ('c,'v,'b) program =>
- ('c,'v,'b) program
+fun sequence :: ('c, 'v) program => ('c, 'v) program => ('c, 'v) program
 where
     sequence Done p = p
   | sequence (Const c p) p' = Const c (sequence p p')
   | sequence (Load v p) p' = Load v (sequence p p')
-  | sequence (Apply b p) p' = Apply b (sequence p p')
+  | sequence (Apply b p) p' = Apply b (sequence p p') 
 \end{verbatim}
 \end{small}
 Program execution is modelled by the function \texttt{exec}, which given a lookup function for binary operators, a store for variables and a program, returns the values on the stack after execution.
 \begin{small}
 \begin{verbatim}
-fun exec :: ('b =>'c =>'c =>'c) => ('v =>'c) => ('c,'v,'b) program =>
-								 'c list =>'c list
+fun exec :: ('v => 'c) =>  ('c,'v) program => 'c list => 'c list
 where
-    exec getBinop env Done stack = stack
-  | exec getBinop env (Const c p) stack = exec getBinop env p (c#stack) 
-  | exec getBinop env (Load v p) stack = 
-  	  exec getBinop env p ((env v)#stack)
-  | exec getBinop env (Apply b p) stack = exec getBinop env p 
-  	  ((getBinop b (hd stack) (hd(tl stack)))#(tl(tl stack)))
+    exec env Done stack = stack
+  | exec env (Const c p) stack = exec env p (c#stack)
+  | exec env (Load v p) stack = exec env p ((env v)#stack)
+  | exec env (Apply b p) stack =
+     exec env p ((b (hd stack) (hd(tl stack)))#(tl(tl stack)))
 \end{verbatim}
 \end{small}
 We finally define a function \texttt{compile}, which specifies how expressions are compiled into programs:
 \begin{small}
 \begin{verbatim}
-fun compile :: ('c,'v,'b) expr => ('c,'v,'b) program
+fun compile :: ('c,'v) expr => ('c,'v) program
   where
     compile (Cex c) =  Const c Done
   | compile (Vex v) =  Load v Done
-  | compile (Bex b e1 e2) = 
-     sequence (compile e2) (sequence (compile e1) (Apply b Done))
+  | compile (Bex b e1 e2) = s
+   sequence (compile e2) (sequence (compile e1) (Apply b Done))"
 \end{verbatim}
 \end{small}
 Now, we wish to prove correctness of the compiler, namely that executing a compiled expression indeed results in the value of that expression: 
 \begin{verbatim}
 theorem "exec getBinop env (compile e) [] = [value getBinop env e]"
 \end{verbatim}
-If we try to apply induction on \texttt{e}, Isabelle's simplifier solves the base-case but neither the simplifier nor Sledgehammer succeeds in proving the step-case. At this stage, we can apply Hipster's theory exploration tactic. It will generate a set of conjectures, and interleave proving these with trying to prove the open sub-goal. Once Hipster succeeds in finding a set of lemmas which allow the open goal to be proved by routine reasoning, it presents the user with a list of lemmas it has proved, in this case:
+If we try to apply induction on \texttt{e}, Isabelle's simplifier solves the base-case but neither the simplifier or first-order reasoning by Sledgehammer succeeds in proving the step-case. At this stage, we can apply Hipster's theory exploration tactic. It will generate a set of conjectures, and interleave proving these with trying to prove the open sub-goal. Once Hipster succeeds in finding a set of lemmas which allow the open goal to be proved by routine reasoning, it presents the user with a list of lemmas it has proved, in this case:
 \begin{small}
 \begin{verbatim}
 Try first proving lemmas:
