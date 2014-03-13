@@ -139,6 +139,9 @@ instance Ord Observation where
   Left _ `compare` Right _ = LT
   Right _ `compare` Left _ = GT
 
+instance Observe Bool where
+  observe = ord
+
 instance Observe Int where
   observe = ord
 

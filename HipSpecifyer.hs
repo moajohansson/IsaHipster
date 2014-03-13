@@ -99,6 +99,7 @@ add_decls funs dec =
               UnkindedVar nm -> TyVar nm    
     TypeSig loc names ty -> [TypeSig loc names (arby (tyFun (TyCon (UnQual (Ident "Default"))) ty))]
     FunBind matches -> [FunBind (map (add_match funs) matches ++ [default_case funs matches])]
+    PatBind loc (PVar name) ty rhs binds -> add_decls funs (FunBind [Match loc name [] ty rhs binds])
     _ -> [dec]
 
 add_match funs (Match loc name pats Nothing rhs binds) =
