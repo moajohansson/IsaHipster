@@ -1,8 +1,8 @@
 Isabelle is a logic of total functions. Nonetheless, we can define
 apparently partial functions, such as \verb|hd|:
 \begin{verbatim}
-fun hd :: "'a list => 'a" where
-  "hd (x#xs) = x"
+fun hd :: 'a list => 'a where
+  hd (x#xs) = x
 \end{verbatim}
 
 How do we reconcile \verb|hd| being partial with Isabelle functions
@@ -10,107 +10,52 @@ being total? The answer is that in Isabelle, \verb|hd| is total, but
 the behaviour of \verb|hd []| is unspecified: it returns some
 arbitrary value of type \verb|'a|. Meanwhile in Haskell, \verb|head|
 is partial, but the behaviour of \verb|head []| is specified: it
-crashes. If we naively translate Isabelle's \verb|hd| into Haskell's
-\verb|head|, we will not respect the semantics of Isabelle.
+crashes. We must therefore translate \emph{partially defined} Isabelle
+functions into \emph{total but underspecified} Haskell functions.
 
-Hipster translates each Isabelle function into a semantically
-equivalent, total Haskell function. We do this by adding
-a \emph{default argument} that specifies the return value when no case
-matches. For example, we will translate \verb|hd| into:\footnote{This is a lie (see next footnote).}
+Hipster uses a technique suggested by Jasmin Blanchette
+\cite{blanchettification} for this. Whenever we translate an Isabelle function
+that is missing some cases, we add a default case, like so:
 \begin{verbatim}
-hd :: a -> [a] -> a
-hd _ (x:xs) = x
-hd def [] = def
+hd :: [a] -> a
+hd (x:xs) = x
+hd [] = ???
 \end{verbatim}
-To model the notion that the default arguments are unspecified,
-whenever we evaluate a test case we will pick a \emph{random} value
-for the default argument. This value will vary from test case to test
-case but will be consistent within one run of a test case.
 
-Though the idea is simple, there are a few details to get right.
-Suppose we define \verb|second|, which returns the second element of a list, as
+But what should we put for the result of \verb|hd []|? To model the
+notion that \verb|hd []| is unspecified, whenever we evaluate a test
+case we will pick a \emph{random} value for \verb|hd []|. This value
+will vary from test case to test case but will be consistent within
+one run of a test case.
+
+Suppose we define the function \verb|second|, which returns the second
+element of a list, as
 \begin{verbatim}
 second (x#y#xs) = y
 \end{verbatim}
 It might seem that we should translate \verb|second|, by analogy with \verb|hd|, as
 \begin{verbatim}
-second :: a -> [a] -> a
-second def (x:y:xs) = y
-second def _ = def
+second :: [a] -> a
+second (x:y:xs) = y
+second _ = ???
 \end{verbatim}
-but this translation is \emph{wrong}! If we call \verb|second| on
-several lists of length 1, it will return the same value---the default
-argument---in all cases. This does not respect the semantics of \verb|second|
-in Isabelle, which returns an unspecified value whenever its argument
-has length 1, but might return a different value for different arguments.
-The default argument must therefore be a random \emph{function}
-of the same type as the original function, which we call whenever the
-original function is unspecified. Thus we really have:\footnote{This is the truth (see previous footnote).}
+and pick a random value of type \verb|a| to use in the default case.
+But this translation is wrong! If we apply our translated \verb|second|
+to a single-element list, it will give the same answer regardless of which
+element is in the list, and QuickSpec will discover the lemma
+\verb|second [x] = second [y]|. This lemma is certainly not true of our
+Isabelle function, which says nothing about the behaviour
+of \verb|second| on single-element lists, and Hipster will fail to
+prove it.
+
+We must allow the default case to produce a different result for
+different arguments. We therefore translate \verb|second| as
 \begin{verbatim}
-second :: ([a] -> a) -> [a] -> a
-second def (x:y:xs) = y
-second def xs = def xs
+second :: [a] -> a
+second (x:y:xs) = y
+second xs = ??? xs
 \end{verbatim}
-
-Another difficulty is what to do about functions that \emph{call} partial functions.
-Suppose we define \verb|nth|, which indexes into a list, as
-\begin{verbatim}
-fun nth :: "nat => 'a list => 'a list" where
-  "nth 0 xs = hd xs"
-| "nth (Suc n) xs = nth n (tl xs)"
-\end{verbatim}
-
-\verb|nth| has no missing cases, so we might want to translate it as
-\begin{verbatim}
-nth :: Int -> [a] -> [a]
-nth 0 xs = hd ??? xs
-nth (n+1) xs = nth n (tl ??? xs)
-\end{verbatim}
-but what should we write for \verb|???|? We need default arguments to
-pass to \verb|hd| and \verb|tl|, so \verb|nth| had better receive
-them as arguments. Since our functions may be mutually recursive in
-arbitrarily complex ways, the easiest way is to define a record
-containing default arguments for \emph{all} the functions in our
-program, and pass this record to every function, regardless of whether
-it has missing cases or not. Thus our \verb|nth| example will become:\footnote{For
-technical reasons, the default implementations in reality are not fully
-polymorphic but have typeclass constraints related to random generation.}
-\begin{verbatim}
-data Default = Default {
-  default_hd :: forall a. [a] -> a,
-  default_tl :: forall a. [a] -> [a]
-  }
-
-hd :: Default -> [a] -> a
-hd _ (x:xs) = x
-hd def xs = default_hd def xs
-
-tl :: Default -> [a] -> [a]
-tl _ (x:xs) = xs
-tl def xs = default_tl def xs
-
-nth :: Default -> Int -> [a] -> [a]
-nth def 0 xs = hd def xs
-nth def (n+1) xs = nth def (tl def xs)
-\end{verbatim}
-Here, \verb|hd| and \verb|tl| extract their default implementations
-from the record, while \verb|nth| simply passes the record to \verb|hd|
-and \verb|tl| and into the recursive call. The regularity of this
-transformation makes it easy to implement.
-
-It is quite easy to import this transformed program into QuickSpec.
-We give QuickSpec the transformed functions as they are (including the
-default argument) as well as one variable \verb|def| of
-type \verb|Default|. The generated equations will mention \verb|def|:
-for example, with a richer signature also containing
-\verb|length| and \verb|append| we would get
-\verb|nth def (length def xs) (append def xs ys) = hd def ys|.
-To turn this into an equation suitable for Isabelle we simply erase
-every occurrence of \verb|def|, to get
-\verb|nth (length xs) (append xs ys) = hd ys|.
-This erasure is sound because, if the Haskell equation holds
-regardless of which default values we choose, then the Isabelle
-equation, in which the default values are unspecified, must also hold.
-As far as QuickSpec is concerned, \verb|def| is the only term of type
-\verb|Default|, so there is no risk of getting several default records
-in one equation (which would make erasure unsound).
+where \verb|???| is a random \emph{function} of type \verb|[a] -> a|.
+(QuickCheck can generate random functions.) As before, whenever we
+evaluate a test case, we instantiate \verb|???| with a new random function.
+This accurately mimics Isabelle's semantics.
