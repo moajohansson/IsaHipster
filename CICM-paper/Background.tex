@@ -6,14 +6,14 @@ we use as a backend for generating conjectures. HipSpec is a
 state-of-the-art inductive theorem prover and theory exploration
 system for Haskell. In \cite{hipspecCADE} we showed that HipSpec is
 able to automatically discover and prove the kind of equational lemmas present in
-Isabelle's list library, when given list functions written in Haskell.
+Isabelle's libraries, when given the corresponding functions written in Haskell.
 
 HipSpec works in two stages:
+\begin{enumerate}
+\item Generate a set of conjectures about the functions at hand. These conjectures are equations between terms involving the given functions, and are only tested for correctness.
 
-(1) Generate a set of conjectures about the functions at hand. These conjectures are equations between terms involving the given functions, and are only tested for correctness.
-
-(2) Attempt to prove each of the conjectures, using already proven conjectures as assumptions. HipSpec implements this by enumerating induction schemas, and firing off many proof obligations to automated first-order logic theorem provers.
-
+\item Attempt to prove each of the conjectures, using already proven conjectures as assumptions. HipSpec implements this by enumerating induction schemas, and firing off many proof obligations to automated first-order logic theorem provers.
+\end{enumerate}
 The proving power of HipSpec comes from its capability to
 automatically discover and prove lemmas, which are then used to help
 subsequent proofs.
@@ -26,15 +26,15 @@ inside Isabelle any proof we found anyway, so it is easier to use
 Isabelle for the proofs in the first place.
 
 The part of HipSpec we do use
-is its conjecture synthesis system (part (1) above, called QuickSpec \cite{quickspec}),
+is its conjecture synthesis system (part (1) above), called QuickSpec \cite{quickspec}),
 which efficiently generates equations about given functions and
 datatypes.
 
 QuickSpec takes a set of functions as input, and proceeds to generate all
 type-correct terms up to a given limit (usually up to depth three), with
 variables (usually three per type).  It first assumes that all terms the same
-type are equivalent, and are initially put in the same equivalence class.  By
-generating random values for the variables (using QuickCheck\cite{quickcheck}), the terms are repeatedly evaluated and their equivalence
+type are equivalent, and initially puts them in the same equivalence class.  By
+generating random values for the variables (using QuickCheck \cite{quickcheck}), the terms are repeatedly evaluated and their equivalence
 classes are separated according to the evaluation results.  This process is
 repeated until the equivalence classes stabilise, and resulting equations can
 be read off from each equivalence class.  This means that the conjectures

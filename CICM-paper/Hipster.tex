@@ -1,7 +1,7 @@
 \section{Hipster: Implementation and Use}
 \label{sec:hipster}
 
-In this section we give an overview of Hipster, and show how it can be used both in theory exploration mode and in proof mode, to find lemmas relevant for a particular proof attempt. An overview of Hipster is shown in figure \ref{fig:hipster}. The source code and examples are available online\footnote{\url{https://github.com/moajohansson/IsaHipster}}.
+We now give a description of the implementation of Hipster, and show how it can be used both in theory exploration mode and in proof mode, to find lemmas relevant for a particular proof attempt. An overview of Hipster is shown in figure \ref{fig:hipster}. The source code and examples are available online\footnote{\url{https://github.com/moajohansson/IsaHipster}}.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -22,15 +22,15 @@ Once the Haskell program is in place, we run theory exploration and generate a s
 The proof procedure in Hipster is parametrised by two tactics, one for easy or \emph{routine reasoning} and one for \emph{difficult reasoning}. In the examples below, we use Isabelle's simplifier followed by first-order reasoning by Metis \cite{metis} as routine reasoning, and a tactic performing structural induction followed by simplification and first-order reasoning as difficult reasoning. Metis is restricted to run for at most one second in both the routine and difficult tactic. If there are several possible variables to apply induction to, we may backtrack if the first choice fails. Both tactics have access to the theorems proved so far, and hence gets stronger as the proof procedure proceed through the list of conjectures. 
 
 As there are rather many conjectures produced by theory exploration, we do not want to present them all to the user, but rather select the most interesting ones, which are difficult to prove. Those that follow only by routine reasoning are filtered out. 
-Depending on the theory and application we can change these tactics to suit our needs. If we want Hipster to produce fewer or more lemmas, we can choose a stronger or weaker tactic, allowing for flexibility.  
+Depending on the theory and application we can vary the tactics for routine- and difficult reasoning to suit our needs. If we want Hipster to produce fewer or more lemmas, we can choose a stronger or weaker tactic, allowing for flexibility.  
 
-The order in which Hipster tries to prove things matter. As we mentioned, it will try more general conjectures first, with the hope that they will be useful to filter out many more specific routine results. Occasionally though, a proof will fail as a not yet proved lemma is required. In this case, the failed conjecture is added back into the list of open conjectures and retried later, provided that at least one new lemma has been proved in the meantime to ensure progress and termination. Hipster terminates when it either runs out of open conjectures, or when it does not make any more progress. 
+The order in which Hipster tries to prove things matter. As we mentioned, it will try more general conjectures first, with the hope that they will be useful to filter out many more specific routine results. Occasionally though, a proof will fail as a not yet proved lemma is required. In this case, the failed conjecture is added back into the list of open conjectures and retried later, provided that at least one new lemma has been proved in the meantime, to ensure progress and termination. Hipster terminates when it either runs out of open conjectures, or when it does not make any more progress. 
 
 Below we give two typical use cases for Hipster. In both examples, Hipster has been instantiated with the  same routine- and difficult reasoning tactics, described above.
 
 \subsection{Exploring a Theory of Binary Trees}
 \label{sec:tree}
-In this example we look at a theory about binary trees, with data stored at the leaves:
+This example is about a theory of binary trees, with data stored at the leaves:
 \begin{small}
 \begin{verbatim}
 datatype 'a Tree = 
@@ -38,7 +38,7 @@ datatype 'a Tree =
   | Node 'a Tree  'a Tree
 \end{verbatim}
 \end{small}
-Let's define some function over our trees. \texttt{mirror} swaps the left and right subtrees everywhere, and \texttt{tmap} applies a function to each element in the tree:
+Let's define some function over our trees: \texttt{mirror} swaps the left and right subtrees everywhere, and \texttt{tmap} applies a function to each element in the tree.
 \begin{small}
 \begin{verbatim}
 fun mirror :: 'a Tree => 'a Tree
@@ -117,9 +117,10 @@ oops
 %flat_tree (mirror x) = rev (flat_tree x)
 %map x (rev xs) = rev (map x xs)
 %hd (xs @ xs) = hd xs
-Lemmas \texttt{ad} and \texttt{af} are perhaps not of much interest, as they only relate functions on lists. In fact, lemma \texttt{ad} is already in Isabelle's list library, but is not labelled as a simplification rule, why Hipster rediscovers it. Lemma \texttt{af} is a specialisation of a conditional library-lemma, with the side-condition that the first list is non-empty. Hipster can however not discover conditional lemmas, why the specialised version is produced instead. In addition to the four lemmas which have been proved, Hipster also outputs one interesting conjecture (labelled \texttt{unknown}) which it fails to prove. To prove this conjecture, we need a lemma stating that, as the trees store data at the leaves, \texttt{flat\_tree} will always produce a non-empty list: \texttt{flat\_tree t $\neq$ []}. As this is not an equation, it is not discovered by Hipster\footnote{Unless we also give it the constant $False$ as an input, however, that would also increase the size of the search space}. 
+Lemmas \texttt{ad} and \texttt{af} are perhaps not of much interest, as they only relate functions on lists. In fact, lemma \texttt{ad} is already in Isabelle's list library, but is not labelled as a simplification rule, why Hipster rediscovers it. Lemma \texttt{af} is a specialisation of a conditional library-lemma, with the side-condition that the first list is non-empty. Hipster can however not discover conditional lemmas, why the specialised version is produced instead. In addition to the four lemmas which have been proved, Hipster also outputs one interesting conjecture (labelled \texttt{unknown}) which it fails to prove. To prove this conjecture, we need a lemma stating that, as the trees store data at the leaves, \texttt{flat\_tree} will always produce a non-empty list:\\
+ \texttt{flat\_tree t $\neq$ []}. As this is not an equation, it is not discovered by Hipster\footnote{Unless we also give it the constant $False$ as an input, however, that would also increase the size of the search space}. 
  
-This example shows that Hipster indeed can find most of the basic lemmas we would expect in a new theory. The user has to provide the constants Hipster should explore, and the rest is fully automatic, thus speeding up theory development.  Theory exploration in this example takes just a few seconds, no longer that it takes to run tools like Sledgehammer. Even if Hipster fail to prove some properties, these can still be interesting, and the user can choose to prove them interactively.
+This example shows that Hipster indeed can find most of the basic lemmas we would expect in a new theory. The user has to provide the constants Hipster should explore, and the rest is fully automatic, thus speeding up theory development.  Theory exploration in this example takes just a few seconds, no longer that it takes to run tools like Sledgehammer. Even if Hipster fail to prove some properties, they may still be interesting, and the user can choose to prove them interactively.
 
 \subsubsection*{Exploring with different tactics.}
 To illustrate the effects of choosing a slightly different tactic for routine and difficult reasoning, we also experimented with an instantiation using only Isabelle's simplifier as routine reasoning and induction followed by simplification as difficult reasoning. The advantage of this instantiation is that the simplifier generally is faster than Metis, but less powerful. However, for this theory, it turns out that the simplifier is sufficient to prove the same lemmas as above. Hipster also suggests one extra lemma, namely \texttt{rightmost (mirror x) = leftmost x}, which is the dual to lemma \texttt{ab} above. When we used Metis, this lemma could be proved without induction, by routine reasoning, and was thus discarded. Using only the simplifier, difficult reasoning and induction is required to find a proof, and the lemma is therefore presented to the user. 
@@ -139,8 +140,8 @@ datatype ('c, 'v) expr =
   Bex "'c binop" "('c,'v) expr" "('c,'v) expr
 \end{verbatim}
 \end{small}
-The types of variables, values and binary operators are not fixed, but given by type parameters \texttt{'c} and \texttt{'v}.
-To evaluate an expression, we define a function \texttt{value}, parametrised by a lookup function for binary operators and an environment mapping variables to values:
+The types of variables and values are not fixed, but given by type parameters \texttt{'c} and \texttt{'v}.
+To evaluate an expression, we define a function \texttt{value}, parametrised by an environment mapping variables to values:
 \begin{small}
 \begin{verbatim}
 fun value :: ('v => 'c) => ('c,'v) expr => 'c
@@ -171,7 +172,7 @@ where
   | sequence (Apply b p) p' = Apply b (sequence p p') 
 \end{verbatim}
 \end{small}
-Program execution is modelled by the function \texttt{exec}, which given a lookup function for binary operators, a store for variables and a program, returns the values on the stack after execution.
+Program execution is modelled by the function \texttt{exec}, which given a store for variables and a program, returns the values on the stack after execution.
 \begin{small}
 \begin{verbatim}
 fun exec :: ('v => 'c) =>  ('c,'v) program => 'c list => 'c list
