@@ -48,7 +48,7 @@ The base-case follow trivially from the definition of \texttt{rev},
 but Isabelle's automated tactics \texttt{simp}, \texttt{auto} and
 \texttt{sledgehammer} will all fail to prove the step-case. We can
 only obtain the simplified version of the step-case: \\\texttt{rev(rev
-  xs) = xs ==> rev ((rev xs) @ [x]) = x#xs}, after which we are stuck.
+  xs) = xs ==> rev ((rev xs) @ [x]) = x\#xs}, after which we are stuck.
 This is where Hipster comes into the picture. If we call Hipster at
 this point in the proof, asking for lemmas about \texttt{rev} and
 append (\texttt{@}), it suggests and proves three lemmas:
