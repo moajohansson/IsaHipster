@@ -4,15 +4,36 @@ The concept of theory exploration was first introduced by Buchberger \cite{buchb
 
 Hipster translate Isabelle theories into Haskell, after which computation and evaluation in Haskell is used to efficiently generate generate interesting conjectures. These are then imported back into Isabelle and proved by automated tactics. Hipster can be used in two main ways: in \emph{exploratory mode} it quickly discovers basic properties about a newly defined function and its relationship to already existing ones. Hipster can also be used in \emph{proof mode}, to provide lemma hints for an ongoing proof attempt when the user is stuck. 
 
-Our work also fits nicely with the increased popularity of Sledgehammer \cite{sledgehammer}, an Isabelle tool allowing the user to call various external automated provers. Sledgehammer use \emph{relevance filtering} to select among the available lemmas those likely to be useful for proving a given conjecture \cite{mash}. However, if a crucial lemma is missing, the proof attempt will fail. If theory exploration is employed before, we can increase the chances of Sledgehammer succeeding with little user effort. 
+Our work also fits nicely with the increased popularity of Sledgehammer \cite{sledgehammer}, an Isabelle tool allowing the user to call various external automated provers. Sledgehammer use \emph{relevance filtering} to select among the available lemmas those likely to be useful for proving a given conjecture \cite{mash}. However, if a crucial lemma is missing, the proof attempt will fail. If theory exploration is employed, we can increase the chances of Isabelle'a automatic tactics succeeding with little user effort. As a first simple introductory example, we consider the example from section 2.3 of the Isabelle tutorial \cite{isabelle}): proving that reversing a list twice produce the same list. We first apply structural induction on the list \texttt{xs}.
+\begin{verbatim}
+theorem rev_rev : "rev(rev xs) = xs"
+apply (induct xs)
+\end{verbatim}
+The base-case follow trivially from the definition of \texttt{rev}, but Isabelle's automated tactics simp, auto and Sledgehammer will all fail to prove the base case. We can only obtain the simplified version of the step-case: \\\texttt{rev(rev xs) ==> rev ((rev xs) @ [x]) = [x]}, after which we are stuck. This is where Hipster comes into the picture. Calling Hipster at this point in the proof, asking for lemmas about \texttt{rev} and append (\texttt{@}), suggests and proves three lemmas: 
+\begin{verbatim}
+lemma lemma_a:  "xs @ [] = xs"
+lemma lemma_aa : "(xs @ ys) @ zs = xs @ (ys @ zs)"
+lemma lemma_ab : "(rev xs) @ (rev ys) = rev (ys @ xs)"
+\end{verbatim}
+The stuck subgoal needs lemma \texttt{ab} to complete the proof of the subgoal. Lemma \texttt{ab} in turn, needs lemma \texttt{a} for its base-case, and lemma \texttt{ab} for its step-case. With these three lemmas present, Isabelle's tactics can take care of the rest. For example, if we now call Sledgehammer in the step-case, it this times suggests a proof by using Isabelle's first-order reasoning tactic \texttt{metis} \cite{metis}, using the relevant function definitions as well as \texttt{lemma\_ab}:
+\begin{small}
+\begin{verbatim}
+theorem rev_rev : "rev(rev xs) = xs"
+apply (induct xs)
+apply simp
+sledgehammer
+by (metis rev.simps(1) rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
+\end{verbatim}
+\end{small}
+%This is because we are missing 
 
-HERE: short example? Something unprovable by Sledgehammer before theory exploration.
+%HERE: short example? Something unprovable by Sledgehammer before theory exploration.
 
 %Hipster is parametrised by tactics for routine and "hard" reasoning. In this paper, we consider routine reasoning to be first-order resoning by Metis, give the conjectures Hipster has proved so far while "hard" reasoning is those proofs requiring induction. 
 
 %Sledgehammer is a popular and powerful tool in Isabelle which allows users to call various external automated first-order provers \cite{sledgehammer}. Proofs are then replayed inside Isabelle's trusted kernel using its Metis prover. Sledgehammer's machine learning based relevance filter \cite{mash}, selects a number of facts from Isabelle's library that are judged to likely be relevant for the problem at hand. 
 % 
 %Which is because we can improve on Sledgehammer-style interactions in cases when the required lemmas simply are not available, so Sledgehammer would fail. 
-Integrating the theory exploration system in an interactive setting has several other advantages, for instance when exploring a large theory which otherwise would generate a very large search space. The user can instead incrementally explore different relevant sub-theories while avoiding a search space explosion. Lemmas discovered in each sub-theory can be made available when exploring increasingly larger sets of functions. 
+The above example showed how Hipster can be used interactively in a stuck proof attempt. Integrating the theory exploration system in an interactive setting has several other advantages, for instance when used in exploratory mode on a large theory which otherwise would generate a very large search space. The user can instead incrementally explore different relevant sub-theories while avoiding a search space explosion. Lemmas discovered in each sub-theory can be made available when exploring increasingly larger sets of functions. 
 
-The article is organised as follows: In section \ref{sec:background} we give a brief overview of the HipSpec system which Hipster use to generate conjectures, after which we describe Hipster in more detail in section \ref{sec:hipster}, together with some worked examples of how it can be used. In section \ref{sec:partial} we describe how we deal with partial functions, as Haskell and Isabelle differ in their semantics for these. 
+The article is organised as follows: In section \ref{sec:background} we give a brief overview of the HipSpec system which Hipster use to generate conjectures, after which we describe Hipster in more detail in section \ref{sec:hipster}, together with some larger worked examples of how it can be used, both in proof mode and exploratory mode. In section \ref{sec:partial} we describe how we deal with partial functions, as Haskell and Isabelle differ in their semantics for these. 
