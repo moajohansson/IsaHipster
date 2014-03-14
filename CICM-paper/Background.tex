@@ -22,8 +22,9 @@ In Hipster we are not interested in HipSpec's
 proving capabilities (stage (2) above); we use Isabelle for the proofs instead. Isabelle
 is based on a small core of trusted axioms, and proofs must be built
 on top of those axioms. In other words, we would have to reconstruct
-inside Isabelle any proof we found anyway, so it is easier to use
-Isabelle for the proofs in the first place.
+inside Isabelle any proof that HipSpec found anyway, so it is easier
+to use Isabelle for the proofs in the first place. We do, however,
+replicate HipSpec's stage (2) inside Isabelle.
 
 The part of HipSpec we do use
 is its conjecture synthesis system (part (1) above), called QuickSpec \cite{quickspec}),

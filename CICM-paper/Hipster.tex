@@ -35,7 +35,7 @@ This example is about a theory of binary trees, with data stored at the leaves:
 \begin{verbatim}
 datatype 'a Tree = 
     Leaf 'a 
-  | Node 'a Tree  'a Tree
+  | Node "'a Tree" "'a Tree"
 \end{verbatim}
 \end{small}
 Let's define some function over our trees: \texttt{mirror} swaps the left and right subtrees everywhere, and \texttt{tmap} applies a function to each element in the tree.
@@ -52,7 +52,8 @@ where
 | tmap f (Node l r) = Node (tmap f l) (tmap f r) 
 \end{verbatim} 
 \end{small}
-Now, let's call theory exploration to discover some properties about these two functions. Hipster quickly finds the two expected lemmas:  
+Now, let's call theory exploration to discover some properties about
+these two functions. Hipster quickly finds and proves the two expected lemmas:
 \begin{small}
 \begin{verbatim}
 lemma lemma_a [thy_expl]: "mirror (tmap x y) = tmap x (mirror y)"
@@ -118,7 +119,11 @@ oops
 %map x (rev xs) = rev (map x xs)
 %hd (xs @ xs) = hd xs
 Lemmas \texttt{ad} and \texttt{af} are perhaps not of much interest, as they only relate functions on lists. In fact, lemma \texttt{ad} is already in Isabelle's list library, but is not labelled as a simplification rule, why Hipster rediscovers it. Lemma \texttt{af} is a specialisation of a conditional library-lemma, with the side-condition that the first list is non-empty. Hipster can however not discover conditional lemmas, why the specialised version is produced instead. In addition to the four lemmas which have been proved, Hipster also outputs one interesting conjecture (labelled \texttt{unknown}) which it fails to prove. To prove this conjecture, we need a lemma stating that, as the trees store data at the leaves, \texttt{flat\_tree} will always produce a non-empty list:\\
- \texttt{flat\_tree t $\neq$ []}. As this is not an equation, it is not discovered by Hipster\footnote{Unless we also give it the constant $False$ as an input, however, that would also increase the size of the search space}. 
+ \texttt{flat\_tree t $\neq$ []}. As this is not an equation, it is
+ not discovered by Hipster\footnote{If we also gave Hipster the
+   constant $False$ as an input, it would discover the equation
+  \texttt{(flat\_tree t = []) = False}, at the cost of increasing
+  the size of the search space.}.
  
 This example shows that Hipster indeed can find most of the basic lemmas we would expect in a new theory. The user has to provide the constants Hipster should explore, and the rest is fully automatic, thus speeding up theory development.  Theory exploration in this example takes just a few seconds, no longer that it takes to run tools like Sledgehammer. Even if Hipster fail to prove some properties, they may still be interesting, and the user can choose to prove them interactively.
 
@@ -127,7 +132,8 @@ To illustrate the effects of choosing a slightly different tactic for routine an
 
 \subsection{Proving Correctness of a Small Compiler}
 \label{sec:comp-ex}
-The following example is about a compiler to a stack machine for a toy language with generic types of expressions\footnote{This example a slight variation of that in \S3.3 in the Isabelle tutorial \cite{isabelle}. }. We show how theory exploration can be used to unblock a proof on which automated tactics otherwise fail due to a missing lemma.
+The following example is about a compiler to a stack machine for a toy
+language with generic types of expressions\footnote{This example is a slight variation of that in \S3.3 in the Isabelle tutorial \cite{isabelle}. }. We show how theory exploration can be used to unblock a proof on which automated tactics otherwise fail due to a missing lemma.
 
 Expressions in the language are built from constants (\texttt{Cex}), values (\texttt{Vex}) and binary operators (\texttt{Bex}): 
 \begin{small}
@@ -137,7 +143,7 @@ type_synonym 'c binop = 'c => 'c => 'c
 datatype ('c, 'v) expr =
   Cex 'c |
   Vex 'v |
-  Bex "'c binop" "('c,'v) expr" "('c,'v) expr
+  Bex "'c binop" "('c,'v) expr" "('c,'v) expr"
 \end{verbatim}
 \end{small}
 The types of variables and values are not fixed, but given by type parameters \texttt{'c} and \texttt{'v}.
@@ -156,7 +162,7 @@ A program for our stack machine consists of four instructions:
 \begin{verbatim}
 datatype ('c, 'v) program =
   Done
-  | Const 'c "('c, 'v) program
+  | Const 'c "('c, 'v) program"
   | Load 'v "('c, 'v) program"
   | Apply "'c binop" "('c, 'v) program"
 \end{verbatim}
@@ -191,8 +197,8 @@ fun compile :: ('c,'v) expr => ('c,'v) program
   where
     compile (Cex c) =  Const c Done
   | compile (Vex v) =  Load v Done
-  | compile (Bex b e1 e2) = s
-   sequence (compile e2) (sequence (compile e1) (Apply b Done))"
+  | compile (Bex b e1 e2) =
+     sequence (compile e2) (sequence (compile e1) (Apply b Done))"
 \end{verbatim}
 \end{small}
 Now, we wish to prove correctness of the compiler, namely that executing a compiled expression indeed results in the value of that expression: 
@@ -219,4 +225,5 @@ Pasting these into our proof script we can try Sledgehammer on our theorem again
 theorem "exec getBinop env (compile e) [] = [value getBinop env e]"
 by (metis lemma_ab)
 \end{verbatim}
-
+Our theorem is a trivial instance of \verb|lemma_ab|, which in turn
+depends on \verb|lemma_aa|. Hipster finds and proves both lemmas.
