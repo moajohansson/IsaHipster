@@ -14,7 +14,7 @@ crashes. We must therefore translate \emph{partially defined} Isabelle
 functions into \emph{total but underspecified} Haskell functions.
 
 Hipster uses a technique suggested by Jasmin Blanchette
-\cite{blanchettification} for this. Whenever we translate an Isabelle function
+\cite{blanchettification} to deal with partial functions. Whenever we translate an Isabelle function
 that is missing some cases, we add a default case, like so:
 \begin{verbatim}
 hd :: [a] -> a
@@ -26,7 +26,9 @@ But what should we put for the result of \verb|hd []|? To model the
 notion that \verb|hd []| is unspecified, whenever we evaluate a test
 case we will pick a \emph{random} value for \verb|hd []|. This value
 will vary from test case to test case but will be consistent within
-one run of a test case.
+one run of a test case. The idea is that, if an equation involving
+\verb|hd| in Haskell no matter which value we pick for \verb|hd []|,
+it will also hold in Isabelle where the value of \verb|hd []| is unspecified.
 
 Suppose we define the function \verb|second|, which returns the second
 element of a list, as
@@ -42,7 +44,7 @@ second _ = ???
 and pick a random value of type \verb|a| to use in the default case.
 But this translation is wrong! If we apply our translated \verb|second|
 to a single-element list, it will give the same answer regardless of which
-element is in the list, and QuickSpec will discover the lemma
+element is in the list, and HipSpec will discover the lemma
 \verb|second [x] = second [y]|. This lemma is certainly not true of our
 Isabelle function, which says nothing about the behaviour
 of \verb|second| on single-element lists, and Hipster will fail to
@@ -57,5 +59,11 @@ second xs = ??? xs
 \end{verbatim}
 where \verb|???| is a random \emph{function} of type \verb|[a] -> a|.
 (QuickCheck can generate random functions.) As before, whenever we
-evaluate a test case, we instantiate \verb|???| with a new random function.
-This mimics Isabelle's semantics.
+evaluate a test case, we instantiate \verb|???| with a new random
+function\footnote{To avoid having to retranslate the Isabelle theory
+every time we evaluate a test case, in reality we parametrise the
+generated program on the various \texttt{???} functions. That way,
+whenever we evaluate a test case, we can cheaply change the default cases.}.
+This second translation mimics Isabelle's semantics: any equation that
+holds in Haskell no matter how we instantiate the \verb|???| functions
+also holds in Isabelle.

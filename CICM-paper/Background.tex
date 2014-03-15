@@ -10,7 +10,10 @@ Isabelle's libraries, when given the corresponding functions written in Haskell.
 
 HipSpec works in two stages:
 \begin{enumerate}
-\item Generate a set of conjectures about the functions at hand. These conjectures are equations between terms involving the given functions, and are only tested for correctness.
+\item Generate a set of conjectures about the functions at hand. These
+  conjectures are equations between terms involving the given
+  functions, and have not yet been proved correct but are nevertheless
+  extensively tested.
 
 \item Attempt to prove each of the conjectures, using already proven conjectures as assumptions. HipSpec implements this by enumerating induction schemas, and firing off many proof obligations to automated first-order logic theorem provers.
 \end{enumerate}
@@ -18,38 +21,49 @@ The proving power of HipSpec comes from its capability to
 automatically discover and prove lemmas, which are then used to help
 subsequent proofs.
 
-In Hipster we are not interested in HipSpec's
-proving capabilities (stage (2) above); we use Isabelle for the proofs instead. Isabelle
+In Hipster we can not directly use HipSpec's
+proof capabilities (stage (2) above); we use Isabelle for the proofs instead. Isabelle
 is based on a small core of trusted axioms, and proofs must be built
 on top of those axioms. In other words, we would have to reconstruct
-inside Isabelle any proof that HipSpec found anyway, so it is easier
+inside Isabelle any proof that HipSpec found, so it is easier
 to use Isabelle for the proofs in the first place. We do, however,
-replicate HipSpec's stage (2) inside Isabelle.
+replicate HipSpec's proof search inside Isabelle.
 
-The part of HipSpec we do use
-is its conjecture synthesis system (part (1) above), called QuickSpec \cite{quickspec}),
-which efficiently generates equations about given functions and
+The part of HipSpec we directly use
+is its conjecture synthesis system (stage (1) above), called QuickSpec \cite{quickspec}),
+which efficiently generates equations about a given set of functions and
 datatypes.
 
 QuickSpec takes a set of functions as input, and proceeds to generate all
-type-correct terms up to a given limit (usually up to depth three), with
-variables (usually three per type).  It first assumes that all terms the same
-type are equivalent, and initially puts them in the same equivalence class.  By
-generating random values for the variables (using QuickCheck \cite{quickcheck}), the terms are repeatedly evaluated and their equivalence
-classes are separated according to the evaluation results.  This process is
-repeated until the equivalence classes stabilise, and resulting equations can
-be read off from each equivalence class.  This means that the conjectures
-generated are, although not yet proved, fairly likely to be true.
+type-correct terms up to a given limit (usually up to depth three).
+The terms may contain variables (usually at most three per type).
+QuickSpec attempts to divide the terms into equivalence classes such
+that two terms end up in the same equivalence class if and only if
+they are equal. It first assumes that all terms of the same type are
+equivalent, and initially puts them in the same equivalence class.
+It then picks random values for the variables in the terms
+(using QuickCheck \cite{quickcheck}) and evaluates the terms.
+If two terms in the same equivalence class evaluate to different
+values, they cannot be equal; QuickSpec thus breaks each equivalence
+class into new, smaller equivalence classes depending on what values
+their terms evaluated to. This process is repeated until the
+equivalence classes stabilise. We then read off equations from each
+equivalence class, by picking one term of that class as a
+representative and equating all the other terms to that representative.
+The conjectures generated are, although not yet proved, likely to be true.
 
-As an example, we tell QuickSpec to explore the theory with list append,
+As an example, suppose we tell QuickSpec to explore the theory with list append,
 \verb~@~, the empty list, \verb~[]~, and three list variables \verb~xs~,
-\verb~ys~, \verb~zs~. Some of all the terms it will generate are these:
-\verb~(xs@ys)@zs~, \verb~xs@(ys@zs)~, \verb~xs@[]~ and simply \verb~xs~.
+\verb~ys~, \verb~zs~. Among the terms it will generate are
+\verb~(xs@ys)@zs~, \verb~xs@(ys@zs)~, \verb~xs@[]~ and \verb~xs~.
 Initially, all four will be assumed to be in the same equivalence class.
-Before soon, it will generate non-empty lists for \verb~ys~ and \verb~zs~.
-Evaluating the terms with such assignments will split this equivalence class
-into two: one with the former two and one with the latter. After this, more
-values will be generated for these lists variables, but no evaluation will make
-them split again. Eventually, QuickSpec stops and the equations for
-associativity and right identity can be read off.
+Before soon, QuickSpec will generate a variable assignment where
+\verb~ys~ and \verb~zs~ are non-empty lists. Evaluating the terms with
+such an assignment will split this equivalence class
+into two: one containing \verb~(xs@ys)@zs~ and \verb~xs@(ys@zs)~,
+and the other containing \verb~xs@[]~ and \verb~xs~.
+After this, whatever variable assignments QuickSpec generates, the
+terms in each class will evaluate to the same value.
+Eventually, QuickSpec stops and the equations for associativity and
+right identity can be read off.
 
