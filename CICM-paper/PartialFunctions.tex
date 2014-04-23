@@ -27,7 +27,7 @@ notion that \verb|hd []| is unspecified, whenever we evaluate a test
 case we will pick a \emph{random} value for \verb|hd []|. This value
 will vary from test case to test case but will be consistent within
 one run of a test case. The idea is that, if an equation involving
-\verb|hd| in Haskell no matter which value we pick for \verb|hd []|,
+\verb|hd| in Haskell holds, for all values we could pick for \verb|hd []|,
 it will also hold in Isabelle where the value of \verb|hd []| is unspecified.
 
 Suppose we define the function \verb|second|, which returns the second

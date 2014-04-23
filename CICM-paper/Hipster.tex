@@ -156,67 +156,67 @@ expression language\footnote{This example is a slight variation of that in \S3.3
 Expressions in the language are built from constants (\texttt{Cex}), values (\texttt{Vex}) and binary operators (\texttt{Bex}): 
 \begin{small}
 \begin{verbatim}
-type_synonym 'c binop = 'c => 'c => 'c
+type_synonym 'a binop = 'a => 'a => 'a
 
-datatype ('c, 'v) expr =
-  Cex 'c |
-  Vex 'v |
-  Bex "'c binop" "('c,'v) expr" "('c,'v) expr"
+datatype ('a, 'b) expr =
+  Cex 'a |
+  Vex 'b |
+  Bex "'a binop" "('a,'b) expr" "('a,'b) expr"
 \end{verbatim}
 \end{small}
-The types of variables and values are not fixed, but given by type parameters \texttt{'c} and \texttt{'v}.
+The types of values and variables are not fixed, but given by type parameters \texttt{'a} and \texttt{'b}.
 To evaluate an expression, we define a function \texttt{value}, parametrised by an environment mapping variables to values:
 \begin{small}
 \begin{verbatim}
-fun value :: ('v => 'c) => ('c,'v) expr => 'c
+fun value :: ('b => 'a) => ('a,'b) expr => 'a
 where
     value env (Cex c) = c 
   | value env (Vex v) = env v
-  | value env (Bex b e1 e2) = b (value env e1) (value env e2)
+  | value env (Bex f e1 e2) = f (value env e1) (value env e2)
 \end{verbatim}
 \end{small}
 A program for our stack machine consists of four instructions:
 \begin{small}
 \begin{verbatim}
-datatype ('c, 'v) program =
+datatype ('a, 'b) program =
   Done
-  | Const 'c "('c, 'v) program"
-  | Load 'v "('c, 'v) program"
-  | Apply "'c binop" "('c, 'v) program"
+  | Const 'a "('a, 'b) program"
+  | Load 'b "('a, 'b) program"
+  | Apply "'a binop" "('a, 'b) program"
 \end{verbatim}
 \end{small}
 A program is either empty (\texttt{Done}), or consists of one of the instructions \texttt{Const}, \texttt{Load} or \texttt{Apply}, followed by the remaining program. We further define a function \texttt{sequence} for combining programs:
 \begin{small}
 \begin{verbatim}
-fun sequence :: ('c, 'v) program => ('c, 'v) program => ('c, 'v) program
+fun sequence :: ('a, 'b) program => ('a, 'b) program => ('a, 'b) program
 where
     sequence Done p = p
   | sequence (Const c p) p' = Const c (sequence p p')
   | sequence (Load v p) p' = Load v (sequence p p')
-  | sequence (Apply b p) p' = Apply b (sequence p p') 
+  | sequence (Apply f p) p' = Apply f (sequence p p') 
 \end{verbatim}
 \end{small}
 Program execution is modelled by the function \texttt{exec}, which given a store for variables and a program, returns the values on the stack after execution.
 \begin{small}
 \begin{verbatim}
-fun exec :: ('v => 'c) =>  ('c,'v) program => 'c list => 'c list
+fun exec :: ('b => 'a) =>  ('a,'b) program => 'a list => 'a list
 where
     exec env Done stack = stack
   | exec env (Const c p) stack = exec env p (c#stack)
   | exec env (Load v p) stack = exec env p ((env v)#stack)
-  | exec env (Apply b p) stack =
-     exec env p ((b (hd stack) (hd(tl stack)))#(tl(tl stack)))
+  | exec env (Apply f p) stack =
+     exec env p ((f (hd stack) (hd(tl stack)))#(tl(tl stack)))
 \end{verbatim}
 \end{small}
 We finally define a function \texttt{compile}, which specifies how expressions are compiled into programs:
 \begin{small}
 \begin{verbatim}
-fun compile :: ('c,'v) expr => ('c,'v) program
+fun compile :: ('a,'b) expr => ('a,'b) program
   where
     compile (Cex c) =  Const c Done
   | compile (Vex v) =  Load v Done
-  | compile (Bex b e1 e2) =
-     sequence (compile e2) (sequence (compile e1) (Apply b Done))"
+  | compile (Bex f e1 e2) =
+     sequence (compile e2) (sequence (compile e1) (Apply f Done))"
 \end{verbatim}
 \end{small}
 Now, we wish to prove correctness of the compiler, namely that executing a compiled expression indeed results in the value of that expression: 
