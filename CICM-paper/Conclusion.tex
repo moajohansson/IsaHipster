@@ -1,12 +1,38 @@
-\section{Summary and Further Work}
-\label{sec:concl}
-
-Hipster integrates lemma discovery by theory exploration in the proof assistant Isabelle. We demonstrated two typical use cases of how this can help and speed up theory development: by generating interesting basic lemmas in \emph{exploration mode} or as a lemma suggestion mechanism for a stuck proof attempt in \emph{proof mode}. Hipster thus becomes a complement to tools like Sledgehammer, by discovery of missing lemmas, more proofs can be tackled automatically. In particular, we show how Hipster can improve on automation of inductive proofs, where auxiliary lemmas are needed. Hipster is parametrised by two tactics, one for routine or easy reasoning, and one for difficult reasoning. In order to present the user with only a small number of interesting lemmas, Hipster discards anything that follow by trivial routine reasoning. The user can control what is discovered by varying these tactics. 
+\section{Further Work}
+\label{sec:further}
+The discovery process is currently limited to equational lemmas. We
+plan to extend the theory exploration to also take side conditions
+into account. If theory exploration is called in the middle of a proof
+attempt, there may be assumptions associated with the current
+sub-goal, which could be a useful source of side conditions. For
+example, if we are proving a lemma about sorting, there will most
+likely be an assumption involving the ``less than'' operator; this
+suggests that we should look for equations that have ``less than'' in
+a side condition. Once we have a candidate set of side conditions, it
+is easy to extend QuickSpec to find equations that assume those conditions.
 
 The parameters for Hipster, e.g. the number of QuickSpec generated tests, the runtime for Metis and so on, are largely based on heuristics from development and previous experience. There is probably room for fine-tuning these heuristics and possibly adapt them to the theory we are working in. We plan to add and experiment with additional automated tactics in Hipster. Again, we expect that different tactics will suit different theories.
  
-The discovery process is currently limited to equational lemmas. We plan to extend the term generation and evaluation on the Haskell side to also take side conditions into account. For example, if theory exploration is called in the middle of a proof attempt, there may be assumptions associated with the current sub-goal, which should be taken into account when evaluating terms and dividing them into equivalence classes. 
+Another interesting area of further work in theory exploration is reasoning by analogy. In the example in section \ref{sec:tree}, theory exploration discovers lemmas about \texttt{mirror} and \texttt{tmap} which are analogous to lemmas about lists and the functions \texttt{rev} and \texttt{map}. Machine learning techniques can be used to identify similar lemmas \cite{acl2ml}, and this information could then be used to for instance suggest new combinations of functions to explore, new connections between theories or directly suggest additional lemmas about trees by analogy to those on lists.
 
-Another interesting area of further work in theory exploration is reasoning by analogy. In the example in section \ref{sec:tree}, theory exploration discovers lemmas about \texttt{mirror} and \texttt{tmap} which are analogous to lemmas about lists and the functions \texttt{rev} and \texttt{map}. Machine learning techniques can be used to identify similar lemmas \cite{acl2ml}, and this information could then be used to for instance suggest new combinations of functions to explore, new connections between theories or directly suggest additional lemmas about trees by analogy to those on lists.  
+\section{Summary}
+\label{sec:concl}
+
+Hipster integrates lemma discovery by theory exploration in the proof
+assistant Isabelle/HOL. We demonstrated two typical use cases of how this
+can help and speed up theory development: by generating interesting
+basic lemmas in \emph{exploration mode} or as a lemma suggestion
+mechanism for a stuck proof attempt in \emph{proof mode}. The user can
+control what is discovered by varying the background theory, and by
+varying Hipster's ``routine reasoning'' and ``difficult reasoning''
+tactics; only lemmas that need difficult reasoning (e.g. induction)
+are presented.
+
+Hipster complements tools like Sledgehammer: by discovering missing
+lemmas, more proofs can be tackled automatically. Hipster succeeds in
+automating inductive proofs and lemma discovery for small, but
+non-trivial, equational Isabelle/HOL theories. The next step is to
+increase its scope, to conditional equations and to bigger theories:
+our goal is practical automated inductive proofs for Isabelle/HOL.
 
 %Conditionals, analogy between different datastructures when similar lemmas has been found about them. 

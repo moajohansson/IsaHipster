@@ -1,21 +1,63 @@
 \section{Introduction}
 \label{sec:intro}
-The concept of theory exploration was first introduced by Buchberger \cite{buchberger2000theory}. He argues that as a contrast to  automated theorem provers that focus on proving one theorem at the time in isolation, mathematicians instead typically proceed by exploring entire theories, by conjecturing and proving layers of increasingly complex propositions. For each layer, appropriate proof methods are identified, and previously proved lemmas may be used to prove later conjectures. When a new concept (e.g. a new function) is introduced, we should prove a set of new conjectures which, ideally, ``completely" relates the new with the old, after which other propositions in this layer can be proved easily by easy ``routine" reasoning. Mathematical software should be designed to support this workflow. This is arguably the mode of use supported by many interactive proof assistants, such as Theorema \cite{theorema} and Isabelle \cite{isabelle}. However, they leave the generation of new conjectures relating different concepts largely to the user. Recently, a number of different systems have been implemented to address also this aspect of theory exploration \cite{McCasland2006,isacosy,isascheme,hipspecCADE}.  In this work, we take this one step further by integrating the discovery and proof of new conjectures in the workflow of the interactive theorem prover Isabelle/HOL. Our system, called Hipster, is based on our previous work on HipSpec \cite{hipspecCADE}, a theory exploration system for Haskell programs. In previous work \cite{hipspecCADE}, we showed that HipSpec is able to automatically discover many of the kind of equational theorems present in for example Isabelle/HOL's libraries for natural numbers and lists. In this article we show how this can be used to speed up the development of new theories in Isabelle/HOL by discovering basic lemmas automatically. 
+The concept of theory exploration was first introduced by Buchberger
+\cite{buchberger2000theory}. He argues that in contrast to automated
+theorem provers that focus on proving one theorem at a time in
+isolation, mathematicians instead typically proceed by exploring
+entire theories, by conjecturing and proving layers of increasingly
+complex propositions. For each layer, appropriate proof methods are
+identified, and previously proved lemmas may be used to prove later
+conjectures. When a new concept (e.g. a new function) is introduced,
+we should prove a set of new conjectures which, ideally, ``completely"
+relates the new with the old, after which other propositions in this
+layer can be proved easily by easy ``routine" reasoning. Mathematical
+software should be designed to support this workflow. This is arguably
+the mode of use supported by many interactive proof assistants, such
+as Theorema \cite{theorema} and Isabelle \cite{isabelle}. However,
+they leave the generation of new conjectures relating different
+concepts largely to the user. Recently, a number of different systems
+have been implemented to address the conjecture synthesis aspect of theory exploration
+\cite{McCasland2006,isacosy,isascheme,hipspecCADE}. Our work goes one
+step further by integrating the discovery and proof of new conjectures
+in the workflow of the interactive theorem prover Isabelle/HOL. Our
+system, called Hipster, is based on our previous work on HipSpec
+\cite{hipspecCADE}, a theory exploration system for Haskell programs.
+In that work, we showed that HipSpec is able to
+automatically discover many of the kind of equational theorems present
+in, for example, Isabelle/HOL's libraries for natural numbers and lists.
+In this article we show how similar techniques can be used to speed up the
+development of new theories in Isabelle/HOL by discovering basic lemmas
+automatically.
 
-Hipster translates Isabelle/HOL theories into Haskell, after which computation and evaluation in Haskell is used to efficiently generate interesting conjectures. These are then imported back into Isabelle and proved automatically. Hipster can be used in two ways: in \emph{exploratory mode} it quickly discovers basic properties about a newly defined function and its relationship to already existing ones. Hipster can also be used in \emph{proof mode}, to provide lemma hints for an ongoing proof attempt when the user is stuck. 
+Hipster translates Isabelle/HOL theories into Haskell and generates equational conjectures by
+testing and evaluating the Haskell program. These conjectures are then
+imported back into Isabelle and proved automatically. Hipster can be
+used in two ways: in \emph{exploratory mode} it quickly discovers
+basic properties about a newly defined function and its relationship
+to already existing ones. Hipster can also be used in \emph{proof
+  mode}, to provide lemma hints for an ongoing proof attempt when the
+user is stuck.
 
-Our work also fits nicely with the increased popularity of Sledgehammer \cite{sledgehammer}, an Isabelle tool allowing the user to call various external automated provers. Sledgehammer use \emph{relevance filtering} to select among the available lemmas those likely to be useful for proving a given conjecture \cite{mash}. However, if a crucial lemma is missing, the proof attempt will fail. If theory exploration is employed, we can increase the chances of Isabelle/HOL's automatic tactics succeeding with little user effort. As a first simple introductory example, we consider the example from section 2.3 of the Isabelle tutorial \cite{isabelle}: proving that reversing a list twice produce the same list. We first apply structural induction on the list \texttt{xs}.
+Our work complements Sledgehammer \cite{sledgehammer}, a popular Isabelle tool allowing the user to call various external automated provers. Sledgehammer uses \emph{relevance filtering} to select among the available lemmas those likely to be useful for proving a given conjecture \cite{mash}. However, if a crucial lemma is missing, the proof attempt will fail. If theory exploration is employed, we can increase the chances of Isabelle/HOL's automatic tactics succeeding with little user effort. As a first simple introductory example, we consider the example from section 2.3 of the Isabelle tutorial \cite{isabelle}: proving that reversing a list twice produces the same list. We first apply structural induction on the list \texttt{xs}.
 \begin{verbatim}
 theorem rev_rev : "rev(rev xs) = xs"
 apply (induct xs)
 \end{verbatim}
-The base-case follow trivially from the definition of \texttt{rev}, but Isabelle/HOL's automated tactics \texttt{simp}, \texttt{auto} and \texttt{sledgehammer} will all fail to prove the step-case. We can only obtain the simplified version of the step-case: \\\texttt{rev(rev xs) ==> rev ((rev xs) @ [x]) = [x]}, after which we are stuck. This is where Hipster comes into the picture. Calling Hipster at this point in the proof, asking for lemmas about \texttt{rev} and append (\texttt{@}), suggests and proves three lemmas: 
+The base case follows trivially from the definition of \texttt{rev},
+but Isabelle/HOL's automated tactics \texttt{simp}, \texttt{auto} and
+\texttt{sledgehammer} all fail to prove the step case. We can
+only simplify the step case to \texttt{rev(rev
+  xs) = xs ==> rev ((rev xs) @ [x]) = x\#xs}, after which we are stuck.
+This is where Hipster comes into the picture. If we call Hipster at
+this point in the proof, asking for lemmas about \texttt{rev} and
+append (\texttt{@}), it suggests and proves three lemmas:
 \begin{verbatim}
 lemma lemma_a:  "xs @ [] = xs"
 lemma lemma_aa : "(xs @ ys) @ zs = xs @ (ys @ zs)"
 lemma lemma_ab : "(rev xs) @ (rev ys) = rev (ys @ xs)"
 \end{verbatim}
-To complete the proof of the stuck subgoal, we need lemma \texttt{ab}. Lemma \texttt{ab} in turn, needs lemma \texttt{a} for its base-case, and lemma \texttt{aa} for its step-case. With these three lemmas present, Isabelle/HOL's tactics can take care of the rest. For example, if we now call Sledgehammer in the step-case, it this times suggests a proof by using Isabelle/HOL's first-order reasoning tactic \texttt{metis} \cite{metis}, using the relevant function definitions as well as \texttt{lemma\_ab}:
+
+To complete the proof of the stuck subgoal, we need lemma \texttt{ab}. Lemma \texttt{ab} in turn, needs lemma \texttt{a} for its base case, and lemma \texttt{aa} for its step case. With these three lemmas present, Isabelle/HOL's tactics can take care of the rest. For example, if we now call Sledgehammer in the step case, it this time suggests a proof by using Isabelle/HOL's first-order reasoning tactic \texttt{metis} \cite{metis}, using the relevant function definitions as well as \texttt{lemma\_ab}:
 \begin{small}
 \begin{verbatim}
 theorem rev_rev : "rev(rev xs) = xs"
@@ -28,4 +70,4 @@ by (metis rev.simps(1) rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
  
 The above example showed how Hipster can be used interactively in a stuck proof attempt. In exploratory mode, there are also advantages of working in an interactive setting. For instance, when dealing with large theories that would otherwise generate a very large search space, the user can instead incrementally explore different relevant sub-theories while avoiding a search space explosion. Lemmas discovered in each sub-theory can be made available when exploring increasingly larger sets of functions. 
 
-The article is organised as follows: In section \ref{sec:background} we give a brief overview of the HipSpec system which Hipster use to generate conjectures, after which we describe Hipster in more detail in section \ref{sec:hipster}, together with some larger worked examples of how it can be used, both in proof mode and exploratory mode. In section \ref{sec:partial} we describe how we deal with partial functions, as Haskell and Isabelle/HOL differ in their semantics for these. Section \ref{sec:related} covers related work and we conclude and discuss some areas of further work in section \ref{sec:concl}. 
+The article is organised as follows: In section \ref{sec:background} we give a brief overview of the HipSpec system which Hipster uses to generate conjectures, after which we describe Hipster in more detail in section \ref{sec:hipster}, together with some larger worked examples of how it can be used, both in proof mode and exploratory mode. In section \ref{sec:partial} we describe how we deal with partial functions, as Haskell and Isabelle/HOL differ in their semantics for these. Section \ref{sec:related} covers related work and we discuss future work in section \ref{sec:further}.

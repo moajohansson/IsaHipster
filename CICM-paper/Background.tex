@@ -10,7 +10,10 @@ Isabelle/HOL's libraries, when given the corresponding functions written in Hask
 
 HipSpec works in two stages:
 \begin{enumerate}
-\item Generate a set of conjectures about the functions at hand. These conjectures are equations between terms involving the given functions, and are only tested for correctness.
+\item Generate a set of conjectures about the functions at hand. These
+  conjectures are equations between terms involving the given
+  functions, and have not yet been proved correct but are nevertheless
+  extensively tested.
 
 \item Attempt to prove each of the conjectures, using already proven conjectures as assumptions. HipSpec implements this by enumerating induction schemas, and firing off many proof obligations to automated first-order logic theorem provers.
 \end{enumerate}
@@ -18,33 +21,44 @@ The proving power of HipSpec comes from its capability to
 automatically discover and prove lemmas, which are then used to help
 subsequent proofs.
 
-In Hipster we are not interested in HipSpec's
-proving capabilities (stage (2) above); we use Isabelle/HOL for the proofs instead. Isabelle is an LCF-style prover which means that it is based on a small core of trusted axioms, and that proofs must be built
-on top of those axioms. In other words, we would have to reconstruct
-inside Isabelle/HOL any proof we found anyway, so it is easier to use
-Isabelle/HOL for the proofs in the first place.
 
-The part of HipSpec we do use
-is its conjecture synthesis system (part (1) above), called QuickSpec \cite{quickspec}),
-which efficiently generates equations about given functions and
+In Hipster we can not directly use HipSpec's
+proof capabilities (stage (2) above); we use Isabelle/HOL for the proofs instead. Isabelle  is an LCF-style prover which means that it
+is based on a small core of trusted axioms, and proofs must be built
+on top of those axioms. In other words, we would have to reconstruct
+inside Isabelle/HOL any proof that HipSpec found, so it is easier
+to use Isabelle/HOL for the proofs in the first place. 
+
+The part of HipSpec we directly use
+is its conjecture synthesis system (stage (1) above), called QuickSpec \cite{quickspec}),
+which efficiently generates equations about a given set of functions and
 datatypes.
 
 QuickSpec takes a set of functions as input, and proceeds to generate all
-type-correct terms up to a given limit (usually up to depth three), with
-variables (usually three per type). These parameters are set heuristically, and can be modified by the user. 
-QuickSpec first assumes that all terms of the same
-type are equivalent, and initially puts them in the same equivalence class.  By
-generating random values for the variables (using QuickCheck \cite{quickcheck}), the terms are repeatedly evaluated. If they evaluate to a different ground value, the equivalence class is split accordingly. This process is
-repeated until the equivalence classes stabilise, and resulting equations can
-be read off from each equivalence class.  This means that the conjectures
-generated are, although not yet proved, fairly likely to be true, as they have been tested on several hundred different random values. The confidence increase with number of tests, which can be set by the user. The default setting is to first run 200 tests, after which the process stops if the equivalence classes appear to have stabilised, i.e. if nothing has changed during the last 100 tests. Otherwise, the number of tests are doubled until stable.
+type-correct terms up to a given limit (usually up to depth three). 
+The terms may contain variables (usually at most three per type). 
+These parameters are set heuristically, and can be modified by the user. 
+QuickSpec attempts to divide the terms into equivalence classes such
+that two terms end up in the same equivalence class if they are equal.
+It first assumes that all terms of the same
+type are equivalent, and initially puts them in the same equivalence class. 
+It then picks random ground values for the variables in the terms
+(using QuickCheck \cite{quickcheck}) and evaluates the terms.
+If two terms in the same equivalence class evaluate to different
+ground values, they cannot be equal; QuickSpec thus breaks each equivalence
+class into new, smaller equivalence classes depending on what values
+their terms evaluated to. This process is repeated until the
+equivalence classes stabilise. We then read off equations from each
+equivalence class, by picking one term of that class as a
+representative and equating all the other terms to that representative.
+This means that the conjectures
+generated are, although not yet proved, fairly likely to be true, as they have been tested on several hundred different random values. The confidence increases with the number of tests, which can be set by the user. The default setting is to first run 200 tests, after which the process stops if the equivalence classes appear to have stabilised, i.e. if nothing has changed during the last 100 tests. Otherwise, the number of tests are doubled until stable.
 
-As an example, we tell QuickSpec to explore the theory with list append,
+As an example, we ask QuickSpec to explore the theory with list append,
 \verb~@~, the empty list, \verb~[]~, and three list variables \verb~xs~,
-\verb~ys~, \verb~zs~. Some of all the terms it will generate are these:
-\verb~(xs @ ys) @ zs~, \verb~xs @ (ys @ zs)~, \verb~xs @ []~ and simply \verb~xs~.
+\verb~ys~, \verb~zs~. Among the terms it will generate are:
+\verb~(xs @ ys) @ zs~, \verb~xs @ (ys @ zs)~, \verb~xs @ []~ and \verb~xs~.
 Initially, all four will be assumed to be in the same equivalence class.
-% Expand on how generators work here!
 The random value generator for lists from QuickCheck might for instance generate the values: \texttt{xs $\mapsto$ []}, \texttt{ys $\mapsto$ [a]} and \texttt{zs $\mapsto$ [b]}, where \texttt{a} and \texttt{b} are arbitrary distinct constants. Performing the substitutions of the variables in the four terms above and evaluating the resulting ground expressions gives us:
 
 \begin{tabularx}{\textwidth}{l  X  X  X}
@@ -57,10 +71,7 @@ The random value generator for lists from QuickCheck might for instance generate
 4 \quad &\texttt{xs} &\texttt{[]} & \texttt{[]} \\
 \end{tabularx}
 Terms 1,2  and 3,4 evaluate to the same value. The initial equivalence class will therefore be split in two accordingly.
-%Before long, it will generate non-empty lists for \verb~ys~ and \verb~zs~.
-%Evaluating the terms with such assignments will split this equivalence class
-%into two: one with the former two and one with the latter. 
-After this, more values will be generated for these lists variables, but no evaluation will make
-them split again. Eventually, QuickSpec stops and the equations for
+After this, whatever variable assignments QuickSpec generates, the
+terms in each class will evaluate to the same value. Eventually, QuickSpec stops and the equations for
 associativity and right identity can be extracted from the resulting equivalence classes.
 
