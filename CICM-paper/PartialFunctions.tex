@@ -27,8 +27,8 @@ notion that \verb|hd []| is unspecified, whenever we evaluate a test
 case we will pick a \emph{random} value for \verb|hd []|. This value
 will vary from test case to test case but will be consistent within
 one run of a test case. The idea is that, if an equation involving
-\verb|hd| in Haskell holds, for all values we could pick for \verb|hd []|,
-it will also hold in Isabelle where the value of \verb|hd []| is unspecified.
+\verb|hd| in Haskell always holds, for all values we could pick for \verb|hd []|,
+it will also hold in Isabelle, where the value of \verb|hd []| is unspecified.
 
 Suppose we define the function \verb|second|, which returns the second
 element of a list, as
@@ -67,3 +67,15 @@ whenever we evaluate a test case, we can cheaply change the default cases.}.
 This second translation mimics Isabelle's semantics: any equation that
 holds in Haskell no matter how we instantiate the \verb|???| functions
 also holds in Isabelle.
+
+In Hipster, after using Isabelle/HOL's code generator to translate the
+theory to Haskell, we transform \emph{every} function definition in the
+Haskell program in the same way we transformed \verb|second|, whether it is
+partial or not---if a function is already total, the added case will
+simply be unreachable. This also means that we really translate \verb|hd| to
+\begin{verbatim}
+hd (x:xs) = x
+hd xs = ??? xs,
+\end{verbatim}
+which is equivalent to the translation we gave above (since the second case
+will only be reached when \verb|xs = []| but more complicated.
