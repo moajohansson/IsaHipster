@@ -2,7 +2,10 @@
 \label{sec:background}
 
 In this section we give a brief overview of the HipSpec system which
-we use as a backend for generating conjectures. HipSpec is a
+we use as a backend for generating conjectures, and of Isabelle's code generator which we use to translate Isabelle theories to Haskell programs. 
+
+\subsection{HipSpec}
+HipSpec is a
 state-of-the-art inductive theorem prover and theory exploration
 system for Haskell. In \cite{hipspecCADE} we showed that HipSpec is
 able to automatically discover and prove the kind of equational lemmas present in
@@ -70,8 +73,11 @@ The random value generator for lists from QuickCheck might for instance generate
 3 \quad&\texttt{xs @ []} & \texttt{[] @ []} & \texttt{[]} \\
 4 \quad &\texttt{xs} &\texttt{[]} & \texttt{[]} \\
 \end{tabularx}
-Terms 1,2  and 3,4 evaluate to the same value. The initial equivalence class will therefore be split in two accordingly.
+Terms 1, 2  and 3, 4 evaluate to the same value. The initial equivalence class will therefore be split in two accordingly.
 After this, whatever variable assignments QuickSpec generates, the
 terms in each class will evaluate to the same value. Eventually, QuickSpec stops and the equations for
 associativity and right identity can be extracted from the resulting equivalence classes.
+
+\subsection{Code Generation in Isabelle}
+Isabelle/HOL's code generator can translate from Isabelle's higher-order logic to code in several functional programming languages, including Haskell \cite{codegen2,codegen}. Isabelle's higher-order logic is a typed $\lambda$-calculus with polymorphism and type-classes. The code-generator works by \emph{shallow embedding}, which means that entities like constants, types and functions are mapped to corresponding entities in the target language. As the code generator supports translation to several programming languages, the translation work by first representing the semantics as a set of equational theorems, which transforms an Isabelle theory into an intermediate language, from which executable code is extracted. For the kind of theories we consider in this paper, this process is straightforward: the equations used for translation is simply the defining equations of the recursive datatypes and functions. In general though, the user may prove lemmas which allow the code generator to replace non-executable constructs by executable ones, e.g. sets for lists, or replace function definitions by more efficient versions in generated code. 
 
