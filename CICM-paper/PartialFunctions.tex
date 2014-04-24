@@ -15,7 +15,7 @@ functions into \emph{total but underspecified} Haskell functions.
 
 Hipster uses a technique suggested by Jasmin Blanchette
 \cite{blanchettification} to deal with partial functions. Whenever we translate an Isabelle function
-that is missing some cases, we add a default case, like so:
+that is missing some cases, we need to add a default case, like so:
 \begin{verbatim}
 hd :: [a] -> a
 hd (x:xs) = x
@@ -68,14 +68,10 @@ This second translation mimics Isabelle's semantics: any equation that
 holds in Haskell no matter how we instantiate the \verb|???| functions
 also holds in Isabelle.
 
-In Hipster, after using Isabelle/HOL's code generator to translate the
-theory to Haskell, we transform \emph{every} function definition in the
-Haskell program in the same way we transformed \verb|second|, whether it is
-partial or not---if a function is already total, the added case will
-simply be unreachable. This also means that we really translate \verb|hd| to
-\begin{verbatim}
-hd (x:xs) = x
-hd xs = ??? xs,
-\end{verbatim}
-which is equivalent to the translation we gave above (since the second case
-will only be reached when \verb|xs = []| but more complicated.
+In Hipster, we first use Isabelle/HOL's code generator to translate the
+theory to Haskell. Then we transform \emph{every} function definition, whether it is
+partial or not, in the same way we transformed \verb|second| above.
+If a function is already total, the added case will
+simply be unreachable. This avoids having to check functions for partiality.
+The extra clutter introduced for total functions is not a problem as we neither reason about nor show the user the generated program.
+  

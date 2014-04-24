@@ -12,7 +12,7 @@ We now give a description of the implementation of Hipster, and show how it can 
 \end{center}
 \end{figure}
 
-Starting from an Isabelle/HOL theory, Hipster calls Isabelle/HOL's code generator \cite{codegen2,codegen} to translate the given functions into a Haskell program. In order to use the testing framework from QuickCheck, as described in the previous section, we also post-process the Haskell file, adding \emph{generators}, which are responsible for producing arbitrary values for evaluation and testing. A generator in Haskell's QuickCheck is simply a function which returns a random ground value for a particular datatype \cite{quickcheck}. In our case, the generators pick a random constructor and then recursively generate its arguments. To ensure termination, the generators are parametrised by size; the generator reduces the size when it invokes itself recursively and when reaching zero, a non-recursive constructor must be picked. 
+Starting from an Isabelle/HOL theory, Hipster calls Isabelle/HOL's code generator \cite{codegen2,codegen} to translate the given functions into a Haskell program. In order to use the testing framework from QuickCheck, as described in the previous section, we also post-process the Haskell file, adding \emph{generators}, which are responsible for producing arbitrary values for evaluation and testing. A generator in Haskell's QuickCheck is simply a function which returns a random ground value for a particular datatype \cite{quickcheck}. In our case, the generators pick a random constructor and then recursively generate its arguments. To ensure termination, the generators are parametrised by a size; the generator reduces the size when it invokes itself recursively and when the size reaches zero, it always picks a non-recursive constructor. 
 
 Another important issue in the translation is the difference in
 semantics for partial functions between Isabelle/HOL and Haskell. In order
@@ -28,8 +28,8 @@ Isabelle/HOL's simplifier followed by first-order reasoning by Metis
 Metis is restricted to run for at most one second in both the routine and difficult tactic. If there are several possible variables to apply induction on, we may backtrack if the first choice fails. Both tactics have access to the theorems proved so far, and hence get stronger as the proof procedure proceeds through the list of conjectures. 
 
 As theory exploration produces rather many conjectures, we do not want
-to present them all to the user, but rather select the most
-interesting ones, those that are difficult to prove. Those that follow only by routine reasoning we filter out.
+to present them all to the user. We select the most
+interesting ones, i.e. those that are difficult to prove, and filter out those that follow only by routine reasoning.
 Depending on the theory and application we can vary the tactics for routine and difficult reasoning to suit our needs. If we want Hipster to produce fewer or more lemmas, we can choose a stronger or weaker tactic, allowing for flexibility.
 
 The order in which Hipster tries to prove things matters. As we
@@ -40,8 +40,7 @@ lemma is required. In this case, the failed conjecture is added back
 into the list of open conjectures and will be retried later, after at
 least one new lemma has been proved. Hipster terminates when it either
 runs out of open conjectures, or when it can not make any more
-progress (when it has tried and failed to prove all the open
-conjectures since it last proved a lemma).
+progress, i.e. when all open conjectures have been tried since it last proved a lemma.
 
 Below we give two typical use cases for Hipster. In both examples,
 Hipster has been instantiated with the routine and difficult reasoning
@@ -110,7 +109,7 @@ Finally, we define a function flattening trees to lists:
 \begin{verbatim}
 fun flat_tree :: 'a Tree => 'a list
 where
-  flat_tree (Leaf x) = Cons x []
+  flat_tree (Leaf x) = [x]
 | flat_tree (Node l r) = (flat_tree l) @ (flat_tree r)
 \end{verbatim}
 \end{small}
@@ -137,12 +136,11 @@ oops
 %flat_tree (mirror x) = rev (flat_tree x)
 %map x (rev xs) = rev (map x xs)
 %hd (xs @ xs) = hd xs
-Lemmas \texttt{ad} and \texttt{af} are perhaps not of much interest, as they only relate functions on lists. In fact, lemma \texttt{ad} is already in Isabelle/HOL's list library, but is not labelled as a simplification rule, which is why Hipster rediscovers it. Lemma \texttt{af} is a variant of a conditional library-lemma: \texttt{xs $\neq$ [] $\Longrightarrow$ hd(xs @ ys) = hd xs}. Observe that it holds due to the partiality of \texttt{hd}. Hipster can not discover conditional lemmas, so we get this version instead. In addition to the four lemmas which have been proved, Hipster also outputs one interesting conjecture (labelled \texttt{unknown}) which it fails to prove. To prove this conjecture, we need a lemma stating that, as the trees store data at the leaves, \texttt{flat\_tree} will always produce a non-empty list: 
- \texttt{flat\_tree t $\neq$ []}. As this is not an equation, it is not discovered by Hipster\footnote{If we also gave Hipster the
-   constant $False$ as an input, it would discover the equation
-  \texttt{(flat\_tree t = []) = False}, at the cost of increasing
-  the size of the search space.}. 
- 
+Lemmas \texttt{ad} and \texttt{af} are perhaps not of much interest, as they only relate functions on lists. In fact, lemma \texttt{ad} is already in Isabelle/HOL's list library, but is not labelled as a simplification rule, which is why Hipster rediscovers it. Lemma \texttt{af} is a variant of a conditional library-lemma: \hbox{\texttt{xs $\neq$ [] $\Longrightarrow$ hd(xs @ ys) = hd xs}}. Observe that lemma \texttt{af} holds due to the partiality of \texttt{hd}. Hipster can not discover conditional lemmas, so we get this version instead. 
+
+In addition to the four lemmas which have been proved, Hipster also outputs one interesting conjecture (labelled \texttt{unknown}) which it fails to prove. To prove this conjecture, we need a lemma stating that, as the trees store data at the leaves, \texttt{flat\_tree} will always produce a non-empty list: 
+ \texttt{flat\_tree t $\neq$ []}. As this is not an equation, it is not discovered by Hipster.
+  
 This example shows that Hipster can indeed find most of the basic lemmas we would expect in a new theory. The user has to provide the constants Hipster should explore, and the rest is fully automatic, thus speeding up theory development.  Theory exploration in this example takes just a few seconds, no longer than it takes to run tools like Sledgehammer. Even if Hipster fails to prove some properties, they may still be interesting, and the user can choose to prove them interactively.
 
 \subsubsection*{Exploring with different tactics.}
@@ -159,9 +157,9 @@ Expressions in the language are built from constants (\texttt{Cex}), values (\te
 type_synonym 'a binop = 'a => 'a => 'a
 
 datatype ('a, 'b) expr =
-  Cex 'a |
-  Vex 'b |
-  Bex "'a binop" "('a,'b) expr" "('a,'b) expr"
+    Cex 'a 
+  | Vex 'b 
+  | Bex "'a binop" "('a,'b) expr" "('a,'b) expr"
 \end{verbatim}
 \end{small}
 The types of values and variables are not fixed, but given by type parameters \texttt{'a} and \texttt{'b}.
@@ -179,7 +177,7 @@ A program for our stack machine consists of four instructions:
 \begin{small}
 \begin{verbatim}
 datatype ('a, 'b) program =
-  Done
+    Done
   | Const 'a "('a, 'b) program"
   | Load 'b "('a, 'b) program"
   | Apply "'a binop" "('a, 'b) program"
@@ -199,7 +197,7 @@ where
 Program execution is modelled by the function \texttt{exec}, which given a store for variables and a program, returns the values on the stack after execution.
 \begin{small}
 \begin{verbatim}
-fun exec :: ('b => 'a) =>  ('a,'b) program => 'a list => 'a list
+fun exec :: ('b => 'a) => ('a,'b) program => 'a list => 'a list
 where
     exec env Done stack = stack
   | exec env (Const c p) stack = exec env p (c#stack)

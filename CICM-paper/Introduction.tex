@@ -10,7 +10,7 @@ identified, and previously proved lemmas may be used to prove later
 conjectures. When a new concept (e.g. a new function) is introduced,
 we should prove a set of new conjectures which, ideally, ``completely"
 relates the new with the old, after which other propositions in this
-layer can be proved easily by easy ``routine" reasoning. Mathematical
+layer can be proved easily by ``routine" reasoning. Mathematical
 software should be designed to support this workflow. This is arguably
 the mode of use supported by many interactive proof assistants, such
 as Theorema \cite{theorema} and Isabelle \cite{isabelle}. However,
@@ -25,7 +25,7 @@ system, called Hipster, is based on our previous work on HipSpec
 In that work, we showed that HipSpec is able to
 automatically discover many of the kind of equational theorems present
 in, for example, Isabelle/HOL's libraries for natural numbers and lists.
-In this article we show how similar techniques can be used to speed up the
+In this article we show how similar techniques can be used to speed up and facilitate the
 development of new theories in Isabelle/HOL by discovering basic lemmas
 automatically.
 
@@ -38,7 +38,10 @@ to already existing ones. Hipster can also be used in \emph{proof
   mode}, to provide lemma hints for an ongoing proof attempt when the
 user is stuck.
 
-Our work complements Sledgehammer \cite{sledgehammer}, a popular Isabelle tool allowing the user to call various external automated provers. Sledgehammer uses \emph{relevance filtering} to select among the available lemmas those likely to be useful for proving a given conjecture \cite{mash}. However, if a crucial lemma is missing, the proof attempt will fail. If theory exploration is employed, we can increase the chances of Isabelle/HOL's automatic tactics succeeding with little user effort. As a first simple introductory example, we consider the example from section 2.3 of the Isabelle tutorial \cite{isabelle}: proving that reversing a list twice produces the same list. We first apply structural induction on the list \texttt{xs}.
+Our work complements Sledgehammer \cite{sledgehammer}, a popular Isabelle tool allowing the user to call various external automated provers. Sledgehammer uses \emph{relevance filtering} to select among the available lemmas those likely to be useful for proving a given conjecture \cite{mash}. However, if a crucial lemma is missing, the proof attempt will fail. If theory exploration is employed, we can increase the success rate 
+of Isabelle/HOL's automatic tactics with little user effort. 
+
+As an introductory example, we consider the example from section 2.3 of the Isabelle tutorial \cite{isabelle}: proving that reversing a list twice produces the same list. We first apply structural induction on the list \texttt{xs}.
 \begin{verbatim}
 theorem rev_rev : "rev(rev xs) = xs"
 apply (induct xs)
@@ -59,7 +62,7 @@ lemma lemma_aa : "(xs @ ys) @ zs = xs @ (ys @ zs)"
 lemma lemma_ab : "(rev xs) @ (rev ys) = rev (ys @ xs)"
 \end{verbatim}
 
-To complete the proof of the stuck subgoal, we need lemma \texttt{ab}. Lemma \texttt{ab} in turn, needs lemma \texttt{a} for its base case, and lemma \texttt{aa} for its step case. With these three lemmas present, Isabelle/HOL's tactics can take care of the rest. For example, if we now call Sledgehammer in the step case, it this time suggests a proof by using Isabelle/HOL's first-order reasoning tactic \texttt{metis} \cite{metis}, using the relevant function definitions as well as \texttt{lemma\_ab}:
+To complete the proof of the stuck subgoal, we need lemma \texttt{ab}. Lemma \texttt{ab} in turn, needs lemma \texttt{a} for its base case, and lemma \texttt{aa} for its step case. With these three lemmas present, Isabelle/HOL's tactics can take care of the rest. For example, when we call Sledgehammer in the step case, it suggests a proof by Isabelle/HOL's first-order reasoning tactic \texttt{metis} \cite{metis}, using the relevant function definitions as well as \texttt{lemma\_ab}:
 \begin{small}
 \begin{verbatim}
 theorem rev_rev : "rev(rev xs) = xs"
@@ -70,6 +73,6 @@ by (metis rev.simps(1) rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
 \end{verbatim}
 \end{small}
  
-The above example showed how Hipster can be used interactively in a stuck proof attempt. In exploratory mode, there are also advantages of working in an interactive setting. For instance, when dealing with large theories that would otherwise generate a very large search space, the user can instead incrementally explore different relevant sub-theories while avoiding a search space explosion. Lemmas discovered in each sub-theory can be made available when exploring increasingly larger sets of functions. 
+The above example shows how Hipster can be used interactively in a stuck proof attempt. In exploratory mode, there are also advantages of working in an interactive setting. For instance, when dealing with large theories that would otherwise generate a very large search space, the user can instead incrementally explore different relevant sub-theories while avoiding a search space explosion. Lemmas discovered in each sub-theory can be made available when exploring increasingly larger sets of functions. 
 
 The article is organised as follows: In section \ref{sec:background} we give a brief overview of the HipSpec system which Hipster uses to generate conjectures, after which we describe Hipster in more detail in section \ref{sec:hipster}, together with some larger worked examples of how it can be used, both in proof mode and exploratory mode. In section \ref{sec:partial} we describe how we deal with partial functions, as Haskell and Isabelle/HOL differ in their semantics for these. Section \ref{sec:related} covers related work and we discuss future work in section \ref{sec:further}.

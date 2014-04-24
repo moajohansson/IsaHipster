@@ -59,13 +59,12 @@ generated are, although not yet proved, fairly likely to be true, as they have b
 
 As an example, we ask QuickSpec to explore the theory with list append,
 \verb~@~, the empty list, \verb~[]~, and three list variables \verb~xs~,
-\verb~ys~, \verb~zs~. Among the terms it will generate are:
+\verb~ys~, \verb~zs~. Among the terms it will generate are
 \verb~(xs @ ys) @ zs~, \verb~xs @ (ys @ zs)~, \verb~xs @ []~ and \verb~xs~.
 Initially, all four will be assumed to be in the same equivalence class.
-The random value generator for lists from QuickCheck might for instance generate the values: \texttt{xs $\mapsto$ []}, \texttt{ys $\mapsto$ [a]} and \texttt{zs $\mapsto$ [b]}, where \texttt{a} and \texttt{b} are arbitrary distinct constants. Performing the substitutions of the variables in the four terms above and evaluating the resulting ground expressions gives us:
+The random value generator for lists from QuickCheck might for instance generate the values: \texttt{xs $\mapsto$ []}, \hbox{\texttt{ys $\mapsto$ [a]}} and \texttt{zs $\mapsto$ [b]}, where \texttt{a} and \texttt{b} are arbitrary distinct constants. Performing the substitutions of the variables in the four terms above and evaluating the resulting ground expressions gives us:
 
 \begin{tabularx}{\textwidth}{l  X  X  X}
-\\
  & Term & Ground Instance & Value \\
  \hline
 1 \quad &\texttt{(xs @ ys) @ zs} & \texttt{([] @ [a]) @ [b]} & \texttt{[a,b]} \\
@@ -73,11 +72,14 @@ The random value generator for lists from QuickCheck might for instance generate
 3 \quad&\texttt{xs @ []} & \texttt{[] @ []} & \texttt{[]} \\
 4 \quad &\texttt{xs} &\texttt{[]} & \texttt{[]} \\
 \end{tabularx}
-Terms 1, 2  and 3, 4 evaluate to the same value. The initial equivalence class will therefore be split in two accordingly.
+
+\noindent Terms 1 and 2 evaluate to the same value, as do terms 3 and 4. The initial equivalence class will therefore be split in two accordingly.
 After this, whatever variable assignments QuickSpec generates, the
 terms in each class will evaluate to the same value. Eventually, QuickSpec stops and the equations for
 associativity and right identity can be extracted from the resulting equivalence classes.
 
 \subsection{Code Generation in Isabelle}
-Isabelle/HOL's code generator can translate from Isabelle's higher-order logic to code in several functional programming languages, including Haskell \cite{codegen2,codegen}. Isabelle's higher-order logic is a typed $\lambda$-calculus with polymorphism and type-classes. The code-generator works by \emph{shallow embedding}, which means that entities like constants, types and functions are mapped to corresponding entities in the target language. As the code generator supports translation to several programming languages, the translation work by first representing the semantics as a set of equational theorems, which transforms an Isabelle theory into an intermediate language, from which executable code is extracted. For the kind of theories we consider in this paper, this process is straightforward: the equations used for translation is simply the defining equations of the recursive datatypes and functions. In general though, the user may prove lemmas which allow the code generator to replace non-executable constructs by executable ones, e.g. sets for lists, or replace function definitions by more efficient versions in generated code. 
+Isabelle/HOL's code generator can translate from Isabelle's higher-order logic to code in several functional programming languages, including Haskell \cite{codegen2,codegen}. Isabelle's higher-order logic is a typed $\lambda$-calculus with polymorphism and type-classes. 
+Entities like constants, types and recursive functions are mapped to corresponding entities in the target language. For the kind of theories we consider in this paper, this process is straightforward. However, the code generator also supports user-given \emph{code lemmas}, which allows
+it to generate code from non-executable constructs, e.g. by replacing sets with lists.
 
