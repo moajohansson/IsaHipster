@@ -43,8 +43,10 @@ by (metis ListDemo.rev.simps(2) app.simps(2) lemma_aa)
 
 theorem rev_rev : "rev(rev xs) = xs "
 apply (induct xs)
-apply auto
+sledgehammer
 (* apply (tactic {* Hipster_Explore.explore_goal @{context} ["ListDemo.rev", "ListDemo.app"] *}) *)
+apply (metis ListDemo.rev.simps(1))
+apply simp
 sledgehammer
 by (metis ListDemo.rev.simps(1) ListDemo.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
 
