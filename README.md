@@ -9,7 +9,7 @@ Note that you will need to clone the branch called "isabelle" to get the right v
 
 When you have installed the above, you should open the file called IsaHipster.thy and edit the ML value 'basepath' to point to your IsaHipster directory (yes, we know, this is not so nice, we'll fix it...). 
 
-You will also have to compile some Haskell files: HipSpecifyer.hs and Examples/GenericArbitrary.hs. 
+You will also have to compile some Haskell files: HipSpecifyer.hs and Examples/GenericArbitrary.hs. Finally, create an (empty) directory called 'GenCode' in the top-level directory, where Hipster will store generated Haskell-files (this requirement will shortly dissapear, when we tidy things up...).
 
 Now, you should be able to try Hipster. Start up Isabelle on for example Examples/TreeDemo.thy and have a go.
 
