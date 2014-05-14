@@ -13,4 +13,4 @@ You will also have to compile some Haskell files: HipSpecifyer.hs and Examples/G
 
 Now, you should be able to try Hipster. Start up Isabelle on for example Examples/TreeDemo.thy and have a go.
 
-DISCLIMER: There are quite a few hacks around, and Hipster is not a polished and finished product by any means. Let us know if you run into anything too odd, and we'll try to fix it.
+DISCLAIMER: There are quite a few hacks around, and Hipster is not a polished and finished product by any means. Let us know if you run into anything too odd, and we'll try to fix it.
