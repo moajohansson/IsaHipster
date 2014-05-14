@@ -4,7 +4,7 @@ To install Hipster, you first need HipSpec and Isabelle.
 Isabelle is availble from: http://isabelle.in.tum.de/index.html.
 Hipster works with Isabelle 2013-2.
 
-Installation instructions for HipSpec and the system it relies on are availble from: https://github.com/danr/hipspec.
+Installation instructions for HipSpec and the systems it relies on (QuickSpec and QuickCheck) are availble from: https://github.com/danr/hipspec.
 Note that you will need to clone the branch called "isabelle" to get the right version of HipSpec. 
 
 When you have installed the above, you should open the file called IsaHipster.thy and edit the ML value 'basepath' to point to your IsaHipster directory (yes, we know, this is not so nice, we'll fix it...). 
