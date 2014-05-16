@@ -5,12 +5,22 @@ Isabelle is availble from: http://isabelle.in.tum.de/index.html.
 Hipster works with Isabelle 2013-2.
 
 Installation instructions for HipSpec and the systems it relies on (QuickSpec and QuickCheck) are availble from: https://github.com/danr/hipspec.
-Note that you will need to clone the branch called "isabelle" to get the right version of HipSpec. 
+Note that you will need to switch to the branch called `isabelle' after you have cloned the repo. Issue this command in the created repository directory for HipSpec:
 
-When you have installed the above, you should open the file called IsaHipster.thy and edit the ML value 'basepath' to point to your IsaHipster directory (yes, we know, this is not so nice, we'll fix it...). 
+     git checkout isabelle
 
-You will also have to compile some Haskell files: HipSpecifyer.hs and Examples/GenericArbitrary.hs. Finally, create an (empty) directory called 'GenCode' in the top-level directory, where Hipster will store generated Haskell-files (this requirement will shortly dissapear, when we tidy things up...).
+When you have installed the above, return to the IsaHipster directory and open the file called `IsaHipster.thy`. Edit the ML value `basepath` to point to your IsaHipster directory (yes, we know, this is not so nice, we'll fix it...). 
+
+You will also have to compile the Haskell files `HipSpecifyer.hs`:
+
+    ghc --make HipSpecifyer 
+    
+Finally, create an (empty) directory called `GenCode` in the top-level directory:
+
+    mkdir -p GenCode
+    
+This is where Hipster will store generated Haskell-files (this requirement will shortly dissapear, when we tidy things up...).
 
 Now, you should be able to try Hipster. Start up Isabelle on for example Examples/TreeDemo.thy and have a go.
 
-DISCLAIMER: There are quite a few hacks around, and Hipster is not a polished and finished product by any means. Let us know if you run into anything too odd, and we'll try to fix it.
+_Disclaimer_: There are quite a few hacks around, and Hipster is not a polished and finished product by any means. Let us know if you run into anything too odd, and we'll try to fix it.
