@@ -99,12 +99,9 @@ fun add_failed_ctxt failed ctxt =
 fun add_proved_ctxt proved ctxt = 
     ExplData.put (add_proved proved (ExplData.get ctxt)) ctxt;
 
-(*-----------------------------------------------------------------------------------------*)
-(* Experimental solve_direct type thing: Have we proved this before?   *) 
-(*-----------------------------------------------------------------------------------------*)
 
 (* Check if this thm is already present. Also do symetric thm. *)
-fun solved_direct ctxt thm = 
+fun is_present ctxt thm = 
     let 
       val crits = [(true, Find_Theorems.Solves)];
     in
@@ -118,11 +115,12 @@ fun solved_direct ctxt thm =
 fun init_expl ctxt facts prio_goal_opt lemma_strs = 
     let
       val thy = Proof_Context.theory_of ctxt
-      val conjs = map (Goal.init o (Thm.cterm_of thy) o (Syntax.read_prop ctxt)) lemma_strs
-      val new_conjs = filter (solved_direct ctxt) conjs;
+      val conjs = lemma_strs 
+                    |> map (Goal.init o (Thm.cterm_of thy) o (Syntax.read_prop ctxt)) 
+                    |> filter (is_present ctxt);
     in
       ExplData.put
-        (Data{open_conjs = new_conjs, failed = [], proved = [], facts = facts,
+        (Data{open_conjs = conjs, failed = [], proved = [], facts = facts,
              used_thm_names = Name.make_context 
                                 (map (fn thm => Long_Name.base_name(Thm.get_name_hint thm))
                                      (Hipster_Rules.get ctxt)),

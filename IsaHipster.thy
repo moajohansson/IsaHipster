@@ -1,7 +1,9 @@
 theory IsaHipster
 imports Main
+keywords "hipster" :: thy_decl
 begin
 
+ 
 ML{*
 structure Hipster_Setup =
 struct
@@ -36,7 +38,21 @@ ML_file "HipsterUtils.ML"
 ML_file "ThyExplData.ML"
 ML_file "HipsterTacs.ML"
 ML_file "ThyExplTacs.ML"
+ML_file "TacticData.ML"
 ML_file "HipsterExplore.ML"
+
+ML{*
+(* Install a Parser for HipSpec. No idea what I'm doing... *)
+let
+fun call_hipster consts = 
+  Local_Theory.target 
+  (fn ctxt => fst(Hipster_Explore.explore ctxt consts));
+in
+Outer_Syntax.local_theory  @{command_spec "hipster"} 
+      "Theory Exploration with Hipster"
+      (Scan.repeat1 Parse.string >> call_hipster)
+      (* (Scan.repeat1 Parse.const >> call_hipster) *)
+end *}
 (*
 ML_file "ProofTools.ML"
 ML_file "HipSpec.ML"

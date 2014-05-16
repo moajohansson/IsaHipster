@@ -7,9 +7,10 @@ sig
   val timed_metis_tac : Proof.context -> Thm.thm list -> int -> tactic
   val simp_or_metis : Proof.context -> thm list -> tactic 
   val induct_simp_metis : Proof.context -> Thm.thm list -> tactic
-  val induct_and_simp : Proof.context -> Thm.thm list -> Thm.thm list option -> string -> int -> tactic
+  val induct_and_simp : hardtac
   val try_inductable_vars : Proof.context -> thm list -> hardtac -> int -> tactic
-  val induct_simp_or_metis : Proof.context -> thm list -> thm list option -> string -> int -> tactic
+  val induct_simp_or_metis : hardtac
+  val induct_simp_tac : Proof.context -> thm list -> tactic
 end
 
 structure Hipster_Tacs : HIPSTER_TACS =

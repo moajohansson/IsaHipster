@@ -18,8 +18,12 @@ where
 | "tmap f (Node l r) = Node (tmap f l) (tmap f r)" 
 
 (* First call to Hipster: Explore tmap and mirror *)
-ML{* Hipster_Explore.explore  @{context} ["TreeDemo.tmap", "TreeDemo.mirror"]; *}
+hipster "TreeDemo.mirror" "TreeDemo.tmap"
+lemma lemma_a [thy_expl]: "mirror (tmap x2 y2) = tmap x2 (mirror y2)"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms TreeDemo.mirror.simps TreeDemo.tmap.simps thy_expl} *})
 
+lemma lemma_aa [thy_expl]: "mirror (mirror x2) = x2"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms TreeDemo.mirror.simps TreeDemo.tmap.simps thy_expl} *})
 
 
 fun flat_tree :: "'a Tree => 'a list"
@@ -28,9 +32,13 @@ where
 | "flat_tree (Node l r) = (flat_tree l) @ (flat_tree r)"
 
 (* Second call to Hipster: Explore relation to lists *)
-ML{*Hipster_Explore.explore  @{context} ["TreeDemo.flat_tree", "TreeDemo.mirror", "TreeDemo.tmap", 
-                                         "List.rev", "List.map"]; *}
+hipster "TreeDemo.flat_tree" "TreeDemo.mirror" "TreeDemo.tmap" "List.rev" "List.map"
 
+lemma lemma_ab [thy_expl]: "flat_tree (tmap x2 y2) = map x2 (flat_tree y2)"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms TreeDemo.flat_tree.simps TreeDemo.mirror.simps TreeDemo.tmap.simps List.rev.simps List.map.simps thy_expl} *})
+
+lemma lemma_ac [thy_expl]: "flat_tree (mirror x2) = rev (flat_tree x2)"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms TreeDemo.flat_tree.simps TreeDemo.mirror.simps TreeDemo.tmap.simps List.rev.simps List.map.simps thy_expl} *})
 
 fun rigthmost :: "'a Tree \<Rightarrow> 'a"
 where 
@@ -42,12 +50,43 @@ where
   "leftmost (Leaf x) = x"
 |  "leftmost (Node l r) = leftmost l"
 
+(* If we store the tactics in a Proof_Data, then we need to explicitly pass a context around *)
+ML {*val myctxt = Tactic_Data.set_induct_simp @{context} *}
+
+ML {*Tactic_Data.hard_tac_str myctxt []; *}
+
 (* Third call to Hipster: Rightmost and Leftmost element of a tree. *)
-ML{* Hipster_Explore.explore  @{context} ["List.hd", "List.rev","TreeDemo.mirror","TreeDemo.flat_tree", 
-                                          "TreeDemo.rigthmost", "TreeDemo.leftmost"]; *}
+hipster "List.hd" "List.rev" "TreeDemo.mirror" "TreeDemo.flat_tree" "TreeDemo.rigthmost" "TreeDemo.leftmost"
+lemma lemma_ad [thy_expl]: "rigthmost (mirror x2) = leftmost x2"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms List.hd.simps List.rev.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rigthmost.simps TreeDemo.leftmost.simps thy_expl} *})
+
+lemma lemma_ae [thy_expl]: "hd (xs2 @ xs2) = hd xs2"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms List.hd.simps List.rev.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rigthmost.simps TreeDemo.leftmost.simps thy_expl} *})
+
+lemma unknown [thy_expl]: "hd (flat_tree x) = leftmost x"
+oops
 
 
-ML{* Hipster_Explore.explore  @{context} ["List.last", "List.rev","TreeDemo.mirror","TreeDemo.flat_tree", 
-                                          "TreeDemo.rigthmost", "TreeDemo.leftmost"]; *}
+
+(* FIXME: Bug in translation? *)
+(*
+fun size :: "'a Tree \<Rightarrow> nat"
+where
+  "size (Leaf x) = 0"
+  | "size (Node l r) = (size l + size r + 1)"
+fun size1 :: "'a Tree \<Rightarrow> nat"
+where
+  "size1 (Leaf x) = 1"
+  | "size1 (Node l r) = (size1 l + size1 r)"
+ML{* Hipster_Explore.explore  @{context} ["TreeDemo.size", "TreeDemo.size1"] *}
+*)
+
+hipster "List.last" "List.rev" "TreeDemo.mirror""TreeDemo.flat_tree" 
+                                          "TreeDemo.rigthmost" "TreeDemo.leftmost"
+lemma lemma_af [thy_expl]: "last (xs2 @ xs2) = last xs2"
+by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms List.last.simps List.rev.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rigthmost.simps TreeDemo.leftmost.simps thy_expl} *})
+
+lemma unknown [thy_expl]: "last (flat_tree x) = rigthmost x"
+oops
 
 end

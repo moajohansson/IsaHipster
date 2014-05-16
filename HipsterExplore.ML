@@ -2,7 +2,7 @@
    routine reasoning are deemed non-interesting and discarded. Those requiring "hard" reasoning are
    kept. *)
 
-functor Hipster_Explore_Fun (Expl_Tacs : THY_EXPL_TACS) = 
+structure Hipster_Explore = 
 struct
 
 
@@ -21,7 +21,7 @@ fun try_nxt_conj ctxt =
 
     | (c::cs) => (* try proving next open conj *) 
       let 
-        val r = SINGLE (Expl_Tacs.routine_tac ctxt) c
+        val r = SINGLE (Tactic_Data.routine_tac ctxt) c
         val lemma_str = (Syntax.string_of_term ctxt (Thm.concl_of c))
           val _ = (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
                 ("Proving: " ^ lemma_str)
@@ -30,7 +30,7 @@ fun try_nxt_conj ctxt =
         SOME _ => SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
       | NONE =>
         let
-          val res = SINGLE (Expl_Tacs.hard_tac ctxt) c 
+          val res = SINGLE (Tactic_Data.hard_tac ctxt) c 
         in
           (* Only care about first proof found *)
           (case res of 
@@ -58,8 +58,8 @@ fun try_nxt_conj ctxt =
 
 fun try_prove_priority_goal ctxt goal =
     let
-      (* val res = SINGLE (Expl_Tacs.hard_tac ctxt) goal *)
-      val res = SINGLE (Expl_Tacs.routine_tac ctxt) goal
+      (* val res = SINGLE (Tactic_Data.hard_tac ctxt) goal *)
+      val res = SINGLE (Tactic_Data.routine_tac ctxt) goal
     in 
       case res of
         SOME _ => SOME (ThyExpl_Data.set_priority_goal_ctxt NONE ctxt)
@@ -161,7 +161,7 @@ fun explore ctxt const_nms =
       val facts_nms = map (fn c => c^".simps") const_nms
       val facts = maps (fn n => Sledgehammer_Util.thms_of_name ctxt n
                        handle _ => []) facts_nms
-      val tac_str = Expl_Tacs.final_tactic_str ctxt facts_nms
+      val tac_str = Tactic_Data.hard_tac_str ctxt facts_nms
                         
       val conjs = hipspec_explore ctxt const_nms;
 
@@ -207,9 +207,9 @@ fun explore_goal ctxt const_nms thm =
         NONE => 
         let val _ = Output.urgent_message ("Failed to find lemmas which will prove goal.")
         in no_tac thm end
-      | SOME ctxt' => (* Success, provided the explored lemmas, the thm can be proved by metis *)
+      | SOME ctxt' => (* Success, provided the explored lemmas, the thm can be proved. *)
         let
-          val tac_str = Expl_Tacs.final_tactic_str ctxt' facts_nms
+          val tac_str = Tactic_Data.hard_tac_str ctxt' facts_nms
           val lemmas = Library.space_implode "\n\n"
                        (map (mk_lemma_str ctxt') 
                            (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt ctxt')))
@@ -218,7 +218,7 @@ fun explore_goal ctxt const_nms thm =
           val _ = Output.urgent_message 
                     ("Try first proving lemmas:\n\n" ^ lemmas ^ "\n\n" ^
                      "then prove the open goal "^ str_of_thm ^ " " ^ 
-                     Expl_Tacs.routine_tac_str)
+                     (Tactic_Data.routine_tac_str ctxt'))
         in
           Seq.single thm
         end
@@ -227,5 +227,4 @@ fun explore_goal ctxt const_nms thm =
 
 end
 
-structure Hipster_Explore = Hipster_Explore_Fun(Simp_Metis_Tacs);
-structure Hipster_Explore_Simp = Hipster_Explore_Fun(Simp_Tacs);
+
