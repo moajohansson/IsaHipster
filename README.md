@@ -11,9 +11,9 @@ Note that you will need to switch to the branch called `isabelle' after you have
 
 When you have installed the above, return to the IsaHipster directory and open the file called `IsaHipster.thy`. Edit the ML value `basepath` to point to your IsaHipster directory (yes, we know, this is not so nice, we'll fix it...). 
 
-You will also have to compile the Haskell files `HipSpecifyer.hs`:
+You will also have to compile the "HipSpecifyer":
 
-    ghc --make HipSpecifyer 
+    cabal install hipspecifyer/
     
 Finally, create an (empty) directory called `GenCode` in the top-level directory:
 

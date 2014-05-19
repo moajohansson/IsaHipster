@@ -14,11 +14,6 @@ struct
 val basepath = "~/TheoremProvers/IsaHipster/";
 val filepath = basepath^"GenCode/";
 
-(* 'hipspecifyer_cmd' is the path to the HipSpecifyer executable,        *)
-(*  which post-process the Haskell file so HipSpec gets generators etc.  *)
-
-val hipspecifyer_cmd = basepath^"HipSpecifyer";
-
 end
 *}
 
