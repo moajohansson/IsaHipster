@@ -102,27 +102,44 @@ fun proof_loop ctxt facts cand_lemmas_str =
    proof script for discovered lemmas  *) 
 (*-----------------------------------------------------------------------------------------*)
 
-(* TO DO: Implement properly *)
-val haskell_consts = [("List.rev","reverse"),("List.append","++")]
+(* TO DO: Implement properly. This is for mapping back to Isabelle constants those things that the
+ code generator renamnes in Haskell. Otherwise, Isabelle will not understand the resulting lemmas. *)
+val haskell_consts = [("List.rev","reverse"),("List.append","++"),
+                      ("Groups.plus_class.plus", "plus_nat"), ("Groups.zero_class.zero", "Zero_nat"),
+                      ("Groups.one_class.one", "one_nat")]
 
 fun map_to_haskell isa_nm = 
     case (Library.find_first (fn (nm,_) => nm=isa_nm) haskell_consts)
          of NONE => isa_nm
           | SOME (_,hask_nm) => hask_nm;
 
+ (* Do we always want to have the --extra-trans flag? this means extra funs gets picked up, if they
+         are in the def of any of the given const-nms *)  
+fun hipspec_plain consts file =
+    let 
+      val add_funs = List.foldl (fn (nm,s) => "--extra-trans "^(Long_Name.base_name nm)^ " "^s) " " consts
+    in
+      "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file
+    end;
+
+fun hipspec_cond cond_name consts file = 
+    let 
+      val add_funs = List.foldl (fn (nm,s) => "--extra-trans "^(Long_Name.base_name nm)^ " "^s) " " consts
+    in
+      "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^ (Long_Name.base_name cond_name) ^ " --cond-count=1" 
+    end;
+
 (* 'const_nms' are the name of the constants we wish to include in the Haskell 
    file. They must be prefixed by the theory name. *)   
-fun hipspec_explore ctxt const_nms =
+fun hipspec_explore ctxt cond_opt const_nms =
     let
       val thy = Proof_Context.theory_of ctxt
       val thynm = Context.theory_name thy
       val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^"_hipspec.hs"
       val const_nms' = map map_to_haskell const_nms
-      (* Do we always want to have the --extra-trans flag? this means extra funs gets picked up, if they
-         are in the def of any of the given const-nms *)                                                         
-      val add_funs = List.foldl (fn (nm,s) => "--extra-trans "^(Long_Name.base_name nm)^ " "^s) " " const_nms';
-      val hipspec_cmd = "hipspec "^ "--isabelle-mode " ^ add_funs  ^ outfile;
-
+                                                            
+      val hipspec_cmd = case cond_opt of NONE => hipspec_plain const_nms' outfile 
+                                       | SOME c => hipspec_cond c const_nms' outfile
       val path_opt = SOME (Path.explode Hipster_Setup.filepath);    
       val _ = Code_Target.export_code thy const_nms [((("Haskell",thynm), path_opt), [])];
       val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile;
@@ -130,6 +147,7 @@ fun hipspec_explore ctxt const_nms =
     in 
       fst (Isabelle_System.bash_output hipspec_cmd)
     end;
+
 
 
 (* The output sting for each lemma discovered. *)
@@ -156,14 +174,14 @@ fun prep_conjs ctxt conjs =
     end;
                                                                  
 (* Outputs snippets of proof script with the discovered lemmas that can be pasted into the theory file. *)
-fun explore ctxt const_nms =
+fun explore' cond_opt ctxt const_nms =
     let
       val facts_nms = map (fn c => c^".simps") const_nms
       val facts = maps (fn n => Sledgehammer_Util.thms_of_name ctxt n
                        handle _ => []) facts_nms
       val tac_str = Tactic_Data.hard_tac_str ctxt facts_nms
                         
-      val conjs = hipspec_explore ctxt const_nms;
+      val conjs = hipspec_explore ctxt cond_opt const_nms;
 
       val res_ctxt = proof_loop ctxt facts conjs
       val output = Library.space_implode "\n\n"
@@ -176,6 +194,10 @@ fun explore ctxt const_nms =
          (Active.sendback_markup [Markup.padding_command] output))
     end;
 
+val explore = explore' NONE;
+fun explore_cond cond = explore' cond;
+
+
 (* A function which can be wrapped in Isabelle's setup command from a theory file.
    It adds the discovered lemmas to the Theory_Data Hipster_Rules. *)
 fun setup_exploration const_nms thy0 =
@@ -183,7 +205,7 @@ fun setup_exploration const_nms thy0 =
       val ctxt = Proof_Context.init_global thy0
       val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")
                        handle _ => []) const_nms
-      val res_ctxt = proof_loop ctxt facts (hipspec_explore ctxt const_nms)
+      val res_ctxt = proof_loop ctxt facts (hipspec_explore ctxt NONE const_nms)
     in
       Library.foldl 
         (fn (thy,thm) => Context.theory_map (Hipster_Rules.add_thm thm) thy) 
@@ -201,7 +223,7 @@ fun explore_goal ctxt const_nms thm =
       val facts_nms = map (fn c => c^".simps") const_nms
       val facts = maps (fn nm => Sledgehammer_Util.thms_of_name ctxt nm 
                                  handle _ => []) facts_nms 
-      val res_ctxt = proof_loop_w_prio ctxt facts (SOME thm) (hipspec_explore ctxt const_nms)
+      val res_ctxt = proof_loop_w_prio ctxt facts (SOME thm) (hipspec_explore ctxt NONE const_nms)
     in
       case res_ctxt of
         NONE => 
