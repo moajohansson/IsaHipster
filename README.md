@@ -5,9 +5,6 @@ Isabelle is availble from: http://isabelle.in.tum.de/index.html.
 Hipster works with Isabelle 2013-2.
 
 Installation instructions for HipSpec and the systems it relies on (QuickSpec and QuickCheck) are availble from: https://github.com/danr/hipspec.
-Note that you will need to switch to the branch called `isabelle' after you have cloned the repo. Issue this command in the created repository directory for HipSpec:
-
-     git checkout isabelle
 
 When you have installed the above, return to the IsaHipster directory and open the file called `IsaHipster.thy`. Edit the ML value `basepath` to point to your IsaHipster directory (yes, we know, this is not so nice, we'll fix it...). 
 
