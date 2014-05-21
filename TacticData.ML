@@ -36,12 +36,16 @@ val induct_simp = Data {routine_tac = Simp_Tacs.routine_tac,
 
 (* Data stored in an Isabelle context, default to induct_simp_metis tactics. 
    THINK: Maybe theis should be stored in the theory instead? *)
-structure Data = Proof_Data (type T = T; fun init thy = induct_simp_metis)
+structure Data = Theory_Data 
+                   (type T = T
+                   val empty = induct_simp_metis (* Default tactics *)
+                   val extend = I
+                   val merge = fst)
 
-fun routine_tac ctxt = (get_routine_tac (Data.get ctxt)) ctxt;
-fun hard_tac ctxt = (get_hard_tac (Data.get ctxt)) ctxt;
-fun hard_tac_str ctxt = (get_hard_str (Data.get ctxt)) ctxt;
-val routine_tac_str = get_routine_str o Data.get;
+fun routine_tac ctxt = (get_routine_tac (Data.get (Proof_Context.theory_of ctxt))) ctxt;
+fun hard_tac ctxt = (get_hard_tac (Data.get (Proof_Context.theory_of ctxt))) ctxt;
+fun hard_tac_str ctxt = (get_hard_str (Data.get (Proof_Context.theory_of ctxt))) ctxt;
+val routine_tac_str = get_routine_str o (Data.get o Proof_Context.theory_of);
 
 val set_tacs = Data.put;
 val set_induct_simp_metis = set_tacs induct_simp_metis;
