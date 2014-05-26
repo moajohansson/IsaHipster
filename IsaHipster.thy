@@ -1,6 +1,6 @@
 theory IsaHipster
 imports Main
-keywords "hipster" :: thy_decl
+keywords "hipster" "hipster_cond" :: thy_decl
 
 begin
 
