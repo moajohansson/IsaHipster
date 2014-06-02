@@ -1,6 +1,6 @@
 theory IsaHipster
 imports Main
-keywords "hipster" :: thy_decl
+keywords "hipster" "hipster_cond" :: thy_decl
 
 begin
 
@@ -38,10 +38,35 @@ ML_file "TacticData.ML"
 ML_file "HipsterExplore.ML"
 ML_file "HipsterIsar.ML"
 
+ML {* 
+op THEN';
+Method.insert_tac;
+*}
 
-(*
-ML_file "ProofTools.ML"
-ML_file "HipSpec.ML"
+method_setup hipster_induct_simp = {*
+  Scan.lift (Scan.succeed 
+    (fn ctxt => SIMPLE_METHOD 
+      (Hipster_Tacs.induct_simp_tac ctxt [])))
+   *}
+
+method_setup hipster_induct_simp_metis = {*
+  Scan.lift (Scan.succeed 
+    (fn ctxt => SIMPLE_METHOD 
+      (Hipster_Tacs.induct_simp_metis ctxt [])))
+ *}
+
+(* 
+(* Default value for tactics is induct_simp_metis. 
+   Use setup command to change to other hard/routine tactics.
 *)
+setup{* 
+Tactic_Data.set_induct_simp;
+*}
+ML{*
+Tactic_Data.routine_tac_str @{context};
+*}
+
+*)
+
 
 end

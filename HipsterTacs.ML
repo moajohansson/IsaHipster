@@ -34,9 +34,9 @@ fun prove_by_simp ctxt = SOLVE (simp_all ctxt);
 (* Metis tactics *) 
 (*-----------------------------------------------------------------------------------------*)
 
-fun SOLVE_TIMEOUT seconds tac t = 
+fun SOLVE_TIMEOUT mseconds tac t = 
     let
-      val res = TimeLimit.timeLimit (Time.fromSeconds seconds)
+      val res = TimeLimit.timeLimit (Time.fromMilliseconds mseconds)
                  (fn () => SINGLE (SOLVE tac) t) ()
                  handle TimeLimit.TimeOut => NONE
                       | ERROR _ => NONE
@@ -48,7 +48,7 @@ fun SOLVE_TIMEOUT seconds tac t =
 
 (* Apply simp, if that doesn't work try metis.  *)
 fun timed_metis_tac ctxt facts i =
-    SOLVE_TIMEOUT 1
+    SOLVE_TIMEOUT 500
     (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.metis_default_lam_trans ctxt facts i);
 
 (* First simp, and if nessecary, let Metis deal with the rest *)

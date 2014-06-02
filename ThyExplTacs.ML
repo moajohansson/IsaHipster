@@ -30,12 +30,17 @@ val routine_tac_str = "by (tactic {*Simp_Metis_Tacs.routine_tac @{context}*})";
 fun hard_tac ctxt = 
     let
       val prev_thms = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-      val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
-                                  (ctxt, prev_thms)
+                      @ (ThyExpl_Data.facts_of_ctxt ctxt)
+      (*val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                  (ctxt, prev_thms) *)
+                      
     in
-      ALLGOALS (Hipster_Tacs.try_inductable_vars ctxt' 
+      ALLGOALS(
+      Method.insert_tac prev_thms THEN' 
+      Hipster_Tacs.try_inductable_vars ctxt Hipster_Tacs.induct_simp_or_metis)
+   (*   ALLGOALS (Hipster_Tacs.try_inductable_vars ctxt' 
                                                  (prev_thms @ (ThyExpl_Data.facts_of_ctxt ctxt'))
-                                                 Hipster_Tacs.induct_simp_or_metis)
+                                                 Hipster_Tacs.induct_simp_or_metis) *)
     end; 
 
 (* The fact_nms are names of extra theorems that we want to refer to in the output *)
