@@ -66,9 +66,9 @@ fun try_prove_priority_goal ctxt goal =
       | NONE => NONE
     end;
 
-fun proof_loop_w_prio ctxt facts prio_goal_opt cand_lemmas_str =
+fun proof_loop_w_prio ctxt facts fact_nms prio_goal_opt cand_lemmas_str =
     let 
-      val ctxt' = ThyExpl_Data.init_expl ctxt facts prio_goal_opt
+      val ctxt' = ThyExpl_Data.init_expl ctxt facts fact_nms prio_goal_opt
                                           (Library.split_lines (Library.trim_line cand_lemmas_str))     
       fun recf ctxt = 
           case (try_nxt_conj ctxt) of
@@ -85,9 +85,9 @@ fun proof_loop_w_prio ctxt facts prio_goal_opt cand_lemmas_str =
       recf ctxt'
     end
 
-fun proof_loop ctxt facts cand_lemmas_str = 
+fun proof_loop ctxt facts fact_nms cand_lemmas_str = 
      let 
-      val ctxt' = ThyExpl_Data.init_expl ctxt facts NONE
+      val ctxt' = ThyExpl_Data.init_expl ctxt facts fact_nms NONE
                                           (Library.split_lines (Library.trim_line cand_lemmas_str))     
       fun recf ctxt = 
           case (try_nxt_conj ctxt) of
@@ -176,19 +176,20 @@ fun prep_conjs ctxt conjs =
 (* Outputs snippets of proof script with the discovered lemmas that can be pasted into the theory file. *)
 fun explore' cond_opt ctxt const_nms =
     let
-      val facts_nms = map (fn c => c^".simps") const_nms
+      val fact_nms = map (fn c => c^".simps") const_nms
       val facts = maps (fn n => Sledgehammer_Util.thms_of_name ctxt n
-                       handle _ => []) facts_nms
-      val tac_str = Tactic_Data.hard_tac_str ctxt facts_nms
+                       handle _ => []) fact_nms
                         
       val conjs = hipspec_explore ctxt cond_opt const_nms;
 
-      val res_ctxt = proof_loop ctxt facts conjs
+      val res_ctxt = proof_loop ctxt facts fact_nms conjs
+      val tac_str = Tactic_Data.hard_tac_str res_ctxt fact_nms
+
       val output = Library.space_implode "\n\n"
                      ((map (mk_lemma_str res_ctxt) 
-                           (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt res_ctxt)) 
+                           (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt res_ctxt))) 
                       @ (map (mk_lemma_str res_ctxt) 
-                             (map (fn conj => (conj,"oops")) (ThyExpl_Data.failed_of_ctxt res_ctxt)))))
+                             (map (fn conj => (conj,"oops")) (ThyExpl_Data.failed_of_ctxt res_ctxt))))
     in
       (res_ctxt, (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
          (Active.sendback_markup [Markup.padding_command] output))
@@ -203,9 +204,11 @@ fun explore_cond cond = explore' cond;
 fun setup_exploration const_nms thy0 =
     let
       val ctxt = Proof_Context.init_global thy0
-      val facts = maps (fn c => Sledgehammer_Util.thms_of_name ctxt (c^".simps")
-                       handle _ => []) const_nms
-      val res_ctxt = proof_loop ctxt facts (hipspec_explore ctxt NONE const_nms)
+      val fact_nms = map (fn c => c^".simps") const_nms
+      val facts = maps (fn n => Sledgehammer_Util.thms_of_name ctxt n
+                       handle _ => []) fact_nms
+      
+      val res_ctxt = proof_loop ctxt facts fact_nms (hipspec_explore ctxt NONE const_nms)
     in
       Library.foldl 
         (fn (thy,thm) => Context.theory_map (Hipster_Rules.add_thm thm) thy) 
@@ -223,7 +226,7 @@ fun explore_goal ctxt const_nms thm =
       val facts_nms = map (fn c => c^".simps") const_nms
       val facts = maps (fn nm => Sledgehammer_Util.thms_of_name ctxt nm 
                                  handle _ => []) facts_nms 
-      val res_ctxt = proof_loop_w_prio ctxt facts (SOME thm) (hipspec_explore ctxt NONE const_nms)
+      val res_ctxt = proof_loop_w_prio ctxt facts facts_nms (SOME thm) (hipspec_explore ctxt NONE const_nms)
     in
       case res_ctxt of
         NONE => 

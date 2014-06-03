@@ -1,38 +1,30 @@
 (* Various tactics for Hipster. Induction, simplification and metis. *)
 
+
 signature HIPSTER_TACS =
 sig 
   type hardtac
-  val prove_by_simp : Proof.context -> tactic
+  val prove_by_simp : Proof.context -> Thm.thm list -> tactic
   val timed_metis_tac : Proof.context -> Thm.thm list -> int -> tactic
-  val simp_or_metis : Proof.context -> thm list -> tactic 
-  val induct_simp_metis : Proof.context -> Thm.thm list -> tactic
-  val induct_and_simp : hardtac
-  val try_inductable_vars : Proof.context -> thm list -> hardtac -> int -> tactic
-  val induct_simp_or_metis : hardtac
-  val induct_simp_tac : Proof.context -> thm list -> tactic
+  val simp_or_metis : Proof.context -> (thm list * thm list) -> tactic 
+
+  val induct_and_simp : thm list -> hardtac
+  val induct_simp_or_metis : thm list * thm list -> hardtac
+
+  val try_inductable_vars : Proof.context -> hardtac -> int -> tactic
+
+  (* Context -> tactic *)
+  val induct_simp_tac : Proof.context -> tactic
+
+  (* Context -> list of simp rules (defs) -> tactic *)
+  val induct_simp_metis : Proof.context -> thm list -> tactic
+
 end
 
-structure Hipster_Tacs : HIPSTER_TACS =
+structure Hipster_Tacs  : HIPSTER_TACS  =
 struct
 
-type hardtac = Proof.context -> thm list -> thm list option -> string -> int -> tactic
-
-(*-----------------------------------------------------------------------------------------*)
-(* Simp tactics *) 
-(*-----------------------------------------------------------------------------------------*)
-
-
-(* Apply simp to all subgoals *)
-fun simp_all ctxt = ALLGOALS (Simplifier.asm_full_simp_tac ctxt);
- 
-(* Fails if all there are some subgoals left after application of simp *)
-fun prove_by_simp ctxt = SOLVE (simp_all ctxt);
-
-
-(*-----------------------------------------------------------------------------------------*)
-(* Metis tactics *) 
-(*-----------------------------------------------------------------------------------------*)
+type hardtac = Proof.context -> thm list option -> string -> int -> tactic
 
 fun SOLVE_TIMEOUT mseconds tac t = 
     let
@@ -46,17 +38,45 @@ fun SOLVE_TIMEOUT mseconds tac t =
       | SOME t' => Seq.single t'
     end;
 
+(*-----------------------------------------------------------------------------------------*)
+(* Simp tactics *) 
+(*-----------------------------------------------------------------------------------------*)
+
+
+(* Apply simp to all subgoals *)
+fun simp_all ctxt = ALLGOALS (Simplifier.asm_full_simp_tac ctxt);
+ 
+
+(* Add the lemmas given as assumptions to the theorem *)
+fun timed_simp_tac ctxt lemmas =
+    SOLVE_TIMEOUT 250 
+    (ALLGOALS (Method.insert_tac lemmas THEN' (Simplifier.asm_full_simp_tac ctxt)))
+
+(* Fails if all there are some subgoals left after application of simp *)
+fun prove_by_simp ctxt lemmas = SOLVE (simp_all ctxt);
+
+(*-----------------------------------------------------------------------------------------*)
+(* Metis tactics *) 
+(*-----------------------------------------------------------------------------------------*)
+
+
 (* Apply simp, if that doesn't work try metis.  *)
 fun timed_metis_tac ctxt facts i =
     SOLVE_TIMEOUT 500
     (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.metis_default_lam_trans ctxt facts i);
 
+
 (* First simp, and if nessecary, let Metis deal with the rest *)
-fun simp_or_metis ctxt facts = 
-    SOLVE((ALLGOALS ((Simplifier.asm_full_simp_tac ctxt))
+fun simp_or_metis ctxt (facts, lemmas) = 
+    SOLVE((timed_simp_tac ctxt lemmas)
+          THEN
+          IF_UNSOLVED
+          (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))
+  (*  SOLVE((ALLGOALS ((Simplifier.asm_full_simp_tac ctxt))
             THEN
             IF_UNSOLVED 
-            (ALLGOALS (timed_metis_tac ctxt facts))));
+            (ALLGOALS (timed_metis_tac ctxt facts )))); *)
+
 
 
 (*-----------------------------------------------------------------------------------------*)
@@ -142,51 +162,153 @@ fun induct_on_var_tac rule var i goalthm =
 (*-----------------------------------------------------------------------------------------*)
 
 (* Apply induction on var and try to prove all cases by simp *)
-fun induct_and_simp ctxt facts rule var i = 
-     (induct_on_var_tac rule var i) THEN (prove_by_simp ctxt);
+fun induct_and_simp lemmas ctxt rule var i = 
+     (induct_on_var_tac rule var i) THEN (timed_simp_tac ctxt lemmas);
 
 (* Induction on var, then try to prove resulting subgoals by simp or metis *)
-fun induct_simp_or_metis ctxt facts rule var i = 
-    (induct_on_var_tac rule var i) THEN (simp_or_metis ctxt facts);
+fun induct_simp_or_metis (facts, lemmas) ctxt rule var i = 
+    (induct_on_var_tac rule var i) THEN (simp_or_metis ctxt (facts,lemmas));
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
-fun try_induct_on ctxt facts rule strat vars i  =
+fun try_induct_on ctxt rule strat vars i  =
     case vars 
        of [] => no_tac 
         | (v :: vs) =>  
           (*(induct_simp_or_metis ctxt facts rule v i)*)
-          strat ctxt facts rule v i
+          strat ctxt rule v i
           ORELSE 
-          (try_induct_on ctxt facts rule strat vs i);
+          (try_induct_on ctxt rule strat vs i);
 
 (* Find the variables we can induct on *)
-fun try_inductable_vars ctxt facts strat i thm = 
+fun try_inductable_vars ctxt strat i thm = 
     let
       val vars = map fst (fst (inductable_things_in_sg i thm))
     in
-      (try_induct_on ctxt facts NONE strat vars i) thm
+      (try_induct_on ctxt NONE strat vars i) thm
     end;
 
 
-(* An induction tactic to paste into the proof-script afterwards *)
-fun induct_simp_metis ctxt lemmas thm = 
-    let
-      val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
-                                (ctxt, lemmas)
-    in
-      ALLGOALS(try_inductable_vars ctxt' lemmas induct_simp_or_metis) thm
-    end
+(* QUESTION: Should these tactics really add the lemma-list to the simplifier?
+The tactics used by Hipster don't, they only pass them to Metis, looking them up from the ctxt. 
+However, if these tactics are used outside of theory exploration, they might not have all the
+stuff in the ctxt, i.e. simprules and discovered theorems? 
+
+Maybe need all separate tactics for outside Theory Exploration? Or data for induction? 
+Or add to TacticData?
+*)
 
 (* An induction tactic to paste into the proof-script afterwards *)
-fun induct_simp_tac ctxt lemmas thm = 
+fun induct_simp_metis ctxt facts thm = 
     let
-      val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
-                                (ctxt, lemmas)
+      val lemmas = ThyExpl_Data.proved_of_ctxt ctxt 
+   (*   val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                (ctxt, lemmas) *)
     in
-      ALLGOALS(try_inductable_vars ctxt' lemmas induct_and_simp) thm
-    end
+      ALLGOALS(try_inductable_vars ctxt (induct_simp_or_metis (facts,lemmas))) thm
+    end;
+
+(* An induction tactic to paste into the proof-script afterwards *)
+fun induct_simp_tac ctxt thm = 
+    let   
+      val lemmas = ThyExpl_Data.proved_of_ctxt ctxt 
+    in 
+      ALLGOALS(try_inductable_vars ctxt (induct_and_simp lemmas)) thm
+    end;
+
+end;
+(*-----------------------------------------------------------------------------------------*)
+(* Structures for pre-defined combinations of routine/hard reasoning in Hipster            *)
+(*-----------------------------------------------------------------------------------------*)
 
 
+signature THY_EXPL_TACS =
+sig
+  val routine_tac : Proof.context -> tactic
+  val routine_tac_str : string
+  val hard_tac : Proof.context -> tactic
+  val final_tactic_str : Proof.context -> string list -> string
+end
+
+
+(* This structure considers simplification or FO reasoning by Metis as routine. *)
+(* Proofs requiring structural induction is considered as "hard"                *)
+structure Simp_Metis_Tacs : THY_EXPL_TACS =
+struct
+
+fun routine_tac ctxt = 
+   (*  let
+       val facts = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
+                        @ (ThyExpl_Data.facts_of_ctxt ctxt)
+      (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                 (ctxt, prev_thms) *)
+     in *)
+       Hipster_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt, 
+                                        (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)); 
+
+val routine_tac_str = "by (tactic {*Simp_Metis_Tacs.routine_tac @{context}*})"; 
+
+fun hard_tac ctxt = 
+    let
+      val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
+      val facts = ThyExpl_Data.facts_of_ctxt ctxt
+      (*val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                  (ctxt, prev_thms) *)                   
+    in
+     (* ALLGOALS(
+      Method.insert_tac prev_thms THEN' 
+      Hipster_Tacs.try_inductable_vars ctxt Hipster_Tacs.induct_simp_or_metis) *)
+      ALLGOALS (Hipster_Tacs.try_inductable_vars ctxt 
+                                            (Hipster_Tacs.induct_simp_or_metis (facts,lemmas)))
+    end; 
+
+(* The fact_nms are names of extra theorems that we want to refer to in the output *)
+fun final_tactic_str _ fact_nms =
+    let
+      val facts_str = "@{thms "^ (Library.space_implode " " fact_nms) ^"}"^ " @{thms thy_expl}" 
+    in 
+      "by (tactic {* Hipster_Tacs.induct_simp_metis @{context} " 
+      ^ facts_str ^" *})"
+    end;
+end
+
+
+
+structure Simp_Tacs : THY_EXPL_TACS =
+struct
+
+fun routine_tac ctxt = 
+     let
+       val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
+      (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                 (ctxt, prev_thms) *)
+     in
+        SOLVE (Hipster_Tacs.prove_by_simp ctxt lemmas)
+     end; 
+
+val routine_tac_str = "by (tactic {*Simp_Tacs.routine_tac @{context}*})"; 
+
+fun hard_tac ctxt = 
+    let
+      val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt) 
+      (*val facts =  ThyExpl_Data.facts_of_ctxt ctxt *)
+    (*  val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                  (ctxt, prev_thms) *)
+    in
+      ALLGOALS (Hipster_Tacs.try_inductable_vars ctxt
+                                                 (Hipster_Tacs.induct_and_simp lemmas))
+    end; 
+
+(* The fact_nms are names of extra theorems that we want to refer to in the output *)
+fun final_tactic_str _ fact_nms = "by hipster_induct_simp"
+(*
+    let
+      (* val facts_str = "@{thms "^ (Library.space_implode " " fact_nms) ^ " thy_expl}" *)
+     (* val facts_str =  "@{thms thy_expl}" *)
+    in 
+     (* "by (tactic {* Hipster_Tacs.induct_simp_tac @{context} " 
+      ^ facts_str ^" *})" *)
+    end;
+*)
 end
 
 
