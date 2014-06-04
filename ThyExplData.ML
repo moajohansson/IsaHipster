@@ -83,7 +83,7 @@ val empty = Data{open_conjs = [], failed = [], proved = [], facts = [], fact_nam
 
 (* Data stored in an Isabelle context *)
 structure ExplData = Proof_Data (type T = T
-                                 fun init thy = empty)
+                                 fun init _ = empty)
 
 (* Get information from a proof context type *)
 val open_conjs_of_ctxt = get_open_conjs o ExplData.get;

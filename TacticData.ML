@@ -9,8 +9,7 @@ datatype T = Data of
          { routine_tac : Proof.context -> tactic,
            hard_tac : Proof.context -> tactic,
            routine_tac_str : string,     
-           (* FIXME: Look up string list of names of lemmas from context!*)
-           hard_tac_str : Proof.context -> string list -> string };
+           hard_tac_str : Proof.context -> string};
 
 
 fun get_routine_tac (Data d) = (#routine_tac d);

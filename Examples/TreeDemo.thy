@@ -2,9 +2,10 @@ theory TreeDemo
 imports "../IsaHipster"
 
 begin
-setup{* 
+(* setup{* 
 Tactic_Data.set_induct_simp;
 *}
+*)
 datatype 'a Tree = 
   Leaf 'a 
   | Node "'a Tree""'a Tree"
@@ -23,10 +24,10 @@ where
 (* First call to Hipster: Explore tmap and mirror *)
 hipster mirror tmap
 lemma lemma_a [thy_expl]: "mirror (tmap x2 y2) = tmap x2 (mirror y2)"
-by hipster_induct_simp
+by (hipster_induct_simp_metis TreeDemo.mirror.simps TreeDemo.tmap.simps)
 
 lemma lemma_aa [thy_expl]: "mirror (mirror x12) = x12"
-by hipster_induct_simp
+by (hipster_induct_simp_metis TreeDemo.mirror.simps TreeDemo.tmap.simps)
 
 fun flat_tree :: "'a Tree => 'a list"
 where
@@ -37,10 +38,10 @@ where
 (* Second call to Hipster: Explore relation to lists *)
 hipster flat_tree mirror tmap rev map
 lemma lemma_ab [thy_expl]: "flat_tree (tmap x10 y10) = map x10 (flat_tree y10)"
-by hipster_induct_simp
+by (hipster_induct_simp_metis TreeDemo.flat_tree.simps TreeDemo.mirror.simps TreeDemo.tmap.simps List.rev.simps List.map.simps)
 
 lemma lemma_ac [thy_expl]: "flat_tree (mirror x36) = rev (flat_tree x36)"
-by hipster_induct_simp
+by (hipster_induct_simp_metis TreeDemo.flat_tree.simps TreeDemo.mirror.simps TreeDemo.tmap.simps List.rev.simps List.map.simps)
 
 fun rigthmost :: "'a Tree \<Rightarrow> 'a"
 where 
@@ -62,17 +63,18 @@ where
 lemmas, as I changed it so it won't add the previous thy_expl things directly to the simp set, also 
 set a rather short time limit. The time limits should be made into flags!*)
 hipster hd rev mirror flat_tree rigthmost leftmost
-lemma lemma_ad [thy_expl]: "rigthmost (mirror x18) = leftmost x18"
-by hipster_induct_simp
+lemma lemma_ad [thy_expl]: "leftmost (mirror x2) = rigthmost x2"
+by (hipster_induct_simp_metis List.hd.simps List.rev.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rigthmost.simps TreeDemo.leftmost.simps)
 
-lemma lemma_ae [thy_expl]: "leftmost (mirror x60) = rigthmost x60"
-by hipster_induct_simp
+lemma lemma_ae [thy_expl]: "rigthmost (mirror x2) = leftmost x2"
+by (hipster_induct_simp_metis List.hd.simps List.rev.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rigthmost.simps TreeDemo.leftmost.simps)
 
-lemma lemma_af [thy_expl]: "hd (xs186 @ xs186) = hd xs186"
-by hipster_induct_simp
+lemma lemma_af [thy_expl]: "hd (xs2 @ xs2) = hd xs2"
+by (hipster_induct_simp_metis List.hd.simps List.rev.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rigthmost.simps TreeDemo.leftmost.simps)
 
 lemma unknown [thy_expl]: "hd (flat_tree x) = leftmost x"
 oops
+
 
 
 (* FIXME: Bug in translation? *)

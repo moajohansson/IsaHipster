@@ -183,7 +183,7 @@ fun explore' cond_opt ctxt const_nms =
       val conjs = hipspec_explore ctxt cond_opt const_nms;
 
       val res_ctxt = proof_loop ctxt facts fact_nms conjs
-      val tac_str = Tactic_Data.hard_tac_str res_ctxt fact_nms
+      val tac_str = Tactic_Data.hard_tac_str res_ctxt 
 
       val output = Library.space_implode "\n\n"
                      ((map (mk_lemma_str res_ctxt) 
@@ -219,7 +219,7 @@ fun setup_exploration const_nms thy0 =
    The aim is to find lemma(s) which allows for the goal to be proved. *)
 fun explore_goal ctxt const_nms thm =
      let
-      val thy = Proof_Context.theory_of ctxt
+      (* val thy = Proof_Context.theory_of ctxt *)
       (*val const_nms = Hipster_Utils.thy_consts_of (Context.theory_name (Thm.theory_of_thm thm)) thm *)
           (* FIXME: No simps for constant symbols, e.g. datatype constructors.
              FIXME: Won't pick up all the simps it needs, e.g. from functions defined in terms of *)
@@ -234,7 +234,7 @@ fun explore_goal ctxt const_nms thm =
         in no_tac thm end
       | SOME ctxt' => (* Success, provided the explored lemmas, the thm can be proved. *)
         let
-          val tac_str = Tactic_Data.hard_tac_str ctxt' facts_nms
+          val tac_str = Tactic_Data.hard_tac_str ctxt' 
           val lemmas = Library.space_implode "\n\n"
                        (map (mk_lemma_str ctxt') 
                            (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt ctxt')))

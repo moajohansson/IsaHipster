@@ -43,35 +43,23 @@ fun compile :: "('c,'v) expr \<Rightarrow> ('c,'v) program"
   "compile (Vex v) =  Load v Done" |
   "compile (Bex b e1 e2) = sequence (compile e2) (sequence (compile e1) (Apply b Done))"
 
-ML{*
-val consts = ["Exp.value", "Exp.exec", "Exp.compile", "Exp.sequence"];
-
-Hipster_Explore.explore @{context} consts;
-
-*}
-
-
+hipster Exp.value exec compile sequence
 lemma lemma_a [thy_expl]: "sequence x4 Done = x4"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Exp.value.simps Exp.exec.simps Exp.compile.simps Exp.sequence.simps thy_expl} *})
+by (hipster_induct_simp_metis Exp.value.simps Exp.exec.simps Exp.compile.simps Exp.sequence.simps)
 
-lemma lemma_aa [thy_expl]: "exec x4 y4 (sequence z4 x14) xs4 = exec x4 y4 x14 (exec x4 y4 z4 xs4)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Exp.value.simps Exp.exec.simps Exp.compile.simps Exp.sequence.simps thy_expl} *})
+lemma lemma_aa [thy_expl]: "exec x4 (sequence y4 z4) xs4 = exec x4 z4 (exec x4 y4 xs4)"
+by (hipster_induct_simp_metis Exp.value.simps Exp.exec.simps Exp.compile.simps Exp.sequence.simps)
 
-lemma lemma_ab [thy_expl]: "exec x3 y3 (compile z3) xs3 = value x3 y3 z3 # xs3"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Exp.value.simps Exp.exec.simps Exp.compile.simps Exp.sequence.simps thy_expl} *})
+lemma lemma_ab [thy_expl]: "exec x3 (compile y3) xs3 = value x3 y3 # xs3"
+by (hipster_induct_simp_metis Exp.value.simps Exp.exec.simps Exp.compile.simps Exp.sequence.simps)
 
-theorem our_thm : "exec getBinop env (compile e) [] = [value getBinop env e]"
+lemma lemma_ac [thy_expl]: "sequence (sequence x4 y4) z4 = sequence x4 (sequence y4 z4)"
+by (hipster_induct_simp_metis Exp.value.simps Exp.exec.simps Exp.compile.simps Exp.sequence.simps)
+
+
+theorem our_thm : "exec env (compile e) [] = [value  env e]"
 sledgehammer
 by (metis lemma_ab)
-
-(*
-(* First try by user, gets stuck, call theory exploration, get suitable lemmas. After can prove goal
-by Sledgehammering *)
-apply (induct e)
-apply (simp_all)
-apply (tactic {*Hipster_Explore.explore_goal @{context} consts*})
- 
-*)
 
 
 end
