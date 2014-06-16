@@ -42,8 +42,10 @@ fun compile :: "('c,'v) expr \<Rightarrow> ('c,'v) program"
   "compile (Cex c) =  Const c Done" |
   "compile (Vex v) =  Load v Done" |
   "compile (Bex b e1 e2) = sequence (compile e2) (sequence (compile e1) (Apply b Done))"
-
-hipster Exp.value exec compile sequence
+(*
+hipster value exec compile sequence
+*)
+(*
 lemma lemma_a [thy_expl]: "sequence x4 Done = x4"
 by (hipster_induct_simp_metis Exp.value.simps Exp.exec.simps Exp.compile.simps Exp.sequence.simps)
 
@@ -55,11 +57,15 @@ by (hipster_induct_simp_metis Exp.value.simps Exp.exec.simps Exp.compile.simps E
 
 lemma lemma_ac [thy_expl]: "sequence (sequence x4 y4) z4 = sequence x4 (sequence y4 z4)"
 by (hipster_induct_simp_metis Exp.value.simps Exp.exec.simps Exp.compile.simps Exp.sequence.simps)
-
-
+*)
+ML{*Tactic_Data.routine_tac_str @{context}; *} 
 theorem our_thm : "exec env (compile e) [] = [value  env e]"
+(*apply (tactic {* Tactic_Data.routine_tac @{context}*}) *)
+
+apply (tactic {*Hipster_Explore.explore_goal @{context} ["Exp.compile", "Exp.exec", "Exp.value"] *})
+(*
 sledgehammer
 by (metis lemma_ab)
-
+*)
 
 end

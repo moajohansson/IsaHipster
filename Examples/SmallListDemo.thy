@@ -16,7 +16,6 @@ where
   "rev Emp = Emp"
 | "rev (Cons x xs) = app (rev xs) (Cons x Emp)"
 
-
 theorem rev_rev : "rev(rev xs) = xs "
 apply (induct xs)
 apply (simp+)

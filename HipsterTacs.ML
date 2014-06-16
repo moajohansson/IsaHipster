@@ -44,7 +44,13 @@ fun SOLVE_TIMEOUT mseconds tac t =
 
 
 (* Apply simp to all subgoals *)
-fun simp_all ctxt = ALLGOALS (Simplifier.asm_full_simp_tac ctxt);
+fun simp_all ctxt lemmas = 
+    let
+       val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                 (ctxt, lemmas)
+    in 
+      ALLGOALS (Simplifier.asm_full_simp_tac ctxt')
+    end;
  
 
 (* Add the lemmas given as assumptions to the theorem. Note: This does not always work as well as adding them
@@ -55,11 +61,7 @@ to the simpset for some reason. *)
 *)
 
 (* Fails if all there are some subgoals left after application of simp *)
- fun prove_by_simp ctxt lemmas = 
-     let
-       val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
-                                 (ctxt, lemmas)
-     in SOLVE (simp_all ctxt') end; 
+ fun prove_by_simp ctxt lemmas = SOLVE (simp_all ctxt lemmas); 
 
 (*-----------------------------------------------------------------------------------------*)
 (* Metis tactics *) 
@@ -74,7 +76,7 @@ fun timed_metis_tac ctxt facts i =
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
 fun simp_or_metis ctxt (facts, lemmas) = 
-    SOLVE((prove_by_simp ctxt lemmas)
+    SOLVE((simp_all ctxt lemmas)
           THEN
           IF_UNSOLVED
           (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))
@@ -253,7 +255,7 @@ fun routine_tac ctxt =
        Hipster_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt, 
                                         (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)); 
 
-val routine_tac_str = "by (tactic {*Simp_Metis_Tacs.routine_tac @{context}*})"; 
+val routine_tac_str = "by (tactic {* Simp_Metis_Tacs.routine_tac @{context} *})"; 
 
 fun hard_tac ctxt = 
     let

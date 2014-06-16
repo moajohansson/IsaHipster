@@ -49,7 +49,17 @@ method_setup hipster_induct_simp_metis = {*
     SIMPLE_METHOD 
       (Hipster_Tacs.induct_simp_metis ctxt thms))
  *}
+(*
+ML{*
+Method.setup;
 
+*}
+
+
+method_setup hipster_goal = {*
+  
+*}
+*)
 (* 
 (* Default value for tactics is induct_simp_metis. 
    Use setup command to change to other hard/routine tactics.

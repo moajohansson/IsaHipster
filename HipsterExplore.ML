@@ -23,8 +23,7 @@ fun try_nxt_conj ctxt =
       let 
         val r = SINGLE (Tactic_Data.routine_tac ctxt) c
         val lemma_str = (Syntax.string_of_term ctxt (Thm.concl_of c))
-          val _ = (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
-                ("Proving: " ^ lemma_str)
+         
       in
       case r of (* Discard this, it is trivial *)
         SOME _ => SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
@@ -42,6 +41,8 @@ fun try_nxt_conj ctxt =
                                  |> (Drule.generalize (Hipster_Utils.frees_and_tfrees_of_thm proved_thm))
                                  |> Goal.finish ctxt' 
                                  |> Thm.put_name_hint new_nm
+               val _ = (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
+                ("Proved: " ^ lemma_str)
              in
                SOME (ctxt'
                        |> ThyExpl_Data.set_open_conjs_ctxt cs
@@ -58,11 +59,15 @@ fun try_nxt_conj ctxt =
 
 fun try_prove_priority_goal ctxt goal =
     let
-      (* val res = SINGLE (Tactic_Data.hard_tac ctxt) goal *)
-      val res = SINGLE (Tactic_Data.routine_tac ctxt) goal
+      val res = SINGLE (Tactic_Data.routine_tac ctxt) goal 
     in 
       case res of
-        SOME _ => SOME (ThyExpl_Data.set_priority_goal_ctxt NONE ctxt)
+        SOME _ => 
+        let
+        val _ = Output.urgent_message "Proved prio goal";
+        in
+            SOME (ThyExpl_Data.set_priority_goal_ctxt NONE ctxt)
+        end
       | NONE => NONE
     end;
 
@@ -73,13 +78,13 @@ fun proof_loop_w_prio ctxt facts fact_nms prio_goal_opt cand_lemmas_str =
       fun recf ctxt = 
           case (try_nxt_conj ctxt) of
             NONE => NONE (*ctxt *) (* No more lemmas to prove, not proved prio goal, fail. *)
-          | SOME ctxt' => 
-            (case (ThyExpl_Data.priority_goal_of_ctxt ctxt')
-              of NONE => NONE (* There is no prio goals, so nothing to do! *)
+          | SOME ctxt1 => 
+            (case (ThyExpl_Data.priority_goal_of_ctxt ctxt1)
+              of NONE =>  NONE (* There is no prio goals, so nothing to do! *)
             | SOME goal => 
-              (case (try_prove_priority_goal ctxt' goal) of
-                 NONE => recf ctxt'
-               | SOME ctxt'' => SOME ctxt'') (* Proved the priority goal, we're done! *)
+              (case (try_prove_priority_goal ctxt1 goal) of
+                 NONE => recf ctxt1
+               | SOME ctxt2 => SOME ctxt2) (* Proved the priority goal, we're done! *)
             )
     in
       recf ctxt'
@@ -231,7 +236,7 @@ fun explore_goal ctxt const_nms thm =
       case res_ctxt of
         NONE => 
         let val _ = Output.urgent_message ("Failed to find lemmas which will prove goal.")
-        in no_tac thm end
+        in no_tac thm end 
       | SOME ctxt' => (* Success, provided the explored lemmas, the thm can be proved. *)
         let
           val tac_str = Tactic_Data.hard_tac_str ctxt' 
