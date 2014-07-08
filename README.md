@@ -1,10 +1,17 @@
 Hipster is still under development, but feel free to play around with it!
-To install Hipster, you first need HipSpec and Isabelle. 
+To install Hipster, you first need Isabelle, Z3 and HipSpec.
 
-Isabelle is availble from: http://isabelle.in.tum.de/index.html.
-Hipster works with Isabelle 2013-2.
+Isabelle is available from: http://isabelle.in.tum.de/index.html.
+Hipster works with Isabelle 2013-2, preferably in jEdit if you want
+nice syntactic sugar.
 
-Installation instructions for HipSpec and the systems it relies on (QuickSpec and QuickCheck) are availble from: https://github.com/danr/hipspec.
+Z3 is available from: http://z3.codeplex.com/releases.
+
+To install HipSpec, you will need to run the following commands (you
+will need to have Git installed):
+  git clone https://github.com/danr/hipspec
+  cabal update
+  cabal install hipspec
 
 When you have installed the above, return to the IsaHipster directory and open the file called `IsaHipster.thy`. Edit the ML value `basepath` to point to your IsaHipster directory (yes, we know, this is not so nice, we'll fix it...). 
 
