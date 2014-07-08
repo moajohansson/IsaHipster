@@ -9,9 +9,10 @@ Z3 is available from: http://z3.codeplex.com/releases.
 
 To install HipSpec, you will need to run the following commands (you
 will need to have Git installed):
-  git clone https://github.com/danr/hipspec
-  cabal update
-  cabal install hipspec
+
+    git clone https://github.com/danr/hipspec
+    cabal update
+    cabal install hipspec
 
 When you have installed the above, return to the IsaHipster directory and open the file called `IsaHipster.thy`. Edit the ML value `basepath` to point to your IsaHipster directory (yes, we know, this is not so nice, we'll fix it...). 
 
