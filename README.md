@@ -12,12 +12,6 @@ You will also have to compile the "HipSpecifyer":
 
     cabal install hipspecifyer/
     
-Finally, create an (empty) directory called `GenCode` in the top-level directory:
-
-    mkdir -p GenCode
-    
-This is where Hipster will store generated Haskell-files (this requirement will shortly dissapear, when we tidy things up...).
-
 Now, you should be able to try Hipster. Start up Isabelle on for example Examples/TreeDemo.thy and have a go.
 
 _Disclaimer_: There are quite a few hacks around, and Hipster is not a polished and finished product by any means. Let us know if you run into anything too odd, and we'll try to fix it.
