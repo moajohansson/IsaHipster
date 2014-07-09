@@ -2,10 +2,7 @@ theory TreeDemo
 imports "../IsaHipster"
 
 begin
-(* setup{* 
-Tactic_Data.set_induct_simp;
-*}
-*)
+
 datatype 'a Tree = 
   Leaf 'a 
   | Node "'a Tree""'a Tree"
@@ -20,65 +17,84 @@ where
   "tmap f (Leaf x) = Leaf (f x)"
 | "tmap f (Node l r) = Node (tmap f l) (tmap f r)" 
 
-
 (* First call to Hipster: Explore tmap and mirror *)
-hipster mirror tmap
+hipster tmap mirror
 lemma lemma_a [thy_expl]: "mirror (tmap x2 y2) = tmap x2 (mirror y2)"
-by (hipster_induct_simp_metis TreeDemo.mirror.simps TreeDemo.tmap.simps)
+by (hipster_induct_simp_metis TreeDemo.tmap.simps TreeDemo.mirror.simps)
 
-lemma lemma_aa [thy_expl]: "mirror (mirror x12) = x12"
-by (hipster_induct_simp_metis TreeDemo.mirror.simps TreeDemo.tmap.simps)
+lemma lemma_aa [thy_expl]: "mirror (mirror x2) = x2"
+by (hipster_induct_simp_metis TreeDemo.tmap.simps TreeDemo.mirror.simps)
+
 
 fun flat_tree :: "'a Tree => 'a list"
 where
   "flat_tree (Leaf x) = [x]"
 | "flat_tree (Node l r) = (flat_tree l) @ (flat_tree r)"
 
+(* Second call to Hipster: Explore relation to lists: flat_tree tmap mirror rev map *)
+hipster flat_tree tmap mirror rev map
+lemma lemma_ab [thy_expl]: "flat_tree (tmap x2 y2) = map x2 (flat_tree y2)"
+by (hipster_induct_simp_metis TreeDemo.flat_tree.simps TreeDemo.tmap.simps TreeDemo.mirror.simps List.rev.simps List.map.simps)
 
-(* Second call to Hipster: Explore relation to lists *)
-hipster flat_tree mirror tmap rev map
-lemma lemma_ab [thy_expl]: "flat_tree (tmap x10 y10) = map x10 (flat_tree y10)"
-by (hipster_induct_simp_metis TreeDemo.flat_tree.simps TreeDemo.mirror.simps TreeDemo.tmap.simps List.rev.simps List.map.simps)
+lemma lemma_ac [thy_expl]: "flat_tree (mirror x2) = rev (flat_tree x2)"
+by (hipster_induct_simp_metis TreeDemo.flat_tree.simps TreeDemo.tmap.simps TreeDemo.mirror.simps List.rev.simps List.map.simps)
 
-lemma lemma_ac [thy_expl]: "flat_tree (mirror x36) = rev (flat_tree x36)"
-by (hipster_induct_simp_metis TreeDemo.flat_tree.simps TreeDemo.mirror.simps TreeDemo.tmap.simps List.rev.simps List.map.simps)
-
-fun rigthmost :: "'a Tree \<Rightarrow> 'a"
+fun rightmost :: "'a Tree \<Rightarrow> 'a"
 where 
-  "rigthmost (Leaf x) = x"
-|  "rigthmost (Node l r) = rigthmost r"
+  "rightmost (Leaf x) = x"
+| "rightmost (Node l r) = rightmost r"
 
 fun leftmost :: "'a Tree \<Rightarrow> 'a"
 where 
   "leftmost (Leaf x) = x"
 | "leftmost (Node l r) = leftmost l"
 
-fun nonEmpty :: "'a list => bool"
-where
-  "nonEmpty [] = False"
- |"nonEmpty _ = True"
+(* Third call to Hipster: hd mirror flat_tree  rightmost leftmost*)
+hipster hd mirror flat_tree rightmost leftmost
+lemma lemma_ad [thy_expl]: "rightmost (mirror x2) = leftmost x2"
+by (hipster_induct_simp_metis List.hd.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rightmost.simps TreeDemo.leftmost.simps)
 
+lemma lemma_ae [thy_expl]: "hd (xs2 @ xs2) = hd xs2"
+by (hipster_induct_simp_metis List.hd.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rightmost.simps TreeDemo.leftmost.simps)
 
-(* Third call to Hipster: Rightmost and Leftmost element of a tree. Now we get both leftmost/rightmost
-lemmas, as I changed it so it won't add the previous thy_expl things directly to the simp set, also 
-set a rather short time limit. The time limits should be made into flags!*)
-hipster hd rev mirror flat_tree rigthmost leftmost
-lemma lemma_ad [thy_expl]: "leftmost (mirror x2) = rigthmost x2"
-by (hipster_induct_simp_metis List.hd.simps List.rev.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rigthmost.simps TreeDemo.leftmost.simps)
-
-lemma lemma_ae [thy_expl]: "rigthmost (mirror x2) = leftmost x2"
-by (hipster_induct_simp_metis List.hd.simps List.rev.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rigthmost.simps TreeDemo.leftmost.simps)
-
-lemma lemma_af [thy_expl]: "hd (xs2 @ xs2) = hd xs2"
-by (hipster_induct_simp_metis List.hd.simps List.rev.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rigthmost.simps TreeDemo.leftmost.simps)
+lemma nonEmp[simp]: "flat_tree t ~= []"
+by (hipster_induct_simp)
 
 lemma unknown [thy_expl]: "hd (flat_tree x) = leftmost x"
-oops
+by (hipster_induct_simp)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 (* FIXME: Bug in translation? *)
-
+(*
 fun size :: "'a Tree \<Rightarrow> nat"
 where
   "size (Leaf x) = 0"
@@ -87,9 +103,10 @@ fun size1 :: "'a Tree \<Rightarrow> nat"
 where
   "size1 (Leaf x) = 1"
   | "size1 (Node l r) = (size1 l + size1 r)"
+*)
 (*  hipster  size *) (* TO DO! Make sure + and 0,1 gets transalated back to the right constants*)
 (* Issue! These constants are polymorphic! fix fix fix... *)
-ML{* @{term "nonEmpty ys \<and> true ==> flat_tree x = []"} *}
+(*ML{* @{term "nonEmpty ys \<and> true ==> flat_tree x = []"} *} *)
 
 (*
 
@@ -99,6 +116,12 @@ by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms List.last.simps L
 
 lemma unknown [thy_expl]: "last (flat_tree x) = rigthmost x"
 oops
+
+(* setup{* 
+Tactic_Data.set_induct_simp;
+*}
+*)
+
 *)
 end
 
