@@ -127,11 +127,12 @@ fun hipspec_plain consts file =
       "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file
     end;
 
+(* FIXME: make cond-count a proper parameter controlled by user. *)
 fun hipspec_cond cond_name consts file = 
     let 
       val add_funs = List.foldl (fn (nm,s) => "--extra-trans "^(Long_Name.base_name nm)^ " "^s) " " consts
     in
-      "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^ (Long_Name.base_name cond_name) ^ " --cond-count=1" 
+      "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^ (Long_Name.base_name cond_name) ^ " --cond-count=3" 
     end;
 
 (* 'const_nms' are the name of the constants we wish to include in the Haskell 
