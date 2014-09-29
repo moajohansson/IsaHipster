@@ -3,6 +3,13 @@ imports "../IsaHipster"
 
 begin
 
+(* FIXME: Simp-rules for map and hd have new names in Isabelle2014. We can't rely on 
+function_name.simps in all cases. This needs to be fixed. When just using simp it doesn't
+matter, but Metis needs to be fed the desired lemmas. Investigate how to select the relevant ones,
+and also, how to only get the neccesary ones to paste into proof-script.
+*)
+setup Tactic_Data.set_induct_simp
+
 datatype 'a Tree = 
   Leaf 'a 
   | Node "'a Tree""'a Tree"
@@ -20,10 +27,10 @@ where
 (* First call to Hipster: Explore tmap and mirror *)
 hipster tmap mirror
 lemma lemma_a [thy_expl]: "mirror (tmap x2 y2) = tmap x2 (mirror y2)"
-by (hipster_induct_simp_metis TreeDemo.tmap.simps TreeDemo.mirror.simps)
+by hipster_induct_simp
 
 lemma lemma_aa [thy_expl]: "mirror (mirror x2) = x2"
-by (hipster_induct_simp_metis TreeDemo.tmap.simps TreeDemo.mirror.simps)
+by hipster_induct_simp
 
 
 fun flat_tree :: "'a Tree => 'a list"
@@ -31,13 +38,14 @@ where
   "flat_tree (Leaf x) = [x]"
 | "flat_tree (Node l r) = (flat_tree l) @ (flat_tree r)"
 
+
 (* Second call to Hipster: Explore relation to lists: flat_tree tmap mirror rev map *)
 hipster flat_tree tmap mirror rev map
 lemma lemma_ab [thy_expl]: "flat_tree (tmap x2 y2) = map x2 (flat_tree y2)"
-by (hipster_induct_simp_metis TreeDemo.flat_tree.simps TreeDemo.tmap.simps TreeDemo.mirror.simps List.rev.simps List.map.simps)
+by hipster_induct_simp
 
 lemma lemma_ac [thy_expl]: "flat_tree (mirror x2) = rev (flat_tree x2)"
-by (hipster_induct_simp_metis TreeDemo.flat_tree.simps TreeDemo.tmap.simps TreeDemo.mirror.simps List.rev.simps List.map.simps)
+by hipster_induct_simp
 
 fun rightmost :: "'a Tree \<Rightarrow> 'a"
 where 
@@ -51,11 +59,15 @@ where
 
 (* Third call to Hipster: hd mirror flat_tree  rightmost leftmost*)
 hipster hd mirror flat_tree rightmost leftmost
-lemma lemma_ad [thy_expl]: "rightmost (mirror x2) = leftmost x2"
-by (hipster_induct_simp_metis List.hd.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rightmost.simps TreeDemo.leftmost.simps)
+lemma lemma_ad [thy_expl]: "leftmost (mirror x2) = rightmost x2"
+by hipster_induct_simp
 
-lemma lemma_ae [thy_expl]: "hd (xs2 @ xs2) = hd xs2"
-by (hipster_induct_simp_metis List.hd.simps TreeDemo.mirror.simps TreeDemo.flat_tree.simps TreeDemo.rightmost.simps TreeDemo.leftmost.simps)
+lemma lemma_ae [thy_expl]: "rightmost (mirror x2) = leftmost x2"
+by hipster_induct_simp
+
+lemma lemma_af [thy_expl]: "hd (xs2 @ xs2) = hd xs2"
+by hipster_induct_simp
+
 
 lemma nonEmp[simp]: "flat_tree t ~= []"
 by (hipster_induct_simp)

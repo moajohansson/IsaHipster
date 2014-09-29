@@ -21,7 +21,7 @@ fun get_hard_str (Data d) = (#hard_tac_str d);
 (*val empty = Data{routine_tac = K FAIL, hard_tac = K FAIL, routine_tac_str = "FAIL", 
                  hard_tac_str = fn _ => K "FAIL"}; *)
 
-(* Routine: simplification and FO reasoning. Hard: Indution, then routine. *)
+(* Routine: simplification and FO reasoning. Hard: Induction, then routine. *)
 val induct_simp_metis = Data {routine_tac = Simp_Metis_Tacs.routine_tac, 
                               hard_tac = Simp_Metis_Tacs.hard_tac,
                               routine_tac_str = Simp_Metis_Tacs.routine_tac_str, 
