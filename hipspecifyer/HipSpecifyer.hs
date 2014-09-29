@@ -26,13 +26,14 @@ process mode m =
 hipspecify (ParseFailed loc err_msg) = error err_msg
 hipspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
   --Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
-  Module srcloc modnm (pragma:modprg) warn exps (imp_ord:imps++imports)
+  --Don't bother with exports, not nessecary for HipSpec.
+  Module srcloc modnm (pragma:modprg) warn Nothing (imp_ord:imps++imports)
   (defaultRecordDecl funs ++ (concatMap (add_decls funs) decls)) -- ++ [add_main decls True])
     where
       imports = map mk_importDecl ["HipSpec","Data.Typeable","Test.QuickCheck.Gen.Unsafe","HipSpecifyer.Prelude","GHC.Generics"]
       imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing
                 (Just (False, [IAbs (Ident "Ord"),IAbs (Ident "Show")]))
-      exps = Nothing
+      
       pragma = LanguagePragma noLoc (map Ident ["DeriveDataTypeable", "DeriveGeneric"]) 
       mk_importDecl moduleName = 
         ImportDecl noLoc (ModuleName moduleName) False False Nothing Nothing Nothing
@@ -64,7 +65,7 @@ nowhere = SrcLoc "" 0 0
 quickspecify (ParseFailed loc err_msg) = error err_msg
 quickspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
   -- Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
-  Module srcloc modnm (pragma:modprg) warn exports (imp_ord:imps++imports) 
+  Module srcloc modnm (pragma:modprg) warn Nothing (imp_ord:imps++imports) 
   ((concatMap (add_decls []) decls)) -- ++ [add_main decls False])
     where
       imports = map mk_importDecl ["Test.QuickCheck.Arbitrary","Test.QuickSpec","Data.Typeable", "HipSpec", "Test.Feat"] 
