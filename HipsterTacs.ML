@@ -71,7 +71,7 @@ to the simpset for some reason. *)
 (* Apply simp, if that doesn't work try metis.  *)
 fun timed_metis_tac ctxt facts i =
     SOLVE_TIMEOUT 500
-    (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.metis_default_lam_trans ctxt facts i);
+    (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i);
 
 
 (* First simp, and if nessecary, let Metis deal with the rest *)

@@ -147,7 +147,8 @@ fun hipspec_explore ctxt cond_opt const_nms =
       val hipspec_cmd = case cond_opt of NONE => hipspec_plain const_nms' outfile 
                                        | SOME c => hipspec_cond c const_nms' outfile
       val path_opt = SOME (Path.explode Hipster_Setup.filepath);    
-      val _ = Code_Target.export_code thy const_nms [((("Haskell",thynm), path_opt), [])];
+          (* As of Isabelle2014, the below function takes a mystery boolean. Guessing false... *)
+      val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
       val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile;
       val _ = Isabelle_System.bash ("HipSpecifyer " ^ args) (*("ghc -e 'let xs = " ^ args ^ " in System.Environment.withArgs xs HipSpecifyer.main'");*)
     in 

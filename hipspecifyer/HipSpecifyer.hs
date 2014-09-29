@@ -25,12 +25,14 @@ process mode m =
 --hipspecfy :: ParseResult Module -> Module
 hipspecify (ParseFailed loc err_msg) = error err_msg
 hipspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
-  Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
-  (defaultRecordDecl funs ++ (concatMap (add_decls funs) decls) ++ [add_main decls True])
+  --Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
+  Module srcloc modnm (pragma:modprg) warn exps (imp_ord:imps++imports)
+  (defaultRecordDecl funs ++ (concatMap (add_decls funs) decls)) -- ++ [add_main decls True])
     where
       imports = map mk_importDecl ["HipSpec","Data.Typeable","Test.QuickCheck.Gen.Unsafe","HipSpecifyer.Prelude","GHC.Generics"]
       imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing
                 (Just (False, [IAbs (Ident "Ord"),IAbs (Ident "Show")]))
+      exps = Nothing
       pragma = LanguagePragma noLoc (map Ident ["DeriveDataTypeable", "DeriveGeneric"]) 
       mk_importDecl moduleName = 
         ImportDecl noLoc (ModuleName moduleName) False False Nothing Nothing Nothing
@@ -61,8 +63,9 @@ nowhere = SrcLoc "" 0 0
 
 quickspecify (ParseFailed loc err_msg) = error err_msg
 quickspecify (ParseOk (Module srcloc modnm modprg warn exports imps decls)) =
-  Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
-  ((concatMap (add_decls []) decls) ++ [add_main decls False])
+  -- Module srcloc (ModuleName "Main") (pragma:modprg) warn exports (imp_ord:imps++imports) 
+  Module srcloc modnm (pragma:modprg) warn exports (imp_ord:imps++imports) 
+  ((concatMap (add_decls []) decls)) -- ++ [add_main decls False])
     where
       imports = map mk_importDecl ["Test.QuickCheck.Arbitrary","Test.QuickSpec","Data.Typeable", "HipSpec", "Test.Feat"] 
       imp_ord = ImportDecl noLoc (ModuleName "Prelude") False False Nothing Nothing 
@@ -120,7 +123,9 @@ add_expr funs expr =
     _ ->
       gmapT (add_expr funs) expr
  
--- HipSpec doesnt need a main anymore so we just add a dummy main function.   
+-- HipSpec doesnt need a main anymore so we just add a dummy main function. 
+-- In fact, this should not be needed at all!
+{-  
 add_main decls is_hipspec = 
   FunBind [Match noLoc (Ident "main") [] Nothing (UnGuardedRhs rhs) (BDecls [])] 
     where
@@ -145,7 +150,7 @@ add_main decls is_hipspec =
       funs = map snd (Map.toList (Map.mapWithKey build_const_list funConstMap))
       -- Make variables of types occuring in function arguments.
       vars = map (build_var_list numVars) (Set.toList funTypSet)
-
+-}
 
 
 -- Make lists of variables for each datatype and give them to 'vars' function.
