@@ -10,4 +10,4 @@ library
 executable HipSpecifyer
     main-is: HipSpecifyer.hs
     ghc-options: -main-is HipSpecifyer
-    build-depends: base >= 4 && < 5, containers, haskell-src-exts
+    build-depends: base >= 4 && < 5, containers, haskell-src-exts < 1.16.0
