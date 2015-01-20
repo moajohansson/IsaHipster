@@ -54,21 +54,38 @@ where
   "isort [] = []"
 | "isort (x#xs) = ins x (isort xs)"
 
-(*hipster_cond sorted isort leq sorted ins *)
-lemma lemma_ac [thy_expl]: "Sorted.sorted (ins Z x2) = True"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Sorted.sorted.simps Sorted.isort.simps Sorted.leq.simps Sorted.sorted.simps Sorted.ins.simps thy_expl} *})
+hipster_cond sorted isort leq sorted ins
+lemma lemma_ae [thy_expl]: "ins Z (isort x2) = isort (ins Z x2)"
+by (hipster_induct_simp_metis Sorted.sorted.simps Sorted.isort.simps Sorted.leq.simps Sorted.sorted.simps Sorted.ins.simps)
 
-lemma unknown [thy_expl]: "Sorted.sorted x \<Longrightarrow> isort (ins Z x) = ins Z x"
+lemma unknown [thy_expl]: "ins x (ins y z) = ins y (ins x z)"
 oops
 
-lemma unknown [thy_expl]: "Sorted.sorted y \<Longrightarrow> isort (ins x y) = ins x y"
+lemma unknown [thy_expl]: "Sorted.sorted (ins x y) = Sorted.sorted y"
+oops
+
+lemma unknown [thy_expl]: "isort (ins x y) = ins x (isort y)"
+oops
+
+lemma unknown [thy_expl]: "Sorted.sorted (isort x) = True"
+oops
+
+lemma unknown [thy_expl]: "isort (isort x) = isort x"
+oops
+
+lemma unknown [thy_expl]: "ins Z (ins x y) = ins x (ins Z y)"
 oops
 
 lemma unknown [thy_expl]: "Sorted.sorted x \<Longrightarrow> isort x = x"
 oops
 
-lemma unknown [thy_expl]: "Sorted.sorted y ==> Sorted.sorted (ins x y) = True"
-apply (tactic {*Hipster_Tacs.induct_simp_metis @{context} @{thms Sorted.ins.simps Sorted.sorted.simps thy_expl} *})
+lemma unknown [thy_expl]: "Sorted.sorted y \<Longrightarrow> Sorted.sorted (ins x y) = True"
+oops
 
+lemma unknown [thy_expl]: "Sorted.sorted y \<Longrightarrow> isort (ins x y) = ins x y"
+oops
+
+lemma unknown [thy_expl]: "Sorted.sorted x \<Longrightarrow> isort (ins Z x) = ins Z x"
+oops
 
 end
