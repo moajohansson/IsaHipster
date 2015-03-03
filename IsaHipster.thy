@@ -65,7 +65,7 @@ method_setup hipster_goal = {*
    Use setup command to change to other hard/routine tactics.
 *)
 setup{* 
-Tactic_Data.set_induct_simp;
+Tactic_Data.set_induct_simp_metis;
 *}
 
 

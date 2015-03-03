@@ -152,8 +152,9 @@ fun induct_on_var_tac rule var i goalthm =
       val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
       val (otherfrees, inductfrees) = mk_induct_insts ithings [var];
       val insts = [map (fn NONE => NONE | SOME v => 
-                                          (* FIXME: Each variable paired with false? *)
-                                          SOME (NONE : Binding.binding option,(Free v,true)))
+                                          (* FIXME: Each variable paired with false?
+                                           -- changed : testing : matters not in our case since we are wrapping them with 'Free' *)
+                                          SOME (NONE : Binding.binding option,(Free v,false)))
                          inductfrees];
          (* Throw away Isar related stuff and only take the Thm.thm seq *)
       val nw_thms = 
@@ -209,10 +210,11 @@ Or add to TacticData?
 fun induct_simp_metis ctxt facts thm = 
     let
       val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-      val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
-                                (ctxt, lemmas)
+      (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                (ctxt, lemmas) *)
     in
-      ALLGOALS(try_inductable_vars ctxt' (induct_simp_or_metis (facts,lemmas))) thm
+      (* XXX: removed as simplifier rules - in this case, so far, no changes *)
+      ALLGOALS(try_inductable_vars ctxt (induct_simp_or_metis (facts,lemmas))) thm
     end;
 
 (* An induction tactic to paste into the proof-script afterwards *)
