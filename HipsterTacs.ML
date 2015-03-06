@@ -88,7 +88,7 @@ fun simp_or_metis ctxt (facts, lemmas) =
 
 
 (*-----------------------------------------------------------------------------------------*)
-(* Figure out what we can do induction on, and tries each variable until sucess.*) 
+(* Figure out what we can do induction on, and tries each variable until success.*) 
 (* Stolen from IsaPlanner...                                                               *)
 (*-----------------------------------------------------------------------------------------*)
 

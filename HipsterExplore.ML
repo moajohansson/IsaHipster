@@ -23,26 +23,34 @@ fun try_nxt_conj ctxt =
       let 
         val r = SINGLE (Tactic_Data.routine_tac ctxt) c
         val lemma_str = (Syntax.string_of_term ctxt (Thm.concl_of c))
-         
+        (* XXX: why concl_of and not prop_of?
+                FOUND: for it to be thm in type at this stage the form is: a \<Longrightarrow> #(a) *)
       in
       case r of (* Discard this, it is trivial *)
-        SOME _ => SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
+        SOME _ =>
+        let
+          (*TODO: uninformative, only to track ==> to be removed*)
+          val _ = Pretty.writeln (Pretty.block [Pretty.str "Trivial proof: ", Pretty.str lemma_str])
+        in SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
+        end
       | NONE =>
         let
-          val res = SINGLE (Tactic_Data.hard_tac ctxt) c 
+          val res = SINGLE (Tactic_Data.hard_tac ctxt) c
         in
           (* Only care about first proof found *)
-          (case res of 
-             SOME proved_thm => 
-             let                
-               val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt 
+          (case res of
+             SOME proved_thm =>
+             let
+               val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt
                (* Thm used by simp need to be lifted so it use meta-variables *)
-               val final_thm = proved_thm 
+               val final_thm = proved_thm
                                  |> (Drule.generalize (Hipster_Utils.frees_and_tfrees_of_thm proved_thm))
-                                 |> Goal.finish ctxt' 
+                                 |> Goal.finish ctxt'
                                  |> Thm.put_name_hint new_nm
-               val _ = (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
-                ("Proved: " ^ lemma_str)
+               (* TODO: remove final_str and its printing in the message - debugging *)
+               val final_str = (Syntax.string_of_term ctxt (Thm.prop_of final_thm))
+               val _ = (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message)
+                 ("Proved: " ^ lemma_str ^ "; Saving to ThyExpl_Data: " ^ final_str)
              in
                SOME (ctxt'
                        |> ThyExpl_Data.set_open_conjs_ctxt cs
@@ -50,9 +58,14 @@ fun try_nxt_conj ctxt =
                        |> ThyExpl_Data.set_progress_ctxt true)
              end
            (* NONE indicates that the tactic failed to prove c *)
-           | NONE => SOME (ctxt
-                             |> ThyExpl_Data.set_open_conjs_ctxt cs
-                             |> ThyExpl_Data.add_failed_ctxt c)
+           | NONE =>
+             let
+               val _ = Pretty.writeln (Pretty.block [Pretty.str "Failed proving: ", Pretty.str lemma_str])
+             in 
+               SOME (ctxt
+                       |> ThyExpl_Data.set_open_conjs_ctxt cs
+                       |> ThyExpl_Data.add_failed_ctxt c)
+             end
           )
         end
       end;
@@ -107,7 +120,7 @@ fun proof_loop ctxt facts fact_nms cand_lemmas_str =
    proof script for discovered lemmas  *) 
 (*-----------------------------------------------------------------------------------------*)
 
-(* TO DO: Implement properly. This is for mapping back to Isabelle constants those things that the
+(* TODO: Implement properly. This is for mapping back to Isabelle constants those things that the
  code generator renamnes in Haskell. Otherwise, Isabelle will not understand the resulting lemmas. *)
 val haskell_consts = [("List.rev","reverse"),("List.append","++"),
                       ("Groups.plus_class.plus", "plus_nat"), ("Groups.zero_class.zero", "Zero_nat"),
@@ -157,14 +170,14 @@ fun hipspec_explore ctxt cond_opt const_nms =
 
 
 
-(* The output sting for each lemma discovered. *)
-fun mk_lemma_str ctxt (lemma,tac_str) = 
+(* The output string for each lemma discovered. *)
+fun mk_lemma_str ctxt prop_extract (lemma,tac_str) = 
     let    
       (* Print variables without ? *)
       val ctxt' = Config.put show_question_marks false ctxt
       (* Disables silly Isabelle YXML markup for printing *)
       val str_of_term = Sledgehammer_Util.with_vanilla_print_mode (Syntax.string_of_term ctxt')
-      val lemma_str = Library.quote (str_of_term (Thm.concl_of lemma))
+      val lemma_str = Library.quote (str_of_term (prop_extract lemma))
       val name = Long_Name.base_name(Thm.get_name_hint lemma)
     in
       ("lemma " ^ name ^" [thy_expl]: "^ lemma_str ^ "\n" ^tac_str)
@@ -193,9 +206,9 @@ fun explore' cond_opt ctxt const_nms =
       val tac_str = Tactic_Data.hard_tac_str res_ctxt 
 
       val output = Library.space_implode "\n\n"
-                     ((map (mk_lemma_str res_ctxt) 
+                     ((map (mk_lemma_str res_ctxt Thm.prop_of) 
                            (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt res_ctxt))) 
-                      @ (map (mk_lemma_str res_ctxt) 
+                      @ (map (mk_lemma_str res_ctxt Thm.concl_of) 
                              (map (fn conj => (conj,"oops")) (ThyExpl_Data.failed_of_ctxt res_ctxt))))
     in
       (res_ctxt, (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
@@ -243,7 +256,7 @@ fun explore_goal ctxt const_nms thm =
         let
           val tac_str = Tactic_Data.hard_tac_str ctxt' 
           val lemmas = Library.space_implode "\n\n"
-                       (map (mk_lemma_str ctxt') 
+                       (map (mk_lemma_str ctxt' Thm.prop_of)
                            (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt ctxt')))
           val str_of_thm = (Sledgehammer_Util.with_vanilla_print_mode Syntax.string_of_term ctxt')
                              (Thm.concl_of thm)
@@ -256,7 +269,5 @@ fun explore_goal ctxt const_nms thm =
         end
     end;
 
-
 end
-
 

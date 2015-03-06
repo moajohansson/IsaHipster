@@ -67,13 +67,13 @@ then prove the open goal ListDemo.rev (ListDemo.rev xs) = xs by (tactic {*Simp_M
 
 ML{*Hipster_Explore.explore @{context} ["ListDemo.app", "ListDemo.rev", "ListDemo.qrev"];
  *}
-lemma lemma_a [thy_expl]: "app x2 Emp = x2"
+lemma lemma_a' [thy_expl]: "app x2 Emp = x2"
 by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
 
-lemma lemma_aa [thy_expl]: "qrev (qrev x2 y2) z2 = qrev y2 (app x2 z2)"
+lemma lemma_aa' [thy_expl]: "qrev (qrev x2 y2) z2 = qrev y2 (app x2 z2)"
 by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
 
-lemma lemma_ab [thy_expl]: "qrev (ListDemo.rev x5) y5 = app x5 y5"
+lemma lemma_ab' [thy_expl]: "qrev (ListDemo.rev x5) y5 = app x5 y5"
 by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
 thm thy_expl
 
@@ -152,7 +152,8 @@ qed
 
 
 *)
-lemma lemma_ab [thy_expl]: "qrev x5 Emp = ListDemo.rev x5"
+lemma lemma_ab'' [thy_expl]: "qrev x5 Emp = ListDemo.rev x5"
 by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.app.simps ListDemo.rev.simps ListDemo.qrev.simps thy_expl} *})
 
 end
+

@@ -33,21 +33,14 @@ definition leZZ :: "Nat \<Rightarrow> bool" where  (* - as a constant definition
   "leZZ x \<equiv> eqN x Z"
 
 
-(* FIXME: 1. missing conditions *)
-
-(* hipster_cond lezzP leq *)
-lemma unknown [thy_expl]: "Z = x2" (* final output skips condition: lezzP x2 \<Longrightarrow> , but brings proof back*)
-oops (* by (hipster_induct_simp_metis NatsBug.lezzP simps NatsBug.leq.simps) *)
-
-(* hipster_cond lezP leq *)
-lemma lemma_ad [thy_expl]: "leq x3 y3 = True" (* final output skips cond: lezP x3 \<Longrightarrow> , but brings proof back*)
-oops (* by (hipster_induct_simp_metis NatsBug.lezP.simps NatsBug.leq.simps) *)
+(* hipster_cond lezzP leq *) (* skipping of conditions in output solved *)
+(* hipster_cond lezP leq *)  (* skipping of conditions in output solved *)
 
 (* hipster lezzP *) (* nothing weird, ok *)
 (* hipster lezP *)  (* everything trivial, ok*)
 
 
-(* FIXME: 2. Isabelle's equality = (gets translated as a separate predicate Haskell
+(* FIXME: 1. Isabelle's equality = (gets translated as a separate predicate Haskell
              function equal<Type> which will be missing in the original theory) *)
 (* hipster lez *)  (* equations only with lez are trivial, aren't returned *)
 lemma unknown [thy_expl]: "equal_Nat x y = equal_Nat y x" (* free variable equal_Nat instead of equality = *)
