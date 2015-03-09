@@ -11,7 +11,7 @@ struct
 
 (* FIXME: Default to Isabelle Contrib or something more sensible *)
 (* Set these to your path to the Hipster directory *)
-val basepath = "~/TheoremProvers/IsaHipster/";
+val basepath = "~/Field/Thesis/IsaHipster/";
 val filepath = basepath^"GenCode/";
 
 end
@@ -49,6 +49,14 @@ method_setup hipster_induct_simp_metis = {*
     SIMPLE_METHOD 
       (Hipster_Tacs.induct_simp_metis ctxt thms))
  *}
+
+
+method_setup hipster_induct_schemes = {*
+  Attrib.thms >> (fn thms => fn ctxt =>
+    SIMPLE_METHOD 
+      (Hipster_Tacs.induct_with_schemes ctxt thms))
+ *}
+
 (*
 ML{*
 Method.setup;

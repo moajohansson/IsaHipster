@@ -9,7 +9,7 @@ fun call_hipster consts =
         fun get_const_name ctxt c = 
             c |> Proof_Context.read_const {proper=true, strict = false} ctxt (*false dummyT *)
               |> dest_Const
-              |> fst          
+              |> fst
       in   
         consts 
           |> map (get_const_name ctxt)

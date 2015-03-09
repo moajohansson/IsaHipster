@@ -163,6 +163,7 @@ fun hipspec_explore ctxt cond_opt const_nms =
           (* As of Isabelle2014, the below function takes a mystery boolean. Guessing false... *)
       val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
       val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile;
+      val _ = Pretty.writeln (Pretty.str (hipspec_cmd ^ " - " ^ args ));
       val _ = Isabelle_System.bash ("HipSpecifyer " ^ args) (*("ghc -e 'let xs = " ^ args ^ " in System.Environment.withArgs xs HipSpecifyer.main'");*)
     in 
       fst (Isabelle_System.bash_output hipspec_cmd)

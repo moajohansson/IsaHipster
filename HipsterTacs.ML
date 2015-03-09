@@ -18,6 +18,11 @@ sig
 
   (* Context -> list of simp rules (defs) -> tactic, to be pasted into proof script. *)
   val induct_simp_metis : Proof.context -> thm list -> tactic
+  
+  val induct_with_schemes : Proof.context -> ( thm ) list -> tactic
+  val try_induct_schemes : Proof.context -> hardtac -> int -> tactic
+  (*val try_induction_with : Proof.context -> thm list list -> hardtac -> vars -> int -> tactic*)
+
 
 end
 
@@ -117,6 +122,18 @@ fun mk_induct_insts ithings indnames =
              | SOME (v, ithings') => (faux ithings' t ((SOME v) :: L)));
     in faux ithings indnames [] end;
 
+(*   val find_inductT: Proof.context -> typ -> thm list *)
+fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);
+(* let              
+              val ctxt = Proof_Context.init_global thry;
+              val _ = Pretty.writeln (pretty_thm ctxt (#induct di)) ;
+              val _ = Pretty.writeln (Pretty.block (map (pretty_thm ctxt) (#inducts di))) ;
+             in *)
+(*  let
+            val ctxt = Proof_Context.init_global thry;
+            val indds = Induct.find_inductT ctxt (Type(tn,xxx)) ;
+            (*val _ = Pretty.writeln (Pretty.block (map (pretty_thm ctxt) indds)) ;*)
+           in*)
 
 (* the free variables of a term that are of a datatype 
    (can have induction applied) *)
@@ -125,10 +142,9 @@ fun inductable_things_in_term thry t =
       fun lookup thy s =
           case (Datatype.get_info thy s) of
              NONE => NONE
-           | SOME di => SOME (#induct di);
-
-      fun datatype_chk (Type(tn,_))  = 
-           Basics.is_some (lookup thry tn)
+           | SOME di => SOME (#induct di)
+      fun datatype_chk (Type(tn,_)) =
+            Basics.is_some (lookup thry tn)
         | datatype_chk _ = false;
     in 
       (* Return frees and forall quantified vars (if any) *)
@@ -165,7 +181,6 @@ fun induct_on_var_tac rule var i goalthm =
       end;
 
 
-
 (*-----------------------------------------------------------------------------------------*)
 (* Induction tactics.                                                                      *)
 (*-----------------------------------------------------------------------------------------*)
@@ -179,14 +194,14 @@ fun induct_simp_or_metis (facts, lemmas) ctxt rule var i =
     (induct_on_var_tac rule var i) THEN (simp_or_metis ctxt (facts,lemmas));
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
-fun try_induct_on ctxt rule strat vars i  =
+fun try_induct_on ctxt rule strat vars i =
     case vars 
        of [] => no_tac 
-        | (v :: vs) =>  
+        | (v :: vs) =>  let val _ = Pretty.writeln (Pretty.str (" - var: "^v)) in
           (*(induct_simp_or_metis ctxt facts rule v i)*)
           strat ctxt rule v i
           ORELSE 
-          (try_induct_on ctxt rule strat vs i);
+          (try_induct_on ctxt rule strat vs i) end;
 
 (* Find the variables we can induct on *)
 fun try_inductable_vars ctxt strat i thm = 
@@ -196,6 +211,32 @@ fun try_inductable_vars ctxt strat i thm =
       (try_induct_on ctxt NONE strat vars i) thm
     end;
 
+fun try_induction_with ctxt scheme_rules strat vars i =
+    (* let val vars = map fst (fst (inductable_things_in_sg i thm)) *)
+    (* TODO:  modify to make vars so that the rule can be applied *)
+    case scheme_rules of
+        [] =>  let val _ = Pretty.writeln (Pretty.str "Rule: none")
+               in try_induct_on ctxt NONE strat vars i end
+      | ((n,r) :: rs) => let
+                     val _ = Pretty.writeln (Pretty.str ("Rule: "^n)) in
+                     (* FIXME: vars types filter *)
+                     try_induct_on ctxt ( r) strat vars i
+                     ORELSE
+                     (try_induction_with ctxt rs strat vars i) end;
+    
+fun try_induct_schemes ctxt strat i thm =
+    let
+      val vars = map fst (fst (inductable_things_in_sg i thm))
+      val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
+      val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
+      val consts = Hipster_Utils.thy_consts_of thynm thm
+      val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
+                        handle _ => (n, NONE) ) ((*"Naturals.leq.induct" ::*)distinct (op =) (map (fn c => (c^".induct")) consts))
+      val schemes =  (*the o snd*) (filter (Basics.is_some o snd) thinds)
+      val _ = Pretty.writeln (pretty_thm ctxt thm)
+      (* FIXME: distinct ... *)
+    in (try_induction_with ctxt schemes strat (distinct (op =) vars) i) thm
+    end;
 
 (* QUESTION: Should these tactics really add the lemma-list to the simplifier?
 The tactics used by Hipster don't, they only pass them to Metis, looking them up from the ctxt. 
@@ -210,11 +251,46 @@ Or add to TacticData?
 fun induct_simp_metis ctxt facts thm = 
     let
       val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
+      val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
+      val consts = Hipster_Utils.thy_consts_of thynm thm
+      val _ = Pretty.writeln (Pretty.block (Pretty.str "Theorem: " :: [pretty_thm ctxt thm]))
+      val _ = Pretty.writeln (Pretty.str ("Num cs = " ^ @{make_string} (length consts)))
+      val _ = Pretty.writeln (Pretty.str (Library.space_implode " " (thynm ^ "-Consts: " :: consts)))
+      val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
+                        handle _ => (n, NONE) ) (map (fn c => (c^".induct")) consts)
+      val _ = Pretty.writeln (Pretty.block (maps (fn (n,thms) => (case thms of
+           SOME ts => map Pretty.str ("\n"^n^" is: " :: (map (Pretty.string_of o pretty_thm ctxt) ts))
+         | NONE => [Pretty.str ("\n"^n^": has no induction scheme")]))  thinds))
       (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                 (ctxt, lemmas) *)
     in
       (* XXX: removed as simplifier rules - in this case, so far, no changes *)
       ALLGOALS(try_inductable_vars ctxt (induct_simp_or_metis (facts,lemmas))) thm
+    end;
+(* lookup @{theory} "conj" 
+val lookup = Symtab.lookup o Data.get
+fun update k v = Data.map (Symtab.update (k, v)) *)
+
+fun induct_with_schemes ctxt facts thm =
+    let
+      val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
+      val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
+      val consts = Hipster_Utils.thy_consts_of thynm thm
+      val _ = Pretty.writeln (Pretty.block (Pretty.str "Theorem: " :: [pretty_thm ctxt thm]))
+      val _ = Pretty.writeln (Pretty.str ("Num cs = " ^ @{make_string} (length consts)))
+      val _ = Pretty.writeln (Pretty.str (Library.space_implode " " (thynm ^ "-Consts: " :: consts)))
+      val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
+                        handle _ => (n, NONE) ) (map (fn c => (c^".induct")) consts)
+      val _ = Pretty.writeln (Pretty.block (maps (fn (n,thms) => (case thms of
+           SOME ts => map Pretty.str ("\n"^n^" is: " :: (map (Pretty.string_of o pretty_thm ctxt) ts))
+         | NONE => [Pretty.str ("\n"^n^": has no induction scheme")]))  thinds))
+      (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
+                                (ctxt, lemmas) *)
+      val schemes = map (the o snd) (filter (Basics.is_some o snd) thinds)
+    in
+      (* XXX: removed as simplifier rules - in this case, so far, no changes *)
+      (*ALLGOALS(try_inductable_vars ctxt (induct_simp_or_metis (facts,lemmas))) thm*)
+      ALLGOALS(try_induct_schemes ctxt (induct_simp_or_metis (facts,lemmas))) thm
     end;
 
 (* An induction tactic to paste into the proof-script afterwards *)
@@ -228,6 +304,7 @@ fun induct_simp_tac ctxt thm =
     end;
 
 end;
+
 (*-----------------------------------------------------------------------------------------*)
 (* Structures for pre-defined combinations of routine/hard reasoning in Hipster            *)
 (*-----------------------------------------------------------------------------------------*)
@@ -259,7 +336,7 @@ fun routine_tac ctxt =
 
 val routine_tac_str = "by (tactic {* Simp_Metis_Tacs.routine_tac @{context} *})"; 
 
-fun hard_tac ctxt = 
+fun hard_tac ctxt =
     let
       val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
       val facts = ThyExpl_Data.facts_of_ctxt ctxt
@@ -287,6 +364,33 @@ fun final_tactic_str ctxt =
     end;
 end
 
+
+(* Induction with schemes! *)
+structure Ind_Schemes_Tacs : THY_EXPL_TACS =
+struct
+
+fun routine_tac ctxt = 
+       Hipster_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt, 
+                                       (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)); 
+val routine_tac_str = "by (tactic {* Ind_Schemes_Tacs.routine_tac @{context} *})"; 
+
+fun hard_tac ctxt = 
+    let
+      val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
+      val facts = ThyExpl_Data.facts_of_ctxt ctxt
+    in
+      ALLGOALS(Hipster_Tacs.try_induct_schemes ctxt (Hipster_Tacs.induct_simp_or_metis (facts,lemmas)))
+    end; 
+(* The fact_nms are names of extra theorems that we want to refer to in the output *)
+fun final_tactic_str ctxt =
+    let
+      (* Only need to pass the facts, the thy_expl theorems are looked up by the tactic *)
+      val facts_str = Library.space_implode " " (ThyExpl_Data.fact_names_of_ctxt ctxt)
+      (* TODO: change so as to have the top level extract the appropriate induction scheme rules? *)
+    in 
+      "by (hipster_induct_schemes " ^ facts_str ^")"
+    end;
+end
 
 
 structure Simp_Tacs : THY_EXPL_TACS =

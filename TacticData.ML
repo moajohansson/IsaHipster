@@ -22,12 +22,18 @@ fun get_hard_str (Data d) = (#hard_tac_str d);
                  hard_tac_str = fn _ => K "FAIL"}; *)
 
 (* Routine: simplification and FO reasoning. Hard: Induction, then routine. *)
+val induct_with_schemes = Data {routine_tac = Ind_Schemes_Tacs.routine_tac,
+                                hard_tac = Ind_Schemes_Tacs.hard_tac,
+                                routine_tac_str = Ind_Schemes_Tacs.routine_tac_str,
+                                hard_tac_str = Ind_Schemes_Tacs.final_tactic_str};
+
+(* Routine: simplification and FO reasoning. Hard: Induction, then routine. *)
 val induct_simp_metis = Data {routine_tac = Simp_Metis_Tacs.routine_tac,
                               hard_tac = Simp_Metis_Tacs.hard_tac,
                               routine_tac_str = Simp_Metis_Tacs.routine_tac_str,
                               hard_tac_str = Simp_Metis_Tacs.final_tactic_str};
 
-(* Routine: simplification. Hard: Indution, then simp. *)
+(* Routine: simplification. Hard: Induction, then simp. *)
 val induct_simp = Data {routine_tac = Simp_Tacs.routine_tac,
                         hard_tac = Simp_Tacs.hard_tac,
                         routine_tac_str = Simp_Tacs.routine_tac_str,
@@ -38,7 +44,7 @@ val induct_simp = Data {routine_tac = Simp_Tacs.routine_tac,
    THINK: Maybe this should be stored in the theory instead? *)
 structure Data = Theory_Data
                    (type T = T
-                   val empty = induct_simp_metis (* Default tactics *)
+                   val empty = induct_with_schemes (* Default tactics *)
                    val extend = I
                    val merge = fst)
 
@@ -50,5 +56,6 @@ val routine_tac_str = get_routine_str o (Data.get o Proof_Context.theory_of);
 val set_tacs = Data.put;
 val set_induct_simp_metis = set_tacs induct_simp_metis;
 val set_induct_simp = set_tacs induct_simp;
+val set_induct_with_schemes = set_tacs induct_with_schemes;
 
 end;
