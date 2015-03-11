@@ -46,15 +46,17 @@ fun SOLVE_TIMEOUT mseconds tac t =
 (*-----------------------------------------------------------------------------------------*)
 (* Simp tactics *) 
 (*-----------------------------------------------------------------------------------------*)
+fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);
 
 
 (* Apply simp to all subgoals *)
-fun simp_all ctxt lemmas = 
+fun simp_all ctxt lemmas thm = 
     let
+       val _ = Pretty.writeln (pretty_thm ctxt thm)
        val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                  (ctxt, lemmas)
     in 
-      ALLGOALS (Simplifier.asm_full_simp_tac ctxt')
+      ALLGOALS (Simplifier.asm_full_simp_tac ctxt') thm
     end;
  
 
@@ -74,17 +76,18 @@ to the simpset for some reason. *)
 
 
 (* Apply simp, if that doesn't work try metis.  *)
-fun timed_metis_tac ctxt facts i =
-    SOLVE_TIMEOUT 500
-    (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i);
+fun timed_metis_tac ctxt facts i thm = 
+    let val _ = Pretty.writeln (pretty_thm ctxt thm) in
+    (SOLVE_TIMEOUT 500
+    (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm end;
 
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
-fun simp_or_metis ctxt (facts, lemmas) = 
-    SOLVE((simp_all ctxt lemmas)
+fun simp_or_metis ctxt (facts, lemmas) thm = let val _ = Pretty.writeln (pretty_thm ctxt thm) in
+    (SOLVE((simp_all ctxt lemmas) (* SOLVE *)
           THEN
           IF_UNSOLVED
-          (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))
+          (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))) thm end;
   (*  SOLVE((ALLGOALS ((Simplifier.asm_full_simp_tac ctxt))
             THEN
             IF_UNSOLVED 
@@ -123,7 +126,6 @@ fun mk_induct_insts ithings indnames =
     in faux ithings indnames [] end;
 
 (*   val find_inductT: Proof.context -> typ -> thm list *)
-fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);
 (* let              
               val ctxt = Proof_Context.init_global thry;
               val _ = Pretty.writeln (pretty_thm ctxt (#induct di)) ;
@@ -167,15 +169,21 @@ fun induct_on_var_tac rule var i goalthm =
       val ctxt = Proof_Context.init_global (Thm.theory_of_thm goalthm);
       val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
       val (otherfrees, inductfrees) = mk_induct_insts ithings [var];
-      val insts = [map (fn NONE => NONE | SOME v => 
+      val insts = map (fn NONE => NONE | SOME v => 
                                           (* FIXME: Each variable paired with false?
                                            -- changed : testing : matters not in our case since we are wrapping them with 'Free' *)
                                           SOME (NONE : Binding.binding option,(Free v,false)))
-                         inductfrees];
+                         inductfrees;
          (* Throw away Isar related stuff and only take the Thm.thm seq *)
-      val nw_thms = 
-          Seq.map snd (Induct.induct_tac (* Induction.induction_tac ?? *)
-                         ctxt false insts [non_ithings @ otherfrees] [] rule [] i goalthm)
+      val _ = Pretty.writeln (Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
+        | SOME (_, (Free (v,_),false)) => v) insts)));
+      val nw_thms' = 
+          (Induction.induction_tac (* Induction.induction_tac ?? *)
+                         ctxt false [insts] [non_ithings](*[non_ithings @ otherfrees]*) [] rule [] i goalthm)
+      val _ = Pretty.writeln (Pretty.str ((Library.space_implode " ? " (map (fn (cases, thm) =>
+          (Library.space_implode " " (map (fn (s,_) => s) cases))
+          ^ ": " ^ (Pretty.string_of (pretty_thm @{context} thm))) (Seq.list_of nw_thms')))^"\n")) ;
+      val nw_thms = Seq.map snd nw_thms'
       in
         nw_thms
       end;
@@ -252,22 +260,13 @@ Or add to TacticData?
 fun induct_simp_metis ctxt facts thm = 
     let
       val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-      val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
-      val consts = Hipster_Utils.thy_consts_of thynm thm
-      val _ = Pretty.writeln (Pretty.block (Pretty.str "Theorem: " :: [pretty_thm ctxt thm]))
-      val _ = Pretty.writeln (Pretty.str ("Num cs = " ^ @{make_string} (length consts)))
-      val _ = Pretty.writeln (Pretty.str (Library.space_implode " " (thynm ^ "-Consts: " :: consts)))
-      val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
-                        handle _ => (n, NONE) ) (map (fn c => (c^".induct")) consts)
-      val _ = Pretty.writeln (Pretty.block (maps (fn (n,thms) => (case thms of
-           SOME ts => map Pretty.str ("\n"^n^" is: " :: (map (Pretty.string_of o pretty_thm ctxt) ts))
-         | NONE => [Pretty.str ("\n"^n^": has no induction scheme")]))  thinds))
       (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                 (ctxt, lemmas) *)
     in
       (* XXX: removed as simplifier rules - in this case, so far, no changes *)
       ALLGOALS(try_inductable_vars ctxt (induct_simp_or_metis (facts,lemmas))) thm
     end;
+
 (* lookup @{theory} "conj" 
 val lookup = Symtab.lookup o Data.get
 fun update k v = Data.map (Symtab.update (k, v)) *)
@@ -291,8 +290,6 @@ fun induct_with_schemes ctxt facts thm =
                                 (ctxt, lemmas) *)
       val schemes = map (the o snd) (filter (Basics.is_some o snd) thinds)
     in
-      (* XXX: removed as simplifier rules - in this case, so far, no changes *)
-      (*ALLGOALS(try_inductable_vars ctxt (induct_simp_or_metis (facts,lemmas))) thm*)
       ALLGOALS(try_induct_schemes ctxt (induct_simp_or_metis (facts,lemmas))) thm
     end;
 

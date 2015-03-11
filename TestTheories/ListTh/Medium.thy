@@ -47,18 +47,21 @@ lemma lastAfterCons: "ts \<noteq> Nil \<Longrightarrow> last ts = last (Cons t t
 by (hipster_induct_simp_metis)
 
 lemma lastElemIsLast: "last (app ts (Cons t Nil)) = t"
+by (hipster_induct_schemes) (*
 apply(induction ts rule: last.induct)
-by (simp_all)
+by (simp_all)*)
 
 lemma firstLast: "ts \<noteq> Nil \<Longrightarrow> head ts = last (rev ts)"
 (* apply(induction ts)  by (simp_all add: lastElemIsLast) *)
 by (hipster_induct_simp_metis lastElemIsLast)
 
 lemma setCountRev: "count t ts = count t (rev ts)"
+(* TODO: Ill-typed instantiation::: check types before inducting with a rule that does not correspond
+   HOWEVER: we cannot know in some cases immediately... XXX: how to extract which var's a rule inducts over? *)
 apply(induction ts)  (* XXX: no need for  rule: rev.induct ! *)
 by (simp_all add: count03 addId addS2) (* for some reason still won't do with hipster and these lemmas *)
 
-lemma lenTake: "leq n (len ts) \<Longrightarrow> len (take n ts) = n"
+lemma lenTake: "leq n (len ts) \<Longrightarrow> len (take n ts) = n" (* XXX: same as previous *)
 apply(induction ts rule: take.induct)
 apply(simp_all)
 done
@@ -70,12 +73,13 @@ by (hipster_induct_simp_metis)
 lemma len0: "Z = len ts \<Longrightarrow> ts = Nil"
 by (hipster_induct_simp_metis)
 
-lemma notLen0: "leq (S n) (len ts) \<Longrightarrow> ts \<noteq> Nil"
+lemma notLen0: "leq (S n) (len ts) \<Longrightarrow> ts \<noteq> Nil" (* FIXME: loops in Hipster \<Longrightarrow> timeout on simp too? *)
 apply(induction ts)
 by (simp_all)
 
+(* XXX: maybe start with innermost? *)
 lemma notEmptyDrop: "leq (S n) (len ts) \<Longrightarrow> (drop n ts) \<noteq> Nil"
-apply(induction ts rule: drop.induct)
+apply(induction ts rule: drop.induct) (* XXX: same as previous; NOTE: loops in struct-ind attempt *)
 by (simp_all add: notLen0)
 
 lemma emptyDrop: "leq (len ts) n \<Longrightarrow> drop n ts = Nil"
@@ -90,7 +94,7 @@ apply(simp_all)
 oops
 
 (* TODO: strategy: start with tailing call? nah, didn't matter: both take.induct and drop.induct get us there *)
-lemma dropTake : "ts = app (take n ts) (drop n ts)"
+lemma dropTake : "ts = app (take n ts) (drop n ts)" (* XXX: ill-instantiation again... *)
 apply(induction ts rule: take.induct)
 apply(case_tac n)
 apply(simp_all)
@@ -103,9 +107,11 @@ apply(simp_all)
 apply(drule emptyDrop)
 by (simp_all)
 
+(* XXX: make sure we include helping lemmas \<Longrightarrow> they avoid errors + infinite running! (ill-instantiations... none) *)
 lemma initAsTake: "init ts = take (sub (len ts) (S Z)) ts"
+by (hipster_induct_schemes subId ) (*
 apply(induction ts rule: init.induct)
-by (simp_all add: subId)
+by (simp_all add: subId) *)
 
 
 lemma zipNil: "\<not> notNil rs \<Longrightarrow> zip rs ts = Nil"
@@ -114,6 +120,9 @@ by (hipster_induct_simp_metis)
 lemma zip2nil: "zip ts Nil = Nil"
 apply(induction ts)
 by (simp_all)
+(* FIXME: hipster_induct_schemes solves all goals but we get when trying to close the proof:
+    Proved a different theorem:
+    Listing.zip ts Listing.List.Nil = Listing.List.Nil *)
 
 lemma zipNilBis: "\<not> notNil ts \<Longrightarrow> zip rs ts = Nil"
 by (hipster_induct_simp_metis zip2nil)
@@ -121,6 +130,7 @@ by (hipster_induct_simp_metis zip2nil)
 lemma zipNotNil: "notNil rs \<Longrightarrow> zip (Cons t ts) rs = Cons (t, head rs) (zip ts (tail rs))"
 by (hipster_induct_simp_metis)
 
+(* XXX: DO NOT RUN with hipster_induct_schemes *)
 lemma appZips: "len a = len b \<Longrightarrow> app (zip a b) (zip c d) = zip (app a c) (app b d)"
 apply(induction a b rule: zip.induct)
 apply(simp_all)
@@ -130,7 +140,12 @@ by (simp_all)
 lemma zipSingleton: "zip (Cons t Nil) (Cons r Nil) = Cons (t,r) Nil"
 by simp
 
+lemma revNil: "ts = Nil \<Longrightarrow> rev ts = Nil"
+by hipster_induct_schemes
+
+(* XXX: DO NOT RUN with hipster_induct_schemes *)
 lemma revZip: "len rs = len ts \<Longrightarrow> rev (zip rs ts) = zip (rev rs) (rev ts)"
+(*apply (hipster_induct_simp_metis)*)
 apply(induction rs ts rule: zip.induct)
 apply(simp_all)
 oops
