@@ -1,12 +1,12 @@
 theory BasicL
 imports Main
         "../Listing"
-        "../../IsaHipster/IsaHipster"
+        "../../IsaHipster"
         "../Naturals"
 
 begin
-print_rules
-print_induct_rules
+(*print_rules
+print_induct_rules*)
 ML {* Outer_Syntax.improper_command *}
 ML {* Datatype.get_info *}
 
@@ -14,7 +14,7 @@ ML {* Datatype.get_info *}
 lemma lemma_a [thy_expl]: "tail (maps x2 y2) = maps x2 (tail y2)"
 (* by (hipster_induct_simp_metis Listing.notNil.simps Listing.maps.simps Listing.tail.simps Listing.init.simps Listing.len.simps) *)
 apply(induction y2)
-print_cases
+(*print_cases*)
 apply(simp_all)
 done
 
@@ -68,6 +68,15 @@ lemma initDef: "init (app ts (Cons t Nil)) = ts"
 apply(induction ts rule: init.induct)
 apply(simp_all)
 done
+(*
+fun noNat :: "Nat List \<Rightarrow> bool" where
+  "noNat l = notNil l"
+fun appnat :: "Nat List \<Rightarrow> Nat List \<Rightarrow> Nat List " where
+  "appnat x y = app x y"
+
+hipster noNat appnat*)
+
+
 
 lemma lastDef: "\<not> notNil ts \<Longrightarrow> last (Cons t ts) = t"
 by (hipster_induct_simp_metis Listing.notNil.simps Listing.last.simps)
@@ -78,8 +87,12 @@ by simp
 
 lemma appNil: "app ts Nil = ts"
 by (hipster_induct_simp_metis Listing.app.simps )
+(*
+hipster_cond notNil app init*)
+
 
 lemma initLast: "notNil ts \<Longrightarrow> app (init ts) (Cons (last ts) Nil) = ts"
+(*by (hipster_induct_schemes Listing.notNil.simps Listing.init.simps Listing.app.simps Listing.last.simps)*)
 apply(induction ts rule: init.induct)
 apply(simp_all)
 done

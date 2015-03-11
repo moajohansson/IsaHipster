@@ -3,11 +3,17 @@ imports Main
         ../Listing
 
 begin
+print_rules
+print_induct_rules
+ML {* Outer_Syntax.improper_command *}
+ML {* Datatype.get_info *}
+
 
 (*hipster_cond notNil maps tail init len*)
 lemma lemma_a [thy_expl]: "tail (maps x2 y2) = maps x2 (tail y2)"
 (* by (hipster_induct_simp_metis Listing.notNil.simps Listing.maps.simps Listing.tail.simps Listing.init.simps Listing.len.simps) *)
 apply(induction y2)
+print_cases
 apply(simp_all)
 done
 
@@ -58,10 +64,26 @@ apply(simp_all)
 done
 
 lemma initDef: "init (app ts (Cons t Nil)) = ts"
-oops
+apply(induction ts rule: init.induct)
+apply(simp_all)
+done
 
 lemma lastDef: "\<not> notNil ts \<Longrightarrow> last (Cons t ts) = t"
-oops
+by (hipster_induct_simp_metis Listing.notNil.simps Listing.last.simps)
+
+(* auxiliary *)
+lemma noElems: "count t Nil = Z"
+by simp
+
+lemma appNil: "app ts Nil = ts"
+by (hipster_induct_simp_metis Listing.app.simps )
+
+lemma initLast: "notNil ts \<Longrightarrow> app (init ts) (Cons (last ts) Nil) = ts"
+apply(induction ts rule: init.induct)
+apply(simp_all)
+done
+
+
 
 lemma setCountRev: "count t ts = count t (rev ts)"
 oops
@@ -70,30 +92,52 @@ lemma initLast: "notNil ts \<Longrightarrow> app (init ts) (last ts) = ts"
 oops
 
 lemma initApp: "notNil ts \<Longrightarrow> init (app rs ts) = app rs (init ts)"
-oops
+apply(induction rs rule: init.induct)
+apply(simp_all)
+apply(case_tac ts)
+apply(simp_all)
+done
 
 lemma initAppNil: "\<not> notNil ts \<Longrightarrow> init (app rs ts) = init rs"
-oops
+by (hipster_induct_simp_metis Listing.notNil.simps Listing.app.simps Listing.init.simps appNil)
+(* before: apply(induction ts rule: init.induct) apply(simp_all add: appNil) *)
 
 lemma lastApp: "notNil ts \<Longrightarrow> last (app rs ts) = last ts"
-oops
+apply(induction rs rule: last.induct)
+apply(simp_all)
+apply(case_tac ts)
+apply(simp_all)
+done
 
 lemma lastAppNil: "\<not> notNil ts \<Longrightarrow> last (app rs ts) = last rs"
-oops
+by (hipster_induct_simp_metis appNil) (* needs it! *)
 
 lemma lastCons: "notNil ts \<Longrightarrow> last (Cons t ts) = last ts"
-oops
+by (hipster_induct_simp_metis)
 
 lemma countDiff: "\<not> eqN r t \<Longrightarrow> count r (app (Cons t Nil) ts) = count r ts"
-oops
+by (hipster_induct_simp_metis)
 
 lemma countInc: "eqN r t \<Longrightarrow> count r (Cons t ts) = S (count r ts)"
-oops
+by (hipster_induct_simp_metis)
 
-lemma dropMapComm: "drop n (map f ts) = map f (drop n ts)"
-oops
+lemma dropNil: "drop n Nil = Nil"
+apply(case_tac n)
+apply(simp_all)
+done
+(* by (hipster_induct_simp_metis Listing.drop.simps) claims:
+  Proved a different theorem:
+  Listing.drop n Listing.List.Nil = Listing.List.Nil 
+FIXME: why?*)
 
-lemma takeMapCom: "take n (map f ts) = map f (take n ts)"
-oops
+lemma dropMapComm: "drop n (maps f ts) = maps f (drop n ts)"
+apply(induction ts rule: drop.induct)
+apply(simp_all)
+done
+
+lemma takeMapCom: "take n (maps f ts) = maps f (take n ts)"
+apply(induction ts rule: drop.induct) (* XXX: either works! drop.induct OR take.induct *)
+apply(simp_all)
+done
 
 end

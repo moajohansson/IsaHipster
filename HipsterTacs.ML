@@ -174,7 +174,7 @@ fun induct_on_var_tac rule var i goalthm =
                          inductfrees];
          (* Throw away Isar related stuff and only take the Thm.thm seq *)
       val nw_thms = 
-          Seq.map snd (Induct.induct_tac
+          Seq.map snd (Induct.induct_tac (* Induction.induction_tac ?? *)
                          ctxt false insts [non_ithings @ otherfrees] [] rule [] i goalthm)
       in
         nw_thms
@@ -233,6 +233,7 @@ fun try_induct_schemes ctxt strat i thm =
       val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
                         handle _ => (n, NONE) ) ((*"Naturals.leq.induct" ::*)distinct (op =) (map (fn c => (c^".induct")) consts))
       val schemes =  (*the o snd*) (filter (Basics.is_some o snd) thinds)
+      (*val dd = induct*)
       val _ = Pretty.writeln (pretty_thm ctxt thm)
       (* FIXME: distinct ... *)
     in (try_induction_with ctxt schemes strat (distinct (op =) vars) i) thm
@@ -281,6 +282,8 @@ fun induct_with_schemes ctxt facts thm =
       val _ = Pretty.writeln (Pretty.str (Library.space_implode " " (thynm ^ "-Consts: " :: consts)))
       val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
                         handle _ => (n, NONE) ) (map (fn c => (c^".induct")) consts)
+      (*val thinds' = map (fn n => (n,  (Attrib.thms n))
+                         handle _ => (n, NONE) ) (map (fn c => (c^".induct")) consts)*)
       val _ = Pretty.writeln (Pretty.block (maps (fn (n,thms) => (case thms of
            SOME ts => map Pretty.str ("\n"^n^" is: " :: (map (Pretty.string_of o pretty_thm ctxt) ts))
          | NONE => [Pretty.str ("\n"^n^": has no induction scheme")]))  thinds))

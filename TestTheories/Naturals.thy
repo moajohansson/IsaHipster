@@ -1,6 +1,6 @@
 theory Naturals
 imports Main
-        "../IsaHipster/IsaHipster"
+        "../IsaHipster"
 begin
 
 datatype Nat = Z | S Nat
@@ -87,6 +87,7 @@ definition leZZ :: "Nat \<Rightarrow> bool" where
   "leZZ x = eqN x Z"
 fun lezpp :: "Nat \<Rightarrow> bool" where
   "lezpp x = eqN x Z"
+
 (* TEST: hipster leq lezpp eqN *)
 lemma unknown1 [thy_expl]: "eqN x y = eqN y x" (* not proven by Hipster, although discovered *)
 apply(induction x rule: eqN.induct)
@@ -152,13 +153,16 @@ apply(induction x rule: geq.induct)
 apply(simp_all add: help01)
 done
 (* manual *)
-lemma unknownLG [thy_expl]: "leq (S x) y = geq y (S x)"
-apply(induction y rule: leq.induct)
-apply(simp_all add: help01)
-done
 
-lemma unknown [thy_expl]: "geq (S x) y = leq y (S x)"
-oops
+lemma unknownLG [thy_expl]: "leq (S x) y = geq y (S x)"
+by (hipster_induct_schemes (*Naturals.leq.simps Naturals.geq.simps*) (*Naturals.lemma_ab help01*))
+(*apply(induction y rule: leq.induct)
+apply(simp_all add: help01)
+done*)
+
+lemma unknownLG' [thy_expl]: "geq (S x) y = leq y (S x)"
+by (hipster_induct_simp_metis Naturals.leq.simps Naturals.geq.simps (*Naturals.lemma_ab help01*))
+(* oops *)
 
 lemma unknown [thy_expl]: "geq (S x) (S y) = leq y x"
 oops
@@ -478,12 +482,12 @@ lemma addS2: "add n (S m) = S (add n m)"
 by (hipster_induct_simp_metis add.simps)
 
 lemma notLessSwap: "\<not> leq n m \<Longrightarrow> leq m n"
-apply(hipster_induct_schemes)
+(*apply(hipster_induct_schemes Naturals.leq.simps)*)
 apply(induction m rule: leq.induct)
 by (simp_all)
 
 lemma subId: "sub n Z = n"
-apply(hipster_induct_schemes add.simps)
+(* apply(hipster_induct_schemes add.simps) *)
 by (hipster_induct_simp_metis add.simps)
 
 end
