@@ -40,7 +40,7 @@ val induct_simp = Data {routine_tac = Simp_Tacs.routine_tac,
                         hard_tac_str = Simp_Tacs.final_tactic_str};
 
 
-(* Data stored in an Isabelle context, default to induct_simp_metis tactics.
+(* Data stored in an Isabelle context, default to induct_with_schemes tactics.
    THINK: Maybe this should be stored in the theory instead? *)
 structure Data = Theory_Data
                    (type T = T

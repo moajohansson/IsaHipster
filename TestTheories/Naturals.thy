@@ -64,7 +64,7 @@ fun lezpp :: "Nat \<Rightarrow> bool" where
   "lezpp x = eqN x Z"
 
 (* TEST: hipster leq lezpp eqN *)
-lemma unknown1 [thy_expl]: "eqN x y = eqN y x" (* not proven by Hipster, although discovered *)
+lemma unknown1 [thy_expl]: "eqN x y = eqN y x" (* requires schemes AND also to take care of arbitrary inductibles *)
 by (hipster_induct_schemes)(*
 apply(induction x rule: eqN.induct)
 apply(simp_all)
@@ -115,7 +115,7 @@ lemma help01 : "geq Z n = leq n Z"
 apply(case_tac n)
 apply(simp_all)
 done
-lemma unknown [thy_expl]: "geq x y = leq y x"
+lemma unknown [thy_expl]: "geq x y = leq y x"  (* requires arbitrary care + schemes *)
 (*by (hipster_induct_simp_metis Naturals.leq.simps Naturals.geq.simps Naturals.lemma_ab)*)
 by (hipster_induct_schemes Naturals.leq.simps Naturals.geq.simps)(*
 apply(induction x rule: geq.induct)
@@ -134,7 +134,7 @@ by (hipster_induct_simp_metis Naturals.leq.simps Naturals.geq.simps (*Naturals.l
 (* oops *)
 
 lemma unknownLGS [thy_expl]: "geq (S x) (S y) = leq y x"
-by (hipster_induct_schemes) (*oops*)
+by (hipster_induct_simp_metis) (*oops*)
 
 (*hipster add leq*)
 (*hipster add geq*)
@@ -238,17 +238,18 @@ lemma succIncreasesG : "geq m n \<Longrightarrow> geq (S m) n"
 apply(simp add: succIncreasedG)
 done
 
-lemma addId: "add m Z = m"
+lemma addId: "add m Z = m" (* will go down to structural induction? *)
 by (hipster_induct_schemes Naturals.add.simps)(*
 apply(induction m)
 apply(auto)
 done*)
 
-lemma addIncreases: "leq n (add n m)"
+lemma addIncreases: "leq n (add n m)" (* now succeeds in both *)
 (* oops in Hipster? *)
 apply(induction n)
 apply(simp_all)
 done
+
 lemma addIncreasesNon: "leq n (add m n)"
 (*slow Hipster... doesn't prove it? *)
 (* ah, with necessary one yeap *)
@@ -256,36 +257,37 @@ by (hipster_induct_simp_metis Naturals.leq.simps succIncreasedL) (* NOTE: will g
 (* before:  apply(induction m)  apply(simp_all) apply(induction n)  apply(simp_all add: succIncreasedL) *)
 
 lemma subBounded: "sub n (add n m) = Z"
-by (hipster_induct_schemes Naturals.sub.simps Naturals.add.simps) (* doesn't even need add.simps ... *)
+by (hipster_induct_simp_metis Naturals.sub.simps Naturals.add.simps) (* doesn't even need add.simps ... *)
 
-lemma noLowerZ: "leq n Z \<Longrightarrow> n = Z"
+lemma noLowerZ: "leq n Z \<Longrightarrow> n = Z" (* will fail with the rule stated *)
+by (hipster_induct_simp_metis)(*
 apply(induction n)
 apply(simp_all)
-done
+done*)
 
 (* TODO: don't we retrieve ALL existing lemmas not only thy_expl ones? it won't work without succIncreasesL ... *)
-lemma subDecreases: "leq (sub n m) n"
+lemma subDecreases: "leq (sub n m) n" (* requires both schemes + arbitrary care *)
 by (hipster_induct_schemes Naturals.leq.simps Naturals.sub.simps succIncreasesL)(*
 apply(induction n m rule: sub.induct) (* TODO: add induction on several variables simultaneously: exists? does it depend on params of functions? *)
 apply(simp_all add: lemma_a succIncreasesL)
 done*)
 
-lemma subHard: "leq n m \<Longrightarrow> leq (sub n m) Z"
+lemma subHard: "leq n m \<Longrightarrow> leq (sub n m) Z"  (* seems to need the induction on both *) (* requires arbitrary care + schemes *)
 by (hipster_induct_schemes Naturals.leq.simps Naturals.sub.simps)(*
 apply(induction n m rule: leq.induct)
 by (simp_all)*)
 
-lemma subCon: "\<not> leq n m \<Longrightarrow> \<not> leq (sub n m) Z"
+lemma subCon: "\<not> leq n m \<Longrightarrow> \<not> leq (sub n m) Z"  (* seems to need the induction on both *)  (* requires arbitrary care + schemes *)
 by (hipster_induct_schemes Naturals.leq.simps Naturals.sub.simps)
 (*apply(induction n m rule: leq.induct)
 by (simp_all)*)
 (* won't work: by (hipster_induct_simp_metis Naturals.sub.simps Naturals.leq.simps)*)
 
 lemma addS2: "add n (S m) = S (add n m)"
-by (hipster_induct_simp_metis add.simps)
+by (hipster_induct_simp_metis)
 
-lemma notLessSwap: "\<not> leq n m \<Longrightarrow> leq m n"
-apply(hipster_induct_schemes Naturals.leq.simps)
+lemma notLessSwap: "\<not> leq n m \<Longrightarrow> leq m n"  (* requires arbitrary care + schemes *)
+apply(hipster_induct_schemes)
 done(*
 apply(induction m rule: leq.induct)
 by (simp_all)*)
@@ -293,7 +295,7 @@ by (simp_all)*)
 
 lemma subId: "sub n Z = n"
 (* apply(hipster_induct_schemes add.simps) *)
-by (hipster_induct_simp_metis add.simps)
+by (hipster_induct_simp_metis)
 
 end
 
