@@ -176,10 +176,15 @@ apply(simp_all)
 done
 (*by(tactic {* Tactic_Data.routine_tac @{context} *}) works too *)
 
-lemma dropNil: "drop n Nil = Nil"
+(*XXX: maybe schemes will solve it when we pick the appropriate variable (type-wise) on which to
+    induct?
+       or does it have something to do with how the goal of a proof is set? 
+  XXX: look up for a type T what T.exhaust is *)
+lemma dropNil: "drop n Nil = Nil" (* XXX: check why this solves our problem... why no "unification" *)
+by (metis drop.simps Nat.exhaust)(*
 apply(induct n)
 apply(simp_all)
-done
+done*)
 (*apply(hipster_induct_simp_metis) done*)
 (*apply(case_tac n)
 apply(simp_all)

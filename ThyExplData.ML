@@ -129,8 +129,8 @@ fun is_present ctxt thm =
     end
 
  
-(* Assmume get list of strings from HipSpec, which can be directly parsed as Isabelle terms*)
-fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs = 
+(* Assmume get list of strings from HipSpec, which can be directly parsed as Isabelle terms *)
+fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
     let
       val thy = Proof_Context.theory_of ctxt
       val conjs = lemma_strs

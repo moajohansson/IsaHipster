@@ -54,9 +54,11 @@ fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);
 fun simp_all ctxt lemmas thm = 
     let
        val _ = Pretty.writeln (Pretty.block [Pretty.str "simp_all: ", pretty_thm ctxt thm])
+       (*val _ = @{print} thm  OR @{make_string} *)
+       (*val ss = map @{print} lemmas *)
        val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                  (ctxt, lemmas)
-    in 
+    in
       ALLGOALS (Simplifier.asm_full_simp_tac ctxt') thm
     end;
  
@@ -85,7 +87,7 @@ fun timed_metis_tac ctxt facts i thm =
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
 fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
-    (SOLVE((simp_all ctxt lemmas) (* SOLVE *)
+    (SOLVE((simp_all ctxt ((*facts@*)lemmas)) (* TRY *) (* FIXME: both facts and lemmas? *)
           THEN
           IF_UNSOLVED
           (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))) thm (*end;*)
@@ -338,7 +340,7 @@ fun routine_tac ctxt =
                                  (ctxt, prev_thms) *)
      in *)
        Hipster_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt, 
-                                        (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)); 
+                                        (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt));
 
 val routine_tac_str = "by (tactic {* Simp_Metis_Tacs.routine_tac @{context} *})"; 
 
@@ -375,9 +377,9 @@ end
 structure Ind_Schemes_Tacs : THY_EXPL_TACS =
 struct
 
-fun routine_tac ctxt = 
-       Hipster_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt, 
-                                       (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)); 
+fun routine_tac ctxt =
+       Hipster_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt,
+                                       (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt));
 val routine_tac_str = "by (tactic {* Ind_Schemes_Tacs.routine_tac @{context} *})"; 
 
 fun hard_tac ctxt = 
@@ -386,14 +388,14 @@ fun hard_tac ctxt =
       val facts = ThyExpl_Data.facts_of_ctxt ctxt
     in
       ALLGOALS(Hipster_Tacs.try_induct_schemes ctxt (Hipster_Tacs.induct_simp_or_metis (facts,lemmas)))
-    end; 
+    end;
 (* The fact_nms are names of extra theorems that we want to refer to in the output *)
 fun final_tactic_str ctxt =
     let
       (* Only need to pass the facts, the thy_expl theorems are looked up by the tactic *)
       val facts_str = Library.space_implode " " (ThyExpl_Data.fact_names_of_ctxt ctxt)
       (* TODO: change so as to have the top level extract the appropriate induction scheme rules? *)
-    in 
+    in
       "by (hipster_induct_schemes " ^ facts_str ^")"
     end;
 end
@@ -402,16 +404,16 @@ end
 structure Simp_Tacs : THY_EXPL_TACS =
 struct
 
-fun routine_tac ctxt = 
+fun routine_tac ctxt =
      let
        val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
      in
         SOLVE (Hipster_Tacs.prove_by_simp ctxt lemmas)
-     end; 
+     end;
 
-val routine_tac_str = "by (tactic {*Simp_Tacs.routine_tac @{context}*})"; 
+val routine_tac_str = "by (tactic {*Simp_Tacs.routine_tac @{context}*})";
 
-fun hard_tac ctxt = 
+fun hard_tac ctxt =
     let
       val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
       (*val facts =  ThyExpl_Data.facts_of_ctxt ctxt *)
@@ -420,7 +422,7 @@ fun hard_tac ctxt =
     in
       ALLGOALS (Hipster_Tacs.try_inductable_vars ctxt
                                                  (Hipster_Tacs.induct_and_simp lemmas))
-    end; 
+    end;
 
 (* The fact_nms are names of extra theorems that we want to refer to in the output *)
 fun final_tactic_str _ = "by hipster_induct_simp"

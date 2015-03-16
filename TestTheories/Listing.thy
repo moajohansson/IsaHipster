@@ -71,5 +71,10 @@ fun notNil :: "'a List \<Rightarrow> bool" where
   "notNil Nil = False"
 | "notNil _   = True"
 
+fun rotate :: "Nat \<Rightarrow> 'a List \<Rightarrow> 'a List" where
+  "rotate Z     xs          = xs"
+| "rotate _     Nil         = Nil"
+| "rotate (S n) (Cons x xs) = rotate n (app xs (Cons x Nil))"
+
 end
 
