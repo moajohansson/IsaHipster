@@ -19,7 +19,14 @@ fun try_nxt_conj ctxt =
                          |> ThyExpl_Data.set_progress_ctxt false)                
             else NONE
 
-    | (c::cs) => (* try proving next open conj *) 
+    | (c::cs) => (* try proving next open conj *)
+      if length ( ThyExpl_Data.proved_of_ctxt ctxt) > 10 then SOME (ctxt |> ThyExpl_Data.set_open_conjs_ctxt cs
+                                                                         |> ThyExpl_Data.add_failed_ctxt c)
+                                                         else
+         if (length (snd (Hipster_Utils.frees_and_tfrees_of_thm c)) > 2) then ctxt |> ThyExpl_Data.set_open_conjs_ctxt cs
+                                                                   |> ThyExpl_Data.add_failed_ctxt c
+                                                                   |> try_nxt_conj
+                                                         else
       let 
         val r = SINGLE (Tactic_Data.routine_tac ctxt) c
         val lemma_str = (Syntax.string_of_term ctxt (Thm.concl_of c))

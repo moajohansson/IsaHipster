@@ -52,10 +52,10 @@ fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);
 
 (* Apply simp to all subgoals *)
 fun simp_all ctxt lemmas thm = 
-    let
-       val _ = Pretty.writeln (Pretty.block [Pretty.str "simp_all: ", pretty_thm ctxt thm])
+    let(*
+       val _ = Pretty.writeln (Pretty.block [Pretty.str "simp_all: ", pretty_thm ctxt thm])*)
        (*val _ = @{print} thm  OR @{make_string} *)
-       (*val ss = map @{print} lemmas *)
+       (*val ss = map @{print} lemmas*)
        val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                  (ctxt, lemmas)
     in
@@ -80,9 +80,9 @@ to the simpset for some reason. *)
 
 (* Apply simp, if that doesn't work try metis.  *)
 fun timed_metis_tac ctxt facts i thm = 
-    let val _ = Pretty.writeln (Pretty.block [Pretty.str "timed_metis: ",pretty_thm ctxt thm]) in
+    (*let val _ = Pretty.writeln (Pretty.block [Pretty.str "timed_metis: ",pretty_thm ctxt thm]) in*)
     (SOLVE_TIMEOUT 500
-    (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm end;
+    (Metis_Tactic.metis_tac [] ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm(* end*);
 
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
@@ -147,7 +147,7 @@ fun inductable_things_in_term thry t =
       fun lookup thy s =
           case (Datatype.get_info thy s) of
              NONE => NONE
-           | SOME di => SOME (#induct di)
+           | SOME di => SOME (#induct di);
       fun datatype_chk (Type(tn,_)) =
             Basics.is_some (lookup thry tn)
         | datatype_chk _ = false;
