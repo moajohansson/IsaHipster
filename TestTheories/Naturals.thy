@@ -3,6 +3,13 @@ imports Main
         "../IsaHipster"
 begin
 
+ML {*
+
+fun align_left msg xs ys =
+  let val m = length xs and n = length ys
+  in if m < n then error msg else (take n xs ~~ ys) end;
+*}
+
 datatype Nat = Z | S Nat
 
 fun leq :: "Nat => Nat => bool" where

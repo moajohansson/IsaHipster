@@ -1,4 +1,4 @@
-(* Various utility function for Hipster *)
+(* Various utility functions for Hipster *)
 
 signature HIPSTER_UTILS =
 sig 

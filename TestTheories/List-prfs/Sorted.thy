@@ -7,56 +7,63 @@ begin
 
 
 
-lemma leqRev: "\<not> leq r t \<Longrightarrow> leq t r"
+lemma leqRev : "\<not> leq r t \<Longrightarrow> leq t r"
 by hipster_induct_schemes (*
 apply(induction r rule: leq.induct)
 apply(simp_all)
 done*)
 
-lemma insSorted: "insert r (isort ts) = isort (insert r ts)"
-(* case with r = Z *)
-oops
-lemma insTwiceComm: "insert r (insert t ts) = insert t (insert r ts)"
+lemma leqLeqEq : "\<lbrakk> leq r t ; leq t r \<rbrakk> \<Longrightarrow> r = t"
+by (hipster_induct_schemes)
+
+lemma insSorted : "insert r (isort ts) = isort (insert r ts)"
+apply(induction ts rule: isort.induct)
+apply(simp_all add: leqRev leqLeqEq)
 (* case with r = Z *)
 oops
 
-lemma isortIds: "sorted ts \<Longrightarrow> isort ts = ts"
+lemma insTwiceComm : "insert r (insert t ts) = insert t (insert r ts)"
+(* case with r = Z *)
+oops
+
+lemma isortIds : "sorted ts \<Longrightarrow> isort ts = ts"
 by hipster_induct_schemes (*
 apply(induction ts rule: sorted.induct)
 apply(simp_all)
 done*)
 
-lemma insSortInvarZ: "sorted ts \<Longrightarrow> sorted (insert Z ts)"
+lemma insSortInvarZ : "sorted ts \<Longrightarrow> sorted (insert Z ts)"
 by (hipster_induct_simp_metis)
 (* alternative: apply(case_tac ts) apply(simp_all) done *)
 
-(*FIX*)
-lemma insSortInvar: "sorted ts \<Longrightarrow> sorted (insert t ts)"
+
+lemma insSortInvar : "sorted ts \<Longrightarrow> sorted (insert t ts)"
+(* apply(hipster_induct_schemes leqRev) won't ... *)
 apply(induction ts rule: sorted.induct)
-apply(simp_all)
-sorry
-(*FIX*)
-lemma isortSorts: "sorted (isort ts)"
-by (hipster_induct_simp_metis  insSortInvar)
+apply(simp_all add: leqRev)
+by metis
+
+lemma isortSorts : "sorted (isort ts)"
+by (hipster_induct_simp_metis insSortInvar)
 (* started as:  apply(induction ts rule: isort.induct)  apply(simp_all) apply(simp add: insSortInvar) *)
-(*FIX*)
-lemma isortIdsP: "sorted ts \<Longrightarrow> sorted (isort ts)"
+
+lemma isortIdsP : "sorted ts \<Longrightarrow> sorted (isort ts)"
 by (hipster_induct_simp_metis isortSorts)
-(*FIX*)
-lemma kerIsort: "isort (isort ts) = isort ts"
+
+lemma kerIsort : "isort (isort ts) = isort ts"
 by (hipster_induct_simp_metis isortSorts isortIds)
 (* apply(induction ts rule: isort.induct) apply(simp_all add: isortIds) *)
-(*FIX*)
-lemma insMinInsorted: "sorted ts \<Longrightarrow> isort (insert Z ts) = insert Z ts"
+
+lemma insMinInsorted : "sorted ts \<Longrightarrow> isort (insert Z ts) = insert Z ts"
 by (hipster_induct_simp_metis isortIds insSortInvar)
-(*FIX*)
-lemma insSomeInsorted: "sorted ts \<Longrightarrow> isort (insert t ts) = insert t ts"
+
+lemma insSomeInsorted : "sorted ts \<Longrightarrow> isort (insert t ts) = insert t ts"
 by (hipster_induct_simp_metis isortIds insSortInvar)
 
 
-lemma postOverPrecond: "sorted (insert t ts) = sorted ts"
-apply(induction ts rule: insert.induct)
-apply(simp_all)
+lemma postOverPrecond: "sorted (insert t ts) \<Longrightarrow> sorted ts"
+apply(induction t ts rule: insert.induct)
+apply(simp_all add: leqRev leqLeqEq)
 oops
 
 

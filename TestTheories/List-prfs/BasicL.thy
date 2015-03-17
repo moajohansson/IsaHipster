@@ -106,46 +106,49 @@ hipster_cond notNil app init*)
 (* XXX: shall we try and have some reasonable decision as to which argument + function to start inducting upon?
   eg: inner-most-left-most *)
 lemma initLast: "notNil ts \<Longrightarrow> app (init ts) (Cons (last ts) Nil) = ts"
+by hipster_induct_schemes
 (*by (hipster_induct_schemes Listing.notNil.simps Listing.init.simps Listing.app.simps Listing.last.simps)*)
 (* by hipster_induct_schemes : succeeds but takes long because it tries first notNil.induct, app.induct
-    and then init.induct *)
+    and then init.induct *)(*
 apply(induction ts rule: init.induct)
 apply(simp_all)
-done
+done*)
 
 
 lemma initCons: "notNil ts \<Longrightarrow> init (Cons t ts) = Cons t (init ts)"
 by (hipster_induct_simp_metis)
 
 lemma initApp: "notNil ts \<Longrightarrow> init (app rs ts) = app rs (init ts)"
+by (hipster_induct_schemes initCons)
 (* by (hipster_induct_schemes initCons : needs initCons! succeeds but takes long - tries notNil.induct
-  and app.induct before last.induct... *)
+  and app.induct before last.induct... *)(*
 apply(induction rs rule: init.induct)
 apply(simp_all)
 apply(case_tac ts)
 apply(simp_all)
-done
+done*)
 
 lemma initAppNil: "\<not> notNil ts \<Longrightarrow> init (app rs ts) = init rs"
-by (hipster_induct_simp_metis Listing.notNil.simps Listing.app.simps Listing.init.simps appNil)
+by (hipster_induct_schemes Listing.notNil.simps Listing.app.simps Listing.init.simps appNil)
 (* before: apply(induction ts rule: init.induct) apply(simp_all add: appNil) *)
 
 lemma lastCons: "notNil ts \<Longrightarrow> last (Cons t ts) = last ts"
 by (hipster_induct_simp_metis)
 
 lemma lastApp: "notNil ts \<Longrightarrow> last (app rs ts) = last ts"
+by (hipster_induct_schemes lastCons)
 (* by (hipster_induct_schemes lastCons) : needs lastCons! succeeds but takes long - tries notNil.induct
   and app.induct before last.induct... XXX: check order in general! *)
 (* XXX2: seems like case distinctions (maybe double inductions too) could benefit from auxiliary
-    lemmas, in general *)
+    lemmas, in general *)(*
 apply(induction rs rule: last.induct)
 apply(simp_all)
 apply(case_tac ts)
 apply(simp_all)
-done
+done*)
 
 lemma lastAppNil: "\<not> notNil ts \<Longrightarrow> last (app rs ts) = last rs"
-by (hipster_induct_simp_metis appNil) (* needs it! *)
+by (hipster_induct_schemes appNil) (* needs it! *)
 
 lemma countDiff: "\<not> eqN r t \<Longrightarrow> count r (app (Cons t Nil) ts) = count r ts"
 by (hipster_induct_simp_metis)
@@ -195,14 +198,16 @@ done*)
 FIXME: why?*)
 
 lemma dropMapComm: "drop n (maps f ts) = maps f (drop n ts)"
+by hipster_induct_schemes (*
 apply(induction ts rule: drop.induct)
 apply(simp_all)
-done
+done*)
 
 lemma takeMapCom: "take n (maps f ts) = maps f (take n ts)"
+by hipster_induct_schemes (*
 apply(induction ts rule: drop.induct) (* XXX: either works! drop.induct OR take.induct *)
 apply(simp_all)
-done
+done*)
 
 
 end

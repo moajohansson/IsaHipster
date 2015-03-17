@@ -19,10 +19,10 @@ sig
   (* Context -> list of simp rules (defs) -> tactic, to be pasted into proof script. *)
   val induct_simp_metis : Proof.context -> thm list -> tactic
   
-  val induct_with_schemes : Proof.context -> ( thm ) list -> tactic
+  (* Context -> list of induct rules (schemes) -> tactic *)
+  val induct_with_schemes : Proof.context -> thm list -> tactic
   val try_induct_schemes : Proof.context -> hardtac -> int -> tactic
   (*val try_induction_with : Proof.context -> thm list list -> hardtac -> vars -> int -> tactic*)
-
 
 end
 
@@ -71,7 +71,7 @@ to the simpset for some reason. *)
 *)
 
 (* Fails if all there are some subgoals left after application of simp *)
- fun prove_by_simp ctxt lemmas = SOLVE (simp_all ctxt lemmas); 
+ fun prove_by_simp ctxt lemmas = SOLVE_TIMEOUT 2000 (simp_all ctxt lemmas); 
 
 (*-----------------------------------------------------------------------------------------*)
 (* Metis tactics *) 
@@ -87,7 +87,7 @@ fun timed_metis_tac ctxt facts i thm =
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
 fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
-    (SOLVE((simp_all ctxt ((*facts@*)lemmas)) (* TRY *) (* FIXME: both facts and lemmas? *)
+    (SOLVE_TIMEOUT 2000((simp_all ctxt (facts @ lemmas)) (* TRY *) (* FIXME: both facts and lemmas? *)
           THEN
           IF_UNSOLVED
           (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))) thm (*end;*)
@@ -187,6 +187,8 @@ fun induct_on_var_tac rule var i goalthm =
       val nw_thms' = 
           (Induct.induct_tac (* Induction.induction_tac ?? *)
                          ctxt false [insts] [non_ithings](*[non_ithings @ otherfrees]*) [] rule [] i goalthm)
+          (* FIXME: dirty hack until I find out how to check before instantiating the induction *)
+            handle ERROR t => let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end
       (*val _ = Pretty.writeln (Pretty.str ((Library.space_implode " ? " (map (fn (cases, thm) =>
           (Library.space_implode " " (map (fn (s,_) => s) cases))
           ^ ": " ^ (Pretty.string_of (pretty_thm @{context} thm))) (Seq.list_of nw_thms')))^"\n")) ;*)

@@ -209,7 +209,7 @@ fun explore' cond_opt ctxt const_nms =
       val facts = maps (fn n => Sledgehammer_Util.thms_of_name ctxt n
                        handle _ => []) fact_nms
                         
-      val conjs = hipspec_explore ctxt cond_opt const_nms;
+      val conjs = hipspec_explore ctxt cond_opt const_nms
 
       val res_ctxt = proof_loop ctxt facts fact_nms conjs
       val tac_str = Tactic_Data.hard_tac_str res_ctxt 

@@ -5,8 +5,8 @@ imports Main
 
 begin
 
-hipster add mul                                    
-                       
+(*hipster add mul*)
+
 lemma l01 [thy_expl] : "mul x Z = Z"
 by hipster_induct_simp_metis
 
@@ -29,9 +29,14 @@ by hipster_induct_simp_metis
 lemma l07 [thy_expl] : "add x (S y) = S (add y x)"
 by hipster_induct_simp_metis
 
-lemma l08 [thy_expl] : "add (mul x y) x = mul x (S y)"
+
+lemma l08' [thy_expl] : "add (mul x y) x = mul x (S y)"
+by (hipster_induct_schemes l03 l04)
+
+(*lemma l08 [thy_expl] : "add (mul x y) x = mul x (S y)"
+(*apply (hipster_induct_schemes add.simps mul.simps l07 l03 l04)*)
 (*apply (tactic {* Hipster_Explore.explore_goal @{context} ["Naturals.add", "Naturals.mul"] *})*)
-sorry (*by (hipster_induct_schemes add.simps mul.simps l07 l03 l04)*)
+sorry (*by (hipster_induct_schemes add.simps mul.simps l07 l03 l04)*)*)
 
 lemma t01 : "add (add x y) x = add x (add x y)"
 by hipster_induct_simp_metis
