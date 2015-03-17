@@ -27,9 +27,11 @@ where
 fun isTasty :: "Cake \<Rightarrow> bool"
 where 
   "isTasty (SwedishPiece slice) = like slice"
- |"isTasty (BigPiece slice cake) = dummyAnd (like slice) (isTasty cake)"
+ |"isTasty (BigPiece slice cake) = (like slice \<and> isTasty cake)"
 
-hipster dummyAnd merge isTasty
+ML{*Syntax.read_prop @{context} "HOL.conj a b = HOL.conj b a"*}
+
+hipster merge isTasty HOL.conj
 lemma lemma_aa [thy_expl]: "dummyAnd (isTasty x2) (isTasty y2) = isTasty (merge x2 y2)"
 by (hipster_induct_simp_metis SimpleCake.dummyAnd.simps SimpleCake.merge.simps SimpleCake.isTasty.simps)
 

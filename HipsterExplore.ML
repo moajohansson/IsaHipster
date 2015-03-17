@@ -122,7 +122,7 @@ fun proof_loop ctxt facts fact_nms cand_lemmas_str =
 
 (* TODO: Implement properly. This is for mapping back to Isabelle constants those things that the
  code generator renamnes in Haskell. Otherwise, Isabelle will not understand the resulting lemmas. *)
-val haskell_consts = [("List.rev","reverse"),("List.append","++"), ("HOL.conj", "&&"),
+val haskell_consts = [("List.rev","reverse"),("List.append","++"), ("HOL.conj", " '&&' "),
                       ("Groups.plus_class.plus", "plus_nat"), ("Groups.zero_class.zero", "Zero_nat"),
                       ("Groups.one_class.one", "one_nat")]
 
