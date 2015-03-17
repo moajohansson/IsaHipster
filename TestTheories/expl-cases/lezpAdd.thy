@@ -1,10 +1,14 @@
 theory lezpAdd
 
 imports Main
-        "../Naturals"
+        "../nats"
+(* NB: just testing. Realised Isabelle imports the first theory module with a matching name,
+      regardless of the theory name. However, to be checked: happened at exploration and the
+      theory being imported was merely "../Naturals" :w *)
 
 begin
-hipster_cond lezp add
+
+(*hipster lezp add*)
 lemma lemma_a [thy_expl]: "add x2 Z = x2"
 by (hipster_induct_schemes nats.lezp.simps nats.add.simps)
 
