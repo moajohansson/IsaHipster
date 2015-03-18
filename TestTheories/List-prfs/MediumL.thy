@@ -15,12 +15,6 @@ apply(induction rule: eqN.induct)
 apply(simp_all)
 done*)
 
-(*
-lemma identityNat: "eqN x x"
-apply(induction x)
-apply(simp_all)
-done *)
-
 lemma count02: "count t ts = n \<Longrightarrow> count t (Cons t ts) = S n"
 (* apply(case_tac ts)     (* OR: induciton ts on its own *)
 by (simp_all add: identityNat) (*XXX: how come the simplifier cannot get itself to the conclusion eqN v v? *)
@@ -140,15 +134,10 @@ by (tactic {* Simp_Tacs.routine_tac @{context} *})
 
 (* XXX: we should do something about our conclusions in the induction? type of the Nil has a 
     _SCHEMATIC TYPE_ variable... *)
-lemma zip2nil: "rs = Nil \<Longrightarrow> zip ts rs = Nil"
-by (hipster_induct_simp_metis)
-(* by (metis Listing.zip.simps Listing.List.exhaust)*) (*
-apply(induction ts)
-by (simp_all)*)
-(* FIXME: hipster_induct_simp_metis solves all goals if the condition is not specified but we get
-    when trying to close the proof:
-      Proved a different theorem:
-      Listing.zip ts Listing.List.Nil = Listing.List.Nil *)
+lemma zip2nil: " zip ts Nil = Nil"
+apply (hipster_induct_simp_metis)
+done
+(* by (metis Listing.zip.simps Listing.List.exhaust)*)
 
 lemma zipNilBis: "\<not> notNil ts \<Longrightarrow> zip rs ts = Nil"
 by (hipster_induct_simp_metis zip2nil) (* here: usage of notNil requires the induction? *)

@@ -2,7 +2,7 @@
 
 signature TERM_INDUCTS =
 sig 
-
+  val 
 end
 
 

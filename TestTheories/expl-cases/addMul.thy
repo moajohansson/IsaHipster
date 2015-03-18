@@ -31,7 +31,7 @@ by hipster_induct_simp_metis
 
 
 lemma l08' [thy_expl] : "add (mul x y) x = mul x (S y)"
-by (hipster_induct_schemes l03 l04)
+by (hipster_induct_simp_metis l03 l04)
 
 (*lemma l08 [thy_expl] : "add (mul x y) x = mul x (S y)"
 (*apply (hipster_induct_schemes add.simps mul.simps l07 l03 l04)*)
@@ -45,10 +45,10 @@ lemma t02 : "add (add x y) y = add x (add y y)"
 by (tactic {* Simp_Tacs.routine_tac @{context} *})
 
 lemma l09 [thy_expl] : "mul (add x x) y = mul x (add y y)"
-by hipster_induct_schemes
+by hipster_induct_simp_metis
 
 lemma l10 [thy_expl] : "mul (add x x) y = mul y (add x x)"
-by hipster_induct_schemes
+by hipster_induct_simp_metis
 
 lemma l11 [thy_expl] : "add (mul x x) y = add y (mul x x)"
 by hipster_induct_simp_metis

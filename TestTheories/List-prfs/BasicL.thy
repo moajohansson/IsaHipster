@@ -67,7 +67,7 @@ apply(case_tac x)
 apply(simp_all)
 done*)
 
-lemma unknown04 [thy_expl]: "notNil (init x) = notNil (tail x)"
+lemma unknown04 [thy_expl]: "notNil (init x) = notNil (tail x)" (* required schemes: init.induct *)
 by hipster_induct_schemes (*
 apply(case_tac x)
 apply(simp_all)
@@ -183,19 +183,14 @@ done
     induct?
        or does it have something to do with how the goal of a proof is set? 
   XXX: look up for a type T what T.exhaust is *)
+
+  declare [[show_types]]
+  declare [[show_sorts]]
+  declare [[show_consts]]
 lemma dropNil: "drop n Nil = Nil" (* XXX: check why this solves our problem... why no "unification" *)
-by (metis drop.simps Nat.exhaust)(*
-apply(induct n)
-apply(simp_all)
-done*)
-(*apply(hipster_induct_simp_metis) done*)
-(*apply(case_tac n)
-apply(simp_all)
-done*)
-(* by (hipster_induct_simp_metis Listing.drop.simps) claims:
-  Proved a different theorem:
-  Listing.drop n Listing.List.Nil = Listing.List.Nil 
-FIXME: why?*)
+(*by (metis drop.simps Nat.exhaust)*)
+by hipster_induct_simp_metis
+
 
 lemma dropMapComm: "drop n (maps f ts) = maps f (drop n ts)"
 by hipster_induct_schemes (*
@@ -203,7 +198,7 @@ apply(induction ts rule: drop.induct)
 apply(simp_all)
 done*)
 
-lemma takeMapCom: "take n (maps f ts) = maps f (take n ts)"
+lemma takeMapCom: "take n (maps f ts) = maps f (take n ts)" (* needs schemes! *)
 by hipster_induct_schemes (*
 apply(induction ts rule: drop.induct) (* XXX: either works! drop.induct OR take.induct *)
 apply(simp_all)

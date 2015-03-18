@@ -6,15 +6,14 @@ imports Main
 begin
 
 
-
-lemma leqRev : "\<not> leq r t \<Longrightarrow> leq t r"
+lemma leqRev [simp] : "\<not> leq r t \<Longrightarrow> leq t r" (* without other lemmas, requires schemes *)
 by hipster_induct_schemes (*
 apply(induction r rule: leq.induct)
 apply(simp_all)
 done*)
 
 lemma leqLeqEq : "\<lbrakk> leq r t ; leq t r \<rbrakk> \<Longrightarrow> r = t"
-by (hipster_induct_schemes)
+by (hipster_induct_schemes) (* without other lemmas, requires schemes *)
 
 lemma insSorted : "insert r (isort ts) = isort (insert r ts)"
 apply(induction ts rule: isort.induct)
@@ -36,12 +35,11 @@ lemma insSortInvarZ : "sorted ts \<Longrightarrow> sorted (insert Z ts)"
 by (hipster_induct_simp_metis)
 (* alternative: apply(case_tac ts) apply(simp_all) done *)
 
-
 lemma insSortInvar : "sorted ts \<Longrightarrow> sorted (insert t ts)"
-(* apply(hipster_induct_schemes leqRev) won't ... *)
+by hipster_induct_schemes (*
 apply(induction ts rule: sorted.induct)
 apply(simp_all add: leqRev)
-by metis
+by metis*)
 
 lemma isortSorts : "sorted (isort ts)"
 by (hipster_induct_simp_metis insSortInvar)
