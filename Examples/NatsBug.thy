@@ -41,7 +41,7 @@ definition leZZ :: "Nat \<Rightarrow> bool" where  (* - as a constant definition
 
 
 (* FIXME: 1. Isabelle's equality = (gets translated as a separate predicate Haskell
-             function equal<Type> which will be missing in the original theory) *)
+             function equal_<Type> which will be missing in the original theory) *)
 (* hipster lez *)  (* equations only with lez are trivial, aren't returned *)
 lemma unknown [thy_expl]: "equal_Nat x y = equal_Nat y x" (* free variable equal_Nat instead of equality = *)
 oops

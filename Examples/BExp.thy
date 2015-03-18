@@ -1,8 +1,10 @@
 theory BExp
 imports Main
-uses "../HipSpec.ML" 
+        "../IsaHipster"
+(*uses "../HipSpec.ML"*)
 
 begin
+ML_file "../HipsterExplore.ML"
 
 datatype boolex = 
   Const bool | 
@@ -39,7 +41,7 @@ where
 ML {* val consts = ["BExp.value", "BExp.valif", "BExp.bool2if" ] ; *}
 
 ML {* 
-val lemma_strs = HipSpec.hipspec_explore @{theory} consts;
+val lemma_strs = Hipster_Explore.hipspec_explore @{theory} consts;
 *}
 ML{*
 (* This fails because in Haskell, the constructor IF has been renamed If, so

@@ -19,7 +19,14 @@ fun try_nxt_conj ctxt =
                          |> ThyExpl_Data.set_progress_ctxt false)                
             else NONE
 
-    | (c::cs) => (* try proving next open conj *) 
+    | (c::cs) => (* try proving next open conj *)
+      if length ( ThyExpl_Data.proved_of_ctxt ctxt) > 10 then SOME (ctxt |> ThyExpl_Data.set_open_conjs_ctxt cs
+                                                                         |> ThyExpl_Data.add_failed_ctxt c)
+                                                         else
+         if (length (snd (Hipster_Utils.frees_and_tfrees_of_thm c)) > 2) then ctxt |> ThyExpl_Data.set_open_conjs_ctxt cs
+                                                                   |> ThyExpl_Data.add_failed_ctxt c
+                                                                   |> try_nxt_conj
+                                                         else
       let 
         val r = SINGLE (Tactic_Data.routine_tac ctxt) c
         val lemma_str = (Syntax.string_of_term ctxt (Thm.concl_of c))
@@ -163,6 +170,7 @@ fun hipspec_explore ctxt cond_opt const_nms =
           (* As of Isabelle2014, the below function takes a mystery boolean. Guessing false... *)
       val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
       val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile;
+      val _ = Pretty.writeln (Pretty.str (hipspec_cmd ^ " - " ^ args ));
       val _ = Isabelle_System.bash ("HipSpecifyer " ^ args) (*("ghc -e 'let xs = " ^ args ^ " in System.Environment.withArgs xs HipSpecifyer.main'");*)
     in 
       fst (Isabelle_System.bash_output hipspec_cmd)
@@ -196,11 +204,12 @@ fun prep_conjs ctxt conjs =
 (* Outputs snippets of proof script with the discovered lemmas that can be pasted into the theory file. *)
 fun explore' cond_opt ctxt const_nms =
     let
+      (* XXX: more principled way of obtaining simps? *)
       val fact_nms = map (fn c => c^".simps") const_nms
       val facts = maps (fn n => Sledgehammer_Util.thms_of_name ctxt n
                        handle _ => []) fact_nms
                         
-      val conjs = hipspec_explore ctxt cond_opt const_nms;
+      val conjs = hipspec_explore ctxt cond_opt const_nms
 
       val res_ctxt = proof_loop ctxt facts fact_nms conjs
       val tac_str = Tactic_Data.hard_tac_str res_ctxt 

@@ -1,4 +1,4 @@
-(* Various utility function for Hipster *)
+(* Various utility functions for Hipster *)
 
 signature HIPSTER_UTILS =
 sig 
@@ -38,8 +38,11 @@ fun frees_and_tfrees_of_thm thm =
 
 fun add_consts_of_thy (thynm, t) consts = 
     case t of
-      Const(nm,_) => if (String.isPrefix thynm nm) 
-                      then insert (op =) nm consts else consts
+      (* FIXME: for now we remove those logic theories we know will be present : need to find a way
+                of having "included" "own" theories *)
+      Const(nm,_) => if (String.isPrefix "Pure" nm orelse String.isPrefix "HOL" nm)
+                      then consts
+                      else insert (op =) nm consts
     | Abs(_,_,body) => add_consts_of_thy (thynm,body) consts
     | t1$t2 => add_consts_of_thy (thynm, t1) (add_consts_of_thy (thynm,t2) consts) 
     | _ => consts;
