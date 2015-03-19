@@ -28,8 +28,8 @@ by hipster_induct_simp_metis
 apply(simp_all)
 done*)
 
-lemma lemma_ac [thy_expl]: "notNil (maps x2 y2) = notNil y2"
-by hipster_induct_simp_metis
+lemma lemma_ac [thy_expl]: "(Nil \<noteq> (maps x2 y2)) = (Nil \<noteq> y2)"
+by hipster_induct_simp_metis (* just metis *)
 (*apply(induction y2)
 apply(simp_all)
 done*)
@@ -44,12 +44,8 @@ apply(induction y rule: init.induct)
 apply(simp_all)
 done*)
 
-lemma auxNilIn : "\<not> (notNil x) \<Longrightarrow> init x = tail x"
-(*apply(case_tac x)
-apply(simp_all)*)
-by hipster_induct_simp_metis (*apply(induction x)
-apply(simp, simp)
-done*)
+lemma auxNilIn : "init Nil = tail Nil"
+by (metis init.simps tail.simps)
 
 lemma unknown02 [thy_expl]: "init (tail x) = tail (init x)"
 by hipster_induct_schemes (*
@@ -94,6 +90,9 @@ done*)
 lemma lastDef: "\<not> notNil ts \<Longrightarrow> last (Cons t ts) = t"
 by (hipster_induct_simp_metis Listing.notNil.simps Listing.last.simps)
 
+lemma lastDef' : "last (Cons t Nil) = t"
+by(tactic {* Tactic_Data.routine_tac @{context} *})
+
 (* auxiliary *)
 lemma noElems: "count t Nil = Z"
 by simp
@@ -105,8 +104,8 @@ hipster_cond notNil app init*)
 
 (* XXX: shall we try and have some reasonable decision as to which argument + function to start inducting upon?
   eg: inner-most-left-most *)
-lemma initLast: "notNil ts \<Longrightarrow> app (init ts) (Cons (last ts) Nil) = ts"
-by hipster_induct_schemes
+lemma initLast: "ts \<noteq> Nil \<Longrightarrow> app (init ts) (Cons (last ts) Nil) = ts"
+by (hipster_induct_schemes)
 (*by (hipster_induct_schemes Listing.notNil.simps Listing.init.simps Listing.app.simps Listing.last.simps)*)
 (* by hipster_induct_schemes : succeeds but takes long because it tries first notNil.induct, app.induct
     and then init.induct *)(*
@@ -149,9 +148,9 @@ done*)
 
 lemma lastAppNil: "\<not> notNil ts \<Longrightarrow> last (app rs ts) = last rs"
 by (hipster_induct_schemes appNil) (* needs it! *)
-
+(*
 lemma countDiff: "\<not> eqN r t \<Longrightarrow> count r (app (Cons t Nil) ts) = count r ts"
-by (hipster_induct_simp_metis)
+by (hipster_induct_simp_metis)*)
 
 lemma countInc: "eqN r t \<Longrightarrow> count r (Cons t ts) = S (count r ts)"
 by (hipster_induct_simp_metis)

@@ -37,8 +37,8 @@ by (hipster_induct_simp_metis insLen)
 lemma appZips  : "len a = len b \<Longrightarrow> app (zip a b) (zip c d) = zip (app a c) (app b d)"
 apply(induction a b rule: zip.induct)
 apply(simp_all)
-apply(drule len0)
-by (simp_all)
+by (metis app.simps len.simps List.exhaust Nat.distinct)
+
 
 lemma auxRev : "rev (rev (Cons a Nil)) = Cons a Nil"
 by (tactic {* Tactic_Data.routine_tac @{context} *})

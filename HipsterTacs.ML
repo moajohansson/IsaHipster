@@ -90,7 +90,7 @@ fun timed_metis_tac ctxt facts i thm =
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
 fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
-    (SOLVE_TIMEOUT 5000((simp_all ctxt (facts @ lemmas)) (* TRY *) (* FIXME: both facts and lemmas? *)
+    (SOLVE_TIMEOUT 6000((simp_all ctxt (facts @ lemmas)) (* TRY *) (* FIXME: both facts and lemmas? *)
           THEN
           IF_UNSOLVED
           (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))) thm (*end;*)
@@ -208,7 +208,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
           (Induct.induct_tac (* Induction.induction_tac ?? *)
                          ctxt' false instss [non_ithings](*[non_ithings @ otherfrees]*) [] rule [] i goalthm)
           (* FIXME: dirty hack until I find out how to check before instantiating the induction *)
-            handle ERROR t => let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end
+            handle ERROR t => let val _ = Pretty.writeln (Pretty.str (" >>")) (* ERROR : " ^ t))*) in Seq.empty end
       (*val _ = Pretty.writeln (Pretty.str ((Library.space_implode " ? " (map (fn (cases, thm) =>
           (Library.space_implode " " (map (fn (s,_) => s) cases))
           ^ ": " ^ (Pretty.string_of (pretty_thm @{context} thm))) (Seq.list_of nw_thms')))^"\n")) ;*)
