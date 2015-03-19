@@ -24,7 +24,7 @@ end
 structure Hipster_Tacs  : HIPSTER_TACS  =
 struct
 
-type hardtac = Proof.context -> thm list option -> string -> int -> tactic
+type hardtac = Proof.context -> thm list option -> string option -> int -> tactic
 
 fun SOLVE_TIMEOUT mseconds tac t = 
     let
@@ -143,19 +143,21 @@ fun inductable_things_in_sg i th =
       (Thm.theory_of_thm th) 
       (Library.nth (prems_of th) (i - 1));
 
+fun infer_term x ctxt =
+     let val (T, ctxt') = Proof_Context.inferred_param x ctxt
+     in (Free (x, T), ctxt') end;
+
+
 (* Rule can be NONE if we just want plain structural induction. *)
 (* var is the variable we want to do induction on *)
-fun induct_on_var_tac rule var i goalthm = 
+fun induct_on_var_tac ctxt rule var i goalthm = 
     let
-        (*Dummy context for the sake of Isar*)
-      val ctxt = Proof_Context.init_global (Thm.theory_of_thm goalthm);
       val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
-      val (otherfrees, inductfrees) = mk_induct_insts ithings [var];
+      val vs = case var of NONE => [] | SOME v => [v]
+      val (otherfrees, inductfrees) = mk_induct_insts ithings vs
       val insts = [map (fn NONE => NONE | SOME v => 
-                                          (* FIXME: Each variable paired with false?
-                                           -- changed : testing : matters not in our case since we are wrapping them with 'Free' *)
                                           SOME (NONE : Binding.binding option,(Free v,false)))
-                         inductfrees];
+                         inductfrees]
          (* Throw away Isar related stuff and only take the Thm.thm seq *)
       val nw_thms = 
           Seq.map snd (Induct.induct_tac
@@ -172,11 +174,11 @@ fun induct_on_var_tac rule var i goalthm =
 
 (* Apply induction on var and try to prove all cases by simp *)
 fun induct_and_simp lemmas ctxt rule var i = 
-     (induct_on_var_tac rule var i) THEN (prove_by_simp ctxt lemmas);
+     (induct_on_var_tac ctxt rule var i) THEN (prove_by_simp ctxt lemmas);
 
 (* Induction on var, then try to prove resulting subgoals by simp or metis *)
 fun induct_simp_or_metis (facts, lemmas) ctxt rule var i = 
-    (induct_on_var_tac rule var i) THEN (simp_or_metis ctxt (facts,lemmas));
+    (induct_on_var_tac ctxt rule var i) THEN (simp_or_metis ctxt (facts,lemmas));
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
 fun try_induct_on ctxt rule strat vars i  =
@@ -184,7 +186,7 @@ fun try_induct_on ctxt rule strat vars i  =
        of [] => no_tac 
         | (v :: vs) =>  
           (*(induct_simp_or_metis ctxt facts rule v i)*)
-          strat ctxt rule v i
+          strat ctxt rule (SOME v) i
           ORELSE 
           (try_induct_on ctxt rule strat vs i);
 
