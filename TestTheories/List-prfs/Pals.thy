@@ -31,6 +31,21 @@ fun headD :: "'a DubL \<Rightarrow> 'a" where
 | "headD (FrontBack x ts y) = x"
 
 
+thm sorted.induct
+thm List.induct
+thm drop.induct
+thm take.induct
+thm app.induct
+
+lemma dropTake : "ts = app (take n ts) (drop n ts)" (* XXX: ill-instantiation again... *)
+apply(induction ts)
+apply (metis Listing.drop.simps(1) Listing.drop.simps(2) Listing.take.simps(1) Listing.take.simps(2) Nat.exhaust app.simps(1))
+sledgehammer
+by hipster_induct_schemes (*
+apply(induction ts rule: take.induct)
+apply(case_tac n)
+apply(simp_all)
+done*)
 
 
 (*
@@ -54,16 +69,21 @@ by (metis List.exhaust Listing.last.simps(2) app.simps)
 lemma lastElemIsLastR: "last (app ts (Cons t Listing.Nil)) = t"
 (* apply(induction ts rule: last.induct)  apply(simp_all) *)
 by (hipster_induct_schemes)
-
+*)
 lemma firstLast: "ts \<noteq> Listing.Nil \<Longrightarrow> head ts = last (rev ts)"
+apply(induction ts)
+apply(simp_all)
+sledgehammer
 (* apply(induction ts)  by (simp_all add: lastElemIsLast) *)
 by (metis Listing.rev.simps(2) head.cases head.simps lastElemIsLast)
 
 lemma firstLastD: "ts \<noteq> Nil \<Longrightarrow> headD ts = lastD (revD ts)"
+by (metis headD.simps is_pal.elims(2) is_pal.elims(3) lastD.simps revD.simps)
+
+(*
 by (tactic {*ALLGOALS( Hipster_Tacs.timed_metis_tac @{context} @{thms
       headD.simps is_pal.elims(2) is_pal.elims(3) lastD.simps revD.simps}) *})
 *)
-
 
 (*
 fun dropD :: "Nat \<Rightarrow> 'a DubL \<Rightarrow> 'a DubL" where

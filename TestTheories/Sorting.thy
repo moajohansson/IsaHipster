@@ -1,6 +1,6 @@
 theory Sorting
 imports Main
-        Nat
+        Naturals
         Listing
 begin
 

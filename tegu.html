@@ -58,28 +58,38 @@ Eg: required when reasoning about sorting algorithsm, treating different branche
 
 ---
 
-# Why do we even need them
+# Why conditional lemmas
+
+Equational lemmas: useful properties and insight.
+
+Reasoning within a specific frame or context => restriction over the structure of objects involved:
+
+- during a (stuck) proof attempt: branching on cases
+
+- invariants: preservation of (data)type invariants
+  
+- algorithm/method correction
+
+Enable automated proofs of later lemmas => enable discovering more lemmas!
+
+
+???
 
 Equational lemmas: can give useful properties and insight into a mathematical structure, however, it is very often the case that reasoning takes place within a specific frame or context where the structure of objects involved is restricted.
 
-Reasoning within a specific frame or context: restriction over the structure of objects involved (hypothesis):
-
-- during a (stuck) proof attempt: branching on cases
-	* construction => structural
-	* complex condition/property => induction-recurison
-- invariants: algorithm/method correction
-- enable automated proofs of later lemmas => enable discovering more lemmas!
-- interest in their own right
-
 Already existing built-in automated tactics of Isabelle may fail to provide a proof at that stage; theory exploration might reveal interesting lemmas conditioned by the current context that were missing.
+
+Gradual refining to get to the bigger theorems.
+
+---
+
+## Isabelle/HOL + Hipster
+
+All, of course, under the umbrella of induction (inductive invariants)
 
 Induction: repetition: recursion or iteration.
 
 Inductive proofs relying in other lemmas, also solved inductively.
-
-
-
----
 
 ## Examples
 
@@ -96,42 +106,108 @@ eg: insertion sort correctness `sorted (isort ts)` requires
 sorted ts ==> sorted (insert t ts)
 ```
 
+???
+
 Cannot be discovered or handled.
 
 ---
 
 ## Extensions required
 
-- Postulate conditional lemmas: open question how to speculate interesting side-conditions (given some definition being analysed, or an equation to be made true)
-	* too strong, too weak
-	* bound by constructor structure
-	* too many
+- Postulate conditional lemmas: how?
+	
+  * too strong, too weak
+  * bound by constructor structure
+  * combinatorial problem
 
-  Simplify this problem, as a first step: a given single predicate as a condition (extract from working context (stuck proof) or specified by a user)
-    
-  * even nat
-	* sorted list
-- Automated tactic: conditionals not proven yet by Hipster's tactic
-	* tactic supporting conditionals requiring induction
-	* prune away trivial proofs
+  => Simplify: have a given condition
+  
+  * extract from working context
+  * user-specified
+
+- Automated induction tactic extension	
+  * conditionals requiring induction
+
+???
+
+How to speculate interesting side-conditions?
+
+as a first step: a given single predicate as a condition (extract from working context (stuck proof) or specified by a user)
+
+conditionals not proven yet by Hipster's tactic
+
+* even nat
+* sorted list
+
+prune away trivial proofs
 
 ---
+name: ingredients
 
-# A tactic for conditionals
+# A tactic (not only) for conditionals
 
-- Simplification as a building block
+Automation ingredients:
+
+- Induction
+
+- Simplification
+
 - Metis FO prover
-- not reasonable to consider some of other tactics (most primitive tactics ones) in a purely automated setting
+
+???
+
+not reasonable to consider some of other tactics (most primitive tactics ones) in a purely automated setting
 
 ---
+template: ingredients
 
-## First stop: Induction-recursion
+But...
 
-IN RELATION TO THE WAY IN WHICH IT IS CONSTRUCTED
+* What to induct on?
+
+* Simplifier rules?
+
+* Facts for Metis?
+
+---
+name: first-stop
+
+## First stop: Recursion induction
+
+Conditionals:
+
+* construction => structural induction
+
+* recursive condition/property => recursion induction
+
 
 Isolate structural (sub)units not represented in the implementational construction.
 
+???
+
+IN RELATION TO THE WAY IN WHICH IT IS CONSTRUCTED
+
+---
+template: first-stop
+
+
+```isabelle
+?P Nil ⟹ (⋀a List. ?P List ⟹ ?P (Cons a List)) ⟹ ?P ?List
+```
+```isabelle
+(⋀ts. ?P Z ts) ⟹ (⋀v. ?P (S v) Nil) ⟹ 
+(⋀n t ts. ?P n ts ⟹ ?P (S n) (Cons t ts)) ⟹ ?P ?a0.0 ?a1.0
+```
+```isabelle
+?P Nil ⟹ (⋀uu_. ?P (Cons uu_ Nil)) ⟹
+(⋀r t ts. ?P (Cons t ts) ⟹ ?P (Cons r (Cons t ts))) ⟹ ?P ?a0.0
+```
+
+???
+
 Isabelle: induction schemata derived from recursive functions => good candidates to consider in Hipster's tactics.
+
+---
 
 Several steps of metis can be reduced
 eg: count01 @ MediumL
@@ -144,12 +220,11 @@ lemma dropTake : "ts = app (take n ts) (drop n ts)"
 by hipster_induct_schemes
 ```
 
----
 
 ```isabelle
 lemma initTailLen: "len (init x) = len (tail x)"
 apply(induction x)
-apply (metis init.simps(1) tail.simps(1) )
+apply (metis init.simps(1) tail.simps(1))
 by (metis head.cases init.simps(2) init.simps(3) len.simps(2) tail.simps(2))
 ```
 
@@ -162,8 +237,6 @@ by hipster_induct_schemes
 
 ## [0] Structure - construction vs operations
 
-Motivation example for considering induction-recursion schemata.
-
 
 ```isabelle
 datatype 'a list  = Nil | Cons'a "'a list"
@@ -171,11 +244,11 @@ datatype 'a openL = Nil | Sing 'a | FrontBack 'a "'a openL" 'a
 ```
 ```isabelle
 fun lastD :: "'a openL ⇒ 'a" where
-  "lastD (Sing t) = t"
+  "lastD (Sing t)           = t"
 | "lastD (FrontBack x ts y) = y"
 
 fun headD :: "'a openL ⇒ 'a" where
-  "headD (Sing t) = t"
+  "headD (Sing t)           = t"
 | "headD (FrontBack x ts y) = x"
 
 ```
@@ -188,30 +261,47 @@ fun last :: "'a List ⇒ 'a" where
 | "last (Cons _ ts)  = last ts"
 ```
 
+???
+
+Motivation example for considering induction-recursion schemata.
+
 ---
+name: front-back
+
+## [0] Structure - construction vs operations
 
 ```isabelle
-lemma lastElemIsLast: "last (app ts (Cons t Listing.Nil)) = t"
+fun revD :: "'a DubL ⇒ 'a DubL" where
+  "revD Nil                = Nil"
+| "revD (Sing x)           = Sing x"
+| "revD (FrontBack t xs r) = FrontBack r (revD xs) t"
+
+fun rev :: "'a List ⇒ 'a List" where
+  "rev Nil         = Nil"
+| "rev (Cons r ts) = app (rev ts) (Cons r Nil)"
+```
+
+Using sledgehammer...
+```isabelle
+lemma lastElemIsLast: "last (app ts (Cons t Nil)) = t"
 apply(induction ts)
 apply(simp_all)
-by (metis List.exhaust Listing.last.simps(2) app.simps)
+sledgehammer
+by (metis List.exhaust last.simps(2) app.simps)
+```
 
-lemma lastElemIsLastR: "last (app ts (Cons t Listing.Nil)) = t"
+---
+template: front-back
+
+and...
+```isabelle
+lemma lastElemIsLastR: "last (app ts (Cons t Nil)) = t"
 by (hipster_induct_schemes)
 ```
 
 ---
 
-```isabelle
-fun revD :: "'a DubL ⇒ 'a DubL" where
-  "revD Nil = Nil"
-| "revD (Sing x) = Sing x"
-| "revD (FrontBack t xs r) = FrontBack r (revD xs) t"
 
-fun rev :: "'a List ⇒ 'a List" where
-  "rev Nil = Nil"
-| "rev (Cons r ts) = app (rev ts) (Cons r Nil)"
-```
 ```isabelle
 lemma firstLast: "ts ≠ Listing.Nil ⟹ head ts = last (rev ts)"
 by (metis Listing.rev.simps(2) head.cases head.simps lastElemIsLast)
@@ -274,12 +364,12 @@ apply(simp_all)
 by (metis app.simps len.simps List.exhaust Nat.distinct)
 ```
 		
----
-
 More refinement needed
 
 - taking care of lemma subsumption
+
 - heuristic to define an order of proving
+
 - refine lemmas passed on to tactics (`simp`, `metis`, etc.): execution time
 
  
