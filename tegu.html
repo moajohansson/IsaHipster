@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Towards conditional lemma discovery in Hipster</title>
+    <title>Towards conditional laws in Hipster</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
       @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -27,12 +27,12 @@
 
 class: center, middle
 
-# Towards conditional lemma discovery
+# Towards conditional laws
 # in Hipster
 
 Irene Lobo Valbuena @ CTH
 
-On-going MSc project
+On-going MSc thesis
 
 
 .footnote[
@@ -83,7 +83,24 @@ Gradual refining to get to the bigger theorems.
 
 ---
 
-## Isabelle/HOL + Hipster
+.center[![](umbrella-s.gif)]
+
+Operation properties
+
+```isabelle
+xs ≠ [] ⟹  head (xs @ ys) = head xs
+
+```
+
+Algorithm correctness
+
+```isabelle
+sorted ts ⟹  sorted (insert t ts)
+```
+.footnote[
+  {img source - http://paulscottinfo.ipage.com/fractals/}
+]
+???
 
 All, of course, under the umbrella of induction (inductive invariants)
 
@@ -91,22 +108,9 @@ Induction: repetition: recursion or iteration.
 
 Inductive proofs relying in other lemmas, also solved inductively.
 
-## Examples
+Operation properties
 
-```isabelle
-xs ≠ [] ==> head (xs @ ys) = head xs
-
-```
-
-Sorting algorithms
-
-eg: insertion sort correctness `sorted (isort ts)` requires
-
-```isabelle
-sorted ts ==> sorted (insert t ts)
-```
-
-???
+ `sorted (isort ts)` requires
 
 Cannot be discovered or handled.
 
@@ -209,38 +213,12 @@ Isabelle: induction schemata derived from recursive functions => good candidates
 
 ---
 
-Several steps of metis can be reduced
-eg: count01 @ MediumL
-
-Or a case distinction can be saved (also saves metis steps)
-eg: dropTake @ MediumL
-
-```isabelle
-lemma dropTake : "ts = app (take n ts) (drop n ts)"
-by hipster_induct_schemes
-```
-
-
-```isabelle
-lemma initTailLen: "len (init x) = len (tail x)"
-apply(induction x)
-apply (metis init.simps(1) tail.simps(1))
-by (metis head.cases init.simps(2) init.simps(3) len.simps(2) tail.simps(2))
-```
-
-```isabelle
-lemma initTailLen [thy_expl]: "len (init x) = len (tail x)"
-by hipster_induct_schemes
-```
-
----
-
 ## [0] Structure - construction vs operations
 
 
 ```isabelle
-datatype 'a list  = Nil | Cons'a "'a list"
-datatype 'a openL = Nil | Sing 'a | FrontBack 'a "'a openL" 'a
+datatype 'a list  = Nil  | Cons'a "'a list"
+datatype 'a openL = Stop | Sing 'a | FrontBack 'a "'a openL" 'a
 ```
 ```isabelle
 fun lastD :: "'a openL ⇒ 'a" where
@@ -271,8 +249,8 @@ name: front-back
 ## [0] Structure - construction vs operations
 
 ```isabelle
-fun revD :: "'a DubL ⇒ 'a DubL" where
-  "revD Nil                = Nil"
+fun revD :: "'a openL ⇒ 'a openL" where
+  "revD Stop               = Stop"
 | "revD (Sing x)           = Sing x"
 | "revD (FrontBack t xs r) = FrontBack r (revD xs) t"
 
@@ -293,69 +271,162 @@ by (metis List.exhaust last.simps(2) app.simps)
 ---
 template: front-back
 
-and...
+Recursion induction scheme...
+```isabelle
+lemma lastElemIsLastR: "last (app ts (Cons t Nil)) = t"
+apply(induction ts rule: last.induct)
+by simp_all
+```
+
+---
+template: front-back
+
+Automation!
 ```isabelle
 lemma lastElemIsLastR: "last (app ts (Cons t Nil)) = t"
 by (hipster_induct_schemes)
 ```
 
 ---
+name: first-last
 
+## [0] Structure - construction vs operations
 
 ```isabelle
-lemma firstLast: "ts ≠ Listing.Nil ⟹ head ts = last (rev ts)"
-by (metis Listing.rev.simps(2) head.cases head.simps lastElemIsLast)
+fun revD :: "'a openL ⇒ 'a openL" where
+  "revD Stop               = Stop"
+| "revD (Sing x)           = Sing x"
+| "revD (FrontBack t xs r) = FrontBack r (revD xs) t"
 
-lemma firstLastD: "ts ≠ Nil ⟹ headD ts = lastD (revD ts)"
-by (tactic {*ALLGOALS( Hipster_Tacs.timed_metis_tac @{context} @{thms
-      headD.simps is_pal.elims(2) is_pal.elims(3) lastD.simps revD.simps})*})
+fun rev :: "'a List ⇒ 'a List" where
+  "rev Nil         = Nil"
+| "rev (Cons r ts) = app (rev ts) (Cons r Nil)"
 ```
 
----
-## [1] last, drop
+Requires an auxiliary lemma (theory exploration!)
+```isabelle
+lemma firstLast: "ts ≠ Nil ⟹ head ts = last (rev ts)"
+by (metis rev.simps(2) head.cases head.simps lastElemIsLast)
+```
+```isabelle
+lemma firstLastD: "ts ≠ Stop ⟹ headD ts = lastD (revD ts)"
+by (metis DubL.exhaust headD.simps lastD.simps revD.simps)
+```
+
+???
+
+Both reproducible with:
+
+by hipster_induct_simp_metis
+
++ auxiliary lemma
 
 ---
+
+## [1] take & drop
+
+```isabelle
+(⋀ts. ?P Z ts) ⟹ (⋀v. ?P (S v) Nil) ⟹ 
+(⋀n t ts. ?P n ts ⟹ ?P (S n) (Cons t ts)) ⟹ ?P ?a0.0 ?a1.0
+```
+
+```isabelle
+lemma dropTake : "ts = app (take n ts) (drop n ts)"
+apply(induction ts)
+sledgehammer
+apply (metis drop.simps(1) drop.simps(2) take.simps(1) take.simps(2)
+  Nat.exhaust app.simps(1))
+sledgehammer
+```
+
+=> Time-out
+
+```isabelle
+lemma dropTake : "ts = app (take n ts) (drop n ts)"
+by hipster_induct_schemes
+```
+
+???
+
+Reduced metis steps
+
+Really requires induction scheme drop.induct
+
+---
+name: sorting
 
 ## [2] sorting
 
 ```isabelle
+?P Nil ⟹ (⋀uu_. ?P (Cons uu_ Nil)) ⟹
+(⋀r t ts. ?P (Cons t ts) ⟹ ?P (Cons r (Cons t ts))) ⟹ ?P ?a0.0
+```
+
+```isabelle
 lemma insSortInvar : "sorted ts ⟹ sorted (insert t ts)"
-by hipster_induct_schemes (*
 apply(induction ts rule: sorted.induct)
-apply(simp_all add: leqRev)
-by metis*)
+apply(simp_all)
+by metis
 
 lemma isortSorts : "sorted (isort ts)"
 by (hipster_induct_simp_metis insSortInvar)
 ```
 
 ---
+name: sorting
 
-## Overall
+## [2] sorting
 
-Helps in automation, less manual work (choosing more specific things to pass on to metis, quite a lot sometimes)
+```isabelle
+?P Nil ⟹ (⋀uu_. ?P (Cons uu_ Nil)) ⟹
+(⋀r t ts. ?P (Cons t ts) ⟹ ?P (Cons r (Cons t ts))) ⟹ ?P ?a0.0
+```
 
-# Underlying tools
+```isabelle
+lemma insSortInvar : "sorted ts ⟹ sorted (insert t ts)"
+by hipster_induct_schemes
 
-- HipSpec
-- QuickSpec: limitations
-	* strong equational support
-	* theory exploration for a single unary predicate at a time
+lemma isortSorts : "sorted (isort ts)"
+by (hipster_induct_simp_metis insSortInvar)
+```
 
-So far
+---
+template: sorting
 
-- Conditional lemma provided/suggested by user; try to prove
-- predicate provided by the user: limited exploration; suggestions automatically proven or *left as an exercise*
+```isabelle
+lemma isortIds : "sorted ts ⟹ isort ts = ts"
+by hipster_induct_schemes
+
+lemma kerIsort : "isort (isort ts) = isort ts"
+by (metis isortSorts isortIds)
+
+lemma isortIdsP : "sorted ts ⟹ sorted (isort ts)"
+by (metis isortSorts)
+```
+
+???
+
+timeouts when no rules...
 
 ---
 
-Full automation is hard
+# Overall
 
-- common to need more than one induction
+**Advance towards automation**
 
-		search for more than one example
+More refinement needed
 
-- common to need simultaneous induction
+- Side-condition vs conclusion driven induction?
+
+- Heuristics: variables to favour
+
+- Simpset?
+
+**Full automation is hard**
+
+- Single induction per proof attempt - need for more: bound?
+
+- Common need for simultaneous induction
   
 ```isabelle 
 lemma appZips: "len a = len b ⟹ app (zip a b) (zip c d) = zip (app a c) (app b d)"
@@ -363,15 +434,66 @@ apply(induction a b rule: zip.induct)
 apply(simp_all)
 by (metis app.simps len.simps List.exhaust Nat.distinct)
 ```
-		
-More refinement needed
+
+???
+
+Less stuff passed on to metis, less manual
 
 - taking care of lemma subsumption
-
 - heuristic to define an order of proving
-
 - refine lemmas passed on to tactics (`simp`, `metis`, etc.): execution time
 
+reasonable bound to number of inducitons?
+
+---
+
+# Next: theory exploration
+
+## Underlying tools
+
+- HipSpec
+
+- QuickSpeck
+	* strong equational support
+	* more to come up!
+
+## First focus
+
+- User-supplied conditions
+- Condition extraction from context
+
+???
+
+Conditional lemma provided/suggested by user; try to prove
+
+predicate provided by the user: limited exploration; suggestions automatically proven or *left as an exercise*
+
+---
+
+class: center, middle
+
+# Q ⟹  ?'a
+
+---
+
+# Sort functions
+
+```isabelle
+fun sorted :: "Nat List ⇒ bool" where
+  "sorted Nil                   = True"
+| "sorted (Cons _ Nil)          = True"
+| "sorted (Cons r (Cons t ts))  = (leq r t ∧ sorted (Cons t ts))"
+
+fun insert :: "Nat ⇒ Nat List ⇒ Nat List" where
+  "insert r Nil         = Cons r Nil"
+| "insert r (Cons t ts) = (if leq r t
+      then Cons r (Cons t ts)
+      else (Cons t (insert r ts)))"
+
+fun isort :: "Nat List ⇒ Nat List" where
+  "isort Nil         = Nil"
+| "isort (Cons t ts) = insert t (isort ts)"
+```
  
     </textarea>
     <script type="text/javascript">
