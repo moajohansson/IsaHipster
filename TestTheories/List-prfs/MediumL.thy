@@ -38,6 +38,7 @@ by (hipster_induct_simp_metis)
 
 lemma inRev: "elem t ts \<Longrightarrow> elem t (rev ts)"
 (* apply(induction ts)  apply(simp_all)  by (metis elem.simps(2) elem02 elem03) *)
+sledgehammer
 by (hipster_induct_simp_metis elem02 elem03 elem.simps(2))
 
 lemma lastAfterCons: "ts \<noteq> Nil \<Longrightarrow> last ts = last (Cons t ts)"
@@ -158,6 +159,23 @@ by simp
 lemma revNil: "ts = Nil \<Longrightarrow> rev ts = Nil"
 by hipster_induct_simp_metis
 
+
+
+
+
+
+hipster rotate len
+
+value "(3,4)"
+datatype 'a bitup = Bt 'a 'a
+
+datatype 'a ptree = Leaf 'a | Node "(('a bitup) ptree)"
+datatype 'a nest = NilN | ConsN "('a \<times> ('a bitup) nest)"
+datatype 'a bush = Ro | Bu "(('a bush) bush)"
+
+(*hipster rotate app*)
+
+thm rotate.induct
 lemma rotSelf : "rotate n (app xs xs) = app (rotate n xs) (rotate n xs)"
 apply(induction xs rule: rotate.induct)
 apply(simp_all)

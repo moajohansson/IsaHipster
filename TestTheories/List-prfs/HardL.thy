@@ -89,7 +89,7 @@ by (tactic {* Tactic_Data.routine_tac @{context} *})
 lemma revZip: "len rs = len ts \<Longrightarrow> rev (zip rs ts) = zip (rev rs) (rev ts)"
 (*apply (hipster_induct_simp_metis)*)
 apply(induction rs ts rule: zip.induct)
-apply(simp_all)
+apply(simp_all (*add: appZips*))
 oops
 
 end

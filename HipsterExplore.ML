@@ -20,7 +20,7 @@ fun try_nxt_conj ctxt =
             else NONE
 
     | (c::cs) => (* try proving next open conj *)
-      if length ( ThyExpl_Data.proved_of_ctxt ctxt) > 10 then SOME (ctxt |> ThyExpl_Data.set_open_conjs_ctxt cs
+      if length ( ThyExpl_Data.proved_of_ctxt ctxt) > 50 then SOME (ctxt |> ThyExpl_Data.set_open_conjs_ctxt cs
                                                                          |> ThyExpl_Data.add_failed_ctxt c)
                                                          else
          if (length (snd (Hipster_Utils.frees_and_tfrees_of_thm c)) > 2) then ctxt |> ThyExpl_Data.set_open_conjs_ctxt cs
@@ -129,7 +129,7 @@ fun proof_loop ctxt facts fact_nms cand_lemmas_str =
 
 (* TODO: Implement properly. This is for mapping back to Isabelle constants those things that the
  code generator renamnes in Haskell. Otherwise, Isabelle will not understand the resulting lemmas. *)
-val haskell_consts = [("List.rev","reverse"),("List.append","++"), ("HOL.conj", " '&&' "),
+val haskell_consts = [("List.rev","reverse"),("List.append","++"), (*("HOL.conj", " '&&' "),*)
                       ("Groups.plus_class.plus", "plus_nat"), ("Groups.zero_class.zero", "Zero_nat"),
                       ("Groups.one_class.one", "one_nat")]
 
