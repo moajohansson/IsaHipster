@@ -42,7 +42,7 @@ fun SOLVE_TIMEOUT mseconds tac t =
                       | ERROR _ => NONE
     in
       case res of
-        NONE => Seq.empty (* let val _ = Pretty.writeln (Pretty.str "Timeout :(") in Seq.empty end *)
+        NONE => (*Seq.empty*) let val _ = Pretty.writeln (Pretty.str "Timeout :(") in Seq.empty end
       | SOME t' => Seq.single t'
     end;
 
@@ -83,14 +83,14 @@ to the simpset for some reason. *)
 (* Apply simp, if that doesn't work try metis.  *)
 fun timed_metis_tac ctxt facts i thm = 
     (*let val _ = Pretty.writeln (Pretty.block [Pretty.str "timed_metis: ",pretty_thm ctxt thm]) in*)
-    (SOLVE_TIMEOUT 3000
+    (SOLVE_TIMEOUT 1000
     (Metis_Tactic.metis_tac [ATP_Proof_Reconstruct.full_type_enc]
       ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm(* end*);
 
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
 fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
-    (SOLVE_TIMEOUT 6000((simp_all ctxt (facts @ lemmas)) (* TRY *) (* FIXME: both facts and lemmas? *)
+    (SOLVE_TIMEOUT 4000((simp_all ctxt (facts @ lemmas)) (* TRY *) (* FIXME: both facts and lemmas? *)
           THEN
           IF_UNSOLVED
           (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))) thm (*end;*)
