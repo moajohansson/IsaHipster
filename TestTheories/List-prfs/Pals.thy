@@ -5,28 +5,28 @@ imports Main
         "../Sorting"
 begin
 
-datatype 'a DubL = Stop | Sing 'a | FrontBack 'a "'a DubL" 'a
+datatype 'a openL = Stop | Sing 'a | FrontBack 'a "'a openL" 'a
 (*
-fun is_pal :: "'a DubL \<Rightarrow> bool" where
+fun is_pal :: "'a openL \<Rightarrow> bool" where
   "is_pal Nil = True"
 | "is_pal (Sing x) = True"
 | "is_pal (FrontBack t xs r) = (t = r \<and> is_pal xs)"*)
 
-fun lenD :: "'a DubL \<Rightarrow> Nat" where
+fun lenD :: "'a openL \<Rightarrow> Nat" where
   "lenD Stop = Z"
 | "lenD (Sing x) = S Z"
 | "lenD (FrontBack _ xs _) = S (S (lenD xs))"
 
-fun revD :: "'a DubL \<Rightarrow> 'a DubL" where
+fun revD :: "'a openL \<Rightarrow> 'a openL" where
   "revD Stop = Stop"
 | "revD (Sing x) = Sing x"
 | "revD (FrontBack t xs r) = FrontBack r (revD xs) t"
 
-fun lastD :: "'a DubL \<Rightarrow> 'a" where
+fun lastD :: "'a openL \<Rightarrow> 'a" where
   "lastD (Sing t) = t"
 | "lastD (FrontBack x ts y) = y"
 
-fun headD :: "'a DubL \<Rightarrow> 'a" where
+fun headD :: "'a openL \<Rightarrow> 'a" where
   "headD (Sing t) = t"
 | "headD (FrontBack x ts y) = x"
 
@@ -36,6 +36,13 @@ thm List.induct
 thm drop.induct
 thm take.induct
 thm app.induct
+
+thm headD.induct
+thm openL.induct
+thm lastD.induct
+thm List.induct
+thm last.induct
+thm head.induct
 
 lemma dropTake : "ts = app (take n ts) (drop n ts)"
 by hipster_induct_schemes (*
@@ -59,7 +66,7 @@ by (hipster_induct_simp_metis insSortInvar)
 lemma isortIdsP : "sorted ts \<Longrightarrow> sorted (isort ts)"
 by (metis isortSorts)
 
-lemma kerIsort : "isort (isort ts) = isort ts"
+lemma isortFixes : "isort (isort ts) = isort ts"
 by (metis isortSorts isortIds)
 
 lemma insSomeInsorted : "sorted ts \<Longrightarrow> isort (insert t ts) = insert t ts"
@@ -82,7 +89,7 @@ by (metis Listing.rev.simps(2) head.cases head.simps lastElemIsLast)
 lemma firstLastD: "ts \<noteq> Stop \<Longrightarrow> headD ts = lastD (revD ts)"
 by (hipster_induct_simp_metis )
 
-(* by (metis DubL.exhaust headD.simps lastD.simps revD.simps) *)
+(* by (metis openL.exhaust headD.simps lastD.simps revD.simps) *)
 
 (*
 by (tactic {*ALLGOALS( Hipster_Tacs.timed_metis_tac @{context} @{thms
@@ -104,14 +111,14 @@ by (metis List.exhaust Listing.last.simps(2))
 *)
 
 (*
-fun dropD :: "Nat \<Rightarrow> 'a DubL \<Rightarrow> 'a DubL" where
+fun dropD :: "Nat \<Rightarrow> 'a openL \<Rightarrow> 'a openL" where
   "dropD _ Nil = Nil"
 | "dropD Z ts  = ts"
 | "dropD (S n) (Sing _) = Nil"
 | "dropD (S n) (FrontBack x Nil y) = dropD n (Sing y)"
 | "dropD (S n) (FrontBack x ts y)  = *)
 (*
-fun appD :: "'a DubL \<Rightarrow> 'a DubL \<Rightarrow> 'a DubL" where
+fun appD :: "'a openL \<Rightarrow> 'a openL \<Rightarrow> 'a openL" where
   "appD Nil ts = ts"
 | "appD ts Nil = ts"
 | "appD (Sing x) (Sing y) = FrontBack x Nil y"
