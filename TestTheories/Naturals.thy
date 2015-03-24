@@ -70,6 +70,8 @@ fun lezp :: "Nat \<Rightarrow> bool" where
 fun lezpp :: "Nat \<Rightarrow> bool" where
   "lezpp x = eqN x Z"
 
+
+
 hipster leq lez
 (* TEST: hipster leq lez *)
 (* TEST: hipster_cond lezp leq *)

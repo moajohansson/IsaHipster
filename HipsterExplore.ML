@@ -43,6 +43,7 @@ fun try_nxt_conj ctxt =
         end
       | NONE =>
         let
+          (* (Proof_Context.init_global (Thm.theory_of_thm c) *)
           val res = SINGLE (Tactic_Data.hard_tac ctxt) c
         in
           (* Only care about first proof found *)

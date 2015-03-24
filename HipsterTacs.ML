@@ -42,7 +42,7 @@ fun SOLVE_TIMEOUT mseconds tac t =
                       | ERROR _ => NONE
     in
       case res of
-        NONE => (*Seq.empty*) let val _ = Pretty.writeln (Pretty.str "Timeout :(") in Seq.empty end
+        NONE => Seq.empty (*let val _ = Pretty.writeln (Pretty.str "Timeout :(") in Seq.empty end*)
       | SOME t' => Seq.single t'
     end;
 
@@ -145,8 +145,8 @@ fun mk_induct_insts ithings indnames =
 
 (* the free variables of a term that are of a datatype 
    (can have induction applied) *)
-fun inductable_things_in_term thry t = 
-    let 
+fun inductable_things_in_term thry t =
+    let
       fun lookup thy s =
           case (Datatype.get_info thy s) of
              NONE => NONE
@@ -157,21 +157,23 @@ fun inductable_things_in_term thry t =
       (*val _ = @{print} (Term.fastype_of t,  (Term.strip_all_body t))
       val tfs = Hipster_Utils.typ_tfrees_of (Term.fastype_of t)
       val _ = @{print} (length tfs)*)
-    in 
+      (*val _ = @{print} (Hipster_Utils.frees_of t)*)
+    in
       (* Return frees and forall quantified vars (if any) *)
       (* Split into those we can do structural induction over, and the rest *)
-       List.partition (datatype_chk o snd) 
-                     ((Hipster_Utils.frees_of t) @ 
-                     (Term.strip_all_vars t))
+       List.partition (datatype_chk o snd)
+                     ((Hipster_Utils.frees_of t) @
+                      (Term.strip_all_vars t))
     end;
 
 fun inductable_things_in_sg i th = 
-    inductable_things_in_term 
-      (Thm.theory_of_thm th) 
+    inductable_things_in_term
+      (Thm.theory_of_thm th)
       (Library.nth (prems_of th) (i - 1)); (* XXX: check how this might affect us *)
 
 fun infer_term x ctxt =
      let val (T, ctxt') = Proof_Context.inferred_param x ctxt
+         (*val _ = @{print} (x, T)*)
      in (Free (x, T), ctxt') end;
 fun bis x = Attrib.thms x ;
 fun induct_for_me ctxt xss rule i =
@@ -193,8 +195,8 @@ fun induct_on_var_tac ctxt rule var i goalthm =
       val (otherfrees, inductfrees) = (case var of
                                         NONE => mk_induct_insts ithings []
                                       | SOME v => mk_induct_insts ithings [v])
-      val (tss, ctxt') = (fold_map o fold_map) infer_term [case var of NONE => [] | SOME v=> [v]] ctxt
-      val instss = map (map (fn inst => SOME (NONE, (inst, false)))) tss;
+      (*val (tss, ctxt') = (fold_map o fold_map) infer_term [case var of NONE => [] | SOME v=> [v]] ctxt
+      val instss = map (map (fn inst => SOME (NONE, (inst, false)))) tss;*)
       val insts = map (fn NONE => NONE | SOME v => 
                                           (* FIXME: Each variable paired with false?
                                            -- changed : testing : matters not in our case since we are wrapping them with 'Free' *)
@@ -206,7 +208,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
           (map (fn (v,_) => v) otherfrees)) ]));
       val nw_thms' = 
           (Induct.induct_tac (* Induction.induction_tac ?? *)
-                         ctxt' false instss [non_ithings](*[non_ithings @ otherfrees]*) [] rule [] i goalthm)
+                         ctxt false [insts] [non_ithings](*[non_ithings @ otherfrees]*) [] rule [] i goalthm)
           (* FIXME: dirty hack until I find out how to check before instantiating the induction *)
             handle ERROR t => let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end
       (*val _ = Pretty.writeln (Pretty.str ((Library.space_implode " ? " (map (fn (cases, thm) =>

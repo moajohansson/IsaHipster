@@ -128,7 +128,14 @@ fun is_present ctxt thm =
       null (snd (Find_Theorems.find_theorems ctxt (SOME (sym RS thm)) (SOME 1) false crits))
     end
 
- 
+(* from the CookBook *)
+fun goal_prop str ctxt =
+    let
+      val prop = Syntax.read_prop ctxt str
+    in
+      Proof.theorem NONE (K I) [[(prop, [])]] ctxt
+    end
+
 (* Assmume get list of strings from HipSpec, which can be directly parsed as Isabelle terms *)
 fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
     let
