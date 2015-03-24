@@ -208,10 +208,15 @@ fun induct_on_var_tac ctxt rule var i goalthm =
           (Induct.induct_tac (* Induction.induction_tac ?? *)
                          ctxt' false instss [non_ithings](*[non_ithings @ otherfrees]*) [] rule [] i goalthm)
           (* FIXME: dirty hack until I find out how to check before instantiating the induction *)
-            handle ERROR t => let val _ = Pretty.writeln (Pretty.str (" >>")) (* ERROR : " ^ t))*) in Seq.empty end
+            handle ERROR t => let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end
       (*val _ = Pretty.writeln (Pretty.str ((Library.space_implode " ? " (map (fn (cases, thm) =>
           (Library.space_implode " " (map (fn (s,_) => s) cases))
           ^ ": " ^ (Pretty.string_of (pretty_thm @{context} thm))) (Seq.list_of nw_thms')))^"\n")) ;*)
+      val ant = Seq.list_of (Seq.map fst nw_thms')
+      val _ = if (null (filter null ant))
+                then @{print} "emtpy!"
+                else @{print} (@{make_string} (map (fn ls => map (fn t => ((fn s => String.size s = 0) o fst) t) ls)
+                                                ant))
       val nw_thms = Seq.map snd nw_thms'
       in
         nw_thms
