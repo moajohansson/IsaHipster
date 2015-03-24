@@ -71,6 +71,8 @@ apply(case_tac List)
 apply(simp_all)
 done *)
 
+lemma unknown04': " (Nil \<noteq> init x) = (Nil \<noteq> tail x)" (* required schemes: init.induct *)
+by hipster_induct_schemes
 
 (*
 fun noNat :: "Nat List \<Rightarrow> bool" where
