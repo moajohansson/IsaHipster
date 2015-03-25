@@ -58,8 +58,10 @@ lemma unknown [thy_expl]: "Sorted.sorted x \<Longrightarrow> isort x = x"
 oops
 
 (*hipster sorted ins isort*)
-hipster_cond sorted isort
-
+(*hipster_cond sorted isort*)
+ML {*
+  val _ = Proof_Context.init_global
+*}
 (*hipster_cond sorted isort leq sorted ins*)
 lemma lemma_ae [thy_expl]: "ins Z (isort x2) = isort (ins Z x2)"
 by (hipster_induct_simp_metis Sorted.sorted.simps Sorted.isort.simps Sorted.leq.simps Sorted.sorted.simps Sorted.ins.simps)

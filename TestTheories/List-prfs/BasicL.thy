@@ -205,5 +205,7 @@ apply(induction ts rule: drop.induct) (* XXX: either works! drop.induct OR take.
 apply(simp_all)
 done*)
 
+lemma mapIntersperse: "map f (intersperse a xs) = intersperse (f a) (map f xs)"
+by hipster_induct_schemes
 
 end

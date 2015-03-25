@@ -76,5 +76,10 @@ fun rotate :: "Nat \<Rightarrow> 'a List \<Rightarrow> 'a List" where
 | "rotate (S n) (Cons x xs) = rotate n (app xs (Cons x Nil))"
 | "rotate n     Nil         = Nil"
 
+fun intersperse :: "'a \<Rightarrow> 'a List \<Rightarrow> 'a List" where
+  "intersperse x Nil = Nil"
+| "intersperse x (Cons y Nil) = Cons y Nil"
+| "intersperse x (Cons y ys) = Cons y (Cons x (intersperse x ys))"
+
 end
 

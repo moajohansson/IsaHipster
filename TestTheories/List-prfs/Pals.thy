@@ -51,8 +51,8 @@ apply(case_tac n)
 apply(simp_all)
 done*)
 
-lemma leqRev [simp] : "\<not> leq r t \<Longrightarrow> leq t r" (* without other lemmas, requires schemes *)
-by hipster_induct_schemes
+lemma q1 : "sorted' (qsort xs)"
+
 
 lemma isortIds : "sorted ts \<Longrightarrow> isort ts = ts"
 by hipster_induct_schemes (* sorted.induct *)
