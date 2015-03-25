@@ -144,7 +144,7 @@ done*)
 lemma addId: "add m Z = m" (* will go down to structural induction? *)
 by hipster_induct_simp_metis (*
 apply(induction m)
-apply(auto)
+apply(simp_all)
 done*)
 
 lemma addIncreases: "leq n (add n m)" (* now succeeds in both *) (* oops in Hipster? *)
@@ -163,6 +163,7 @@ lemma subBounded: "sub n (add n m) = Z"
 by hipster_induct_simp_metis
 
 lemma noLowerZ: "leq n Z \<Longrightarrow> n = Z" (* will fail with the rule stated *)
+(* by (metis Nat.distinct(1) leq.elims(2)) *)
 by hipster_induct_simp_metis (* tactic {* Tactic_Data.routine_tac @{context}*}) if lemma_az is in thy_expl*)
 (*
 apply(induction n)
