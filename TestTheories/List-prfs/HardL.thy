@@ -1,14 +1,60 @@
 theory HardL
 imports MediumL
-        "../Sorting"
+        "../Nat-prfs/ProofN"
 
 begin
 
-lemma setCountSort: "count t ts = count t (isort ts)"
-oops
+
+fun sorted :: "Nat List \<Rightarrow> bool" where
+  "sorted Nil                   = True"
+| "sorted (Cons _ Nil)          = True"
+| "sorted (Cons r (Cons t ts))  = (leq r t \<and> sorted (Cons t ts))"
+
+fun insert :: "Nat \<Rightarrow> Nat List \<Rightarrow> Nat List" where
+  "insert r Nil         = Cons r Nil"
+| "insert r (Cons t ts) = (if leq r t then Cons r (Cons t ts) else (Cons t (insert r ts)))"
+
+fun isort :: "Nat List \<Rightarrow> Nat List" where
+  "isort Nil = Nil"
+| "isort (Cons t ts) = insert t (isort ts)"
+
+fun qsort :: "Nat list \<Rightarrow> Nat list" where
+  "qsort [] = []"
+| "qsort (t # ts) = [r . r <- ts, leq r t] @ (t # [r . r <- ts, \<not> (leq r t)])"
+
+fun sorted' :: "Nat list \<Rightarrow> bool" where
+  "sorted' []                   = True"
+| "sorted' [x]         = True"
+| "sorted' (r # (t # ts))  = (leq r t \<and>  sorted' (t # ts))"
+
+fun count' :: "'a \<Rightarrow> 'a List \<Rightarrow> Nat" where
+  "count' n Nil = Z"
+| "count' n (Cons t ts) = (if n = t then S (count' n ts) else count' n ts)"
+
+fun elem' :: "'a \<Rightarrow> 'a List \<Rightarrow> bool" where
+  "elem' n Nil = False"
+| "elem' n (Cons t ts) = (n = t \<or> elem' n ts)"
+
+lemma elemIns0: "elem t (insert t ts)"
+by hipster_induct_simp_metis
 
 lemma elemIns : "\<not> eqN r t \<Longrightarrow> elem r (insert t ts) = elem r ts"
 by hipster_induct_simp_metis
+
+lemma elemCount: "elem t ts \<Longrightarrow> lt Z (count t ts)"
+by hipster_induct_simp_metis
+
+lemma countIns: "S (count t ts) = count t (insert t ts)"
+by hipster_induct_simp_metis
+
+lemma eqEq: "eqN r t = (r = t)"
+by hipster_induct_schemes
+
+lemma countIns0: "\<not> eqN r t \<Longrightarrow> count t ts = count t (insert r ts)"
+by hipster_induct_simp_metis
+
+lemma setCountSort: "count t ts = count t (isort ts)"
+by (hipster_induct_schemes eqEq countIns0 countIns)  (* XXX: something weird with regular induct: shouldn't *)
 
 lemma subLCount : "leq (count t ts) (len ts)"
 by (hipster_induct_simp_metis succIncreasesL)

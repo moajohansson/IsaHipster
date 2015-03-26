@@ -44,6 +44,13 @@ thm List.induct
 thm last.induct
 thm head.induct
 
+lemma lemma_ac2 []: "leq x2 Z = lez x2" (* NB: used to be problematic *)
+(*by (metis leq.elims(2) leq.simps(1) leq.simps(2) lez.simps)*)
+by (hipster_induct_simp_metis)
+
+lemma leqLeqEq : "\<lbrakk> leq r t ; leq t r \<rbrakk> \<Longrightarrow> r = t"  (* schemes ... *)
+by (hipster_induct_schemes lemma_ac2)
+
 lemma dropTake : "ts = app (take n ts) (drop n ts)"
 by hipster_induct_schemes (*
 apply(induction ts rule: take.induct)
@@ -51,8 +58,8 @@ apply(case_tac n)
 apply(simp_all)
 done*)
 
-lemma q1 : "sorted' (qsort xs)"
-
+(*lemma q1 : "sorted' (qsort xs)"
+*)
 
 lemma isortIds : "sorted ts \<Longrightarrow> isort ts = ts"
 by hipster_induct_schemes (* sorted.induct *)

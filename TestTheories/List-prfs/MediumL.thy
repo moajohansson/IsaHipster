@@ -205,10 +205,10 @@ by hipster_induct_simp_metis
 
 value "(3,4)"
 datatype 'a bitup = Bt 'a 'a
-
+(*
 datatype 'a ptree = Leaf 'a | Node "(('a bitup) ptree)"
 datatype 'a nest = NilN | ConsN "('a \<times> ('a bitup) nest)"
-datatype 'a bush = Ro | Bu "(('a bush) bush)"
+datatype 'a bush = Ro | Bu "(('a bush) bush)"*)
 
 (*hipster rotate app*)
 

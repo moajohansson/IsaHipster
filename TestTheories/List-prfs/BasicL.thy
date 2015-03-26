@@ -205,7 +205,30 @@ apply(induction ts rule: drop.induct) (* XXX: either works! drop.induct OR take.
 apply(simp_all)
 done*)
 
-lemma mapIntersperse: "map f (intersperse a xs) = intersperse (f a) (map f xs)"
+(* XXX: for now changed order \<Longrightarrow> do something about those HO objects, such as f *)
+lemma mapIntersperse: "intersperse (f a) (maps f xs) = maps f (intersperse a xs)"
 by hipster_induct_schemes
 
+fun ith :: "'a List \<Rightarrow> nat \<Rightarrow> 'a" where
+  "ith (Cons t ts) 0 = t"
+| "ith (Cons t ts) (Suc n) = ith ts n"
+
+fun len' :: "'a List \<Rightarrow> nat" where
+  "len' Nil = 0"
+| "len' (Cons t ts) = Suc (len' ts)"
+
+lemma extens: "\<lbrakk> len' xs = len' ys ; ALL i < len' xs. ith xs i = ith ys i \<rbrakk> \<Longrightarrow> xs = ys"
+oops
+
+fun map' :: "('a \<Rightarrow> 'b) \<Rightarrow> 'a list \<Rightarrow> 'b List" where
+  "map' f [] = Nil"
+| "map' f (t # ts) = Cons (f t) (map' f ts)"
+
+lemma mapIth:  "map' (\<lambda>i. ith xs i) [0..<len' xs] = xs"
+oops
+
+
 end
+
+
+

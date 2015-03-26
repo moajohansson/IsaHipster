@@ -6,7 +6,7 @@ imports Main
 begin
 
 
-lemma leqRev [simp] : "\<not> leq r t \<Longrightarrow> leq t r" (* without other lemmas, requires schemes *)
+lemma leqRev [] : "\<not> leq r t \<Longrightarrow> leq t r" (* without other lemmas, requires schemes *)
 by hipster_induct_schemes (*
 apply(induction r rule: leq.induct)
 apply(simp_all)
@@ -36,7 +36,7 @@ by (hipster_induct_simp_metis)
 (* alternative: apply(case_tac ts) apply(simp_all) done *)
 
 lemma insSortInvar : "sorted ts \<Longrightarrow> sorted (insert t ts)"
-by hipster_induct_schemes (*
+by (hipster_induct_schemes leqRev) (*
 apply(induction ts rule: sorted.induct)
 apply(simp_all add: leqRev)
 by metis*)
