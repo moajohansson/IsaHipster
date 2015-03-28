@@ -1,5 +1,6 @@
 theory Turtle
 imports Main
+        "../IsaHipster"
 
 begin
 
@@ -69,20 +70,24 @@ fun getOp :: "prog \<Rightarrow> prog list \<Rightarrow> prog" where
   "getOp (Empty  _) = Empty"
 | "getOp (Node t _) = Node t"
 
-fun inject :: "int \<Rightarrow> prog \<Rightarrow> (int \<Rightarrow> prog \<Rightarrow> bool) \<Rightarrow> (prog \<Rightarrow> prog \<Rightarrow> prog) \<Rightarrow> prog \<Rightarrow> prog" where
+function inject :: "int \<Rightarrow> prog \<Rightarrow> (int \<Rightarrow> prog \<Rightarrow> bool) \<Rightarrow> (prog \<Rightarrow> prog \<Rightarrow> prog) \<Rightarrow> prog \<Rightarrow> prog" where
   "inject n new fcond gtrans p =
     (if fcond n p then gtrans new p
                   else getOp p (map (inject ((\<lambda>p . case p of Empty _ \<Rightarrow> n
                                                            | Node _ _ \<Rightarrow> n + 1) p) new fcond gtrans) (getCh p)))"
+by auto
+
+fun replace :: "int \<Rightarrow> prog \<Rightarrow> (int \<Rightarrow> prog \<Rightarrow> bool) \<Rightarrow> prog \<Rightarrow> prog" where
+  "replace n new f = inject n new f (\<lambda>r _. r)"
 
 fun append :: "int \<Rightarrow> prog \<Rightarrow> (int \<Rightarrow> prog \<Rightarrow> bool) \<Rightarrow> prog \<Rightarrow> prog" where
   "append n new f = inject n new f (\<lambda>r p. getOp p [r])"
 
 fun isLeaf :: "prog \<Rightarrow> bool" where
-  "isLeaf p = null (getCh p)"
+  "isLeaf p = List.null (getCh p)"
 
-fun isLastAction :: "prog \<Rightarrow> bool" where
-  "isLastAction = isLeaf"
+fun isLastAction :: "prog \<Rightarrow> bool" where (* also possible via a definition, of course *)
+  "isLastAction p = isLeaf p"
 
 fun hasEmptyAction :: "prog \<Rightarrow> bool" where
   "hasEmptyAction (Empty _) = True"
@@ -93,47 +98,33 @@ fun isEmpty :: "prog \<Rightarrow> bool" where
 | "isEmpty (Empty cs) = list_all isEmpty cs"
 | "isEmpty _          = False"
 
-fun seq :: "program \<Rightarrow> program \<Rightarrow> program" where  (infixr " >*>" 65)
-  "seq p q = append 0 q (\<lambda>x. isLeaf x) p"
+fun seq :: "prog \<Rightarrow> prog \<Rightarrow> prog" (infixr ">*>" 65) where
+  "seq p q = append 0 q (\<lambda>_ x. isLeaf x) p"
 
--- | Parallel combinator: execution of two programs in parallel
-(<|>) :: Program -> Program -> Program
-p <|> q = Empty [p, q]
+fun par :: "prog \<Rightarrow> prog \<Rightarrow> prog" (infixr "<|>" 65) where
+  "par p q = Empty [p, q]"
 
--- | Setting a lifespan
-lifespan :: Int -> Program -> Program
-lifespan n = replace 0 die (\i _ -> i == n)
+fun lifespan :: "int => prog => prog" where
+  "lifespan n = replace 0 die (\<lambda>i _. i = n)"
 
--- | Limiting operations in time
-limited :: Int -> Program -> Program
-limited n = replace 0 (Empty []) (\i _ -> i == n)
+fun limited :: "int => prog => prog" where
+  "limited n = replace 0 (Empty []) (\<lambda>i _. i = n)"
 
--- | Creates a program repeating the program parameter a finite number of times
-times :: Int -> Program -> Program
-times n p | n <= 0    = Empty []
-          | otherwise = p >*> times (n-1) p 
+fun times :: "int \<Rightarrow> prog \<Rightarrow> prog" where
+  "times n p = (if n \<le> 0 then Empty [] else p >*> times (n - 1) p)"
 
--- | Creates a program repeating the program parameter infinitely
-forever :: Program -> Program
-forever p = p >*> forever p
+function forever :: "prog \<Rightarrow> prog" where
+  "forever p = p >*> forever p"
+by auto
 
+fun firstAction :: "prog \<Rightarrow> prog list \<Rightarrow> prog" where
+  "firstAction p l = getOp p l"
 
+fun restActions :: "prog \<Rightarrow> prog list" where
+  "restActions p = getCh p"
 
--- | Returns the first action in a program. Such an action is a function
--- 
---   >  [Program] -> Program
---
--- which sequences a list of programs (to occur in parallel) after the first
--- operation in the program parameter.
-firstAction :: Program -> [Program] -> Program
-firstAction = getOp
-
--- | Returns all programs occurring in paralell after the first operation
--- in the program
-restActions :: Program -> [Program]
-restActions = getCh
-
-
+lemma test: "(p <|> q) >*> r = (p >*> r) <|> (q >*> r)"
+by hipster_induct_schemes
 
 end
 

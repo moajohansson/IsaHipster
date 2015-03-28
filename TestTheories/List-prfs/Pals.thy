@@ -36,6 +36,12 @@ thm List.induct
 thm drop.induct
 thm take.induct
 thm app.induct
+thm zip.induct
+
+prf zip.induct
+prf List.induct
+prf last.induct
+prf drop.induct
 
 thm headD.induct
 thm openL.induct
@@ -43,6 +49,10 @@ thm lastD.induct
 thm List.induct
 thm last.induct
 thm head.induct
+
+ML {*
+  val t = Induct.find_inductT @{context} @{typ "Nat \<Rightarrow> 'a List \<Rightarrow> 'a List"}
+*}
 
 lemma lemma_ac2 []: "leq x2 Z = lez x2" (* NB: used to be problematic *)
 (*by (metis leq.elims(2) leq.simps(1) leq.simps(2) lez.simps)*)
