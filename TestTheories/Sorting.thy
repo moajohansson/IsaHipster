@@ -71,13 +71,27 @@ lemma ssu: "sorted' (r # rs) \<and> t \<le> r \<Longrightarrow> sorted' (t # (me
 
 lemma ssu': "sorted' (r # rs) \<and> t \<le> v \<and> t \<le> r \<Longrightarrow> sorted' (t # (merge [v] (r#rs)))"
 by (metis mer5'' merge.simps sorted'.simps)
+lemma ssu'': " sorted' [t, v] \<and> sorted' (r # rs) \<and> t \<le> r \<Longrightarrow> sorted' (t # (merge [v] (r#rs)))"
+(*by (metis sorted'.simps(3) ssu')*)
+by (hipster_induct_schemes sorted'.simps mer5'')
 
 (* simplification can very much screw up the goal state! *)
 lemma mer5: "(sorted' (t # ts) \<and> sorted' (r # rs) \<and> t \<le> r) \<Longrightarrow> (sorted' (t # (merge ts (r#rs))))"
 apply(induction ts rule: sorted'.induct)
 apply(simp)
 apply(simp add: mer5'')
-apply(simp add: ssu ssu' mer5' mer4') (*
+apply(simp add: mer4' mer5'' mer3 ssu' ssu'' ssu)
+apply(rule conjI)
+apply(rule impI)
+apply simp
+apply(rule impI, rule conjI)
+apply(simp_all)
+apply(drule conjE)
+apply(simp_all add: ssu' mer5'' mer4 mer4' mer3 mer2 mer1 ssu'' mer5')
+
+apply (metis (full_types) sorted'.simps merge.simps if_splits list.exhaust list.distinct)
+apply(simp add: ssu ssu' mer3 mer2 mer1 ssu'' mer5' mer4')
+ (*
 apply(metis merge.simps(3) mer5' mer4' mer3 mer4)*)
 sorry
 
