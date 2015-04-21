@@ -117,7 +117,9 @@ done*)
 
 
 lemma initCons: "notNil ts \<Longrightarrow> init (Cons t ts) = Cons t (init ts)"
-by (hipster_induct_simp_metis)
+by (metis init.simps(3) notNil.elims(2))
+(*by (hipster_induct_simp_metis)
+by (metis init.simps(3) notNil.cases)*)
 
 lemma initApp: "notNil ts \<Longrightarrow> init (app rs ts) = app rs (init ts)"
 by (hipster_induct_schemes initCons)
@@ -192,6 +194,30 @@ lemma dropNil: "drop n Nil = Nil" (* XXX: check why this solves our problem... w
 (*by (metis drop.simps Nat.exhaust)*)
 by hipster_induct_simp_metis
 
+ML {*
+  @{thm "drop.induct"};
+  (Thm.concl_of @{thm "drop.induct"});
+  (HOLogic.dest_Trueprop (Thm.concl_of @{thm "drop.induct"}));
+  @{term "case x of 0 \<Rightarrow> 0 | Suc y \<Rightarrow> y"};
+  @{term "P y x"};
+  fun reP uu = case uu of
+        Var (_,t) => t
+      | (t$_) => reP t
+      | (Abs (_, t, _)) => t
+      | (Free (_, t)) => t; (* TODO: Bound, Const *)
+  val ump = binder_types (reP(HOLogic.dest_Trueprop (Thm.concl_of @{thm "drop.induct"})));
+  val tumf = fastype_of @{term "Cons Z Nil"};
+  hd (tl ump) = tumf;
+  fastype_of1 ([],@{term "Cons Z Nil"});
+  Type.could_match(hd (tl ump), tumf);
+
+(*typ list * term -> typ
+
+  hd (tl ump) = Type ( *)
+*}
+
+thm drop.induct
+(*thm List.rel_induct[case_names Nil Cons, {* @{thm "List.induct"} *}]*)
 
 lemma dropMapComm: "drop n (maps f ts) = maps f (drop n ts)"
 by hipster_induct_schemes (*

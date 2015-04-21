@@ -1,7 +1,7 @@
 (* Various tactics for Hipster. Induction, simplification and metis. *)
 
 
-signature HIPSTER_TACS =
+signature IND_TACS =
 sig 
   type hardtac
   val simp_all : Proof.context -> thm list -> tactic
@@ -28,10 +28,10 @@ sig
 
 end
 
-structure Hipster_Tacs  : HIPSTER_TACS  =
+structure Ind_Tacs  : IND_TACS  =
 struct
 
-type hardtac = Proof.context -> thm list option -> string option -> int -> tactic
+type hardtac = Proof.context -> thm list option -> string list option -> int -> tactic
 (* XXX: string option seems better than checking for nulls string, right? *)
 
 fun SOLVE_TIMEOUT mseconds tac t = 
@@ -63,17 +63,10 @@ fun simp_all ctxt lemmas thm =
     in
       ALLGOALS (Simplifier.asm_full_simp_tac ctxt') thm
     end;
- 
-
-(* Add the lemmas given as assumptions to the theorem. Note: This does not always work as well as adding them
-to the simpset for some reason. *)
-(* fun prove_by_simp ctxt lemmas =
-    SOLVE_TIMEOUT 500 
-    (ALLGOALS (Method.insert_tac lemmas THEN' (Simplifier.asm_full_simp_tac ctxt)))
-*)
 
 (* Fails if all there are some subgoals left after application of simp *)
  fun prove_by_simp ctxt lemmas = SOLVE_TIMEOUT 500 (simp_all ctxt lemmas); 
+
 
 (*-----------------------------------------------------------------------------------------*)
 (* Metis tactics *) 
@@ -90,15 +83,10 @@ fun timed_metis_tac ctxt facts i thm =
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
 fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
-    (SOLVE_TIMEOUT 4000((simp_all ctxt (facts @ lemmas)) (* TRY *) (* FIXME: both facts and lemmas? *)
+    (SOLVE_TIMEOUT 3000((simp_all ctxt (facts @ lemmas)) (* TRY *) (* FIXME: both facts and lemmas? *)
           THEN
           IF_UNSOLVED
           (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))) thm (*end;*)
-  (*  SOLVE((ALLGOALS ((Simplifier.asm_full_simp_tac ctxt))
-            THEN
-            IF_UNSOLVED 
-            (ALLGOALS (timed_metis_tac ctxt facts )))); *)
-
 
 
 (*-----------------------------------------------------------------------------------------*)
@@ -175,7 +163,7 @@ fun infer_term x ctxt =
      let val (T, ctxt') = Proof_Context.inferred_param x ctxt
          (*val _ = @{print} (x, T)*)
      in (Free (x, T), ctxt') end;
-fun bis x = Attrib.thms x ;
+(*fun bis x = Attrib.thms x ;*)
 fun induct_for_me ctxt xss rule i =
      let
        val (tss, ctxt') = (fold_map o fold_map) infer_term xss ctxt
@@ -194,7 +182,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
         (* TODO: make better (otherfrees, etc.) *)
       val (otherfrees, inductfrees) = (case var of
                                         NONE => mk_induct_insts ithings []
-                                      | SOME v => mk_induct_insts ithings [v])
+                                      | SOME v => mk_induct_insts ithings v (*[v]*))
       (*val (tss, ctxt') = (fold_map o fold_map) infer_term [case var of NONE => [] | SOME v=> [v]] ctxt
       val instss = map (map (fn inst => SOME (NONE, (inst, false)))) tss;*)
       val insts = map (fn NONE => NONE | SOME v => 
@@ -214,14 +202,8 @@ fun induct_on_var_tac ctxt rule var i goalthm =
       (*val _ = Pretty.writeln (Pretty.str ((Library.space_implode " ? " (map (fn (cases, thm) =>
           (Library.space_implode " " (map (fn (s,_) => s) cases))
           ^ ": " ^ (Pretty.string_of (pretty_thm @{context} thm))) (Seq.list_of nw_thms')))^"\n")) ;*)
-      (*val ant = Seq.list_of (Seq.map fst nw_thms')
-      val _ = if (null (filter null ant))
-                then @{print} "emtpy!"
-                else @{print} (@{make_string} (map (fn ls => map (fn t => ((fn s => String.size s = 0) o fst) t) ls)
-                                                ant))*)
-      val nw_thms = Seq.map snd nw_thms'
       in
-        nw_thms
+        Seq.map snd nw_thms'
       end;
 
 
@@ -243,7 +225,7 @@ fun try_induct_on ctxt rule strat vars i =
     case vars
        of [] => (*strat ctxt NONE (* for now, no: rule - don't think it should ever work *) NONE i
                 ORELSE*) no_tac
-        | (v :: vs) =>  let val _ = Pretty.writeln (Pretty.str (" - var: "^v)) in
+        | (v :: vs) =>  let val _ = Pretty.writeln (Pretty.str (" - vars: "^ @{make_string} v)) in
           (*(induct_simp_or_metis ctxt facts rule v i)*)
           strat ctxt rule (SOME v) i (*THEN simp_all ctxt []*)
           ORELSE
@@ -252,7 +234,7 @@ fun try_induct_on ctxt rule strat vars i =
 (* Find the variables we can induct on *)
 fun try_inductable_vars ctxt strat i thm = 
     let
-      val vars = map fst (fst (inductable_things_in_sg i thm))
+      val vars = map (fn (v,_) => [v]) (*fst*) (fst (inductable_things_in_sg i thm))
     in
       (try_induct_on ctxt NONE strat vars i) thm
     end;
@@ -280,18 +262,19 @@ fun try_induction_with ctxt scheme_rules strat vars i =
     (* TODO:  modify to make vars so that the rule can be applied *)
     case scheme_rules of
         [] =>  let val _ = Pretty.writeln (Pretty.str "Rule: none")
-               in try_induct_on ctxt NONE strat (map fst vars) i end
-      | ((n,r) :: rs) => let
-                     val _ = Pretty.writeln (Pretty.str ("Rule: "^n))
-                     val argTyps = binder_types (reP(HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
-                     val ruleVars = map fst (filter (fn v => exists (fn tr => Type.could_match (tr,snd v)) argTyps) vars)
-                     fun paired [] = []
-                       | paired (v::vs) = map (fn w => [v,w]) vs @ paired vs
-                     val indvars = map (fn v => [v]) ruleVars @ paired ruleVars in
-                     (* FIXME: vars types filter *)
-                     try_induct_on ctxt ( r) strat (map fst vars) i
-                     ORELSE
-                     (try_induction_with ctxt rs strat vars i) end;
+               in try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i end
+      | ((n,r) :: rs) =>
+          let val _ = Pretty.writeln (Pretty.str ("Rule: "^n))
+              val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
+              val ruleVars = map fst (filter (fn v => exists (fn tr => Type.could_match (tr,snd v)) argTyps) vars)
+              fun paired [] = []
+                | paired (v::vs) = map (fn w => [v,w]) vs @ paired vs
+              val indvars = map (fn v => [v]) ruleVars @ paired ruleVars
+              (* FIXME: vars types filter *)
+          in
+            try_induct_on ctxt ( r) strat indvars i
+            ORELSE
+            (try_induction_with ctxt rs strat vars i) end;
 
 fun try_induct_schemes ctxt strat i thm =
     let
@@ -371,7 +354,7 @@ end;
 (*-----------------------------------------------------------------------------------------*)
 
 
-signature THY_EXPL_TACS =
+signature EXPL_TACS =
 sig
   val routine_tac : Proof.context -> tactic
   val routine_tac_str : string
@@ -382,7 +365,7 @@ end
 
 (* This structure considers simplification or FO reasoning by Metis as routine. *)
 (* Proofs requiring structural induction is considered as "hard"                *)
-structure Simp_Metis_Tacs : THY_EXPL_TACS =
+structure Simp_Metis_T : EXPL_TACS =
 struct
 
 fun routine_tac ctxt = 
@@ -392,7 +375,7 @@ fun routine_tac ctxt =
       (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                  (ctxt, prev_thms) *)
      in *)
-       Hipster_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt, 
+       Ind_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt, 
                                         (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt));
 
 val routine_tac_str = "by (tactic {* Simp_Metis_Tacs.routine_tac @{context} *})"; 
@@ -406,9 +389,9 @@ fun hard_tac ctxt =
     in
      (* ALLGOALS(
       Method.insert_tac prev_thms THEN' 
-      Hipster_Tacs.try_inductable_vars ctxt Hipster_Tacs.induct_simp_or_metis) *)
-      ALLGOALS (Hipster_Tacs.try_inductable_vars ctxt 
-                                            (Hipster_Tacs.induct_simp_or_metis (facts,lemmas)))
+      Ind_Tacs.try_inductable_vars ctxt Ind_Tacs.induct_simp_or_metis) *)
+      ALLGOALS (Ind_Tacs.try_inductable_vars ctxt 
+                                            (Ind_Tacs.induct_simp_or_metis (facts,lemmas)))
     end; 
 
 (* The fact_nms are names of extra theorems that we want to refer to in the output *)
@@ -427,11 +410,11 @@ end
 
 
 (* Induction with schemes! *)
-structure Ind_Schemes_Tacs : THY_EXPL_TACS =
+structure Ind_Schemes_T : EXPL_TACS =
 struct
 
 fun routine_tac ctxt =
-       Hipster_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt,
+       Ind_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt,
                                        (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt));
 val routine_tac_str = "by (tactic {* Ind_Schemes_Tacs.routine_tac @{context} *})"; 
 
@@ -440,7 +423,7 @@ fun hard_tac ctxt =
       val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
       val facts = ThyExpl_Data.facts_of_ctxt ctxt
     in
-      ALLGOALS(Hipster_Tacs.try_induct_schemes ctxt (Hipster_Tacs.induct_simp_or_metis (facts,lemmas)))
+      ALLGOALS(Ind_Tacs.try_induct_schemes ctxt (Ind_Tacs.induct_simp_or_metis (facts,lemmas)))
     end;
 
 fun final_tactic_str ctxt =
@@ -453,14 +436,14 @@ fun final_tactic_str ctxt =
 end
 
 
-structure Simp_Tacs : THY_EXPL_TACS =
+structure Simp_T : THY_EXPL_TACS =
 struct
 
 fun routine_tac ctxt =
      let
        val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
      in
-        SOLVE (Hipster_Tacs.prove_by_simp ctxt lemmas)
+        SOLVE (Ind_Tacs.prove_by_simp ctxt lemmas)
      end;
 
 val routine_tac_str = "by (tactic {*Simp_Tacs.routine_tac @{context}*})";
@@ -472,7 +455,7 @@ fun hard_tac ctxt =
       (*val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                   (ctxt, lemmas) *)
     in
-      ALLGOALS (Hipster_Tacs.try_inductable_vars ctxt (Hipster_Tacs.induct_and_simp lemmas))
+      ALLGOALS (Ind_Tacs.try_inductable_vars ctxt (Ind_Tacs.induct_and_simp lemmas))
     end;
 
 (* The fact_nms are names of extra theorems that we want to refer to in the output *)

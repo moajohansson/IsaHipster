@@ -81,9 +81,15 @@ by (hipster_induct_simp_metis insLen)
 
 (* XXX: DO NOT RUN with hipster_induct_schemes *)
 lemma appZips  : "len a = len b \<Longrightarrow> app (zip a b) (zip c d) = zip (app a c) (app b d)"
-apply(induction a b rule: zip.induct)
+(*apply(hipster_induct_schemes app.simps len.simps List.exhaust Nat.distinct)*)
+by (tactic {* let 
+      val lemmas = [] (* (ThyExpl_Data.proved_of_ctxt @{context}) @ (Hipster_Rules.get @{context})*)
+      val facts = @{thms app.simps  len.simps List.exhaust Nat.distinct} in
+        ALLGOALS(Ind_Tacs.induct_simp_or_metis (facts,lemmas) @{context} (SOME @{thms "zip.induct"}) (SOME ["a","b"]))
+      end*})
+(*apply(induction a b rule: zip.induct)
 apply(simp_all)
-by (metis app.simps len.simps List.exhaust Nat.distinct)
+by (metis app.simps len.simps List.exhaust Nat.distinct)*)
 
 
 lemma auxRev : "rev (rev (Cons a Nil)) = Cons a Nil"
@@ -101,7 +107,7 @@ by hipster_induct_simp_metis
     without any issues, however it won't do so with
       by (hipster_induct_schemes revA) nor by (hipster_induct_simp_metis revA) *)
 lemma revRev  : "rev (rev xs) = xs"
-by (hipster_induct_simp_metis revA')
+by (hipster_induct_simp_metis revA) (*revA'*)
 (*apply(induction xs)
 apply(simp_all add: revA)
 done*)
@@ -119,21 +125,25 @@ by hipster_induct_simp_metis
 lemma appAssoc : "app (app x y) z = app x (app y z)"
 by hipster_induct_simp_metis
 
+lemma appNil: "app ts Nil = ts" (* borrowed from BasicL *)
+by hipster_induct_simp_metis
+
 lemma appRevAntiDistr [thy_expl] : "app (rev x) (rev y) = rev (app y x)"
 by (hipster_induct_simp_metis appNil appAssoc)
 
 lemma revApp: "rev (app xs ts) = app (rev ts) (rev xs)"
-by (hipster_induct_simp_metis appAssoc appNil)
+by (hipster_induct_simp_metis appAssoc app.simps)
 
 (* immediately follows *)
 lemma s : "t = rev t \<Longrightarrow> rev (app t t) = app t t"
 (*apply(hipster_induct_schemes revA appNil appAssoc)*)
 by (tactic {* Tactic_Data.routine_tac @{context} *})
 
+lemma revCons: "rev (Cons t ts) = app (rev ts) (Cons t Nil)"
+by simp
 
 (* XXX: DO NOT RUN with hipster_induct_schemes *)
 lemma revZip: "len rs = len ts \<Longrightarrow> rev (zip rs ts) = zip (rev rs) (rev ts)"
-(*apply (hipster_induct_simp_metis)*)
 apply(induction rs ts rule: zip.induct)
 apply(simp_all (*add: appZips*))
 oops

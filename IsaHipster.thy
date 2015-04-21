@@ -33,6 +33,9 @@ setup {* Hipster_Rules.setup;*}
 ML_file "HipsterUtils.ML"
 ML_file "ThyExplData.ML"
 ML_file "HipsterTacs.ML"
+
+ML_file "IndTacs.ML"
+
 ML_file "TacticData.ML"
 ML_file "HipsterExplore.ML"
 ML_file "HipsterIsar.ML"
@@ -41,20 +44,20 @@ ML_file "HipsterIsar.ML"
 method_setup hipster_induct_simp = {*
   Scan.lift (Scan.succeed 
     (fn ctxt => SIMPLE_METHOD 
-      (Hipster_Tacs.induct_simp_tac ctxt)))
+      (Ind_Tacs.induct_simp_tac ctxt)))
    *}
 
 method_setup hipster_induct_simp_metis = {*
   Attrib.thms >> (fn thms => fn ctxt =>
     SIMPLE_METHOD 
-      (Hipster_Tacs.induct_simp_metis ctxt thms))
+      (Ind_Tacs.induct_simp_metis ctxt thms))
  *}
 
 
 method_setup hipster_induct_schemes = {*
   Attrib.thms >> (fn thms => fn ctxt =>
     SIMPLE_METHOD 
-      (Hipster_Tacs.induct_with_schemes ctxt thms))
+      (Ind_Tacs.induct_with_schemes ctxt thms))
  *}
 
 (*

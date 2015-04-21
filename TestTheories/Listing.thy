@@ -17,8 +17,7 @@ fun rev :: "'a List \<Rightarrow> 'a List" where
   "rev Nil = Nil"
 | "rev (Cons r ts) = app (rev ts) (Cons r Nil)"
 
-fun qrev :: "'a List \<Rightarrow> 'a List \<Rightarrow> 'a List"
-where 
+fun qrev :: "'a List \<Rightarrow> 'a List \<Rightarrow> 'a List" where
   "qrev Nil         a = a"
 | "qrev (Cons b bs) a = qrev bs (Cons b a)"
 

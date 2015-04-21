@@ -22,22 +22,22 @@ fun get_hard_str (Data d) = (#hard_tac_str d);
                  hard_tac_str = fn _ => K "FAIL"}; *)
 
 (* Routine: simplification and FO reasoning. Hard: Induction, then routine. *)
-val induct_with_schemes = Data {routine_tac = Ind_Schemes_Tacs.routine_tac,
-                                hard_tac = Ind_Schemes_Tacs.hard_tac,
-                                routine_tac_str = Ind_Schemes_Tacs.routine_tac_str,
-                                hard_tac_str = Ind_Schemes_Tacs.final_tactic_str};
+val induct_with_schemes = Data {routine_tac = Ind_Schemes_T.routine_tac,
+                                hard_tac = Ind_Schemes_T.hard_tac,
+                                routine_tac_str = Ind_Schemes_T.routine_tac_str,
+                                hard_tac_str = Ind_Schemes_T.final_tactic_str};
 
 (* Routine: simplification and FO reasoning. Hard: Induction, then routine. *)
-val induct_simp_metis = Data {routine_tac = Simp_Metis_Tacs.routine_tac,
-                              hard_tac = Simp_Metis_Tacs.hard_tac,
-                              routine_tac_str = Simp_Metis_Tacs.routine_tac_str,
-                              hard_tac_str = Simp_Metis_Tacs.final_tactic_str};
+val induct_simp_metis = Data {routine_tac = Simp_Metis_T.routine_tac,
+                              hard_tac = Simp_Metis_T.hard_tac,
+                              routine_tac_str = Simp_Metis_T.routine_tac_str,
+                              hard_tac_str = Simp_Metis_T.final_tactic_str};
 
 (* Routine: simplification. Hard: Induction, then simp. *)
-val induct_simp = Data {routine_tac = Simp_Tacs.routine_tac,
-                        hard_tac = Simp_Tacs.hard_tac,
-                        routine_tac_str = Simp_Tacs.routine_tac_str,
-                        hard_tac_str = Simp_Tacs.final_tactic_str};
+val induct_simp = Data {routine_tac = Simp_T.routine_tac,
+                        hard_tac = Simp_T.hard_tac,
+                        routine_tac_str = Simp_T.routine_tac_str,
+                        hard_tac_str = Simp_T.final_tactic_str};
 
 
 (* Data stored in an Isabelle context, default to induct_with_schemes tactics.

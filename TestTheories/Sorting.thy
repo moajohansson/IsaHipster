@@ -41,6 +41,8 @@ fun msort :: "nat list => nat list" where
                     (msort (List.drop (length ts div 2) ts))"
 
 (* lemma sortCons: "r \<le> t \<and> sorted2 (t # ts) \<Longrightarrow> sorted2 (r # (t # ts))" by simp *)
+lemma insSortInvar : "sorted ts \<Longrightarrow> sorted (insert t ts)"
+by hipster_induct_schemes
 
 lemma mer1[thy_expl]: "sorted2 ts \<Longrightarrow> sorted2 (merge [] ts)"
 (*by(metis sorted2.cases merge.simps)*) (* replace of cases by inductions *)
@@ -95,9 +97,10 @@ apply(rule impI)
 apply(rule conjI)
 apply(simp add: thy_expl)
 apply(simp add: thy_expl)
-by (hipster_induct_schemes ssu' ssu'' mer5' mer5'' mer3)
+oops
+(*by (hipster_induct_schemes ssu' ssu'' mer5' mer5'' mer3)
 sledgehammer
-apply(metis sorted2.simps ssu'' mer3 ssu ssu' mer4 mer2 mer1 t1 mer5' mer5'' mer4')
+apply(metis sorted2.simps ssu'' mer3 ssu ssu' mer4 mer2 mer1 t1 mer5' mer5'' mer4')*)
 
 (* simplification can very much screw up the goal state! *)
 lemma mer5[thy_expl]: "(sorted2 (t # ts) \<and> sorted2 (r # rs) \<and> t \<le> r) \<Longrightarrow> (sorted2 (t # (merge ts (r#rs))))"
@@ -114,8 +117,7 @@ apply(drule conjE)
 apply(simp_all add: ssu' mer5'' mer4 mer4' mer3 mer2 mer1 ssu'' mer5')
 (*apply (metis (full_types) sorted2.simps merge.simps if_splits list.exhaust list.distinct)*)
 (*apply(simp add: ssu ssu' mer3 mer2 mer1 ssu'' mer5' mer4')*)
- (*
-apply(metis merge.simps(3) mer5' mer4' mer3 mer4)*)
+(*apply(metis merge.simps(3) mer5' mer4' mer3 mer4)*)
 sorry
 
 lemma mergeS: "sorted2 ts \<and> sorted2 rs \<Longrightarrow> sorted2 (merge ts rs)"
