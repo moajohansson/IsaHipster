@@ -81,7 +81,7 @@ fun try_nxt_conj ctxt =
 
 fun try_prove_priority_goal ctxt goal =
     let
-      val res = SINGLE (Tactic_Data.routine_tac ctxt) goal 
+      val res = SINGLE (Tactic_Data.routine_tac ctxt) goal
     in 
       case res of
         SOME _ => 
@@ -100,10 +100,10 @@ fun proof_loop_w_prio ctxt facts fact_nms prio_goal_opt cand_lemmas_str =
       fun recf ctxt = 
           case (try_nxt_conj ctxt) of
             NONE => NONE (*ctxt *) (* No more lemmas to prove, not proved prio goal, fail. *)
-          | SOME ctxt1 => 
+          | SOME ctxt1 =>
             (case (ThyExpl_Data.priority_goal_of_ctxt ctxt1)
               of NONE =>  NONE (* There is no prio goals, so nothing to do! *)
-            | SOME goal => 
+            | SOME goal =>
               (case (try_prove_priority_goal ctxt1 goal) of
                  NONE => recf ctxt1
                | SOME ctxt2 => SOME ctxt2) (* Proved the priority goal, we're done! *)
@@ -260,20 +260,20 @@ fun explore_goal ctxt const_nms thm =
       val res_ctxt = proof_loop_w_prio ctxt facts facts_nms (SOME thm) (hipspec_explore ctxt NONE const_nms)
     in
       case res_ctxt of
-        NONE => 
+        NONE =>
         let val _ = Output.urgent_message ("Failed to find lemmas which will prove goal.")
-        in no_tac thm end 
+        in no_tac thm end
       | SOME ctxt' => (* Success, provided the explored lemmas, the thm can be proved. *)
         let
-          val tac_str = Tactic_Data.hard_tac_str ctxt' 
+          val tac_str = Tactic_Data.hard_tac_str ctxt'
           val lemmas = Library.space_implode "\n\n"
                        (map (mk_lemma_str ctxt' Thm.prop_of)
                            (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt ctxt')))
-          val str_of_thm = (Sledgehammer_Util.with_vanilla_print_mode Syntax.string_of_term ctxt')
-                             (Thm.concl_of thm)
-          val _ = Output.urgent_message 
+          val str_of_thm = @{make_string} thm (*(Sledgehammer_Util.with_vanilla_print_mode Syntax.string_of_term ctxt')
+                             (Thm.concl_of thm)*)
+          val _ = Output.urgent_message
                     ("Try first proving lemmas:\n\n" ^ lemmas ^ "\n\n" ^
-                     "then prove the open goal "^ str_of_thm ^ " " ^ 
+                     "then prove the open goal "^ str_of_thm ^ " " ^
                      (Tactic_Data.routine_tac_str ctxt'))
         in
           Seq.single thm

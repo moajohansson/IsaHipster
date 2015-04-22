@@ -72,7 +72,7 @@ method_setup hipster_goal = {*
 *}
 *)
 (* 
-(* Default value for tactics is induct_simp_metis. 
+(* Default value for tactics is induct_simp_metis.
    Use setup command to change to other hard/routine tactics.
 *)
 setup{* 

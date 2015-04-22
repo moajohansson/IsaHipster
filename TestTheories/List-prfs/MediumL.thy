@@ -68,10 +68,10 @@ apply simp_all
   XXX: strangely enough this brings the same subgoal twice... and does not get simplified *)
 
 
-lemma addId: "add m Z = m"
+lemma addId[]: "add m Z = m"
 by hipster_induct_simp_metis
 
-lemma addS2: "add n (S m) = S (add n m)"
+lemma addS2[]: "add n (S m) = S (add n m)"
 by hipster_induct_simp_metis
 
 lemma setCountRev: "count t ts = count t (rev ts)"

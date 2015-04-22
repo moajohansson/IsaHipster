@@ -194,14 +194,8 @@ fun induct_on_var_tac ctxt rule var i goalthm =
       val _ = Pretty.writeln (Pretty.block ( [Pretty.str "induct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
         | SOME (_, (Free (v,_),false)) => v) insts)), Pretty.str "; otherfrees: ", Pretty.str (Library.space_implode ", "
           (map (fn (v,_) => v) otherfrees)) ]));
-      val nw_thms' = 
-          (Induct.induct_tac (* Induction.induction_tac ?? *)
-                         ctxt false [insts] [non_ithings](*[non_ithings @ otherfrees]*) [] rule [] i goalthm)
-          (* FIXME: dirty hack until I find out how to check before instantiating the induction *)
+      val nw_thms' = (Induct.induct_tac ctxt false [insts] [non_ithings] [] rule [] i goalthm)
             handle ERROR t => Seq.empty (* let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end *)
-      (*val _ = Pretty.writeln (Pretty.str ((Library.space_implode " ? " (map (fn (cases, thm) =>
-          (Library.space_implode " " (map (fn (s,_) => s) cases))
-          ^ ": " ^ (Pretty.string_of (pretty_thm @{context} thm))) (Seq.list_of nw_thms')))^"\n")) ;*)
       in
         Seq.map snd nw_thms'
       end;
@@ -278,14 +272,13 @@ fun try_induction_with ctxt scheme_rules strat vars i =
 
 fun try_induct_schemes ctxt strat i thm =
     let
-      val vars = (fst (inductable_things_in_sg i thm)) (* map fst ... *)
-      val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
+      val vars = fst (inductable_things_in_sg i thm) (* map fst ... *)
+      val lemmas = ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
                         handle _ => (n, NONE) ) ((*"Naturals.leq.induct" ::*)distinct (op =) (map (fn c => (c^".induct")) consts))
-      val schemes =  rev (*the o snd*) (filter (Basics.is_some o snd) thinds)
-      (*val dd = induct*)
+      val schemes = rev (*the o snd*) (filter (Basics.is_some o snd) thinds)
       val _ = Pretty.writeln (pretty_thm ctxt thm)
       (* FIXME: distinct ... *)
     in (try_induction_with ctxt schemes strat (distinct (op =) vars) i) thm
@@ -304,8 +297,6 @@ Or add to TacticData?
 fun induct_simp_metis ctxt facts thm = 
     let
       val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-      (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
-                                (ctxt, lemmas) *)
     in
       (* XXX: removed as simplifier rules - in this case, so far, no changes *)
       ALLGOALS(try_inductable_vars ctxt (induct_simp_or_metis (facts,lemmas))) thm
@@ -330,9 +321,7 @@ fun induct_with_schemes ctxt facts thm =
       val _ = Pretty.writeln (Pretty.block (maps (fn (n,thms) => (case thms of
            SOME ts => map Pretty.str ("\n"^n^" is: " :: (map (Pretty.string_of o pretty_thm ctxt) ts))
          | NONE => [Pretty.str ("\n"^n^": has no induction scheme")]))  thinds))
-      (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
-                                (ctxt, lemmas) *)
-      val schemes = map (the o snd) (filter (Basics.is_some o snd) thinds)
+      (*val schemes = map (the o snd) (filter (Basics.is_some o snd) thinds)*)
     in
       ALLGOALS(try_induct_schemes ctxt (induct_simp_or_metis (facts,lemmas))) thm
     end;
@@ -369,14 +358,8 @@ structure Simp_Metis_T : EXPL_TACS =
 struct
 
 fun routine_tac ctxt = 
-   (*  let
-       val facts = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-                        @ (ThyExpl_Data.facts_of_ctxt ctxt)
-      (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
-                                 (ctxt, prev_thms) *)
-     in *)
        Ind_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt, 
-                                        (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt));
+                                    ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt);
 
 val routine_tac_str = "by (tactic {* Simp_Metis_Tacs.routine_tac @{context} *})"; 
 
@@ -384,12 +367,7 @@ fun hard_tac ctxt =
     let
       val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
       val facts = ThyExpl_Data.facts_of_ctxt ctxt
-     (* val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
-                                  (ctxt, lemmas)           *)        
     in
-     (* ALLGOALS(
-      Method.insert_tac prev_thms THEN' 
-      Ind_Tacs.try_inductable_vars ctxt Ind_Tacs.induct_simp_or_metis) *)
       ALLGOALS (Ind_Tacs.try_inductable_vars ctxt 
                                             (Ind_Tacs.induct_simp_or_metis (facts,lemmas)))
     end; 
@@ -399,7 +377,6 @@ fun final_tactic_str ctxt =
     let
     (* val thy_expl_thms =  map (fn thm => Long_Name.base_name(Thm.get_name_hint thm)) 
                                (Hipster_Rules.get ctxt); *)
-
       (* Only need to pass the facts, the thy_expl theorems are looked up by the tactic *)
       val facts_str = Library.space_implode " " (ThyExpl_Data.fact_names_of_ctxt ctxt)
                                                  
@@ -415,7 +392,7 @@ struct
 
 fun routine_tac ctxt =
        Ind_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt,
-                                       (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt));
+                                    ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt);
 val routine_tac_str = "by (tactic {* Ind_Schemes_Tacs.routine_tac @{context} *})"; 
 
 fun hard_tac ctxt = 
@@ -450,10 +427,7 @@ val routine_tac_str = "by (tactic {*Simp_Tacs.routine_tac @{context}*})";
 
 fun hard_tac ctxt =
     let
-      val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-      (*val facts =  ThyExpl_Data.facts_of_ctxt ctxt *)
-      (*val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
-                                  (ctxt, lemmas) *)
+      val lemmas = ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt
     in
       ALLGOALS (Ind_Tacs.try_inductable_vars ctxt (Ind_Tacs.induct_and_simp lemmas))
     end;
