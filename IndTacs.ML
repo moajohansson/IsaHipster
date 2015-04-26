@@ -185,6 +185,8 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                                       | SOME v => mk_induct_insts ithings v (*[v]*))
       (*val (tss, ctxt') = (fold_map o fold_map) infer_term [case var of NONE => [] | SOME v=> [v]] ctxt
       val instss = map (map (fn inst => SOME (NONE, (inst, false)))) tss;*)
+      val _ = @{print} inductfrees;
+      val _ = @{print} rule;
       val insts = map (fn NONE => NONE | SOME v => 
                                           (* FIXME: Each variable paired with false?
                                            -- changed : testing : matters not in our case since we are wrapping them with 'Free' *)
