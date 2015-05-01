@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveFunctor, FlexibleInstances, TypeOperators, ScopedTypeVariables, FlexibleContexts, GADTs #-}
-module HipSpecifyer.Prelude(genericArbitrary, genericCoarbitrary, Observe(..), genericObserve, obs0, obs1, obs2, obs3, obs4, obs5) where
+module HipSpecifyer.Prelude(genericArbitrary, HipSpecifyer.Prelude.genericCoarbitrary, Observe(..), genericObserve, obs0, obs1, obs2, obs3, obs4, obs5) where
 
 import Prelude hiding (Either(..))
 import Test.QuickCheck
