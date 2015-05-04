@@ -1,5 +1,8 @@
 (* Various tactics for Hipster. Induction, simplification and metis. *)
 
+(* TODO: checkout Type.could_unify
+          --> and: purely structural matching (raw_match, etc)
+         else Term.could_unify (for terms...) *)
 
 signature IND_TACS =
 sig 
@@ -172,6 +175,11 @@ fun induct_for_me ctxt xss rule i =
                         handle _ => NONE
      in Seq.map snd o Induct.induct_tac ctxt' false instss [] [] ruleT [] i end
 
+(* Term: has_abs, dest_abs??
+         typ_subst_atomic? *)
+fun isHO 
+
+
 (* Rule can be NONE if we just want plain structural induction. *)
 (* var is the variable we want to do induction on *)
 fun induct_on_var_tac ctxt rule var i goalthm = 
@@ -180,6 +188,11 @@ fun induct_on_var_tac ctxt rule var i goalthm =
       (*val ctxt = Proof_Context.init_global (Thm.theory_of_thm goalthm);*)
       val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
         (* TODO: make better (otherfrees, etc.) *)
+
+      val _ = @{print} non_ithings
+      val _ = @{print} "I-things"
+      val _ = @{print} ithings
+
       val (otherfrees, inductfrees) = (case var of
                                         NONE => mk_induct_insts ithings []
                                       | SOME v => mk_induct_insts ithings v (*[v]*))
@@ -262,6 +275,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
       | ((n,r) :: rs) =>
           let val _ = Pretty.writeln (Pretty.str ("Rule: "^n))
               val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
+              val _ = @{print} vars
               val ruleVars = map fst (filter (fn v => exists (fn tr => Type.could_match (tr,snd v)) argTyps) vars)
               fun paired [] = []
                 | paired (v::vs) = map (fn w => [v,w]) vs @ paired vs
