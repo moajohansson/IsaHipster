@@ -177,7 +177,7 @@ fun induct_for_me ctxt xss rule i =
 
 (* Term: has_abs, dest_abs??
          typ_subst_atomic? *)
-fun isHO 
+(*fun isHO *)
 
 
 (* Rule can be NONE if we just want plain structural induction. *)
@@ -190,7 +190,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
         (* TODO: make better (otherfrees, etc.) *)
 
       val _ = @{print} non_ithings
-      val _ = @{print} "I-things"
+      val _ = Pretty.writeln (Pretty.str "I-things")
       val _ = @{print} ithings
 
       val (otherfrees, inductfrees) = (case var of
@@ -206,7 +206,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                                           SOME (NONE : Binding.binding option,(Free v,false)))
                          inductfrees;
          (* Throw away Isar related stuff and only take the Thm.thm seq *)
-      val _ = Pretty.writeln (Pretty.block ( [Pretty.str "induct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
+      val _ = Pretty.writeln (Pretty.block ( [Pretty.str "pinduct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
         | SOME (_, (Free (v,_),false)) => v) insts)), Pretty.str "; otherfrees: ", Pretty.str (Library.space_implode ", "
           (map (fn (v,_) => v) otherfrees)) ]));
       val nw_thms' = (Induct.induct_tac ctxt false [insts] [non_ithings] [] rule [] i goalthm)
