@@ -9,9 +9,9 @@ ML{*
 structure Hipster_Setup =
 struct
 
-(* FIXME: Default to Isabelle Contrib or something more sensible *)
-(* Set these to your path to the Hipster directory *)
-val basepath = "~/TheoremProvers/IsaHipster/";
+
+(* Set the basepath to Hipster's home directory *)
+val basepath = "$HIPSTER_HOME";
 val filepath = basepath^"GenCode/";
 
 end

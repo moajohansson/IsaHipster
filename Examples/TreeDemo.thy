@@ -1,5 +1,5 @@
 theory TreeDemo
-imports "../IsaHipster"
+imports "$HIPSTER_HOME/IsaHipster"
 
 begin
 
@@ -26,11 +26,7 @@ where
 
 (* First call to Hipster: Explore tmap and mirror *)
 hipster tmap mirror
-lemma lemma_a [thy_expl]: "mirror (tmap x2 y2) = tmap x2 (mirror y2)"
-by hipster_induct_simp
 
-lemma lemma_aa [thy_expl]: "mirror (mirror x2) = x2"
-by hipster_induct_simp
 
 
 fun flat_tree :: "'a Tree => 'a list"
@@ -41,11 +37,7 @@ where
 
 (* Second call to Hipster: Explore relation to lists: flat_tree tmap mirror rev map *)
 hipster flat_tree tmap mirror rev map
-lemma lemma_ab [thy_expl]: "flat_tree (tmap x2 y2) = map x2 (flat_tree y2)"
-by hipster_induct_simp
 
-lemma lemma_ac [thy_expl]: "flat_tree (mirror x2) = rev (flat_tree x2)"
-by hipster_induct_simp
 
 fun rightmost :: "'a Tree \<Rightarrow> 'a"
 where 
@@ -59,21 +51,6 @@ where
 
 (* Third call to Hipster: hd mirror flat_tree  rightmost leftmost*)
 hipster hd mirror flat_tree rightmost leftmost
-lemma lemma_ad [thy_expl]: "leftmost (mirror x2) = rightmost x2"
-by hipster_induct_simp
-
-lemma lemma_ae [thy_expl]: "rightmost (mirror x2) = leftmost x2"
-by hipster_induct_simp
-
-lemma lemma_af [thy_expl]: "hd (xs2 @ xs2) = hd xs2"
-by hipster_induct_simp
-
-
-lemma nonEmp[simp]: "flat_tree t ~= []"
-by (hipster_induct_simp)
-
-lemma unknown [thy_expl]: "hd (flat_tree x) = leftmost x"
-by (hipster_induct_simp)
 
 
 
