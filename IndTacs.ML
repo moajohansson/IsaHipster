@@ -277,6 +277,8 @@ fun try_induction_with ctxt scheme_rules strat vars i =
               val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
               val _ = @{print} vars
               val ruleVars = map fst (filter (fn v => exists (fn tr => Type.could_match (tr,snd v)) argTyps) vars)
+              val ruleSets = map (fn rv => filter (fn av => Type.could_match (tr, snd av))) argTyps
+              val _ = @{print}
               fun paired [] = []
                 | paired (v::vs) = map (fn w => [v,w]) vs @ paired vs
               val indvars = map (fn v => [v]) ruleVars @ paired ruleVars
