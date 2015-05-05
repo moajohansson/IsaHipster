@@ -82,5 +82,45 @@ fun intersperse :: "'a \<Rightarrow> 'a List \<Rightarrow> 'a List" where
 
 (*hipster_cond notNil tail app*)
 
+ML {*
+fun inductable_things_in_term thry t =
+    let
+      val _ = @{print} (Hipster_Utils.frees_of t)
+      val _ = @{print} (Term.strip_all_vars t)
+      fun lookup thy s =
+          case (Datatype.get_info thy s) of
+             NONE => NONE
+           | SOME di => SOME (#induct di);
+      fun datatype_chk (Type(tn,_)) =
+            Basics.is_some (lookup thry tn)
+        | datatype_chk _ = false;
+    in
+      (* Return frees and forall quantified vars (if any) *)
+      (* Split into those we can do structural induction over, and the rest *)
+       List.partition (datatype_chk o snd)
+                     ((Hipster_Utils.frees_of t) @
+                      (Term.strip_all_vars t))
+    end;
+
+  inductable_things_in_term @{theory} @{term "len b = len a"};
+  fun reP uu = case uu of
+        Var (_,t) => let val _ = @{print} "Var" in t end
+      | (t$_) => let val _ = @{print} "$" in reP t end
+      | (Abs (_, t, _)) => let val _ = @{print} "Abs" in t end
+      | (Free (_, t)) => t; (* TODO: Bound, Const *)
+
+  @{thm "drop.induct"};
+  (Thm.concl_of @{thm "drop.induct"});
+  (HOLogic.dest_Trueprop (Thm.concl_of @{thm "drop.induct"}));
+  @{term "case x of 0 \<Rightarrow> 0 | Suc y \<Rightarrow> y"};
+  @{term "P y x"};
+  (reP(HOLogic.dest_Trueprop (Thm.concl_of @{thm "drop.induct"})));
+  val ump = binder_types (reP(HOLogic.dest_Trueprop (Thm.concl_of @{thm "drop.induct"})));
+  val tumf = fastype_of @{term "Cons Z Nil"};
+  hd (tl ump) = tumf;
+  fastype_of1 ([],@{term "Cons Z Nil"});
+  Type.could_match(hd (tl ump), tumf);
+*}
+
 end
 

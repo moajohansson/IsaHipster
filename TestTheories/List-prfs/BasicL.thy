@@ -23,10 +23,134 @@ apply(simp_all)
 done*)
 
 lemma lemma_aa [thy_expl]: "len (maps x2 y2) = len y2"
-by hipster_induct_simp_metis
+by hipster_induct_schemes
 (*apply(induction y2)
 apply(simp_all)
 done*)
+
+lemma hdmap:
+  "xs \<noteq> Nil ==> head (maps f xs) = f (head xs)"
+  by hipster_induct_simp_metis
+
+lemma maptl:
+  "maps f (tail xs) = tail (maps f xs)"
+  by hipster_induct_simp_metis
+
+lemma map_ext: "(!!x. x : set xs --> f x = g x) ==> map f xs = map g xs"
+by (induct xs) simp_all
+
+lemma map_ident [simp]: "map (\<lambda>x. x) = (\<lambda>xs. xs)"
+by (rule ext, induct_tac xs) auto
+
+lemma map_append [simp]: "map f (xs @ ys) = map f xs @ map f ys"
+by (induct xs) auto
+
+lemma map_map [simp]: "map f (map g xs) = map (f o g) xs"
+by (induct xs) auto
+
+lemma map_comp_map[simp]: "((map f) o (map g)) = map(f o g)"
+apply(rule ext)
+apply(simp)
+done
+
+lemma rev_map: "rev (map f xs) = map f (rev xs)"
+by (induct xs) auto
+
+lemma map_eq_conv[simp]: "(map f xs = map g xs) = (!x : set xs. f x = g x)"
+by (induct xs) auto
+
+lemma map_cong [fundef_cong]:
+  "xs = ys ==> (!!x. x \<in> set ys ==> f x = g x) ==> map f xs = map g ys"
+  by simp
+
+lemma map_is_Nil_conv [iff]: "(map f xs = []) = (xs = [])"
+by (cases xs) auto
+
+lemma Nil_is_map_conv [iff]: "([] = map f xs) = (xs = [])"
+by (cases xs) auto
+
+lemma map_eq_Cons_conv:
+ "(map f xs = y#ys) = (\<exists>z zs. xs = z#zs \<and> f z = y \<and> map f zs = ys)"
+by (cases xs) auto
+
+lemma Cons_eq_map_conv:
+ "(x#xs = map f ys) = (\<exists>z zs. ys = z#zs \<and> x = f z \<and> xs = map f zs)"
+by (cases ys) auto
+
+lemmas map_eq_Cons_D = map_eq_Cons_conv [THEN iffD1]
+lemmas Cons_eq_map_D = Cons_eq_map_conv [THEN iffD1]
+declare map_eq_Cons_D [dest!]  Cons_eq_map_D [dest!]
+
+lemma ex_map_conv:
+  "(EX xs. ys = map f xs) = (ALL y : set ys. EX x. y = f x)"
+by(induct ys, auto simp add: Cons_eq_map_conv)
+
+lemma map_eq_imp_length_eq:
+  assumes "map f xs = map g ys"
+  shows "length xs = length ys"
+using assms proof (induct ys arbitrary: xs)
+  case Nil then show ?case by simp
+next
+  case (Cons y ys) then obtain z zs where xs: "xs = z # zs" by auto
+  from Cons xs have "map f zs = map g ys" by simp
+  moreover with Cons have "length zs = length ys" by blast
+  with xs show ?case by simp
+qed
+  
+lemma map_inj_on:
+ "[| map f xs = map f ys; inj_on f (set xs Un set ys) |]
+  ==> xs = ys"
+apply(frule map_eq_imp_length_eq)
+apply(rotate_tac -1)
+apply(induct rule:list_induct2)
+ apply simp
+apply(simp)
+apply (blast intro:sym)
+done
+
+lemma inj_on_map_eq_map:
+ "inj_on f (set xs Un set ys) ==> (map f xs = map f ys) = (xs = ys)"
+by(blast dest:map_inj_on)
+
+lemma map_injective:
+ "map f xs = map f ys ==> inj f ==> xs = ys"
+by (induct ys arbitrary: xs) (auto dest!:injD)
+
+lemma inj_map_eq_map[simp]: "inj f ==> (map f xs = map f ys) = (xs = ys)"
+by(blast dest:map_injective)
+
+lemma inj_mapI: "inj f ==> inj (map f)"
+by (iprover dest: map_injective injD intro: inj_onI)
+
+lemma inj_mapD: "inj (map f) ==> inj f"
+apply (unfold inj_on_def, clarify)
+apply (erule_tac x = "[x]" in ballE)
+ apply (erule_tac x = "[y]" in ballE, simp, blast)
+apply blast
+done
+
+lemma inj_map[iff]: "inj (map f) = inj f"
+by (blast dest: inj_mapD intro: inj_mapI)
+
+lemma inj_on_mapI: "inj_on f (\<Union>(set ` A)) ==> inj_on (map f) A"
+apply(rule inj_onI)
+apply(erule map_inj_on)
+apply(blast intro:inj_onI dest:inj_onD)
+done
+
+lemma map_idI: "(!!x. x \<in> set xs ==> f x = x) ==> map f xs = xs"
+by (induct xs, auto)
+
+lemma map_fun_upd [simp]: "y \<notin> set xs ==> map (f(y:=v)) xs = map f xs"
+by (induct xs) auto
+
+lemma map_fst_zip[simp]:
+  "length xs = length ys ==> map fst (zip xs ys) = xs"
+by (induct rule:list_induct2, simp_all)
+
+lemma map_snd_zip[simp]:
+  "length xs = length ys ==> map snd (zip xs ys) = ys"
+by (induct rule:list_induct2, simp_all)
 
 lemma lemma_ac [thy_expl]: "(Nil \<noteq> (maps x2 y2)) = (Nil \<noteq> y2)"
 by hipster_induct_simp_metis (* just metis *)
@@ -39,6 +163,9 @@ done*)
 (* FIXME: we rev the list so that it doesn't get stuck in maps.induct BUT we should control this
   behaviour! \<Rightarrow> limit simp_or_metis... *)
 lemma unknown01 [thy_expl]: "init (maps x y) = maps x (init y)"
+apply(induction arbitrary: x rule: maps.induct )
+apply simp_all
+sledgehammer
 by (hipster_induct_schemes)(*
 apply(induction y rule: init.induct)
 apply(simp_all)

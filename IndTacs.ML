@@ -277,17 +277,23 @@ fun try_induction_with ctxt scheme_rules strat vars i =
               val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
               val _ = @{print} vars
               val ruleVars = map fst (filter (fn v => exists (fn tr => Type.could_match (tr,snd v)) argTyps) vars)
+              fun filter_matching t vs = filter (fn v => Type.could_match (t, snd v)) vs
+              val rulSss = map (fn t => filter_matching t vars) argTyps
               val ruleSets = map (fn rv => filter (fn av => Type.could_match (rv, snd av)) vars) argTyps
               val _ = @{print} (ruleSets)
+              val _ = @{print} rulSss
               fun paired [] = []
                 | paired (v::vs) = map (fn w => [v,w]) vs @ paired vs
               val indvars = map (fn v => [v]) ruleVars @ paired ruleVars
-              fun nonreptup (vs:: vss) = map (fn v => map (fn ts => v::ts) (nonreptup (map (filter (fn t => not ((op =) v t))) vss))) vs @ nonreptup vss
+              fun nonreptup [] = []
+                | nonreptup (vs:: vss) = fold (fn v => fn acc => acc @ (map (fn ts => v::ts) (nonreptup (map (filter (fn t => not (v = t))) vss)))) vs [] @ nonreptup vss
+              val _ = @{print} nonreptup ruleSets
               (* FIXME: vars types filter *)
           in
             try_induct_on ctxt ( r) strat indvars i
             ORELSE
             (try_induction_with ctxt rs strat vars i) end;
+
 
 fun try_induct_schemes ctxt strat i thm =
     let
@@ -297,7 +303,7 @@ fun try_induct_schemes ctxt strat i thm =
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
                         handle _ => (n, NONE) ) ((*"Naturals.leq.induct" ::*)distinct (op =) (map (fn c => (c^".induct")) consts))
-      val schemes = rev (*the o snd*) (filter (Basics.is_some o snd) thinds)
+      val schemes = (*rev*) (*the o snd*) (filter (Basics.is_some o snd) thinds)
       val _ = Pretty.writeln (pretty_thm ctxt thm)
       (* FIXME: distinct ... *)
     in (try_induction_with ctxt schemes strat (distinct (op =) vars) i) thm
@@ -360,8 +366,10 @@ end;
 (*-----------------------------------------------------------------------------------------*)
 (* Structures for pre-defined combinations of routine/hard reasoning in Hipster            *)
 (*-----------------------------------------------------------------------------------------*)
+fun x vss = fn v => map (fn ts => v::ts) ( (map (filter (fn t => not (v = t))) vss))
 
-
+              fun nonreptup [] = []
+                | nonreptup (vs:: vss) = fold (fn v => fn acc => (map (fn ts => v::ts) (nonreptup (map (filter (fn t => not (v = t))) vss))) @ acc) vs [] @ nonreptup vss
 signature EXPL_TACS =
 sig
   val routine_tac : Proof.context -> tactic
