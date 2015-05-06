@@ -16,12 +16,13 @@ struct
 (* Term mainipulation stuff, stolen from IsaPlanner... *)
 (*------------------------------------------------------------------------------------*)
 
-fun add_term_frees (t, frees: Term.term list) = 
-    case t of
-      Free   _ => Ord_List.insert Term_Ord.term_ord t frees
+fun add_term_frees (t, frees: Term.term list) = let
+      fun myeq tup = case Term_Ord.term_ord tup of EQUAL => true | _ => false in
+    (case t of
+      Free   _ => distinct myeq (t::frees) (*Ord_List.insert Term_Ord.term_ord t frees*)
       | Abs (_,_,body) => add_term_frees(body,frees)
       | f$t =>  add_term_frees (f, add_term_frees(t, frees))
-      | _ => frees;
+      | _ => frees) end;
 
 fun add_typ_tfrees (Type(_,Ts),fs) = List.foldr add_typ_tfrees fs Ts
       | add_typ_tfrees(TFree(f),fs) = insert (op =) f fs

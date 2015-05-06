@@ -84,25 +84,16 @@ fun intersperse :: "'a \<Rightarrow> 'a List \<Rightarrow> 'a List" where
 
 ML {*
 fun inductable_things_in_term thry t =
-    let
-      val _ = @{print} (Hipster_Utils.frees_of t)
-      val _ = @{print} (Term.strip_all_vars t)
-      fun lookup thy s =
-          case (Datatype.get_info thy s) of
-             NONE => NONE
-           | SOME di => SOME (#induct di);
-      fun datatype_chk (Type(tn,_)) =
-            Basics.is_some (lookup thry tn)
+    let val _ = @{print} (Hipster_Utils.frees_of t)
+        val _ = @{print} (Term.strip_all_vars t)
+        fun lookup thy s = case (Datatype.get_info thy s) of
+               NONE => NONE
+             | SOME di => SOME (#induct di);
+      fun datatype_chk (Type(tn,_)) = Basics.is_some (lookup thry tn)
         | datatype_chk _ = false;
-    in
-      (* Return frees and forall quantified vars (if any) *)
-      (* Split into those we can do structural induction over, and the rest *)
-       List.partition (datatype_chk o snd)
-                     ((Hipster_Utils.frees_of t) @
-                      (Term.strip_all_vars t))
-    end;
+    in List.partition (datatype_chk o snd) ((Hipster_Utils.frees_of t) @ (Term.strip_all_vars t)) end;
 
-  inductable_things_in_term @{theory} @{term "len b = len a"};
+  inductable_things_in_term @{theory} @{term "len b = len a \<Longrightarrow> app (zip a b) (zip c d) = zip (app a c) (app b d)"};
   fun reP uu = case uu of
         Var (_,t) => let val _ = @{print} "Var" in t end
       | (t$_) => let val _ = @{print} "$" in reP t end
