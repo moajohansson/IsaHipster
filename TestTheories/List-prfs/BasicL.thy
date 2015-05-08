@@ -47,13 +47,13 @@ by (induct xs) auto
 
 lemma map_map [simp]: "map f (map g xs) = map (f o g) xs"
 by (induct xs) auto
-
-lemma map_comp_map[simp]: "((map f) o (map g)) = map(f o g)"
+(*
+lemma map_comp_map[simp]: "((maps f) o (maps g)) = maps(f o g)"
 apply(rule ext)
 apply(simp)
-done
+oops
 
-lemma rev_map: "rev (map f xs) = map f (rev xs)"
+lemma rev_map: "rev (maps f xs) = maps f (rev xs)"
 by (induct xs) auto
 
 lemma map_eq_conv[simp]: "(map f xs = map g xs) = (!x : set xs. f x = g x)"
@@ -151,6 +151,9 @@ by (induct rule:list_induct2, simp_all)
 lemma map_snd_zip[simp]:
   "length xs = length ys ==> map snd (zip xs ys) = ys"
 by (induct rule:list_induct2, simp_all)
+*)
+lemma map_snd_zip: "len xs = len ys \<Longrightarrow> maps snd (zip xs ys) = y"
+oops
 
 lemma lemma_ac [thy_expl]: "(Nil \<noteq> (maps x2 y2)) = (Nil \<noteq> y2)"
 by hipster_induct_simp_metis (* just metis *)
@@ -163,9 +166,8 @@ done*)
 (* FIXME: we rev the list so that it doesn't get stuck in maps.induct BUT we should control this
   behaviour! \<Rightarrow> limit simp_or_metis... *)
 lemma unknown01 [thy_expl]: "init (maps x y) = maps x (init y)"
-apply(induction arbitrary: x rule: maps.induct )
-apply simp_all
-sledgehammer
+(*apply(induction arbitrary: x rule: maps.induct )
+apply simp_all*)
 by (hipster_induct_schemes)(*
 apply(induction y rule: init.induct)
 apply(simp_all)
@@ -371,6 +373,8 @@ fun len' :: "'a List \<Rightarrow> nat" where
 | "len' (Cons t ts) = Suc (len' ts)"
 
 lemma extens: "\<lbrakk> len' xs = len' ys ; ALL i < len' xs. ith xs i = ith ys i \<rbrakk> \<Longrightarrow> xs = ys"
+apply hipster_induct_schemes
+
 oops
 
 fun map' :: "('a \<Rightarrow> 'b) \<Rightarrow> 'a list \<Rightarrow> 'b List" where

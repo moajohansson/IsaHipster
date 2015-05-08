@@ -157,10 +157,10 @@ fun inductable_things_in_term thry t =
                       (Term.strip_all_vars t))
     end;
 
-fun inductable_things_in_sg i th = 
+fun inductable_things_in_sg i thm = let val _ = @{print} i in
     inductable_things_in_term
-      (Thm.theory_of_thm th)
-      (Library.nth (prems_of th) (i - 1)); (* XXX: check how this might affect us *)
+      (Thm.theory_of_thm thm)
+      (Library.nth (prems_of thm) (i - 1)) end (* XXX: check how this might affect us *)
 
 fun infer_term x ctxt =
      let val (T, ctxt') = Proof_Context.inferred_param x ctxt
@@ -303,7 +303,7 @@ fun try_induct_schemes ctxt strat i thm =
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
                         handle _ => (n, NONE) ) ((*"Naturals.leq.induct" ::*)distinct (op =) (map (fn c => (c^".induct")) consts))
-      val schemes = (*rev*) (*the o snd*) (filter (Basics.is_some o snd) thinds)
+      val schemes = rev (*the o snd*) (filter (Basics.is_some o snd) thinds)
       val _ = Pretty.writeln (pretty_thm ctxt thm)
       (* FIXME: distinct ... *)
     in (try_induction_with ctxt schemes strat (distinct (op =) vars) i) thm

@@ -82,6 +82,38 @@ fun intersperse :: "'a \<Rightarrow> 'a List \<Rightarrow> 'a List" where
 
 (*hipster_cond notNil tail app*)
 
+fun id :: "'a \<Rightarrow> 'a" where "id x = x"
+fun remDrop :: "Nat \<Rightarrow> 'a List \<Rightarrow> Nat" where "remDrop n ts = len (drop n ts)"
+
+lemma example : "len b = len a \<Longrightarrow> app (zip a b) (zip c d) = zip (app a c) (app b d)"
+apply(induction a b  rule: zip.induct)
+apply (simp_all)
+by (metis Nat.distinct(1) app.simps(1) len.simps(2) List.exhaust)
+
+lemma eg : "maps f (init xs) = init (maps f xs)"
+apply(induction xs rule: maps.induct)
+apply simp_all
+(* ( {* Drule.flexflex_unique*}*)
+(*apply (tactic {*  prune_params_tac @{context} *})
+apply (tactic {*  flexflex_tac *})*)
+proof -
+  fix fa :: "'b \<Rightarrow> 'a" and a :: 'b and as :: "'b List"
+  assume a1: "maps fa (init as) = init (maps fa as)"
+  obtain esk1\<^sub>1 :: "'b List \<Rightarrow> 'b" and esk2\<^sub>1 :: "'b List \<Rightarrow> 'b List" where f2: "\<forall>x\<^sub>4. x\<^sub>4 = Listing.List.Cons (esk1\<^sub>1 x\<^sub>4) (esk2\<^sub>1 x\<^sub>4) \<or> x\<^sub>4 = Listing.List.Nil" by (metis head.cases)
+  hence f3: "\<And>x1 x2. init (Listing.List.Cons (x1\<Colon>'b) x2) = Listing.List.Cons x1 (init x2) \<or> Listing.List.Nil = x2" by (metis init.simps(3))
+  have f4: "\<And>x1 x2 x\<^sub>3 x\<^sub>4. init (Listing.List.Cons (x1\<Colon>'a) (maps x2 (Listing.List.Cons (x\<^sub>3\<Colon>'b) x\<^sub>4))) = Listing.List.Cons x1 (init (maps x2 (Listing.List.Cons x\<^sub>3 x\<^sub>4)))" by simp
+  have "as = Listing.List.Nil \<longrightarrow> init (maps fa (Listing.List.Cons a as)) = maps fa (init (Listing.List.Cons a as))" by simp
+  thus "maps fa (init (Listing.List.Cons a as)) = init (Listing.List.Cons (fa a) (maps fa as))" using a1 f2 f3 f4 by (metis maps.simps(2))
+qed
+(*by (metis head.cases init.simps(2) init.simps(3) maps.simps(1) maps.simps(2))
+by (metis List.distinct(1) head.cases init.simps(2) init.simps(3) maps.elims maps.simps(1) maps.simps(2))
+*)
+
+lemma eg2 : "leq (S n) (len ts) \<Longrightarrow> (drop n ts) \<noteq> Nil"
+apply (induction n ts rule: drop.induct)
+apply simp_all
+oops
+
 ML {*
 fun inductable_things_in_term thry t =
     let val _ = @{print} (Hipster_Utils.frees_of t)
@@ -93,12 +125,15 @@ fun inductable_things_in_term thry t =
         | datatype_chk _ = false;
     in List.partition (datatype_chk o snd) ((Hipster_Utils.frees_of t) @ (Term.strip_all_vars t)) end;
 
-  inductable_things_in_term @{theory} @{term "len b = len a \<Longrightarrow> app (zip a b) (zip c d) = zip (app a c) (app b d)"};
+  val prop = @{term "len b = len a \<Longrightarrow> app (zip a b) (zip c d) = zip (app a c) (app b d)"};
+  val th' = (Goal.init o (Thm.cterm_of @{theory})) ((Syntax.read_prop @{context}) "len b = len a \<Longrightarrow> app (zip a b) (zip c d) = zip (app a c) (app b d)");
+
+  inductable_things_in_term @{theory} prop;
   fun reP uu = case uu of
-        Var (_,t) => let val _ = @{print} "Var" in t end
-      | (t$_) => let val _ = @{print} "$" in reP t end
-      | (Abs (_, t, _)) => let val _ = @{print} "Abs" in t end
-      | (Free (_, t)) => t; (* TODO: Bound, Const *)
+        Var (_,t)       => (*let val _ = @{print} "Var" in t end*) t
+      | (t$_)           => (*let val _ = @{print} "$" in reP t end*) reP t
+      | (Abs (_, t, _)) => (*let val _ = @{print} "Abs" in t end*) t
+      | (Free (_, t))   => t; (* TODO: Bound, Const *)
 
   @{thm "drop.induct"};
   (Thm.concl_of @{thm "drop.induct"});
@@ -111,6 +146,36 @@ fun inductable_things_in_term thry t =
   hd (tl ump) = tumf;
   fastype_of1 ([],@{term "Cons Z Nil"});
   Type.could_match(hd (tl ump), tumf);
+*}
+
+ML {*
+  val rdrop = @{thm "drop.induct"}
+  val eg2 = @{term "leq (S n) (len ts) \<Longrightarrow> (drop n ts) \<noteq> Nil"}
+  val th2 = (Goal.init o (Thm.cterm_of @{theory})) ((Syntax.read_prop @{context}) "leq (S n) (len ts) \<Longrightarrow> (drop n ts) \<noteq> Nil")
+  fun argTyps r = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ( r)))) (* types of pred P args *)
+  (*val _ = @{print} (prems_of th')
+  val _ = @{print} (length (prems_of @{thm "len.induct"}));
+  val _ = @{print}((concl_of th'));
+  val bist = fst (inductable_things_in_term (Thm.theory_of_thm th') (concl_of th'))*)
+  val vars = fst (inductable_things_in_term (Thm.theory_of_thm th') (Library.nth (prems_of th') 0))
+  val _ = @{print} vars
+  fun ruleVars r  vs = map fst (filter (fn v => exists (fn tr => Type.could_match (tr,snd v)) (argTyps r)) vs)
+  fun filter_matching t vs = filter (fn v => Type.could_match (t, snd v)) vs
+  fun rulSss r = map (fn t => filter_matching t vars) (argTyps r)
+  fun ruleSets r vs = map (fn rv => filter (fn av => Type.could_unify (rv, snd av)) vs) (argTyps r)
+  fun paired [] = []
+    | paired (v::vs) = map (fn w => [v,w]) vs @ paired vs
+  val indvars = map (fn v => [v]) (ruleVars rdrop vars) @ paired (ruleVars rdrop vars)
+  fun nonreptup [] = []
+    | nonreptup (vs:: vss) = fold (fn v => fn acc => acc @ (map (fn ts => v::ts) (nonreptup (map (filter (fn t => not (v = t))) vss)))) vs [] @ nonreptup vss
+  fun instance_rule (vs::vss) (t::ts) = map 
+  val nonrepR = nonreptup (ruleSets rdrop vars);
+  ruleSets rdrop vars;
+  ruleSets @{thm "zip.induct"} vars;
+  ruleSets @{thm "app.induct"} vars;
+  val vs2 = fst (inductable_things_in_term (Thm.theory_of_thm th2) (Library.nth (prems_of th2) 0));
+  ruleSets rdrop vs2;
+  ruleSets @{thm "maps.induct"} vs2;
 *}
 
 end
