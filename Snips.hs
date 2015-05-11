@@ -2,8 +2,13 @@ module Snips where
 
 import Data.List
 
-data Ty = A | B | C
+type Indexname = (String, Int)
+type Class = String
+type Sort = [Class]
+
+data Ty = Type String [Ty] | TFree String Sort | TVar Indexname Sort
   deriving (Eq, Show)
+
 data Va = X | Y | Z
   deriving (Eq, Show)
 

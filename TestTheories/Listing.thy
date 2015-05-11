@@ -91,7 +91,7 @@ apply (simp_all)
 by (metis Nat.distinct(1) app.simps(1) len.simps(2) List.exhaust)
 
 lemma eg : "maps f (init xs) = init (maps f xs)"
-apply(induction xs rule: maps.induct)
+apply(induction f xs rule: maps.induct)
 apply simp_all
 (* ( {* Drule.flexflex_unique*}*)
 (*apply (tactic {*  prune_params_tac @{context} *})
@@ -168,14 +168,59 @@ ML {*
   val indvars = map (fn v => [v]) (ruleVars rdrop vars) @ paired (ruleVars rdrop vars)
   fun nonreptup [] = []
     | nonreptup (vs:: vss) = fold (fn v => fn acc => acc @ (map (fn ts => v::ts) (nonreptup (map (filter (fn t => not (v = t))) vss)))) vs [] @ nonreptup vss
-  fun instance_rule (vs::vss) (t::ts) = map 
+  fun instance_rule (vs::vss) (_::ts) = List.concat (map (fn v => [v] :: map (fn stuff => v::stuff) (instance_rule vss ts)) vs)
+    | instance_rule _ _ = []
   val nonrepR = nonreptup (ruleSets rdrop vars);
   ruleSets rdrop vars;
   ruleSets @{thm "zip.induct"} vars;
   ruleSets @{thm "app.induct"} vars;
   val vs2 = fst (inductable_things_in_term (Thm.theory_of_thm th2) (Library.nth (prems_of th2) 0));
   ruleSets rdrop vs2;
+  val instanceDrop = instance_rule (ruleSets rdrop vs2) (argTyps rdrop);
+  val instanceZip = instance_rule (ruleSets @{thm "zip.induct"} vars) (argTyps @{thm "zip.induct"});
+  val instanceApp = instance_rule (ruleSets @{thm "app.induct"} vars) (argTyps @{thm "app.induct"});
   ruleSets @{thm "maps.induct"} vs2;
+  
+  
+  fun var_typ_ord ((x,t1),(y,t2)) =
+       (case fast_string_ord (x,y) of
+          EQUAL => (if Term_Ord.typ_ord (t1,t2) = EQUAL then EQUAL else raise Type.TYPE_MATCH)
+        | LESS => LESS
+        | GREATER => GREATER)
+
+  val merge_n_instances = fold (fn ws => fn bss => Ord_List.insert (dict_ord var_typ_ord) ws bss)
+(*Ord_List.insert Term_Ord.term_ord t frees*) (*| indexBins v [[[]]] = [[[v]], [[]]]*)
+  fun index_bins v (bin1s::bin0s::binss) =
+        let val new1s = map (fn is0 => is0@[v] (*v::is0*)) bin0s
+            val all1s = merge_n_instances new1s bin1s (*fold (fn ws => fn bss => Ord_List.insert (dict_ord var_typ_ord) ws bss) new1s bin1s*)
+        in
+           all1s :: index_bins v (bin0s::binss)
+        end
+    | index_bins _ [[[]]] = [[[]]]
+    | index_bins _ _ = [];
+  index_bins (hd vs2) ([]::(index_bins (hd vs2) [[], [[]]]));
+
+  fun zipWith f xs ys = ListPair.foldr (fn (a, b, cs) => f(a, b)::cs) [] (xs, ys)
+  val tesz = zipWith (op +) [1,2,3] [1,2];
+
+  fun merge_bins xss yss = zipWith (fn (xs,ys) => merge_n_instances ys xs) xss yss (*(xs::xss) (ys::yss) = (xs@ys)::merge_bins xss yss*)
+
+  fun foldl1 _ nil = raise Empty
+    | foldl1 f (x::xs) = fold f xs x
+
+  fun fix_nth_arg (t::ts) xs bins =
+        let fun update_types v = map (fn t' => if Term_Ord.typ_ord (t,t') = EQUAL then snd v else t') ts
+            fun into_bins v = index_bins v ([]::bins)
+            val vars = filter (fn v => Type.could_match (t, snd v)) xs
+            val all_bins = map (fn v => fix_nth_arg (update_types v) xs (into_bins v)) vars
+       in if null all_bins then bins else foldl1 merge_bins all_bins end
+    | fix_nth_arg [] _ bins = bins
+  
+  val tesq = fix_nth_arg (argTyps rdrop) vs2 [[[]]]
+  val tesz = fix_nth_arg (argTyps @{thm "zip.induct"}) (vars) [[[]]];
+  val tesa = fix_nth_arg (argTyps @{thm "app.induct"}) (vars) [[[]]];
+  length tesz;
+  length (nth tesz 0)
 *}
 
 end
