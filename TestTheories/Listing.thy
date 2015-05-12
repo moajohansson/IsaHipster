@@ -213,14 +213,16 @@ ML {*
             fun into_bins v = index_bins v ([]::bins)
             val vars = filter (fn v => Type.could_match (t, snd v)) xs
             val all_bins = map (fn v => fix_nth_arg (update_types v) xs (into_bins v)) vars
-       in if null all_bins then bins else foldl1 merge_bins all_bins end
+       in if null all_bins then fix_nth_arg ts xs bins else foldl1 merge_bins all_bins end
     | fix_nth_arg [] _ bins = bins
   
   val tesq = fix_nth_arg (argTyps rdrop) vs2 [[[]]]
   val tesz = fix_nth_arg (argTyps @{thm "zip.induct"}) (vars) [[[]]];
   val tesa = fix_nth_arg (argTyps @{thm "app.induct"}) (vars) [[[]]];
   length tesz;
-  length (nth tesz 0)
+  length (nth tesz 0);
+  val tesm = fix_nth_arg (argTyps @{thm "maps.induct"}) (vars) [[[]]];
+
 *}
 
 end

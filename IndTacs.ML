@@ -288,9 +288,14 @@ fun try_induction_with ctxt scheme_rules strat vars i =
               fun nonreptup [] = []
                 | nonreptup (vs:: vss) = fold (fn v => fn acc => acc @ (map (fn ts => v::ts) (nonreptup (map (filter (fn t => not (v = t))) vss)))) vs [] @ nonreptup vss
               val _ = @{print} nonreptup ruleSets
+              val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
+              val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)
+              val instt = hd all_instances
+              val _ = @{print} instances
+              val _ = @{print} instt
               (* FIXME: vars types filter *)
           in
-            try_induct_on ctxt ( r) strat indvars i
+            try_induct_on ctxt ( r) strat (map (map fst) instt) i
             ORELSE
             (try_induction_with ctxt rs strat vars i) end;
 
@@ -366,10 +371,7 @@ end;
 (*-----------------------------------------------------------------------------------------*)
 (* Structures for pre-defined combinations of routine/hard reasoning in Hipster            *)
 (*-----------------------------------------------------------------------------------------*)
-fun x vss = fn v => map (fn ts => v::ts) ( (map (filter (fn t => not (v = t))) vss))
 
-              fun nonreptup [] = []
-                | nonreptup (vs:: vss) = fold (fn v => fn acc => (map (fn ts => v::ts) (nonreptup (map (filter (fn t => not (v = t))) vss))) @ acc) vs [] @ nonreptup vss
 signature EXPL_TACS =
 sig
   val routine_tac : Proof.context -> tactic

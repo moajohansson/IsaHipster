@@ -373,7 +373,7 @@ fun len' :: "'a List \<Rightarrow> nat" where
 | "len' (Cons t ts) = Suc (len' ts)"
 
 lemma extens: "\<lbrakk> len' xs = len' ys ; ALL i < len' xs. ith xs i = ith ys i \<rbrakk> \<Longrightarrow> xs = ys"
-apply hipster_induct_schemes
+(*apply hipster_induct_schemes*)
 
 oops
 

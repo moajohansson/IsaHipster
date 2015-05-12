@@ -31,6 +31,7 @@ val thy_interesting = Attrib.setup_config_bool @{binding thy_interesting} (K tru
 setup {* Hipster_Rules.setup;*}
 
 ML_file "HipsterUtils.ML"
+ML_file "SchemeInstances.ML"
 ML_file "ThyExplData.ML"
 ML_file "HipsterTacs.ML"
 
