@@ -80,6 +80,8 @@ fun intersperse :: "'a \<Rightarrow> 'a List \<Rightarrow> 'a List" where
 | "intersperse x (Cons y Nil) = Cons y Nil"
 | "intersperse x (Cons y ys) = Cons y (Cons x (intersperse x ys))"
 
+hipster drop take app
+
 (*hipster_cond notNil tail app*)
 
 fun id :: "'a \<Rightarrow> 'a" where "id x = x"

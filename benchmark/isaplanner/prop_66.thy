@@ -1,5 +1,6 @@
 theory prop_66
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -14,6 +15,7 @@ begin
   "filter x (nil) = nil"
   | "filter x (cons z xs) =
        (if x z then cons z (filter x xs) else filter x xs)"
+  hipster len le filter
   theorem x0 :
     "!! (q :: ('a => bool)) (xs :: 'a list) .
        le (len (filter q xs)) (len xs)"

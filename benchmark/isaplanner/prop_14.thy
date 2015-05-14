@@ -1,5 +1,6 @@
 theory prop_14
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   fun filter :: "('a => bool) => 'a list => 'a list" where
@@ -9,6 +10,7 @@ begin
   fun append :: "'a list => 'a list => 'a list" where
   "append (nil) y = y"
   | "append (cons z xs) y = cons z (append xs y)"
+  hipster filter append
   theorem x0 :
     "!! (p :: ('a => bool)) (xs :: 'a list) (ys :: 'a list) .
        (filter p (append xs ys)) = (append (filter p xs) (filter p ys))"

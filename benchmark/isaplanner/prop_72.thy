@@ -1,5 +1,6 @@
 theory prop_72
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -24,6 +25,7 @@ begin
   fun rev :: "'a list => 'a list" where
   "rev (nil) = nil"
   | "rev (cons y xs) = append (rev xs) (cons y (nil))"
+  hipster take minus len drop append rev
   theorem x0 :
     "!! (i :: Nat) (xs :: 'a list) .
        (rev (drop i xs)) = (take (minus (len xs) i) (rev xs))"

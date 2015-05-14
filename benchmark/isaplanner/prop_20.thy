@@ -1,5 +1,6 @@
 theory prop_20
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -17,6 +18,7 @@ begin
   fun sort :: "Nat list => Nat list" where
   "sort (nil) = nil"
   | "sort (cons y xs) = insort y (sort xs)"
+  hipster len le insort sort
   theorem x0 :
     "!! (xs :: Nat list) . (len (sort xs)) = (len xs)"
     oops

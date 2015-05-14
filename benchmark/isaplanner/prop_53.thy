@@ -1,5 +1,6 @@
 theory prop_53
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -23,6 +24,7 @@ begin
   "count x (nil) = Z"
   | "count x (cons z ys) =
        (if equal2 x z then S (count x ys) else count x ys)"
+  hipster le insort sort equal2 count
   theorem x0 :
     "!! (n :: Nat) (xs :: Nat list) .
        (count n xs) = (count n (sort xs))"

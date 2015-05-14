@@ -140,10 +140,14 @@ fun goal_prop str ctxt =
 fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
     let
       val thy = Proof_Context.theory_of ctxt
+      val _ = @{print} lemma_strs
       val conjs = lemma_strs
                     |> map (Goal.init o (Thm.cterm_of thy) o (Syntax.read_prop ctxt))
                     |> filter (is_present ctxt);
       (*val _ = @{print} prio_goal_opt*)
+      val _ = @{print} conjs
+      val culprit = filter (fn s => String.isSubstring "[]" s) (map (@{make_string}) conjs)
+      val _ = @{print}culprit
     in
       ExplData.put
         (Data{open_conjs = conjs, failed = [], proved = [], facts = facts, fact_names = fact_names,

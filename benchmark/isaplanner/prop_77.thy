@@ -1,5 +1,6 @@
 theory prop_77
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -16,6 +17,7 @@ begin
   "insort x (nil) = cons x (nil)"
   | "insort x (cons z xs) =
        (if le x z then cons x (cons z xs) else cons z (insort x xs))"
+  hipster le sorted insort
   theorem x0 :
     "!! (x :: Nat) (xs :: Nat list) .
        (sorted xs) ==> (sorted (insort x xs))"

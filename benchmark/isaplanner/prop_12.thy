@@ -1,5 +1,6 @@
 theory prop_12
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -10,6 +11,7 @@ begin
   "drop (Z) y = y"
   | "drop (S z) (nil) = nil"
   | "drop (S z) (cons x2 x3) = drop z x3"
+  hipster map2 drop
   theorem x0 :
     "!! (n :: Nat) (f :: ('a1 => 'a)) (xs :: 'a1 list) .
        (drop n (map2 f xs)) = (map2 f (drop n xs))"

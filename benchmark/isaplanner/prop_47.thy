@@ -1,5 +1,6 @@
 theory prop_47
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a Tree = Leaf | Node "'a Tree" "'a" "'a Tree"
   datatype Nat = Z | S "Nat"
@@ -13,6 +14,7 @@ begin
   fun height :: "'a Tree => Nat" where
   "height (Leaf) = Z"
   | "height (Node l y r) = S (max2 (height l) (height r))"
+  hipster mirror max2 height
   theorem x0 :
     "!! (b :: 'a Tree) . (height (mirror b)) = (height b)"
     oops

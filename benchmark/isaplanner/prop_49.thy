@@ -1,5 +1,6 @@
 theory prop_49
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   fun butlast :: "'a list => 'a list" where
@@ -12,6 +13,7 @@ begin
   fun butlastConcat :: "'a list => 'a list => 'a list" where
   "butlastConcat x (nil) = butlast x"
   | "butlastConcat x (cons z x2) = append x (butlast (cons z x2))"
+  hipster butlast append butlastConcat
   theorem x0 :
     "!! (xs :: 'a list) (ys :: 'a list) .
        (butlast (append xs ys)) = (butlastConcat xs ys)"

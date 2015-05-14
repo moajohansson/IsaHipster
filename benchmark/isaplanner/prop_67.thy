@@ -1,5 +1,6 @@
 theory prop_67
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -14,6 +15,7 @@ begin
   "butlast (nil) = nil"
   | "butlast (cons y (nil)) = nil"
   | "butlast (cons y (cons x2 x3)) = cons y (butlast (cons x2 x3))"
+  hipster minus len butlast
   theorem x0 :
     "!! (xs :: 'a list) . (len (butlast xs)) = (minus (len xs) (S Z))"
     oops

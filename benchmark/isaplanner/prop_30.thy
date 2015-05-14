@@ -1,5 +1,6 @@
 theory prop_30
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -19,6 +20,7 @@ begin
   fun elem :: "Nat => Nat list => bool" where
   "elem x (nil) = False"
   | "elem x (cons z xs) = (if equal2 x z then True else elem x xs)"
+  hipster lt ins equal2 elem
   theorem x0 :
     "!! (x :: Nat) (xs :: Nat list) . elem x (ins x xs)"
     oops

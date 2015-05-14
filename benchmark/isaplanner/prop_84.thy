@@ -1,5 +1,6 @@
 theory prop_84
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype ('a, 'b) Pair2 = Pair "'a" "'b"
@@ -22,6 +23,7 @@ begin
   fun append :: "'a list => 'a list => 'a list" where
   "append (nil) y = y"
   | "append (cons z xs) y = cons z (append xs y)"
+  hipster zip take len drop append
   theorem x0 :
     "!! (xs :: 'a list) (ys :: 'a1 list) (zs :: 'a1 list) .
        (zip xs (append ys zs)) =

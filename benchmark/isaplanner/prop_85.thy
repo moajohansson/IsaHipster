@@ -1,5 +1,6 @@
 theory prop_85
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype ('a, 'b) Pair2 = Pair "'a" "'b"
@@ -17,6 +18,7 @@ begin
   fun rev :: "'a list => 'a list" where
   "rev (nil) = nil"
   | "rev (cons y xs) = append (rev xs) (cons y (nil))"
+  hipster zip len append rev
   theorem x0 :
     "!! (xs :: 'a list) (ys :: 'b list) .
        ((len xs) = (len ys)) ==>

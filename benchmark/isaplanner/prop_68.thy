@@ -1,5 +1,6 @@
 theory prop_68
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -19,6 +20,7 @@ begin
   "delete x (nil) = nil"
   | "delete x (cons z xs) =
        (if equal2 x z then delete x xs else cons z (delete x xs))"
+  hipster len le equal2 delete
   theorem x0 :
     "!! (n :: Nat) (xs :: Nat list) . le (len (delete n xs)) (len xs)"
     oops

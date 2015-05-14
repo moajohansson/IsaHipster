@@ -1,5 +1,6 @@
 theory prop_58
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype ('a, 'b) Pair2 = Pair "'a" "'b"
@@ -12,6 +13,7 @@ begin
   "drop (Z) y = y"
   | "drop (S z) (nil) = nil"
   | "drop (S z) (cons x2 x3) = drop z x3"
+  hipster zip drop
   theorem x0 :
     "!! (n :: Nat) (xs :: 'a list) (ys :: 'b list) .
        (drop n (zip xs ys)) = (zip (drop n xs) (drop n ys))"

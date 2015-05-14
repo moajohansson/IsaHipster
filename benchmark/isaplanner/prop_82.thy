@@ -1,5 +1,6 @@
 theory prop_82
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype ('a, 'b) Pair2 = Pair "'a" "'b"
@@ -12,6 +13,7 @@ begin
   "take (Z) y = nil"
   | "take (S z) (nil) = nil"
   | "take (S z) (cons x2 x3) = cons x2 (take z x3)"
+  hipster zip take
   theorem x0 :
     "!! (n :: Nat) (xs :: 'a list) (ys :: 'b list) .
        (take n (zip xs ys)) = (zip (take n xs) (take n ys))"

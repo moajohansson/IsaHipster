@@ -1,5 +1,6 @@
 theory prop_69
 imports Main
+imports "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun plus :: "Nat => Nat => Nat" where
@@ -9,6 +10,7 @@ begin
   "le (Z) y = True"
   | "le (S z) (Z) = False"
   | "le (S z) (S x2) = le z x2"
+  hipster plus le
   theorem x0 :
     "!! (n :: Nat) (m :: Nat) . le n (plus m n)"
     oops

@@ -1,5 +1,6 @@
 theory prop_01
 imports Main
+        "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -14,6 +15,8 @@ begin
   fun append :: "'a list => 'a list => 'a list" where
   "append (nil) y = y"
   | "append (cons z xs) y = cons z (append xs y)"
+
+  hipster take
   theorem x0 :
     "!! (n :: Nat) (xs :: 'a list) .
        (append (take n xs) (drop n xs)) = xs"

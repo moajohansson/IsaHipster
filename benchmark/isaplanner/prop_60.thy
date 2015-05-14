@@ -1,5 +1,6 @@
 theory prop_60
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -13,6 +14,7 @@ begin
   fun append :: "'a list => 'a list => 'a list" where
   "append (nil) y = y"
   | "append (cons z xs) y = cons z (append xs y)"
+  hipster null last append
   theorem x0 :
     "!! (xs :: Nat list) (ys :: Nat list) .
        (~ (null ys)) ==> ((last (append xs ys)) = (last ys))"

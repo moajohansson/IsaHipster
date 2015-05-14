@@ -1,5 +1,6 @@
 theory prop_41
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -10,6 +11,7 @@ begin
   fun map2 :: "('a => 'b) => 'a list => 'b list" where
   "map2 x (nil) = nil"
   | "map2 x (cons z xs) = cons (x z) (map2 x xs)"
+  hipster take map2
   theorem x0 :
     "!! (n :: Nat) (f :: ('a1 => 'a)) (xs :: 'a1 list) .
        (take n (map2 f xs)) = (map2 f (take n xs))"

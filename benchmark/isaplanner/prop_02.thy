@@ -1,5 +1,6 @@
 theory prop_02
 imports Main
+imports "../../IsaHipster"
 begin
   datatype 'a list = nil | cons "'a" "'a list"
   datatype Nat = Z | S "Nat"
@@ -18,6 +19,7 @@ begin
   fun append :: "'a list => 'a list => 'a list" where
   "append (nil) y = y"
   | "append (cons z xs) y = cons z (append xs y)"
+  hipster plus equal2 count append
   theorem x0 :
     "!! (n :: Nat) (xs :: Nat list) (ys :: Nat list) .
        (plus (count n xs) (count n ys)) = (count n (append xs ys))"
