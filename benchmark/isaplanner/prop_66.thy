@@ -1,4 +1,4 @@
-theory A
+theory prop_66
 imports Main
 begin
   datatype 'a list = nil | cons "'a" "'a list"
@@ -10,12 +10,12 @@ begin
   "le (Z) y = True"
   | "le (S z) (Z) = False"
   | "le (S z) (S x2) = le z x2"
-  fun filter :: "'a => bool => 'a list => 'a list" where
+  fun filter :: "('a => bool) => 'a list => 'a list" where
   "filter x (nil) = nil"
   | "filter x (cons z xs) =
        (if x z then cons z (filter x xs) else filter x xs)"
   theorem x0 :
-    "!! (q :: 'a => bool) (xs :: 'a list) .
+    "!! (q :: ('a => bool)) (xs :: 'a list) .
        le (len (filter q xs)) (len xs)"
     oops
 end

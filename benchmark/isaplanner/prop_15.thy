@@ -1,4 +1,4 @@
-theory A
+theory prop_15
 imports Main
 begin
   datatype 'a list = nil | cons "'a" "'a list"

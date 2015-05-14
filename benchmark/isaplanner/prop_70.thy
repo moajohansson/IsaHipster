@@ -1,4 +1,4 @@
-theory A
+theory prop_70
 imports Main
 begin
   datatype Nat = Z | S "Nat"

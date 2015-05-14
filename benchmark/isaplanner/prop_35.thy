@@ -1,8 +1,8 @@
-theory A
+theory prop_35
 imports Main
 begin
   datatype 'a list = nil | cons "'a" "'a list"
-  fun dropWhile :: "'a => bool => 'a list => 'a list" where
+  fun dropWhile :: "('a => bool) => 'a list => 'a list" where
   "dropWhile x (nil) = nil"
   | "dropWhile x (cons z xs) =
        (if x z then dropWhile x xs else cons z xs)"

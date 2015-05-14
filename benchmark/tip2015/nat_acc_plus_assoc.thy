@@ -1,0 +1,12 @@
+theory nat_acc_plus_assoc
+imports Main
+begin
+  datatype Nat = Z | S "Nat"
+  fun accplus :: "Nat => Nat => Nat" where
+  "accplus (Z) y = y"
+  | "accplus (S z) y = accplus z (S y)"
+  theorem x0 :
+    "!! (x :: Nat) (y :: Nat) (z :: Nat) .
+       (accplus x (accplus y z)) = (accplus (accplus x y) z)"
+    oops
+end

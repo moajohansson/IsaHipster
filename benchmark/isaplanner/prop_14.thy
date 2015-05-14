@@ -1,8 +1,8 @@
-theory A
+theory prop_14
 imports Main
 begin
   datatype 'a list = nil | cons "'a" "'a list"
-  fun filter :: "'a => bool => 'a list => 'a list" where
+  fun filter :: "('a => bool) => 'a list => 'a list" where
   "filter x (nil) = nil"
   | "filter x (cons z xs) =
        (if x z then cons z (filter x xs) else filter x xs)"
@@ -10,7 +10,7 @@ begin
   "append (nil) y = y"
   | "append (cons z xs) y = cons z (append xs y)"
   theorem x0 :
-    "!! (p :: 'a => bool) (xs :: 'a list) (ys :: 'a list) .
+    "!! (p :: ('a => bool)) (xs :: 'a list) (ys :: 'a list) .
        (filter p (append xs ys)) = (append (filter p xs) (filter p ys))"
     oops
 end
