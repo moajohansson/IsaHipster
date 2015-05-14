@@ -1,0 +1,12 @@
+theory A
+imports Main
+begin
+  datatype Nat = Z | S "Nat"
+  fun le :: "Nat => Nat => bool" where
+  "le (Z) y = True"
+  | "le (S z) (Z) = False"
+  | "le (S z) (S x2) = le z x2"
+  theorem x0 :
+    "!! (m :: Nat) (n :: Nat) . (le m n) ==> (le m (S n))"
+    oops
+end
