@@ -1,5 +1,6 @@
 theory bin_times
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   datatype Bin = One | ZeroAnd "Bin" | OneAnd "Bin"
@@ -29,6 +30,7 @@ begin
   fun mult :: "Nat => Nat => Nat" where
   "mult (Z) y = Z"
   | "mult (S n) y = plus y (mult n y)"
+  hipster s plus2 times plus toNat mult
   theorem x0 :
     "!! (x :: Bin) (y :: Bin) .
        (toNat (times x y)) = (mult (toNat x) (toNat y))"

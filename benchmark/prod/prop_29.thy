@@ -1,17 +1,19 @@
 theory prop_29
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   fun qrev :: "'a list => 'a list => 'a list" where
-  "qrev (nil) y = y"
-  | "qrev (cons z xs) y = qrev xs (cons z y)"
+  "qrev (Nil2) y = y"
+  | "qrev (Cons2 z xs) y = qrev xs (cons2 z y)"
   fun append :: "'a list => 'a list => 'a list" where
-  "append (nil) y = y"
-  | "append (cons z xs) y = cons z (append xs y)"
+  "append (Nil2) y = y"
+  | "append (Cons2 z xs) y = cons2 z (append xs y)"
   fun rev :: "'a list => 'a list" where
-  "rev (nil) = nil"
-  | "rev (cons y xs) = append (rev xs) (cons y (nil))"
+  "rev (Nil2) = nil2"
+  | "rev (Cons2 y xs) = append (rev xs) (cons2 y (Nil2))"
+  hipster qrev append rev
   theorem x0 :
-    "!! (x :: 'a list) . (rev (qrev x (nil))) = x"
+    "!! (x :: 'a list) . (rev (qrev x (Nil2))) = x"
     oops
 end

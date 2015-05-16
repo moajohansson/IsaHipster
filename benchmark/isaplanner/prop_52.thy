@@ -1,8 +1,8 @@
 theory prop_52
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   fun equal2 :: "Nat => Nat => bool" where
   "equal2 (Z) (Z) = True"
@@ -10,15 +10,15 @@ begin
   | "equal2 (S x2) (Z) = False"
   | "equal2 (S x2) (S y2) = equal2 x2 y2"
   fun count :: "Nat => Nat list => Nat" where
-  "count x (nil) = Z"
-  | "count x (cons z ys) =
+  "count x (Nil2) = Z"
+  | "count x (Cons2 z ys) =
        (if equal2 x z then S (count x ys) else count x ys)"
   fun append :: "'a list => 'a list => 'a list" where
-  "append (nil) y = y"
-  | "append (cons z xs) y = cons z (append xs y)"
+  "append (Nil2) y = y"
+  | "append (Cons2 z xs) y = cons2 z (append xs y)"
   fun rev :: "'a list => 'a list" where
-  "rev (nil) = nil"
-  | "rev (cons y xs) = append (rev xs) (cons y (nil))"
+  "rev (Nil2) = nil2"
+  | "rev (Cons2 y xs) = append (rev xs) (cons2 y (Nil2))"
   hipster equal2 count append rev
   theorem x0 :
     "!! (n :: Nat) (xs :: Nat list) .

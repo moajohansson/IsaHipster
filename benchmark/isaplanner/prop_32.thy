@@ -1,6 +1,6 @@
 theory prop_32
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun min2 :: "Nat => Nat => Nat" where

@@ -1,7 +1,8 @@
 theory escape_NoSpecial
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Token = A | B | C | D | ESC | P | Q | R
   fun or2 :: "bool => bool => bool" where
   "or2 True y = True"
@@ -33,16 +34,17 @@ begin
        | R => C
      end"
   fun escape :: "Token list => Token list" where
-  "escape (nil) = nil"
-  | "escape (cons y xs) =
-       (if isSpecial y then cons ESC (cons (code y) (escape xs)) else
-          cons y (escape xs))"
+  "escape (Nil2) = nil2"
+  | "escape (Cons2 y xs) =
+       (if isSpecial y then Cons2 ESC (cons2 (code y) (escape xs)) else
+          Cons2 y (escape xs))"
   fun and2 :: "bool => bool => bool" where
   "and2 True y = y"
   | "and2 False y = False"
   fun all :: "('a => bool) => 'a list => bool" where
-  "all x (nil) = True"
-  | "all x (cons z xs) = and2 (x z) (all x xs)"
+  "all x (Nil2) = True"
+  | "all x (Cons2 z xs) = and2 (x z) (all x xs)"
+  hipster or2 isSpecial isEsc ok code escape and2 all
   theorem x0 :
     "!! (xs :: Token list) . all (% (x :: Token) => ok x) (escape xs)"
     oops

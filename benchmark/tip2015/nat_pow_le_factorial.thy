@@ -1,5 +1,6 @@
 theory nat_pow_le_factorial
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun plus :: "Nat => Nat => Nat" where
@@ -18,6 +19,7 @@ begin
   fun factorial :: "Nat => Nat" where
   "factorial (Z) = S Z"
   | "factorial (S n) = mult (S n) (factorial n)"
+  hipster plus mult pow lt factorial
   theorem x0 :
     "!! (n :: Nat) .
        lt (pow (S (S Z)) (S (S (S (S n))))) (factorial (S (S (S (S n)))))"

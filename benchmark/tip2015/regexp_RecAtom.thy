@@ -1,7 +1,8 @@
 theory regexp_RecAtom
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype A = X | Y
   datatype R
     = Nil2 | Eps | Atom "A" | Plus "R" "R" | Seq "R" "R" | Star "R"
@@ -65,16 +66,17 @@ begin
        | Star p3 => seq (step p3 y) x
      end"
   fun recognise :: "R => A list => bool" where
-  "recognise x (nil) = eps x"
-  | "recognise x (cons z xs) = recognise (step x z) xs"
+  "recognise x (Nil2) = eps x"
+  | "recognise x (Cons2 z xs) = recognise (step x z) xs"
   fun eqList :: "A list => A list => bool" where
-  "eqList (nil) (nil) = True"
-  | "eqList (nil) (cons z x2) = False"
-  | "eqList (cons x3 xs) (nil) = False"
-  | "eqList (cons x3 xs) (cons y2 ys) =
+  "eqList (Nil2) (nil2) = True"
+  | "eqList (Nil2) (Cons2 z x2) = False"
+  | "eqList (Cons2 x3 xs) (Nil2) = False"
+  | "eqList (Cons2 x3 xs) (cons2 y2 ys) =
        and2 (eqA x3 y2) (eqList xs ys)"
+  hipster seq plus or2 eqA and2 eps epsR step recognise eqList
   theorem x0 :
     "!! (a :: A) (s :: A list) .
-       (recognise (Atom a) s) = (eqList s (cons a (nil)))"
+       (recognise (Atom a) s) = (eqList s (Cons2 a (Nil2)))"
     oops
 end

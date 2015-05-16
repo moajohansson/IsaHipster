@@ -1,5 +1,6 @@
 theory bin_plus
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   datatype Bin = One | ZeroAnd "Bin" | OneAnd "Bin"
@@ -22,6 +23,7 @@ begin
   "toNat (One) = S Z"
   | "toNat (ZeroAnd xs) = plus (toNat xs) (toNat xs)"
   | "toNat (OneAnd ys) = S (plus (toNat ys) (toNat ys))"
+  hipster s plus2 plus toNat
   theorem x0 :
     "!! (x :: Bin) (y :: Bin) .
        (toNat (plus2 x y)) = (plus (toNat x) (toNat y))"

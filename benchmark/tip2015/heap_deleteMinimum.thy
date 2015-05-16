@@ -1,7 +1,8 @@
 theory heap_deleteMinimum
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   datatype 'a Maybe = Nothing | Just "'a"
   datatype Heap = Node "Heap" "Nat" "Heap" | Nil2
@@ -9,8 +10,8 @@ begin
   "plus (Z) y = y"
   | "plus (S n) y = S (plus n y)"
   fun listDeleteMinimum :: "Nat list => (Nat list) Maybe" where
-  "listDeleteMinimum (nil) = Nothing"
-  | "listDeleteMinimum (cons y xs) = Just xs"
+  "listDeleteMinimum (Nil2) = Nothing"
+  | "listDeleteMinimum (Cons2 y xs) = Just xs"
   fun le :: "Nat => Nat => bool" where
   "le (Z) y = True"
   | "le (S z) (Z) = False"
@@ -22,9 +23,10 @@ begin
   | "merge (Node z x2 x3) (Nil2) = Node z x2 x3"
   | "merge (Nil2) y = y"
   fun toList :: "Nat => Heap => Nat list" where
-  "toList (Z) y = nil"
-  | "toList (S z) (Node x2 x3 x4) = cons x3 (toList z (merge x2 x4))"
-  | "toList (S z) (Nil2) = nil"
+  "toList (Z) y = Nil2"
+  | "toList (S z) (Node x2 x3 x4) =
+       Cons2 x3 (toList z (merge x2 x4))"
+  | "toList (S z) (Nil2) = Nil2"
   fun heapSize :: "Heap => Nat" where
   "heapSize (Node l y r) = S (plus (heapSize l) (heapSize r))"
   | "heapSize (Nil2) = Z"
@@ -36,6 +38,15 @@ begin
   fun deleteMinimum :: "Heap => Heap Maybe" where
   "deleteMinimum (Node l y r) = Just (merge l r)"
   | "deleteMinimum (Nil2) = Nothing"
+  hipster plus
+          listDeleteMinimum
+          le
+          merge
+          toList
+          heapSize
+          toList2
+          maybeToList
+          deleteMinimum
   theorem x0 :
     "!! (h :: Heap) .
        (listDeleteMinimum (toList2 h)) = (maybeToList (deleteMinimum h))"

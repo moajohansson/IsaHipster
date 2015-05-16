@@ -1,61 +1,74 @@
 theory sort_MSortTDPermutes'
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   fun ztake :: "int => 'a list => 'a list" where
   "ztake x y =
-     (if x = 0 then nil else
+     (if x = 0 then Nil2 else
         case y of
-          | nil => y
-          | cons z xs => cons z (ztake (x - 1) xs)
+          | Nil2 => y
+          | Cons2 z xs => cons2 z (ztake (x - 1) xs)
         end)"
   fun zlength :: "'a list => int" where
-  "zlength (nil) = 0"
-  | "zlength (cons y xs) = 1 + (zlength xs)"
+  "zlength (Nil2) = 0"
+  | "zlength (Cons2 y xs) = 1 + (zlength xs)"
   fun zdrop :: "int => 'a list => 'a list" where
   "zdrop x y =
      (if x = 0 then y else
         case y of
-          | nil => y
-          | cons z xs => zdrop (x - 1) xs
+          | Nil2 => y
+          | Cons2 z xs => zdrop (x - 1) xs
         end)"
   fun or2 :: "bool => bool => bool" where
   "or2 True y = True"
   | "or2 False y = y"
   fun null :: "'t list => bool" where
-  "null (nil) = True"
-  | "null (cons y z) = False"
+  "null (Nil2) = True"
+  | "null (Cons2 y z) = False"
   fun lmerge :: "int list => int list => int list" where
-  "lmerge (nil) y = y"
-  | "lmerge (cons z x2) (nil) = cons z x2"
-  | "lmerge (cons z x2) (cons x3 x4) =
-       (if z <= x3 then cons z (lmerge x2 (cons x3 x4)) else
-          cons x3 (lmerge (cons z x2) x4))"
+  "lmerge (Nil2) y = y"
+  | "lmerge (Cons2 z x2) (Nil2) = cons2 z x2"
+  | "lmerge (Cons2 z x2) (cons2 x3 x4) =
+       (if z <= x3 then Cons2 z (lmerge x2 (cons2 x3 x4)) else
+          Cons2 x3 (lmerge (cons2 z x2) x4))"
   fun msorttd :: "int list => int list" where
-  "msorttd (nil) = nil"
-  | "msorttd (cons y (nil)) = cons y (nil)"
-  | "msorttd (cons y (cons x2 x3)) =
+  "msorttd (Nil2) = nil2"
+  | "msorttd (Cons2 y (Nil2)) = cons2 y (nil2)"
+  | "msorttd (Cons2 y (cons2 x2 x3)) =
        lmerge
          (msorttd
             (ztake
-               (div (zlength (cons y (cons x2 x3))) 2) (cons y (cons x2 x3))))
+               (div (zlength (Cons2 y (cons2 x2 x3))) 2) (cons2 y (cons2 x2 x3))))
          (msorttd
             (zdrop
-               (div (zlength (cons y (cons x2 x3))) 2) (cons y (cons x2 x3))))"
+               (div (zlength (Cons2 y (cons2 x2 x3))) 2)
+               (Cons2 y (cons2 x2 x3))))"
   fun elem :: "int => int list => bool" where
-  "elem x (nil) = False"
-  | "elem x (cons z ys) = or2 (x = z) (elem x ys)"
+  "elem x (Nil2) = False"
+  | "elem x (Cons2 z ys) = or2 (x = z) (elem x ys)"
   fun delete :: "int => int list => int list" where
-  "delete x (nil) = nil"
-  | "delete x (cons z ys) =
-       (if x = z then ys else cons z (delete x ys))"
+  "delete x (Nil2) = nil2"
+  | "delete x (Cons2 z ys) =
+       (if x = z then ys else Cons2 z (delete x ys))"
   fun and2 :: "bool => bool => bool" where
   "and2 True y = y"
   | "and2 False y = False"
   fun isPermutation :: "int list => int list => bool" where
-  "isPermutation (nil) y = null y"
-  | "isPermutation (cons z xs) y =
+  "isPermutation (Nil2) y = null y"
+  | "isPermutation (Cons2 z xs) y =
        and2 (elem z y) (isPermutation xs (delete z y))"
+  hipster ztake
+          zlength
+          zdrop
+          or2
+          null
+          lmerge
+          msorttd
+          elem
+          delete
+          and2
+          isPermutation
   theorem x0 :
     "!! (x :: int list) . isPermutation (msorttd x) x"
     oops

@@ -1,7 +1,8 @@
 theory regexp_RecStar
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype A = X | Y
   datatype R
     = Nil2 | Eps | Atom "A" | Plus "R" "R" | Seq "R" "R" | Star "R"
@@ -37,8 +38,8 @@ begin
   "or2 True y = True"
   | "or2 False y = y"
   fun null :: "'a list => bool" where
-  "null (nil) = True"
-  | "null (cons y z) = False"
+  "null (Nil2) = True"
+  | "null (Cons2 y z) = False"
   fun eqA :: "A => A => bool" where
   "eqA (X) y = False"
   | "eqA (Y) (X) = False"
@@ -68,8 +69,9 @@ begin
        | Star p3 => seq (step p3 y) x
      end"
   fun recognise :: "R => A list => bool" where
-  "recognise x (nil) = eps x"
-  | "recognise x (cons z xs) = recognise (step x z) xs"
+  "recognise x (Nil2) = eps x"
+  | "recognise x (Cons2 z xs) = recognise (step x z) xs"
+  hipster seq plus or2 null eqA and2 eps epsR step recognise
   theorem x0 :
     "!! (p :: R) (s :: A list) .
        (recognise (Star p) s) =

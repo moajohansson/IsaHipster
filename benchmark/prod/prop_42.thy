@@ -1,7 +1,8 @@
 theory prop_42
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   fun equal2 :: "Nat => Nat => bool" where
   "equal2 (Z) (Z) = True"
@@ -9,12 +10,13 @@ begin
   | "equal2 (S x2) (Z) = False"
   | "equal2 (S x2) (S y2) = equal2 x2 y2"
   fun elem :: "Nat => Nat list => bool" where
-  "elem x (nil) = False"
-  | "elem x (cons z xs) = (if equal2 x z then True else elem x xs)"
+  "elem x (Nil2) = False"
+  | "elem x (Cons2 z xs) = (if equal2 x z then True else elem x xs)"
   fun union :: "Nat list => Nat list => Nat list" where
-  "union (nil) y = y"
-  | "union (cons z xs) y =
-       (if elem z y then union xs y else cons z (union xs y))"
+  "union (Nil2) y = y"
+  | "union (Cons2 z xs) y =
+       (if elem z y then union xs y else Cons2 z (union xs y))"
+  hipster equal2 elem union
   theorem x0 :
     "!! (x :: Nat) (y :: Nat list) (z :: Nat list) .
        (elem x y) ==> (elem x (union y z))"

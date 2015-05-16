@@ -1,6 +1,6 @@
 theory prop_70
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun le :: "Nat => Nat => bool" where

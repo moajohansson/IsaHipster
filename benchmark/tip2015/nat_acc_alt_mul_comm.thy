@@ -1,5 +1,6 @@
 theory nat_acc_alt_mul_comm
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun accplus :: "Nat => Nat => Nat" where
@@ -10,6 +11,7 @@ begin
   | "accaltmul (S z) (Z) = Z"
   | "accaltmul (S z) (S x2) =
        S (accplus z (accplus x2 (accaltmul z x2)))"
+  hipster accplus accaltmul
   theorem x0 :
     "!! (x :: Nat) (y :: Nat) . (accaltmul x y) = (accaltmul y x)"
     oops

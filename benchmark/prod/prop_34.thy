@@ -1,5 +1,6 @@
 theory prop_34
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun plus :: "Nat => Nat => Nat" where
@@ -11,6 +12,7 @@ begin
   fun mult :: "Nat => Nat => Nat => Nat" where
   "mult (Z) y z = z"
   | "mult (S x2) y z = mult x2 y (plus y z)"
+  hipster plus mult2 mult
   theorem x0 :
     "!! (x :: Nat) (y :: Nat) . (mult2 x y) = (mult x y Z)"
     oops

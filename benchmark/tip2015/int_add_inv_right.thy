@@ -1,5 +1,6 @@
 theory int_add_inv_right
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Zero | Succ "Nat"
   datatype Z = P "Nat" | N "Nat"
@@ -22,6 +23,7 @@ begin
   | "plus (P m) (N o) = minus m (Succ o)"
   | "plus (N m2) (P n2) = minus n2 (Succ m2)"
   | "plus (N m2) (N n3) = N (Succ (plus2 m2 n3))"
+  hipster zero plus2 neg minus plus
   theorem x0 :
     "!! (x :: Z) . (plus x (neg x)) = zero"
     oops

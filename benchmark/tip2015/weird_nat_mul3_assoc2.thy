@@ -1,5 +1,6 @@
 theory weird_nat_mul3_assoc2
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun add3 :: "Nat => Nat => Nat => Nat" where
@@ -28,6 +29,7 @@ begin
             (add3
                (mul3 (S Z) x3 x4) (mul3 (S x7) (S Z) x4) (mul3 (S x7) x3 (S Z)))
             (add3 (S x7) x3 x4))"
+  hipster add3 mul3
   theorem x0 :
     "!! (x1 :: Nat) (x2 :: Nat) (x3 :: Nat) (x4 :: Nat) (x5 :: Nat) .
        (mul3 (mul3 x1 x2 x3) x4 x5) = (mul3 x1 (mul3 x2 x3 x4) x5)"

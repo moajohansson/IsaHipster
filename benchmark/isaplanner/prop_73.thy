@@ -1,18 +1,18 @@
 theory prop_73
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   fun filter :: "('a => bool) => 'a list => 'a list" where
-  "filter x (nil) = nil"
-  | "filter x (cons z xs) =
-       (if x z then cons z (filter x xs) else filter x xs)"
+  "filter x (Nil2) = nil2"
+  | "filter x (Cons2 z xs) =
+       (if x z then Cons2 z (filter x xs) else filter x xs)"
   fun append :: "'a list => 'a list => 'a list" where
-  "append (nil) y = y"
-  | "append (cons z xs) y = cons z (append xs y)"
+  "append (Nil2) y = y"
+  | "append (Cons2 z xs) y = cons2 z (append xs y)"
   fun rev :: "'a list => 'a list" where
-  "rev (nil) = nil"
-  | "rev (cons y xs) = append (rev xs) (cons y (nil))"
+  "rev (Nil2) = nil2"
+  | "rev (Cons2 y xs) = append (rev xs) (cons2 y (Nil2))"
   hipster filter append rev
   theorem x0 :
     "!! (p :: ('a => bool)) (xs :: 'a list) .

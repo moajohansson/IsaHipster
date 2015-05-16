@@ -1,20 +1,22 @@
 theory prop_28
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   fun append :: "'a list => 'a list => 'a list" where
-  "append (nil) y = y"
-  | "append (cons z xs) y = cons z (append xs y)"
+  "append (Nil2) y = y"
+  | "append (Cons2 z xs) y = cons2 z (append xs y)"
   fun rev :: "'a list => 'a list" where
-  "rev (nil) = nil"
-  | "rev (cons y xs) = append (rev xs) (cons y (nil))"
+  "rev (Nil2) = nil2"
+  | "rev (Cons2 y xs) = append (rev xs) (cons2 y (Nil2))"
   fun qrevflat :: "('a list) list => 'a list => 'a list" where
-  "qrevflat (nil) y = y"
-  | "qrevflat (cons xs xss) y = qrevflat xss (append (rev xs) y)"
+  "qrevflat (Nil2) y = y"
+  | "qrevflat (Cons2 xs xss) y = qrevflat xss (append (rev xs) y)"
   fun revflat :: "('a list) list => 'a list" where
-  "revflat (nil) = nil"
-  | "revflat (cons xs xss) = append (revflat xss) xs"
+  "revflat (Nil2) = nil2"
+  | "revflat (Cons2 xs xss) = append (revflat xss) xs"
+  hipster append rev qrevflat revflat
   theorem x0 :
-    "!! (x :: ('a list) list) . (revflat x) = (qrevflat x (nil))"
+    "!! (x :: ('a list) list) . (revflat x) = (qrevflat x (Nil2))"
     oops
 end

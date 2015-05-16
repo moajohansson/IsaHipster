@@ -1,19 +1,19 @@
 theory prop_62
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   fun null :: "'a list => bool" where
-  "null (nil) = True"
-  | "null (cons y z) = False"
+  "null (Nil2) = True"
+  | "null (Cons2 y z) = False"
   fun last :: "Nat list => Nat" where
-  "last (nil) = Z"
-  | "last (cons y (nil)) = y"
-  | "last (cons y (cons x2 x3)) = last (cons x2 x3)"
+  "last (Nil2) = Z"
+  | "last (Cons2 y (Nil2)) = y"
+  | "last (Cons2 y (cons2 x2 x3)) = last (cons2 x2 x3)"
   hipster null last
   theorem x0 :
     "!! (xs :: Nat list) (x :: Nat) .
-       (~ (null xs)) ==> ((last (cons x xs)) = (last xs))"
+       (~ (null xs)) ==> ((last (Cons2 x xs)) = (last xs))"
     oops
 end

@@ -1,5 +1,6 @@
 theory prop_13
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun plus :: "Nat => Nat => Nat" where
@@ -9,6 +10,7 @@ begin
   "half (Z) = Z"
   | "half (S (Z)) = Z"
   | "half (S (S z)) = S (half z)"
+  hipster plus half
   theorem x0 :
     "!! (x :: Nat) . (half (plus x x)) = x"
     oops

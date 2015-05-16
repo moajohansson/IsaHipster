@@ -1,5 +1,6 @@
 theory prop_35
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun plus :: "Nat => Nat => Nat" where
@@ -16,6 +17,7 @@ begin
   fun exp :: "Nat => Nat => Nat" where
   "exp x (Z) = S Z"
   | "exp x (S n) = mult x (exp x n)"
+  hipster plus one mult qexp exp
   theorem x0 :
     "!! (x :: Nat) (y :: Nat) . (exp x y) = (qexp x y one)"
     oops

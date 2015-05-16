@@ -1,16 +1,16 @@
 theory prop_16
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   fun last :: "Nat list => Nat" where
-  "last (nil) = Z"
-  | "last (cons y (nil)) = y"
-  | "last (cons y (cons x2 x3)) = last (cons x2 x3)"
+  "last (Nil2) = Z"
+  | "last (Cons2 y (Nil2)) = y"
+  | "last (Cons2 y (cons2 x2 x3)) = last (cons2 x2 x3)"
   hipster last
   theorem x0 :
     "!! (x :: Nat) (xs :: Nat list) .
-       (xs = (nil)) ==> ((last (cons x xs)) = x)"
+       (xs = (Nil2)) ==> ((last (Cons2 x xs)) = x)"
     oops
 end

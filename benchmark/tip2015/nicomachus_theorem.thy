@@ -1,5 +1,6 @@
 theory nicomachus_theorem
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun plus :: "Nat => Nat => Nat" where
@@ -14,6 +15,7 @@ begin
   fun cubes :: "Nat => Nat" where
   "cubes (Z) = Z"
   | "cubes (S n) = plus (cubes n) (mult (mult (S n) (S n)) (S n))"
+  hipster plus sum mult cubes
   theorem x0 :
     "!! (n :: Nat) . (cubes n) = (mult (sum n) (sum n))"
     oops

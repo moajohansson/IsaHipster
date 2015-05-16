@@ -1,5 +1,6 @@
 theory int_left_distrib
 imports Main
+        "../../IsaHipster"
 begin
   datatype Sign = Pos | Neg
   datatype Nat = Zero | Succ "Nat"
@@ -40,6 +41,16 @@ begin
   "times x y =
      toInteger
        (timesSign (sign2 x) (sign2 y)) (mult (absVal x) (absVal y))"
+  hipster toInteger
+          sign2
+          plus2
+          opposite
+          timesSign
+          mult
+          minus
+          plus
+          absVal
+          times
   theorem x0 :
     "!! (x :: Z) (y :: Z) (z :: Z) .
        (times x (plus y z)) = (plus (times x y) (times x z))"

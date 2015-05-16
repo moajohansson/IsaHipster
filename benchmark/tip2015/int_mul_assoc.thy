@@ -1,5 +1,6 @@
 theory int_mul_assoc
 imports Main
+        "../../IsaHipster"
 begin
   datatype Sign = Pos | Neg
   datatype Nat = Zero | Succ "Nat"
@@ -30,6 +31,7 @@ begin
   "times x y =
      toInteger
        (timesSign (sign2 x) (sign2 y)) (mult (absVal x) (absVal y))"
+  hipster toInteger sign2 plus opposite timesSign mult absVal times
   theorem x0 :
     "!! (x :: Z) (y :: Z) (z :: Z) .
        (times x (times y z)) = (times (times x y) z)"

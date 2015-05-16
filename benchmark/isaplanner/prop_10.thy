@@ -1,6 +1,6 @@
 theory prop_10
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun minus :: "Nat => Nat => Nat" where

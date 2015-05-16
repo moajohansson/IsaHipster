@@ -1,5 +1,6 @@
 theory rotate_self
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = S "Nat" | Z
   datatype 'a List2 = Cons2 "'a" "'a List2" | Nil2
@@ -11,6 +12,7 @@ begin
      rotate z (append x3 (Cons2 x2 (Nil2)))"
   | "rotate (S z) (Nil2) = Nil2"
   | "rotate (Z) y = y"
+  hipster append rotate
   theorem x0 :
     "!! (n :: Nat) (xs :: 'a List2) .
        (rotate n (append xs xs)) = (append (rotate n xs) (rotate n xs))"

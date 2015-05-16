@@ -1,7 +1,8 @@
 theory regexp_RecSeq
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype ('a, 'b) Pair2 = Pair "'a" "'b"
   datatype A = X | Y
   datatype R
@@ -41,15 +42,15 @@ begin
   "eqA (X) y = False"
   | "eqA (Y) (X) = False"
   | "eqA (Y) (Y) = True"
-  fun consfst :: "'a => ((('a list), 'b) Pair2) list =>
+  fun Consfst :: "'a => ((('a list), 'b) Pair2) list =>
                   ((('a list), 'b) Pair2) list" where
-  "consfst x (nil) = nil"
-  | "consfst x (cons (Pair xs y2) ys) =
-       cons (Pair (cons x xs) y2) (consfst x ys)"
+  "Consfst x (Nil2) = nil2"
+  | "Consfst x (cons2 (Pair xs y2) ys) =
+       Cons2 (Pair (cons2 x xs) y2) (consfst x ys)"
   fun split :: "'a list => ((('a list), ('a list)) Pair2) list" where
-  "split (nil) = cons (Pair (nil) (nil)) (nil)"
-  | "split (cons y s) =
-       cons (Pair (nil) (cons y s)) (consfst y (split s))"
+  "split (Nil2) = Cons2 (Pair (nil2) (nil2)) (nil2)"
+  | "split (Cons2 y s) =
+       Cons2 (Pair (Nil2) (cons2 y s)) (consfst y (split s))"
   fun and2 :: "bool => bool => bool" where
   "and2 True y = y"
   | "and2 False y = False"
@@ -75,14 +76,26 @@ begin
        | Star p3 => seq (step p3 y) x
      end"
   fun recognise :: "R => A list => bool" where
-  "recognise x (nil) = eps x"
-  | "recognise x (cons z xs) = recognise (step x z) xs"
+  "recognise x (Nil2) = eps x"
+  | "recognise x (Cons2 z xs) = recognise (step x z) xs"
   fun recognisePair :: "R => R =>
                       (((A list), (A list)) Pair2) list => bool" where
-  "recognisePair x y (nil) = False"
-  | "recognisePair x y (cons (Pair s1 s2) xs) =
+  "recognisePair x y (Nil2) = False"
+  | "recognisePair x y (Cons2 (Pair s1 s2) xs) =
        or2
          (and2 (recognise x s1) (recognise y s2)) (recognisePair x y xs)"
+  hipster seq
+          plus
+          or2
+          eqA
+          Consfst
+          split
+          and2
+          eps
+          epsR
+          step
+          recognise
+          recognisePair
   theorem x0 :
     "!! (p :: R) (q :: R) (s :: A list) .
        (recognise (Seq p q) s) = (recognisePair p q (split s))"

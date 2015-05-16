@@ -1,27 +1,28 @@
 theory prop_48
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   fun null :: "'a list => bool" where
-  "null (nil) = True"
-  | "null (cons y z) = False"
+  "null (Nil2) = True"
+  | "null (Cons2 y z) = False"
   fun last :: "Nat list => Nat" where
-  "last (nil) = Z"
-  | "last (cons y (nil)) = y"
-  | "last (cons y (cons x2 x3)) = last (cons x2 x3)"
+  "last (Nil2) = Z"
+  | "last (Cons2 y (Nil2)) = y"
+  | "last (Cons2 y (cons2 x2 x3)) = last (cons2 x2 x3)"
   fun butlast :: "'a list => 'a list" where
-  "butlast (nil) = nil"
-  | "butlast (cons y (nil)) = nil"
-  | "butlast (cons y (cons x2 x3)) = cons y (butlast (cons x2 x3))"
+  "butlast (Nil2) = nil2"
+  | "butlast (Cons2 y (Nil2)) = nil2"
+  | "butlast (Cons2 y (cons2 x2 x3)) =
+       Cons2 y (butlast (cons2 x2 x3))"
   fun append :: "'a list => 'a list => 'a list" where
-  "append (nil) y = y"
-  | "append (cons z xs) y = cons z (append xs y)"
+  "append (Nil2) y = y"
+  | "append (Cons2 z xs) y = cons2 z (append xs y)"
   hipster null last butlast append
   theorem x0 :
     "!! (xs :: Nat list) .
        (~ (null xs)) ==>
-         ((append (butlast xs) (cons (last xs) (nil))) = xs)"
+         ((append (butlast xs) (Cons2 (last xs) (Nil2))) = xs)"
     oops
 end

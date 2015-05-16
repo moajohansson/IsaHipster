@@ -1,5 +1,6 @@
 theory nat_pow_pow
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun plus :: "Nat => Nat => Nat" where
@@ -11,6 +12,7 @@ begin
   fun pow :: "Nat => Nat => Nat" where
   "pow x (Z) = S Z"
   | "pow x (S m) = mult x (pow x m)"
+  hipster plus mult pow
   theorem x0 :
     "!! (x :: Nat) (y :: Nat) (z :: Nat) .
        (pow x (mult y z)) = (pow (pow x y) z)"

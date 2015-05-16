@@ -1,5 +1,6 @@
 theory prop_33
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun plus :: "Nat => Nat => Nat" where
@@ -16,6 +17,7 @@ begin
   fun fac :: "Nat => Nat" where
   "fac (Z) = S Z"
   | "fac (S y) = mult (S y) (fac y)"
+  hipster plus one mult qfac fac
   theorem x0 :
     "!! (x :: Nat) . (fac x) = (qfac x one)"
     oops

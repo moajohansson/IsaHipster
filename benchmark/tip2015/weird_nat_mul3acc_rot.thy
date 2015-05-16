@@ -1,5 +1,6 @@
 theory weird_nat_mul3acc_rot
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun add3acc :: "Nat => Nat => Nat => Nat" where
@@ -32,6 +33,7 @@ begin
                (mul3acc (S Z) x3 x4) (mul3acc (S x7) (S Z) x4)
                (mul3acc (S x7) x3 (S Z)))
             (add3acc (S x7) x3 x4))"
+  hipster add3acc mul3acc
   theorem x0 :
     "!! (x :: Nat) (y :: Nat) (z :: Nat) .
        (mul3acc x y z) = (mul3acc y x z)"

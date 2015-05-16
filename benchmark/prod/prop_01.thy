@@ -1,5 +1,6 @@
 theory prop_01
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun plus :: "Nat => Nat => Nat" where
@@ -8,6 +9,7 @@ begin
   fun double :: "Nat => Nat" where
   "double (Z) = Z"
   | "double (S y) = S (S (double y))"
+  hipster plus double
   theorem x0 :
     "!! (x :: Nat) . (double x) = (plus x x)"
     oops

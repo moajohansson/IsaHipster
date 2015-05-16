@@ -1,12 +1,12 @@
 theory prop_68
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   fun len :: "'a list => Nat" where
-  "len (nil) = Z"
-  | "len (cons y xs) = S (len xs)"
+  "len (Nil2) = Z"
+  | "len (Cons2 y xs) = S (len xs)"
   fun le :: "Nat => Nat => bool" where
   "le (Z) y = True"
   | "le (S z) (Z) = False"
@@ -17,9 +17,9 @@ begin
   | "equal2 (S x2) (Z) = False"
   | "equal2 (S x2) (S y2) = equal2 x2 y2"
   fun delete :: "Nat => Nat list => Nat list" where
-  "delete x (nil) = nil"
-  | "delete x (cons z xs) =
-       (if equal2 x z then delete x xs else cons z (delete x xs))"
+  "delete x (Nil2) = nil2"
+  | "delete x (Cons2 z xs) =
+       (if equal2 x z then delete x xs else Cons2 z (delete x xs))"
   hipster len le equal2 delete
   theorem x0 :
     "!! (n :: Nat) (xs :: Nat list) . le (len (delete n xs)) (len xs)"

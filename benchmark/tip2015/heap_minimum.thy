@@ -1,7 +1,8 @@
 theory heap_minimum
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   datatype 'a Maybe = Nothing | Just "'a"
   datatype Heap = Node "Heap" "Nat" "Heap" | Nil2
@@ -12,8 +13,8 @@ begin
   "minimum (Node y z x2) = Just z"
   | "minimum (Nil2) = Nothing"
   fun listMinimum :: "Nat list => Nat Maybe" where
-  "listMinimum (nil) = Nothing"
-  | "listMinimum (cons y z) = Just y"
+  "listMinimum (Nil2) = Nothing"
+  | "listMinimum (Cons2 y z) = Just y"
   fun le :: "Nat => Nat => bool" where
   "le (Z) y = True"
   | "le (S z) (Z) = False"
@@ -25,14 +26,16 @@ begin
   | "merge (Node z x2 x3) (Nil2) = Node z x2 x3"
   | "merge (Nil2) y = y"
   fun toList :: "Nat => Heap => Nat list" where
-  "toList (Z) y = nil"
-  | "toList (S z) (Node x2 x3 x4) = cons x3 (toList z (merge x2 x4))"
-  | "toList (S z) (Nil2) = nil"
+  "toList (Z) y = Nil2"
+  | "toList (S z) (Node x2 x3 x4) =
+       Cons2 x3 (toList z (merge x2 x4))"
+  | "toList (S z) (Nil2) = Nil2"
   fun heapSize :: "Heap => Nat" where
   "heapSize (Node l y r) = S (plus (heapSize l) (heapSize r))"
   | "heapSize (Nil2) = Z"
   fun toList2 :: "Heap => Nat list" where
   "toList2 x = toList (heapSize x) x"
+  hipster plus minimum listMinimum le merge toList heapSize toList2
   theorem x0 :
     "!! (h :: Heap) . (listMinimum (toList2 h)) = (minimum h)"
     oops

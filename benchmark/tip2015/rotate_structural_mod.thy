@@ -1,5 +1,6 @@
 theory rotate_structural_mod
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = S "Nat" | Z
   datatype 'a List2 = Cons2 "'a" "'a List2" | Nil2
@@ -34,6 +35,7 @@ begin
      rotate z (append x3 (Cons2 x2 (Nil2)))"
   | "rotate (S z) (Nil2) = Nil2"
   | "rotate (Z) y = y"
+  hipster take minus mod2 mod3 length drop append rotate
   theorem x0 :
     "!! (n :: Nat) (xs :: 'a List2) .
        (rotate n xs) =

@@ -1,11 +1,13 @@
 theory prop_31
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   fun qrev :: "'a list => 'a list => 'a list" where
-  "qrev (nil) y = y"
-  | "qrev (cons z xs) y = qrev xs (cons z y)"
+  "qrev (Nil2) y = y"
+  | "qrev (Cons2 z xs) y = qrev xs (cons2 z y)"
+  hipster qrev
   theorem x0 :
-    "!! (x :: 'a list) . (qrev (qrev x (nil)) (nil)) = x"
+    "!! (x :: 'a list) . (qrev (qrev x (Nil2)) (nil2)) = x"
     oops
 end

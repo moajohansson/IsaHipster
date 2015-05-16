@@ -1,7 +1,8 @@
 theory heap_SortPermutes
 imports Main
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   datatype Heap = Node "Heap" "Nat" "Heap" | Nil2
   fun plus :: "Nat => Nat => Nat" where
@@ -18,14 +19,15 @@ begin
   | "merge (Node z x2 x3) (Nil2) = Node z x2 x3"
   | "merge (Nil2) y = y"
   fun toList :: "Nat => Heap => Nat list" where
-  "toList (Z) y = nil"
-  | "toList (S z) (Node x2 x3 x4) = cons x3 (toList z (merge x2 x4))"
-  | "toList (S z) (Nil2) = nil"
+  "toList (Z) y = Nil2"
+  | "toList (S z) (Node x2 x3 x4) =
+       Cons2 x3 (toList z (merge x2 x4))"
+  | "toList (S z) (Nil2) = Nil2"
   fun insert2 :: "Nat => Heap => Heap" where
   "insert2 x y = merge (Node Nil2 x Nil2) y"
   fun toHeap :: "Nat list => Heap" where
-  "toHeap (nil) = Nil2"
-  | "toHeap (cons y xs) = insert2 y (toHeap xs)"
+  "toHeap (Nil2) = Nil2"
+  | "toHeap (Cons2 y xs) = insert2 y (toHeap xs)"
   fun heapSize :: "Heap => Nat" where
   "heapSize (Node l y r) = S (plus (heapSize l) (heapSize r))"
   | "heapSize (Nil2) = Z"
@@ -42,9 +44,21 @@ begin
   "hsort x =
      dot (% (y :: Heap) => toList2 y) (% (z :: Nat list) => toHeap z) x"
   fun count :: "Nat => Nat list => Nat" where
-  "count x (nil) = Z"
-  | "count x (cons z xs) =
+  "count x (Nil2) = Z"
+  | "count x (Cons2 z xs) =
        (if equal2 x z then S (count x xs) else count x xs)"
+  hipster plus
+          le
+          merge
+          toList
+          insert2
+          toHeap
+          heapSize
+          toList2
+          equal2
+          dot
+          hsort
+          count
   theorem x0 :
     "!! (x :: Nat) (y :: Nat list) . (count x (hsort y)) = (count x y)"
     oops

@@ -1,5 +1,6 @@
 theory nat_alt_mul_assoc
 imports Main
+        "../../IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun plus :: "Nat => Nat => Nat" where
@@ -9,6 +10,7 @@ begin
   "altmul (Z) y = Z"
   | "altmul (S z) (Z) = Z"
   | "altmul (S z) (S x2) = S (plus (plus (altmul z x2) z) x2)"
+  hipster plus altmul
   theorem x0 :
     "!! (x :: Nat) (y :: Nat) (z :: Nat) .
        (altmul x (altmul y z)) = (altmul (altmul x y) z)"

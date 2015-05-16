@@ -1,30 +1,30 @@
 theory prop_74
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   fun take :: "Nat => 'a list => 'a list" where
-  "take (Z) y = nil"
-  | "take (S z) (nil) = nil"
-  | "take (S z) (cons x2 x3) = cons x2 (take z x3)"
+  "take (Z) y = Nil2"
+  | "take (S z) (Nil2) = nil2"
+  | "take (S z) (Cons2 x2 x3) = cons2 x2 (take z x3)"
   fun minus :: "Nat => Nat => Nat" where
   "minus (Z) y = Z"
   | "minus (S z) (Z) = S z"
   | "minus (S z) (S x2) = minus z x2"
   fun len :: "'a list => Nat" where
-  "len (nil) = Z"
-  | "len (cons y xs) = S (len xs)"
+  "len (Nil2) = Z"
+  | "len (Cons2 y xs) = S (len xs)"
   fun drop :: "Nat => 'a list => 'a list" where
   "drop (Z) y = y"
-  | "drop (S z) (nil) = nil"
-  | "drop (S z) (cons x2 x3) = drop z x3"
+  | "drop (S z) (Nil2) = nil2"
+  | "drop (S z) (Cons2 x2 x3) = drop z x3"
   fun append :: "'a list => 'a list => 'a list" where
-  "append (nil) y = y"
-  | "append (cons z xs) y = cons z (append xs y)"
+  "append (Nil2) y = y"
+  | "append (Cons2 z xs) y = cons2 z (append xs y)"
   fun rev :: "'a list => 'a list" where
-  "rev (nil) = nil"
-  | "rev (cons y xs) = append (rev xs) (cons y (nil))"
+  "rev (Nil2) = nil2"
+  | "rev (Cons2 y xs) = append (rev xs) (cons2 y (Nil2))"
   hipster take minus len drop append rev
   theorem x0 :
     "!! (i :: Nat) (xs :: 'a list) .

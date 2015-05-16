@@ -1,5 +1,6 @@
 theory bin_times_comm
 imports Main
+        "../../IsaHipster"
 begin
   datatype Bin = One | ZeroAnd "Bin" | OneAnd "Bin"
   fun s :: "Bin => Bin" where
@@ -18,6 +19,7 @@ begin
   "times (One) y = y"
   | "times (ZeroAnd xs) y = ZeroAnd (times xs y)"
   | "times (OneAnd ys) y = plus (ZeroAnd (times ys y)) y"
+  hipster s plus times
   theorem x0 :
     "!! (x :: Bin) (y :: Bin) . (times x y) = (times y x)"
     oops

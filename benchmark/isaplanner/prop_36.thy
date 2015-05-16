@@ -1,12 +1,12 @@
 theory prop_36
 imports Main
-imports "../../IsaHipster"
+        "../../IsaHipster"
 begin
-  datatype 'a list = nil | cons "'a" "'a list"
+  datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   fun takeWhile :: "('a => bool) => 'a list => 'a list" where
-  "takeWhile x (nil) = nil"
-  | "takeWhile x (cons z xs) =
-       (if x z then cons z (takeWhile x xs) else nil)"
+  "takeWhile x (Nil2) = nil2"
+  | "takeWhile x (Cons2 z xs) =
+       (if x z then Cons2 z (takeWhile x xs) else Nil2)"
   hipster takeWhile
   theorem x0 :
     "!! (xs :: 'a list) . (takeWhile (% (x :: 'a) => True) xs) = xs"
