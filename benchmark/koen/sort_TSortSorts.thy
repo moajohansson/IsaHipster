@@ -15,7 +15,7 @@ begin
   fun ordered :: "int list => bool" where
   "ordered (Nil2) = True"
   | "ordered (Cons2 y (Nil2)) = True"
-  | "ordered (Cons2 y (cons2 y2 xs)) =
+  | "ordered (Cons2 y (Cons2 y2 xs)) =
        and2 (y <= y2) (ordered (Cons2 y2 xs))"
   fun add :: "int => int Tree => int Tree" where
   "add x (TNode p z q) =

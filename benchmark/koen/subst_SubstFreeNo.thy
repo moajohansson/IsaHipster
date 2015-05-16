@@ -14,7 +14,7 @@ begin
   fun new :: "int list => int" where
   "new x = (newmaximum 0 x) + 1"
   fun filter :: "('t => bool) => 't list => 't list" where
-  "filter p (Nil2) = nil2"
+  "filter p (Nil2) = Nil2"
   | "filter p (Cons2 y z) =
        (if p y then Cons2 y (filter p z) else filter p z)"
   fun elem :: "int => int list => bool" where
@@ -22,7 +22,7 @@ begin
   | "elem x (Cons2 z ys) = or2 (x = z) (elem x ys)"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   fun free :: "Expr => int list" where
   "free (Var y) = Cons2 y (Nil2)"
   | "free (Lam z b) = filter (% (x2 :: int) => z ~= x2) (free b)"

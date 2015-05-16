@@ -23,18 +23,18 @@ begin
   fun isPrefix :: "It list => It list => bool" where
   "isPrefix (Nil2) y = True"
   | "isPrefix (Cons2 z x2) (Nil2) = False"
-  | "isPrefix (Cons2 z x2) (cons2 x3 x4) =
+  | "isPrefix (Cons2 z x2) (Cons2 x3 x4) =
        (if eq z x3 then isPrefix x2 x4 else False)"
   fun isRelaxedPrefix :: "It list => It list => bool" where
   "isRelaxedPrefix (Nil2) y = True"
   | "isRelaxedPrefix (Cons2 z (Nil2)) y = True"
-  | "isRelaxedPrefix (Cons2 z (cons2 x3 x4)) (Nil2) = False"
-  | "isRelaxedPrefix (Cons2 z (cons2 x3 x4)) (cons2 x5 x6) =
+  | "isRelaxedPrefix (Cons2 z (Cons2 x3 x4)) (Nil2) = False"
+  | "isRelaxedPrefix (Cons2 z (Cons2 x3 x4)) (Cons2 x5 x6) =
        (if eq z x5 then isRelaxedPrefix (Cons2 x3 x4) x6 else
-          isPrefix (Cons2 x3 x4) (cons2 x5 x6))"
+          isPrefix (Cons2 x3 x4) (Cons2 x5 x6))"
   fun append :: "It list => It list => It list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   hipster eq isPrefix isRelaxedPrefix append
   theorem x0 :
     "!! (x :: It) (xs :: It list) (ys :: It list) (zs :: It list) .

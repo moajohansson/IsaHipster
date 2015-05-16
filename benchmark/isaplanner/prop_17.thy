@@ -12,8 +12,8 @@ begin
   | "equal2 (Z) (S z) = False"
   | "equal2 (S x2) (Z) = False"
   | "equal2 (S x2) (S y2) = equal2 x2 y2"
-  hipster le equal2
+  (*hipster le equal2 *)
   theorem x0 :
     "!! (n :: Nat) . (le n Z) = (equal2 n Z)"
-    oops
+    by (hipster_induct_schemes)
 end

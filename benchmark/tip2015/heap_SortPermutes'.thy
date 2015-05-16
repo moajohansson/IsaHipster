@@ -53,7 +53,7 @@ begin
   "hsort x =
      dot (% (y :: Heap) => toList2 y) (% (z :: Nat list) => toHeap z) x"
   fun delete :: "Nat => Nat list => Nat list" where
-  "delete x (Nil2) = nil2"
+  "delete x (Nil2) = Nil2"
   | "delete x (Cons2 z ys) =
        (if equal2 x z then ys else Cons2 z (delete x ys))"
   fun and2 :: "bool => bool => bool" where

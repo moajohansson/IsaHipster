@@ -15,13 +15,13 @@ begin
        (if equal2 x z then S (count x ys) else count x ys)"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   fun rev :: "'a list => 'a list" where
-  "rev (Nil2) = nil2"
-  | "rev (Cons2 y xs) = append (rev xs) (cons2 y (Nil2))"
-  hipster equal2 count append rev
+  "rev (Nil2) = Nil2"
+  | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
+  (*hipster equal2 count append rev *)
   theorem x0 :
     "!! (n :: Nat) (xs :: Nat list) .
        (count n xs) = (count n (rev xs))"
-    oops
+    by (hipster_induct_schemes)
 end

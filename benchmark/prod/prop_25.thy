@@ -16,7 +16,7 @@ begin
   | "even (S (S z)) = even z"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   hipster plus length even append
   theorem x0 :
     "!! (x :: 'a list) (y :: 'a list) .

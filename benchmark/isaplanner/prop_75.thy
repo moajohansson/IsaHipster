@@ -16,10 +16,10 @@ begin
   "count x (Nil2) = Z"
   | "count x (Cons2 z ys) =
        (if equal2 x z then S (count x ys) else count x ys)"
-  hipster plus equal2 count
+  (*hipster plus equal2 count *)
   theorem x0 :
     "!! (n :: Nat) (m :: Nat) (xs :: Nat list) .
        (plus (count n xs) (count n (Cons2 m (Nil2)))) =
          (count n (Cons2 m xs))"
-    oops
+    by (hipster_induct_schemes)
 end

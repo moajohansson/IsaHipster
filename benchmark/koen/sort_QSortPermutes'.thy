@@ -10,21 +10,21 @@ begin
   "null (Nil2) = True"
   | "null (Cons2 y z) = False"
   fun filter :: "('t => bool) => 't list => 't list" where
-  "filter p (Nil2) = nil2"
+  "filter p (Nil2) = Nil2"
   | "filter p (Cons2 y z) =
        (if p y then Cons2 y (filter p z) else filter p z)"
   fun elem :: "int => int list => bool" where
   "elem x (Nil2) = False"
   | "elem x (Cons2 z ys) = or2 (x = z) (elem x ys)"
   fun delete :: "int => int list => int list" where
-  "delete x (Nil2) = nil2"
+  "delete x (Nil2) = Nil2"
   | "delete x (Cons2 z ys) =
        (if x = z then ys else Cons2 z (delete x ys))"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   fun qsort :: "int list => int list" where
-  "qsort (Nil2) = nil2"
+  "qsort (Nil2) = Nil2"
   | "qsort (Cons2 y xs) =
        append
          (append

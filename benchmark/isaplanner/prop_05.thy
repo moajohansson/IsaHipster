@@ -13,9 +13,9 @@ begin
   "count x (Nil2) = Z"
   | "count x (Cons2 z ys) =
        (if equal2 x z then S (count x ys) else count x ys)"
-  hipster equal2 count
+  (*hipster equal2 count *)
   theorem x0 :
     "!! (n :: Nat) (x :: Nat) (xs :: Nat list) .
        (n = x) ==> ((S (count n xs)) = (count n (Cons2 x xs)))"
-    oops
+    by (hipster_induct_schemes)
 end

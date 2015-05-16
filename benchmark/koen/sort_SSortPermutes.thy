@@ -9,11 +9,11 @@ begin
   | "ssortminimum x (Cons2 z ys) =
        (if z <= x then ssortminimum z ys else ssortminimum x ys)"
   fun delete :: "int => int list => int list" where
-  "delete x (Nil2) = nil2"
+  "delete x (Nil2) = Nil2"
   | "delete x (Cons2 z ys) =
        (if x = z then ys else Cons2 z (delete x ys))"
   fun ssort :: "int list => int list" where
-  "ssort (Nil2) = nil2"
+  "ssort (Nil2) = Nil2"
   | "ssort (Cons2 y ys) =
        Cons2
          (ssortminimum y ys)

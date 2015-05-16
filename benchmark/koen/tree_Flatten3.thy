@@ -11,7 +11,7 @@ begin
   | "flatten3 (Nil2) = Nil2"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   fun flatten0 :: "'a Tree => 'a list" where
   "flatten0 (Node p y q) =
      append (append (flatten0 p) (Cons2 y (Nil2))) (flatten0 q)"

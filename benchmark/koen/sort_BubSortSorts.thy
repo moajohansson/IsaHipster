@@ -8,9 +8,9 @@ begin
   "or2 True y = True"
   | "or2 False y = y"
   fun bubble :: "int list => (bool, (int list)) Pair2" where
-  "bubble (Nil2) = Pair False (nil2)"
-  | "bubble (Cons2 y (Nil2)) = Pair False (cons2 y (nil2))"
-  | "bubble (Cons2 y (cons2 y2 xs)) =
+  "bubble (Nil2) = Pair False (Nil2)"
+  | "bubble (Cons2 y (Nil2)) = Pair False (Cons2 y (Nil2))"
+  | "bubble (Cons2 y (Cons2 y2 xs)) =
        (if y <= y2 then
           case bubble (Cons2 y2 xs) of
             | Pair b6 ys5 =>
@@ -71,7 +71,7 @@ begin
   fun ordered :: "int list => bool" where
   "ordered (Nil2) = True"
   | "ordered (Cons2 y (Nil2)) = True"
-  | "ordered (Cons2 y (cons2 y2 xs)) =
+  | "ordered (Cons2 y (Cons2 y2 xs)) =
        and2 (y <= y2) (ordered (Cons2 y2 xs))"
   hipster or2 bubble bubsort and2 ordered
   theorem x0 :

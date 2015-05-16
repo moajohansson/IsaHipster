@@ -16,8 +16,8 @@ begin
   | "equal2 (Z) (S z) = False"
   | "equal2 (S x2) (Z) = False"
   | "equal2 (S x2) (S y2) = equal2 x2 y2"
-  hipster min2 le equal2
+  (*hipster min2 le equal2 *)
   theorem x0 :
     "!! (a :: Nat) (b :: Nat) . (equal2 (min2 a b) a) = (le a b)"
-    oops
+    by (hipster_induct_schemes)
 end

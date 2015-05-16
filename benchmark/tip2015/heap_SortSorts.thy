@@ -44,7 +44,7 @@ begin
   fun ordered :: "Nat list => bool" where
   "ordered (Nil2) = True"
   | "ordered (Cons2 y (Nil2)) = True"
-  | "ordered (Cons2 y (cons2 y2 xs)) =
+  | "ordered (Cons2 y (Cons2 y2 xs)) =
        and2 (le y y2) (ordered (Cons2 y2 xs))"
   hipster plus
           le

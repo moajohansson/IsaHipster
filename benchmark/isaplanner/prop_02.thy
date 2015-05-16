@@ -18,10 +18,12 @@ begin
        (if equal2 x z then S (count x ys) else count x ys)"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
-  hipster plus equal2 count append
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
+  (*hipster plus equal2 count append *)
   theorem x0 :
-    "!! (n :: Nat) (xs :: Nat list) (ys :: Nat list) .
+    "\<forall> (n :: Nat) (xs :: Nat list) (ys :: Nat list) .
        (plus (count n xs) (count n ys)) = (count n (append xs ys))"
-    oops
+    apply(rule allI)+
+    apply(tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    done
 end

@@ -14,14 +14,14 @@ begin
   fun last :: "Nat list => Nat" where
   "last (Nil2) = Z"
   | "last (Cons2 y (Nil2)) = y"
-  | "last (Cons2 y (cons2 x2 x3)) = last (cons2 x2 x3)"
+  | "last (Cons2 y (Cons2 x2 x3)) = last (Cons2 x2 x3)"
   fun drop :: "Nat => 'a list => 'a list" where
   "drop (Z) y = y"
-  | "drop (S z) (Nil2) = nil2"
+  | "drop (S z) (Nil2) = Nil2"
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
-  hipster lt len last drop
+  (*hipster lt len last drop *)
   theorem x0 :
     "!! (n :: Nat) (xs :: Nat list) .
        (lt n (len xs)) ==> ((last (drop n xs)) = (last xs))"
-    oops
+    by (hipster_induct_schemes)
 end

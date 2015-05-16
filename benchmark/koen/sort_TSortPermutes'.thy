@@ -19,7 +19,7 @@ begin
   fun dot :: "('b => 'c) => ('a => 'b) => 'a => 'c" where
   "dot x y z = x (y z)"
   fun delete :: "int => int list => int list" where
-  "delete x (Nil2) = nil2"
+  "delete x (Nil2) = Nil2"
   | "delete x (Cons2 z ys) =
        (if x = z then ys else Cons2 z (delete x ys))"
   fun and2 :: "bool => bool => bool" where

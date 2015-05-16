@@ -25,10 +25,10 @@ begin
   | "toList (S z) (Nil2) = Nil2"
   fun mergeLists :: "Nat list => Nat list => Nat list" where
   "mergeLists (Nil2) y = y"
-  | "mergeLists (Cons2 z x2) (Nil2) = cons2 z x2"
-  | "mergeLists (Cons2 z x2) (cons2 x3 x4) =
-       (if le z x3 then Cons2 z (mergeLists x2 (cons2 x3 x4)) else
-          Cons2 x3 (mergeLists (cons2 z x2) x4))"
+  | "mergeLists (Cons2 z x2) (Nil2) = Cons2 z x2"
+  | "mergeLists (Cons2 z x2) (Cons2 x3 x4) =
+       (if le z x3 then Cons2 z (mergeLists x2 (Cons2 x3 x4)) else
+          Cons2 x3 (mergeLists (Cons2 z x2) x4))"
   fun heapSize :: "Heap => Nat" where
   "heapSize (Node l y r) = S (plus (heapSize l) (heapSize r))"
   | "heapSize (Nil2) = Z"

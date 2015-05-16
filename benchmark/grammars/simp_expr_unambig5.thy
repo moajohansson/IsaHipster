@@ -11,7 +11,7 @@ begin
   | "linTerm (TY) = Cons2 Y (Nil2)"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   fun lin :: "E => Tok list" where
   "lin (Plus a b) =
      append (append (linTerm a) (Cons2 Pl (Nil2))) (lin b)"

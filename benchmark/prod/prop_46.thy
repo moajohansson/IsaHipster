@@ -9,9 +9,9 @@ begin
   | "le (S z) (Z) = False"
   | "le (S z) (S x2) = le z x2"
   fun insert2 :: "Nat => Nat list => Nat list" where
-  "insert2 x (Nil2) = Cons2 x (nil2)"
+  "insert2 x (Nil2) = Cons2 x (Nil2)"
   | "insert2 x (Cons2 z xs) =
-       (if le x z then Cons2 x (cons2 z xs) else cons2 z (insert2 x xs))"
+       (if le x z then Cons2 x (Cons2 z xs) else Cons2 z (insert2 x xs))"
   fun equal2 :: "Nat => Nat => bool" where
   "equal2 (Z) (Z) = True"
   | "equal2 (Z) (S z) = False"

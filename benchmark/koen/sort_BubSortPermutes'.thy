@@ -14,13 +14,13 @@ begin
   "elem x (Nil2) = False"
   | "elem x (Cons2 z ys) = or2 (x = z) (elem x ys)"
   fun delete :: "int => int list => int list" where
-  "delete x (Nil2) = nil2"
+  "delete x (Nil2) = Nil2"
   | "delete x (Cons2 z ys) =
        (if x = z then ys else Cons2 z (delete x ys))"
   fun bubble :: "int list => (bool, (int list)) Pair2" where
-  "bubble (Nil2) = Pair False (nil2)"
-  | "bubble (Cons2 y (Nil2)) = Pair False (cons2 y (nil2))"
-  | "bubble (Cons2 y (cons2 y2 xs)) =
+  "bubble (Nil2) = Pair False (Nil2)"
+  | "bubble (Cons2 y (Nil2)) = Pair False (Cons2 y (Nil2))"
+  | "bubble (Cons2 y (Cons2 y2 xs)) =
        (if y <= y2 then
           case bubble (Cons2 y2 xs) of
             | Pair b6 ys5 =>

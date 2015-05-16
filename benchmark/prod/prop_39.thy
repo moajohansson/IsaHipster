@@ -14,7 +14,7 @@ begin
   | "elem x (Cons2 z xs) = (if equal2 x z then True else elem x xs)"
   fun drop :: "Nat => 'a list => 'a list" where
   "drop (Z) y = y"
-  | "drop (S z) (Nil2) = nil2"
+  | "drop (S z) (Nil2) = Nil2"
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
   hipster equal2 elem drop
   theorem x0 :

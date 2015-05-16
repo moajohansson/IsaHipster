@@ -27,7 +27,7 @@ begin
   "elem x (Nil2) = False"
   | "elem x (Cons2 z ys) = or2 (equal2 x z) (elem x ys)"
   fun delete :: "Nat => Nat list => Nat list" where
-  "delete x (Nil2) = nil2"
+  "delete x (Nil2) = Nil2"
   | "delete x (Cons2 z ys) =
        (if equal2 x z then ys else Cons2 z (delete x ys))"
   fun and2 :: "bool => bool => bool" where

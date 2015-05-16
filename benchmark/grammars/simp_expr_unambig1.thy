@@ -7,12 +7,12 @@ begin
   datatype E = Plus "E" "E" | EX | EY
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   fun lin :: "E => Tok list" where
   "lin (Plus a b) =
      append
        (append
-          (append (append (Cons2 C (Nil2)) (lin a)) (cons2 Pl (nil2)))
+          (append (append (Cons2 C (Nil2)) (lin a)) (Cons2 Pl (Nil2)))
           (lin b))
        (Cons2 D (Nil2))"
   | "lin (EX) = Cons2 X (Nil2)"

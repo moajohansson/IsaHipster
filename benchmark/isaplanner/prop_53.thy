@@ -9,11 +9,11 @@ begin
   | "le (S z) (Z) = False"
   | "le (S z) (S x2) = le z x2"
   fun insort :: "Nat => Nat list => Nat list" where
-  "insort x (Nil2) = Cons2 x (nil2)"
+  "insort x (Nil2) = Cons2 x (Nil2)"
   | "insort x (Cons2 z xs) =
-       (if le x z then Cons2 x (cons2 z xs) else cons2 z (insort x xs))"
+       (if le x z then Cons2 x (Cons2 z xs) else Cons2 z (insort x xs))"
   fun sort :: "Nat list => Nat list" where
-  "sort (Nil2) = nil2"
+  "sort (Nil2) = Nil2"
   | "sort (Cons2 y xs) = insort y (sort xs)"
   fun equal2 :: "Nat => Nat => bool" where
   "equal2 (Z) (Z) = True"
@@ -24,9 +24,9 @@ begin
   "count x (Nil2) = Z"
   | "count x (Cons2 z ys) =
        (if equal2 x z then S (count x ys) else count x ys)"
-  hipster le insort sort equal2 count
+  (*hipster le insort sort equal2 count *)
   theorem x0 :
     "!! (n :: Nat) (xs :: Nat list) .
        (count n xs) = (count n (sort xs))"
-    oops
+    by (hipster_induct_schemes)
 end

@@ -44,13 +44,13 @@ begin
   | "eqA (Y) (Y) = True"
   fun Consfst :: "'a => ((('a list), 'b) Pair2) list =>
                   ((('a list), 'b) Pair2) list" where
-  "Consfst x (Nil2) = nil2"
-  | "Consfst x (cons2 (Pair xs y2) ys) =
-       Cons2 (Pair (cons2 x xs) y2) (consfst x ys)"
+  "Consfst x (Nil2) = Nil2"
+  | "Consfst x (Cons2 (Pair xs y2) ys) =
+       Cons2 (Pair (Cons2 x xs) y2) (Consfst x ys)"
   fun split :: "'a list => ((('a list), ('a list)) Pair2) list" where
-  "split (Nil2) = Cons2 (Pair (nil2) (nil2)) (nil2)"
+  "split (Nil2) = Cons2 (Pair (Nil2) (Nil2)) (Nil2)"
   | "split (Cons2 y s) =
-       Cons2 (Pair (Nil2) (cons2 y s)) (consfst y (split s))"
+       Cons2 (Pair (Nil2) (Cons2 y s)) (Consfst y (split s))"
   fun and2 :: "bool => bool => bool" where
   "and2 True y = y"
   | "and2 False y = False"

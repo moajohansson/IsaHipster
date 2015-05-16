@@ -6,17 +6,17 @@ begin
   datatype ('a, 'b) Pair2 = Pair "'a" "'b"
   fun select2 :: "'a => (('a, ('a list)) Pair2) list =>
                   (('a, ('a list)) Pair2) list" where
-  "select2 x (Nil2) = nil2"
+  "select2 x (Nil2) = Nil2"
   | "select2 x (Cons2 (Pair y2 ys) x2) =
-       Cons2 (Pair y2 (cons2 x ys)) (select2 x x2)"
+       Cons2 (Pair y2 (Cons2 x ys)) (select2 x x2)"
   fun select :: "'a list => (('a, ('a list)) Pair2) list" where
-  "select (Nil2) = nil2"
-  | "select (Cons2 y xs) = cons2 (Pair y xs) (select2 y (select xs))"
+  "select (Nil2) = Nil2"
+  | "select (Cons2 y xs) = Cons2 (Pair y xs) (select2 y (select xs))"
   fun propSelectPermutations :: "((int, (int list)) Pair2) list =>
                                  (int list) list" where
-  "propSelectPermutations (Nil2) = nil2"
+  "propSelectPermutations (Nil2) = Nil2"
   | "propSelectPermutations (Cons2 (Pair y2 ys) z) =
-       Cons2 (cons2 y2 ys) (propSelectPermutations z)"
+       Cons2 (Cons2 y2 ys) (propSelectPermutations z)"
   fun or2 :: "bool => bool => bool" where
   "or2 True y = True"
   | "or2 False y = y"
@@ -27,7 +27,7 @@ begin
   "elem x (Nil2) = False"
   | "elem x (Cons2 z ys) = or2 (x = z) (elem x ys)"
   fun delete :: "int => int list => int list" where
-  "delete x (Nil2) = nil2"
+  "delete x (Nil2) = Nil2"
   | "delete x (Cons2 z ys) =
        (if x = z then ys else Cons2 z (delete x ys))"
   fun and2 :: "bool => bool => bool" where

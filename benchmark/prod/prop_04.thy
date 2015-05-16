@@ -12,7 +12,7 @@ begin
   | "double (S y) = S (S (double y))"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   hipster length double append
   theorem x0 :
     "!! (x :: 'a list) . (length (append x x)) = (double (length x))"

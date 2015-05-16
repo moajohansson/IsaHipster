@@ -12,7 +12,7 @@ begin
   | "length (Cons2 y xs) = S (length xs)"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   hipster plus length append
   theorem x0 :
     "!! (x :: 'a list) (y :: 'a list) .

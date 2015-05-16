@@ -14,8 +14,8 @@ begin
   fun height :: "'a Tree => Nat" where
   "height (Leaf) = Z"
   | "height (Node l y r) = S (max2 (height l) (height r))"
-  hipster mirror max2 height
+  (*hipster mirror max2 height *)
   theorem x0 :
     "!! (b :: 'a Tree) . (height (mirror b)) = (height b)"
-    oops
+    by (hipster_induct_schemes)
 end

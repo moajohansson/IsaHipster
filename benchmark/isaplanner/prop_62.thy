@@ -10,10 +10,10 @@ begin
   fun last :: "Nat list => Nat" where
   "last (Nil2) = Z"
   | "last (Cons2 y (Nil2)) = y"
-  | "last (Cons2 y (cons2 x2 x3)) = last (cons2 x2 x3)"
-  hipster null last
+  | "last (Cons2 y (Cons2 x2 x3)) = last (Cons2 x2 x3)"
+  (*hipster null last *)
   theorem x0 :
     "!! (xs :: Nat list) (x :: Nat) .
        (~ (null xs)) ==> ((last (Cons2 x xs)) = (last xs))"
-    oops
+    by (hipster_induct_schemes)
 end

@@ -14,10 +14,10 @@ begin
   | "elem x (Cons2 z xs) = (if equal2 x z then True else elem x xs)"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
-  hipster equal2 elem append
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
+  (*hipster equal2 elem append *)
   theorem x0 :
     "!! (x :: Nat) (xs :: Nat list) (ys :: Nat list) .
        (elem x ys) ==> (elem x (append xs ys))"
-    oops
+    by (hipster_induct_schemes)
 end

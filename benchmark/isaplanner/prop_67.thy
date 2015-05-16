@@ -12,12 +12,12 @@ begin
   "len (Nil2) = Z"
   | "len (Cons2 y xs) = S (len xs)"
   fun butlast :: "'a list => 'a list" where
-  "butlast (Nil2) = nil2"
-  | "butlast (Cons2 y (Nil2)) = nil2"
-  | "butlast (Cons2 y (cons2 x2 x3)) =
-       Cons2 y (butlast (cons2 x2 x3))"
-  hipster minus len butlast
+  "butlast (Nil2) = Nil2"
+  | "butlast (Cons2 y (Nil2)) = Nil2"
+  | "butlast (Cons2 y (Cons2 x2 x3)) =
+       Cons2 y (butlast (Cons2 x2 x3))"
+  (*hipster minus len butlast *)
   theorem x0 :
     "!! (xs :: 'a list) . (len (butlast xs)) = (minus (len xs) (S Z))"
-    oops
+    by (hipster_induct_schemes)
 end

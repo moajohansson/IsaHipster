@@ -5,8 +5,8 @@ begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype 'a Heap = Node "'a Heap" "'a" "'a Heap" | Nil2
   fun toHeap2 :: "int list => (int Heap) list" where
-  "toHeap2 (Nil2) = nil2"
-  | "toHeap2 (Cons2 y z) = cons2 (Node (Nil2) y (Nil2)) (toHeap2 z)"
+  "toHeap2 (Nil2) = Nil2"
+  | "toHeap2 (Cons2 y z) = Cons2 (Node (Nil2) y (Nil2)) (toHeap2 z)"
   fun or2 :: "bool => bool => bool" where
   "or2 True y = True"
   | "or2 False y = y"
@@ -20,15 +20,15 @@ begin
   | "hmerge (Node z x2 x3) (Nil2) = Node z x2 x3"
   | "hmerge (Nil2) y = y"
   fun hpairwise :: "(int Heap) list => (int Heap) list" where
-  "hpairwise (Nil2) = nil2"
-  | "hpairwise (Cons2 p (Nil2)) = cons2 p (nil2)"
-  | "hpairwise (Cons2 p (cons2 q qs)) =
+  "hpairwise (Nil2) = Nil2"
+  | "hpairwise (Cons2 p (Nil2)) = Cons2 p (Nil2)"
+  | "hpairwise (Cons2 p (Cons2 q qs)) =
        Cons2 (hmerge p q) (hpairwise qs)"
   fun hmerging :: "(int Heap) list => int Heap" where
   "hmerging (Nil2) = Nil2"
   | "hmerging (Cons2 p (Nil2)) = p"
-  | "hmerging (Cons2 p (cons2 z x2)) =
-       hmerging (hpairwise (Cons2 p (cons2 z x2)))"
+  | "hmerging (Cons2 p (Cons2 z x2)) =
+       hmerging (hpairwise (Cons2 p (Cons2 z x2)))"
   fun toHeap :: "int list => int Heap" where
   "toHeap x = hmerging (toHeap2 x)"
   fun toList :: "int Heap => int list" where
@@ -44,7 +44,7 @@ begin
      dot
        (% (y :: int Heap) => toList y) (% (z :: int list) => toHeap z) x"
   fun delete :: "int => int list => int list" where
-  "delete x (Nil2) = nil2"
+  "delete x (Nil2) = Nil2"
   | "delete x (Cons2 z ys) =
        (if x = z then ys else Cons2 z (delete x ys))"
   fun and2 :: "bool => bool => bool" where

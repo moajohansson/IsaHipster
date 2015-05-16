@@ -12,11 +12,11 @@ begin
   "len (Nil2) = Z"
   | "len (Cons2 y xs) = S (len xs)"
   fun ins :: "Nat => Nat list => Nat list" where
-  "ins x (Nil2) = Cons2 x (nil2)"
+  "ins x (Nil2) = Cons2 x (Nil2)"
   | "ins x (Cons2 z xs) =
-       (if lt x z then Cons2 x (cons2 z xs) else cons2 z (ins x xs))"
-  hipster lt len ins
+       (if lt x z then Cons2 x (Cons2 z xs) else Cons2 z (ins x xs))"
+  (*hipster lt len ins *)
   theorem x0 :
     "!! (x :: Nat) (xs :: Nat list) . (len (ins x xs)) = (S (len xs))"
-    oops
+    by (hipster_induct_schemes)
 end

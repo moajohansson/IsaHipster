@@ -11,15 +11,15 @@ begin
   fun sorted :: "Nat list => bool" where
   "sorted (Nil2) = True"
   | "sorted (Cons2 y (Nil2)) = True"
-  | "sorted (Cons2 y (cons2 y2 ys)) =
+  | "sorted (Cons2 y (Cons2 y2 ys)) =
        (if le y y2 then sorted (Cons2 y2 ys) else False)"
   fun insort :: "Nat => Nat list => Nat list" where
-  "insort x (Nil2) = Cons2 x (nil2)"
+  "insort x (Nil2) = Cons2 x (Nil2)"
   | "insort x (Cons2 z xs) =
-       (if le x z then Cons2 x (cons2 z xs) else cons2 z (insort x xs))"
-  hipster le sorted insort
+       (if le x z then Cons2 x (Cons2 z xs) else Cons2 z (insort x xs))"
+  (*hipster le sorted insort *)
   theorem x0 :
     "!! (x :: Nat) (xs :: Nat list) .
        (sorted xs) ==> (sorted (insort x xs))"
-    oops
+    by (hipster_induct_schemes)
 end

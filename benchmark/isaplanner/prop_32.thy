@@ -7,8 +7,8 @@ begin
   "min2 (Z) y = Z"
   | "min2 (S z) (Z) = Z"
   | "min2 (S z) (S y1) = S (min2 z y1)"
-  hipster min2
+  (*hipster min2 *)
   theorem x0 :
     "!! (a :: Nat) (b :: Nat) . (min2 a b) = (min2 b a)"
-    oops
+    by (hipster_induct_schemes)
 end

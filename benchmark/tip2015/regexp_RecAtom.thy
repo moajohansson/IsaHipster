@@ -69,10 +69,10 @@ begin
   "recognise x (Nil2) = eps x"
   | "recognise x (Cons2 z xs) = recognise (step x z) xs"
   fun eqList :: "A list => A list => bool" where
-  "eqList (Nil2) (nil2) = True"
+  "eqList (Nil2) (Nil2) = True"
   | "eqList (Nil2) (Cons2 z x2) = False"
   | "eqList (Cons2 x3 xs) (Nil2) = False"
-  | "eqList (Cons2 x3 xs) (cons2 y2 ys) =
+  | "eqList (Cons2 x3 xs) (Cons2 y2 ys) =
        and2 (eqA x3 y2) (eqList xs ys)"
   hipster seq plus or2 eqA and2 eps epsR step recognise eqList
   theorem x0 :

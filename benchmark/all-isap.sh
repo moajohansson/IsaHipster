@@ -37,6 +37,6 @@ do
   outfile=${OUTDIR%%/}/$f3$EXTENSION
   echo "Output file: $outfile"
   # take action on each file. $f store current file name
-  tip-parser $f isabelle | sed "1s/A/$f3/" | sed "s/cons/Cons/" | sed "s/nil/Nil/" > $outfile
+  tip-parser $f isabelle | sed "1s/A/$f3/" | sed "s/cons/Cons/g" | sed "s/nil/Nil/g" > $outfile
 
 done

@@ -13,11 +13,11 @@ begin
   | "len (Cons2 y xs) = S (len xs)"
   fun drop :: "Nat => 'a list => 'a list" where
   "drop (Z) y = y"
-  | "drop (S z) (Nil2) = nil2"
+  | "drop (S z) (Nil2) = Nil2"
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
-  hipster minus len drop
+  (*hipster minus len drop *)
   theorem x0 :
     "!! (n :: Nat) (xs :: 'a list) .
        (len (drop n xs)) = (minus (len xs) n)"
-    oops
+    by (hipster_induct_schemes)
 end

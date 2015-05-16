@@ -6,7 +6,7 @@ begin
   datatype Nat = Z | S "Nat"
   fun qrev :: "'a list => 'a list => 'a list" where
   "qrev (Nil2) y = y"
-  | "qrev (Cons2 z xs) y = qrev xs (cons2 z y)"
+  | "qrev (Cons2 z xs) y = qrev xs (Cons2 z y)"
   fun plus :: "Nat => Nat => Nat" where
   "plus (Z) y = y"
   | "plus (S z) y = S (plus z y)"

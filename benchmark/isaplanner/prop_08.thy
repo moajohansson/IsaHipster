@@ -10,9 +10,9 @@ begin
   "minus (Z) y = Z"
   | "minus (S z) (Z) = S z"
   | "minus (S z) (S x2) = minus z x2"
-  hipster plus minus
+  (*hipster plus minus *)
   theorem x0 :
     "!! (k :: Nat) (m :: Nat) (n :: Nat) .
        (minus (plus k m) (plus k n)) = (minus m n)"
-    oops
+    by (hipster_induct_schemes)
 end

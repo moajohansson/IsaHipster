@@ -13,9 +13,9 @@ begin
   | "le (S z) (Z) = False"
   | "le (S z) (S x2) = le z x2"
   fun listInsert :: "Nat => Nat list => Nat list" where
-  "listInsert x (Nil2) = Cons2 x (nil2)"
+  "listInsert x (Nil2) = Cons2 x (Nil2)"
   | "listInsert x (Cons2 z ys) =
-       (if le x z then Cons2 x (cons2 z ys) else
+       (if le x z then Cons2 x (Cons2 z ys) else
           Cons2 z (listInsert x ys))"
   fun merge :: "Heap => Heap => Heap" where
   "merge (Node z x2 x3) (Node x4 x5 x6) =

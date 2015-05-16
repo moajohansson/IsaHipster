@@ -13,11 +13,11 @@ begin
   "elem x (Nil2) = False"
   | "elem x (Cons2 z xs) = (if equal2 x z then True else elem x xs)"
   fun delete :: "Nat => Nat list => Nat list" where
-  "delete x (Nil2) = nil2"
+  "delete x (Nil2) = Nil2"
   | "delete x (Cons2 z xs) =
        (if equal2 x z then delete x xs else Cons2 z (delete x xs))"
-  hipster equal2 elem delete
+  (*hipster equal2 elem delete *)
   theorem x0 :
     "!! (x :: Nat) (xs :: Nat list) . ~ (elem x (delete x xs))"
-    oops
+    by (hipster_induct_schemes)
 end

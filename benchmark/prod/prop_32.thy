@@ -9,10 +9,10 @@ begin
   | "length (Cons2 y xs) = S (length xs)"
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
-  | "append (Cons2 z xs) y = cons2 z (append xs y)"
+  | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   fun rotate :: "Nat => 'a list => 'a list" where
   "rotate (Z) y = y"
-  | "rotate (S z) (Nil2) = nil2"
+  | "rotate (S z) (Nil2) = Nil2"
   | "rotate (S z) (Cons2 x2 x3) =
        rotate z (append x3 (Cons2 x2 (Nil2)))"
   hipster length append rotate

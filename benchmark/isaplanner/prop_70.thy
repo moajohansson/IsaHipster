@@ -7,8 +7,8 @@ begin
   "le (Z) y = True"
   | "le (S z) (Z) = False"
   | "le (S z) (S x2) = le z x2"
-  hipster le
+  (*hipster le *)
   theorem x0 :
     "!! (m :: Nat) (n :: Nat) . (le m n) ==> (le m (S n))"
-    oops
+    by (hipster_induct_schemes)
 end

@@ -9,9 +9,9 @@ begin
   | "lt (Z) (S z) = True"
   | "lt (S x2) (S z) = lt x2 z"
   fun ins :: "Nat => Nat list => Nat list" where
-  "ins x (Nil2) = Cons2 x (nil2)"
+  "ins x (Nil2) = Cons2 x (Nil2)"
   | "ins x (Cons2 z xs) =
-       (if lt x z then Cons2 x (cons2 z xs) else cons2 z (ins x xs))"
+       (if lt x z then Cons2 x (Cons2 z xs) else Cons2 z (ins x xs))"
   fun equal2 :: "Nat => Nat => bool" where
   "equal2 (Z) (Z) = True"
   | "equal2 (Z) (S z) = False"
@@ -20,9 +20,9 @@ begin
   fun elem :: "Nat => Nat list => bool" where
   "elem x (Nil2) = False"
   | "elem x (Cons2 z xs) = (if equal2 x z then True else elem x xs)"
-  hipster lt ins equal2 elem
+  (*hipster lt ins equal2 elem *)
   theorem x0 :
     "!! (x :: Nat) (y :: Nat) (xs :: Nat list) .
        (~ (equal2 x y)) ==> ((elem x (ins y xs)) = (elem x xs))"
-    oops
+    by (hipster_induct_schemes)
 end

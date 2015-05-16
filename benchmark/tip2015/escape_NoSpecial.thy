@@ -34,9 +34,9 @@ begin
        | R => C
      end"
   fun escape :: "Token list => Token list" where
-  "escape (Nil2) = nil2"
+  "escape (Nil2) = Nil2"
   | "escape (Cons2 y xs) =
-       (if isSpecial y then Cons2 ESC (cons2 (code y) (escape xs)) else
+       (if isSpecial y then Cons2 ESC (Cons2 (code y) (escape xs)) else
           Cons2 y (escape xs))"
   fun and2 :: "bool => bool => bool" where
   "and2 True y = y"

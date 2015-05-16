@@ -10,8 +10,8 @@ begin
   "lt x (Z) = False"
   | "lt (Z) (S z) = True"
   | "lt (S x2) (S z) = lt x2 z"
-  hipster plus lt
+  (*hipster plus lt *)
   theorem x0 :
     "!! (i :: Nat) (m :: Nat) . lt i (S (plus m i))"
-    oops
+    by (hipster_induct_schemes)
 end

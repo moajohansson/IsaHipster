@@ -13,9 +13,9 @@ begin
   | "count x (Cons2 z xs) =
        (if x = z then S (count x xs) else count x xs)"
   fun bubble :: "int list => (bool, (int list)) Pair2" where
-  "bubble (Nil2) = Pair False (nil2)"
-  | "bubble (Cons2 y (Nil2)) = Pair False (cons2 y (nil2))"
-  | "bubble (Cons2 y (cons2 y2 xs)) =
+  "bubble (Nil2) = Pair False (Nil2)"
+  | "bubble (Cons2 y (Nil2)) = Pair False (Cons2 y (Nil2))"
+  | "bubble (Cons2 y (Cons2 y2 xs)) =
        (if y <= y2 then
           case bubble (Cons2 y2 xs) of
             | Pair b6 ys5 =>

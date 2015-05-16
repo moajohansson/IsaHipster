@@ -13,7 +13,7 @@ begin
   "elem x (Nil2) = False"
   | "elem x (Cons2 z xs) = (if equal2 x z then True else elem x xs)"
   fun intersect :: "Nat list => Nat list => Nat list" where
-  "intersect (Nil2) y = nil2"
+  "intersect (Nil2) y = Nil2"
   | "intersect (Cons2 z xs) y =
        (if elem z y then Cons2 z (intersect xs y) else intersect xs y)"
   fun subset :: "Nat list => Nat list => bool" where
