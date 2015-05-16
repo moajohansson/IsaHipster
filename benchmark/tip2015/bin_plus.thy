@@ -23,9 +23,8 @@ begin
   "toNat (One) = S Z"
   | "toNat (ZeroAnd xs) = plus (toNat xs) (toNat xs)"
   | "toNat (OneAnd ys) = S (plus (toNat ys) (toNat ys))"
-  hipster s plus2 plus toNat
+  (*hipster s plus2 plus toNat *)
   theorem x0 :
-    "!! (x :: Bin) (y :: Bin) .
-       (toNat (plus2 x y)) = (plus (toNat x) (toNat y))"
-    oops
+    "(toNat (plus2 x y)) = (plus (toNat x) (toNat y))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

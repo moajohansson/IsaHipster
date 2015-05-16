@@ -12,8 +12,8 @@ begin
   fun mult :: "Nat => Nat => Nat => Nat" where
   "mult (Z) y z = z"
   | "mult (S x2) y z = mult x2 y (plus y z)"
-  hipster plus mult2 mult
+  (*hipster plus mult2 mult *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) . (mult2 x y) = (mult x y Z)"
-    oops
+    "(mult2 x y) = (mult x y Z)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -68,9 +68,8 @@ begin
   fun recognise :: "R => A list => bool" where
   "recognise x (Nil2) = eps x"
   | "recognise x (Cons2 z xs) = recognise (step x z) xs"
-  hipster seq plus or2 eqA and2 eps epsR step recognise
+  (*hipster seq plus or2 eqA and2 eps epsR step recognise *)
   theorem x0 :
-    "!! (p :: R) (q :: R) (r :: R) (s :: A list) .
-       (recognise (Seq p (Seq q r)) s) = (recognise (Seq (Seq p q) r) s)"
-    oops
+    "(recognise (Seq p (Seq q r)) s) = (recognise (Seq (Seq p q) r) s)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

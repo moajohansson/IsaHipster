@@ -19,8 +19,8 @@ begin
   "times (One) y = y"
   | "times (ZeroAnd xs) y = ZeroAnd (times xs y)"
   | "times (OneAnd ys) y = plus (ZeroAnd (times ys y)) y"
-  hipster s plus times
+  (*hipster s plus times *)
   theorem x0 :
-    "!! (x :: Bin) (y :: Bin) . (times x y) = (times y x)"
-    oops
+    "(times x y) = (times y x)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -9,7 +9,6 @@ begin
   | "min2 (S z) (S y1) = S (min2 z y1)"
   (*hipster min2 *)
   theorem x0 :
-    "!! (a :: Nat) (b :: Nat) (c :: Nat) .
-       (min2 (min2 a b) c) = (min2 a (min2 b c))"
-    by (hipster_induct_schemes)
+    "(min2 (min2 a b) c) = (min2 a (min2 b c))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -15,7 +15,6 @@ begin
   | "take (S z) (Cons2 x2 x3) = Cons2 x2 (take z x3)"
   (*hipster zip take *)
   theorem x0 :
-    "!! (n :: Nat) (xs :: 'a list) (ys :: 'b list) .
-       (take n (zip xs ys)) = (zip (take n xs) (take n ys))"
-    by (hipster_induct_schemes)
+    "(take n (zip xs ys)) = (zip (take n xs) (take n ys))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

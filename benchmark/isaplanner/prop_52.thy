@@ -21,7 +21,6 @@ begin
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
   (*hipster equal2 count append rev *)
   theorem x0 :
-    "!! (n :: Nat) (xs :: Nat list) .
-       (count n xs) = (count n (rev xs))"
-    by (hipster_induct_schemes)
+    "(count n xs) = (count n (rev xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

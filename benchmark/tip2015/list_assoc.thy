@@ -9,9 +9,8 @@ begin
   fun bind :: "'a list => ('a => 'b list) => 'b list" where
   "bind (Nil2) y = Nil2"
   | "bind (Cons2 z xs) y = append (y z) (bind xs y)"
-  hipster append bind
+  (*hipster append bind *)
   theorem x0 :
-    "!! (m :: 'a list) (f :: ('a => 'b list)) (g :: ('b => 'c list)) .
-       (bind (bind m f) g) = (bind m (% (x :: 'a) => bind (f x) g))"
-    oops
+    "(bind (bind m f) g) = (bind m (% (x :: 'a) => bind (f x) g))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -27,7 +27,6 @@ begin
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
   (*hipster take minus len drop append rev *)
   theorem x0 :
-    "!! (i :: Nat) (xs :: 'a list) .
-       (rev (drop i xs)) = (take (minus (len xs) i) (rev xs))"
-    by (hipster_induct_schemes)
+    "(rev (drop i xs)) = (take (minus (len xs) i) (rev xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

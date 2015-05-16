@@ -9,6 +9,6 @@ begin
   | "le (S z) (S x2) = le z x2"
   (*hipster le *)
   theorem x0 :
-    "!! (m :: Nat) (n :: Nat) . (le m n) ==> (le m (S n))"
-    by (hipster_induct_schemes)
+    "(le m n) ==> (le m (S n))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

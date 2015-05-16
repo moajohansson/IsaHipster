@@ -12,7 +12,6 @@ begin
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster filter append *)
   theorem x0 :
-    "!! (p :: ('a => bool)) (xs :: 'a list) (ys :: 'a list) .
-       (filter p (append xs ys)) = (append (filter p xs) (filter p ys))"
-    by (hipster_induct_schemes)
+    "(filter p (append xs ys)) = (append (filter p xs) (filter p ys))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

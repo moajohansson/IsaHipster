@@ -25,8 +25,7 @@ begin
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster zip take len drop append *)
   theorem x0 :
-    "!! (xs :: 'a list) (ys :: 'a list) (zs :: 'b list) .
-       (zip (append xs ys) zs) =
-         (append (zip xs (take (len xs) zs)) (zip ys (drop (len xs) zs)))"
-    by (hipster_induct_schemes)
+    "(zip (append xs ys) zs) =
+       (append (zip xs (take (len xs) zs)) (zip ys (drop (len xs) zs)))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

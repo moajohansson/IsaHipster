@@ -12,9 +12,8 @@ begin
   fun pow :: "Nat => Nat => Nat" where
   "pow x (Z) = S Z"
   | "pow x (S m) = mult x (pow x m)"
-  hipster plus mult pow
+  (*hipster plus mult pow *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) (z :: Nat) .
-       (pow x (mult y z)) = (pow (pow x y) z)"
-    oops
+    "(pow x (mult y z)) = (pow (pow x y) z)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

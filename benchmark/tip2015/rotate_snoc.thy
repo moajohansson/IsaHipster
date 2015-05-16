@@ -14,8 +14,8 @@ begin
   fun length :: "'a list => Nat" where
   "length (Nil2) = Z"
   | "length (Cons2 y xs) = S (length xs)"
-  hipster snoc rotate length
+  (*hipster snoc rotate length *)
   theorem x0 :
-    "!! (xs :: 'a list) . (rotate (length xs) xs) = xs"
-    oops
+    "(rotate (length xs) xs) = xs"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

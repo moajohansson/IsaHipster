@@ -13,8 +13,8 @@ begin
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
-  hipster length double append
+  (*hipster length double append *)
   theorem x0 :
-    "!! (x :: 'a list) . (length (append x x)) = (double (length x))"
-    oops
+    "(length (append x x)) = (double (length x))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

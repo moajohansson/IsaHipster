@@ -22,9 +22,8 @@ begin
   fun elem :: "Nat => Nat list => bool" where
   "elem x (Nil2) = False"
   | "elem x (Cons2 z xs) = (if equal2 x z then True else elem x xs)"
-  hipster le insert2 equal2 unequal elem
+  (*hipster le insert2 equal2 unequal elem *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) (z :: Nat list) .
-       (unequal x y) ==> ((elem x (insert2 y z)) = (elem x z))"
-    oops
+    "(unequal x y) ==> ((elem x (insert2 y z)) = (elem x z))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

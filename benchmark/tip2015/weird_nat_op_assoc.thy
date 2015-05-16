@@ -8,9 +8,8 @@ begin
   | "op (Z) y (S x3) x2 = op Z y x3 (S x2)"
   | "op (S x4) y (Z) x2 = op x4 y y x2"
   | "op (S x4) y (S c) x2 = op (S x4) y c (S x2)"
-  hipster op
+  (*hipster op *)
   theorem x0 :
-    "!! (a :: Nat) (b :: Nat) (c :: Nat) (d :: Nat) (e :: Nat) .
-       (op (op a b Z Z) c d e) = (op a (op b c Z Z) d e)"
-    oops
+    "(op (op a b Z Z) c d e) = (op a (op b c Z Z) d e)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -10,8 +10,8 @@ begin
   "half (Z) = Z"
   | "half (S (Z)) = Z"
   | "half (S (S z)) = S (half z)"
-  hipster plus half
+  (*hipster plus half *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) . (half (plus x y)) = (half (plus y x))"
-    oops
+    "(half (plus x y)) = (half (plus y x))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

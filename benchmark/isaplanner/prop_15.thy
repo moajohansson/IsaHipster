@@ -17,6 +17,6 @@ begin
        (if lt x z then Cons2 x (Cons2 z xs) else Cons2 z (ins x xs))"
   (*hipster lt len ins *)
   theorem x0 :
-    "!! (x :: Nat) (xs :: Nat list) . (len (ins x xs)) = (S (len xs))"
-    by (hipster_induct_schemes)
+    "(len (ins x xs)) = (S (len xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

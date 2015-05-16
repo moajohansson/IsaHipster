@@ -38,17 +38,16 @@ begin
   fun deleteMinimum :: "Heap => Heap Maybe" where
   "deleteMinimum (Node l y r) = Just (merge l r)"
   | "deleteMinimum (Nil2) = Nothing"
-  hipster plus
-          listDeleteMinimum
-          le
-          merge
-          toList
-          heapSize
-          toList2
-          maybeToList
-          deleteMinimum
+  (*hipster plus
+            listDeleteMinimum
+            le
+            merge
+            toList
+            heapSize
+            toList2
+            maybeToList
+            deleteMinimum *)
   theorem x0 :
-    "!! (h :: Heap) .
-       (listDeleteMinimum (toList2 h)) = (maybeToList (deleteMinimum h))"
-    oops
+    "(listDeleteMinimum (toList2 h)) = (maybeToList (deleteMinimum h))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

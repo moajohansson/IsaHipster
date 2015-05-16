@@ -15,9 +15,8 @@ begin
   | "plus (OneAnd x2) (One) = s (OneAnd x2)"
   | "plus (OneAnd x2) (ZeroAnd zs) = OneAnd (plus x2 zs)"
   | "plus (OneAnd x2) (OneAnd ys2) = ZeroAnd (s (plus x2 ys2))"
-  hipster s plus
+  (*hipster s plus *)
   theorem x0 :
-    "!! (x :: Bin) (y :: Bin) (z :: Bin) .
-       (plus x (plus y z)) = (plus (plus x y) z)"
-    oops
+    "(plus x (plus y z)) = (plus (plus x y) z)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

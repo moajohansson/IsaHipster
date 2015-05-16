@@ -31,8 +31,15 @@ begin
   "times x y =
      toInteger
        (timesSign (sign2 x) (sign2 y)) (mult (absVal x) (absVal y))"
-  hipster toInteger sign2 plus opposite timesSign mult absVal times
+  (*hipster toInteger
+            sign2
+            plus
+            opposite
+            timesSign
+            mult
+            absVal
+            times *)
   theorem x0 :
-    "!! (x :: Z) (y :: Z) . (times x y) = (times y x)"
-    oops
+    "(times x y) = (times y x)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

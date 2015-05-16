@@ -30,8 +30,8 @@ begin
   | "toTree (Cons2 y xs) = add y (toTree xs)"
   fun tsort :: "Nat list => Nat list" where
   "tsort x = flatten (toTree x) (Nil2)"
-  hipster le flatten equal2 count add toTree tsort
+  (*hipster le flatten equal2 count add toTree tsort *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat list) . (count x (tsort y)) = (count x y)"
-    oops
+    "(count x (tsort y)) = (count x y)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

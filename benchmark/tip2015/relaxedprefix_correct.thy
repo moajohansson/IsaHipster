@@ -47,16 +47,15 @@ begin
   | "isRelaxedPrefix (Cons2 z (Cons2 x3 x4)) (Cons2 x5 x6) =
        (if eq z x5 then isRelaxedPrefix (Cons2 x3 x4) x6 else
           isPrefix (Cons2 x3 x4) (Cons2 x5 x6))"
-  hipster removeOne2
-          removeOne
-          or2
-          eq
-          isPrefix
-          spec2
-          spec
-          isRelaxedPrefix
+  (*hipster removeOne2
+            removeOne
+            or2
+            eq
+            isPrefix
+            spec2
+            spec
+            isRelaxedPrefix *)
   theorem x0 :
-    "!! (xs :: It list) (ys :: It list) .
-       (isRelaxedPrefix xs ys) = (spec xs ys)"
-    oops
+    "(isRelaxedPrefix xs ys) = (spec xs ys)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -33,11 +33,9 @@ begin
                (mul3acc (S Z) x3 x4) (mul3acc (S x7) (S Z) x4)
                (mul3acc (S x7) x3 (S Z)))
             (add3acc (S x7) x3 x4))"
-  hipster add3acc mul3acc
+  (*hipster add3acc mul3acc *)
   theorem x0 :
-    "!!
-       (x1 :: Nat) (x2 :: Nat) (x3acc :: Nat) (x4 :: Nat) (x5 :: Nat) .
-       (mul3acc (mul3acc x1 x2 x3acc) x4 x5) =
-         (mul3acc x1 x2 (mul3acc x3acc x4 x5))"
-    oops
+    "(mul3acc (mul3acc x1 x2 x3acc) x4 x5) =
+       (mul3acc x1 x2 (mul3acc x3acc x4 x5))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

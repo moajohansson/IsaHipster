@@ -9,8 +9,8 @@ begin
   fun double :: "Nat => Nat" where
   "double (Z) = Z"
   | "double (S y) = S (S (double y))"
-  hipster plus double
+  (*hipster plus double *)
   theorem x0 :
-    "!! (x :: Nat) . (double x) = (plus x x)"
-    oops
+    "(double x) = (plus x x)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

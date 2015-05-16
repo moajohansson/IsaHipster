@@ -16,7 +16,6 @@ begin
   | "butlastConcat x (Cons2 z x2) = append x (butlast (Cons2 z x2))"
   (*hipster butlast append butlastConcat *)
   theorem x0 :
-    "!! (xs :: 'a list) (ys :: 'a list) .
-       (butlast (append xs ys)) = (butlastConcat xs ys)"
-    by (hipster_induct_schemes)
+    "(butlast (append xs ys)) = (butlastConcat xs ys)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

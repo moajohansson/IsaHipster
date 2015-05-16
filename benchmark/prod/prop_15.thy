@@ -6,8 +6,8 @@ begin
   fun plus :: "Nat => Nat => Nat" where
   "plus (Z) y = y"
   | "plus (S z) y = S (plus z y)"
-  hipster plus
+  (*hipster plus *)
   theorem x0 :
-    "!! (x :: Nat) . (plus x (S x)) = (S (plus x x))"
-    oops
+    "(plus x (S x)) = (S (plus x x))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

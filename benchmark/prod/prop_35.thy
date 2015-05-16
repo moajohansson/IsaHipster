@@ -17,8 +17,8 @@ begin
   fun exp :: "Nat => Nat => Nat" where
   "exp x (Z) = S Z"
   | "exp x (S n) = mult x (exp x n)"
-  hipster plus one mult qexp exp
+  (*hipster plus one mult qexp exp *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) . (exp x y) = (qexp x y one)"
-    oops
+    "(exp x y) = (qexp x y one)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -20,6 +20,6 @@ begin
   | "sort (Cons2 y xs) = insort y (sort xs)"
   (*hipster len le insort sort *)
   theorem x0 :
-    "!! (xs :: Nat list) . (len (sort xs)) = (len xs)"
-    by (hipster_induct_schemes)
+    "(len (sort xs)) = (len xs)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

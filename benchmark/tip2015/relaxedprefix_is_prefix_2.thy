@@ -35,11 +35,10 @@ begin
   fun append :: "It list => It list => It list" where
   "append (Nil2) y = y"
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
-  hipster eq isPrefix isRelaxedPrefix append
+  (*hipster eq isPrefix isRelaxedPrefix append *)
   theorem x0 :
-    "!! (x :: It) (xs :: It list) (ys :: It list) (zs :: It list) .
-       isRelaxedPrefix
-         (append (append xs (Cons2 x (Nil2))) ys)
-         (append (append xs ys) zs)"
-    oops
+    "isRelaxedPrefix
+       (append (append xs (Cons2 x (Nil2))) ys)
+       (append (append xs ys) zs)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -11,9 +11,8 @@ begin
   "mul2 (Z) y = Z"
   | "mul2 (S z) (Z) = Z"
   | "mul2 (S z) (S x2) = S (add3acc z x2 (mul2 z x2))"
-  hipster add3acc mul2
+  (*hipster add3acc mul2 *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) (z :: Nat) .
-       (mul2 x (mul2 y z)) = (mul2 (mul2 x y) z)"
-    oops
+    "(mul2 x (mul2 y z)) = (mul2 (mul2 x y) z)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

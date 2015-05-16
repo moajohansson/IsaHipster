@@ -44,8 +44,8 @@ begin
   fun all :: "('a => bool) => 'a list => bool" where
   "all x (Nil2) = True"
   | "all x (Cons2 z xs) = and2 (x z) (all x xs)"
-  hipster or2 isSpecial isEsc ok code escape and2 all
+  (*hipster or2 isSpecial isEsc ok code escape and2 all *)
   theorem x0 :
-    "!! (xs :: Token list) . all (% (x :: Token) => ok x) (escape xs)"
-    oops
+    "all (% (x :: Token) => ok x) (escape xs)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -17,8 +17,8 @@ begin
   | "accaltmul (S z) (Z) = Z"
   | "accaltmul (S z) (S x2) =
        S (accplus z (accplus x2 (accaltmul z x2)))"
-  hipster plus mult accplus accaltmul
+  (*hipster plus mult accplus accaltmul *)
   theorem x0 :
-    "!! (x :: Nat) . !! (y :: Nat) . (accaltmul x y) = (mult x y)"
-    oops
+    "(accaltmul x y) = (mult x y)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

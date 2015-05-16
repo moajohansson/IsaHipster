@@ -12,11 +12,10 @@ begin
   fun pow :: "Nat => Nat => Nat" where
   "pow x (Z) = S Z"
   | "pow x (S m) = mult x (pow x m)"
-  hipster plus mult pow
+  (*hipster plus mult pow *)
   theorem x0 :
-    "!! (n :: Nat) (x :: Nat) (y :: Nat) (z :: Nat) .
-       ((plus (pow (S x) (S (S (S n)))) (pow (S y) (S (S (S n))))) =
-          (pow (S z) (S (S (S n))))) ==>
-         False"
-    oops
+    "((plus (pow (S x) (S (S (S n)))) (pow (S y) (S (S (S n))))) =
+        (pow (S z) (S (S (S n))))) ==>
+       False"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

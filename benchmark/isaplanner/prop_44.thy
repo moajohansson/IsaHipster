@@ -14,7 +14,6 @@ begin
   | "zipConcat x y (Cons2 y2 ys) = Cons2 (Pair x y2) (zip y ys)"
   (*hipster zip zipConcat *)
   theorem x0 :
-    "!! (x :: 'a) (xs :: 'a list) (ys :: 'b list) .
-       (zip (Cons2 x xs) ys) = (zipConcat x xs ys)"
-    by (hipster_induct_schemes)
+    "(zip (Cons2 x xs) ys) = (zipConcat x xs ys)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

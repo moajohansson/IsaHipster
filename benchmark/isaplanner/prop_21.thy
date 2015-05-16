@@ -12,6 +12,6 @@ begin
   | "le (S z) (S x2) = le z x2"
   (*hipster plus le *)
   theorem x0 :
-    "!! (n :: Nat) (m :: Nat) . le n (plus n m)"
-    by (hipster_induct_schemes)
+    "le n (plus n m)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

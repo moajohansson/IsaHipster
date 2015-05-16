@@ -17,7 +17,6 @@ begin
        (if x z then Cons2 z (filter x xs) else filter x xs)"
   (*hipster len le filter *)
   theorem x0 :
-    "!! (q :: ('a => bool)) (xs :: 'a list) .
-       le (len (filter q xs)) (len xs)"
-    by (hipster_induct_schemes)
+    "le (len (filter q xs)) (len xs)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

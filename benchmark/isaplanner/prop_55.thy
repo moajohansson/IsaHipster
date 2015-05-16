@@ -20,8 +20,7 @@ begin
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster minus len drop append *)
   theorem x0 :
-    "!! (n :: Nat) (xs :: 'a list) (ys :: 'a list) .
-       (drop n (append xs ys)) =
-         (append (drop n xs) (drop (minus n (len xs)) ys))"
-    by (hipster_induct_schemes)
+    "(drop n (append xs ys)) =
+       (append (drop n xs) (drop (minus n (len xs)) ys))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -14,8 +14,8 @@ begin
   fun concat2 :: "('a list) list => 'a list" where
   "concat2 (Nil2) = Nil2"
   | "concat2 (Cons2 xs xss) = append xs (concat2 xss)"
-  hipster weirdconcat append concat2
+  (*hipster weirdconcat append concat2 *)
   theorem x0 :
-    "!! (x :: ('a list) list) . (concat2 x) = (weirdconcat x)"
-    oops
+    "(concat2 x) = (weirdconcat x)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

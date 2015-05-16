@@ -13,9 +13,8 @@ begin
   fun length :: "'a list => Nat" where
   "length (Nil2) = Z"
   | "length (Cons2 y xs) = S (length xs)"
-  hipster qrev plus length
+  (*hipster qrev plus length *)
   theorem x0 :
-    "!! (x :: 'a list) (y :: 'a list) .
-       (length (qrev x y)) = (plus (length x) (length y))"
-    oops
+    "(length (qrev x y)) = (plus (length x) (length y))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

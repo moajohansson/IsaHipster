@@ -17,9 +17,8 @@ begin
   | "plus (P m) (N o) = minus m (Succ o)"
   | "plus (N m2) (P n2) = minus n2 (Succ m2)"
   | "plus (N m2) (N n3) = N (Succ (plus2 m2 n3))"
-  hipster plus2 minus plus
+  (*hipster plus2 minus plus *)
   theorem x0 :
-    "!! (x :: Z) (y :: Z) (z :: Z) .
-       (plus x (plus y z)) = (plus (plus x y) z)"
-    oops
+    "(plus x (plus y z)) = (plus (plus x y) z)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

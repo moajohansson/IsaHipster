@@ -34,9 +34,8 @@ begin
   | "heapSize (Nil2) = Z"
   fun toList2 :: "Heap => Nat list" where
   "toList2 x = toList (heapSize x) x"
-  hipster plus le merge toList mergeLists heapSize toList2
+  (*hipster plus le merge toList mergeLists heapSize toList2 *)
   theorem x0 :
-    "!! (x :: Heap) (y :: Heap) .
-       (toList2 (merge x y)) = (mergeLists (toList2 x) (toList2 y))"
-    oops
+    "(toList2 (merge x y)) = (mergeLists (toList2 x) (toList2 y))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -12,6 +12,6 @@ begin
   | "lt (S x2) (S z) = lt x2 z"
   (*hipster plus lt *)
   theorem x0 :
-    "!! (i :: Nat) (m :: Nat) . lt i (S (plus m i))"
-    by (hipster_induct_schemes)
+    "lt i (S (plus m i))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

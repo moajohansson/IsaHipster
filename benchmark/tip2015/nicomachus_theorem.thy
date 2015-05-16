@@ -15,8 +15,8 @@ begin
   fun cubes :: "Nat => Nat" where
   "cubes (Z) = Z"
   | "cubes (S n) = plus (cubes n) (mult (mult (S n) (S n)) (S n))"
-  hipster plus sum mult cubes
+  (*hipster plus sum mult cubes *)
   theorem x0 :
-    "!! (n :: Nat) . (cubes n) = (mult (sum n) (sum n))"
-    oops
+    "(cubes n) = (mult (sum n) (sum n))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

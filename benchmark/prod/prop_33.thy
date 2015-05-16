@@ -17,8 +17,8 @@ begin
   fun fac :: "Nat => Nat" where
   "fac (Z) = S Z"
   | "fac (S y) = mult (S y) (fac y)"
-  hipster plus one mult qfac fac
+  (*hipster plus one mult qfac fac *)
   theorem x0 :
-    "!! (x :: Nat) . (fac x) = (qfac x one)"
-    oops
+    "(fac x) = (qfac x one)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

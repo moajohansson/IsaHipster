@@ -24,8 +24,8 @@ begin
   "count x (Nil2) = Z"
   | "count x (Cons2 z xs) =
        (if equal2 x z then S (count x xs) else count x xs)"
-  hipster le insert2 isort equal2 count
+  (*hipster le insert2 isort equal2 count *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat list) . (count x (isort y)) = (count x y)"
-    oops
+    "(count x (isort y)) = (count x y)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

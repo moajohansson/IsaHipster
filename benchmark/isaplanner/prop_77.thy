@@ -19,7 +19,6 @@ begin
        (if le x z then Cons2 x (Cons2 z xs) else Cons2 z (insort x xs))"
   (*hipster le sorted insort *)
   theorem x0 :
-    "!! (x :: Nat) (xs :: Nat list) .
-       (sorted xs) ==> (sorted (insort x xs))"
-    by (hipster_induct_schemes)
+    "(sorted xs) ==> (sorted (insort x xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

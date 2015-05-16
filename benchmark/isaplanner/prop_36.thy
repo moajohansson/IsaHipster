@@ -9,6 +9,6 @@ begin
        (if x z then Cons2 z (takeWhile x xs) else Nil2)"
   (*hipster takeWhile *)
   theorem x0 :
-    "!! (xs :: 'a list) . (takeWhile (% (x :: 'a) => True) xs) = xs"
-    by (hipster_induct_schemes)
+    "(takeWhile (% (x :: 'a) => True) xs) = xs"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -15,7 +15,6 @@ begin
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
   (*hipster filter append rev *)
   theorem x0 :
-    "!! (p :: ('a => bool)) (xs :: 'a list) .
-       (rev (filter p xs)) = (filter p (rev xs))"
-    by (hipster_induct_schemes)
+    "(rev (filter p xs)) = (filter p (rev xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

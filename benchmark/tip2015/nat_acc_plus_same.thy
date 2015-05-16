@@ -9,8 +9,8 @@ begin
   fun accplus :: "Nat => Nat => Nat" where
   "accplus (Z) y = y"
   | "accplus (S z) y = accplus z (S y)"
-  hipster plus accplus
+  (*hipster plus accplus *)
   theorem x0 :
-    "!! (x :: Nat) . !! (y :: Nat) . (plus x y) = (accplus x y)"
-    oops
+    "(plus x y) = (accplus x y)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

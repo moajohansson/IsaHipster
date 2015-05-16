@@ -47,19 +47,19 @@ begin
   "count x (Nil2) = Z"
   | "count x (Cons2 z xs) =
        (if equal2 x z then S (count x xs) else count x xs)"
-  hipster plus
-          le
-          merge
-          toList
-          insert2
-          toHeap
-          heapSize
-          toList2
-          equal2
-          dot
-          hsort
-          count
+  (*hipster plus
+            le
+            merge
+            toList
+            insert2
+            toHeap
+            heapSize
+            toList2
+            equal2
+            dot
+            hsort
+            count *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat list) . (count x (hsort y)) = (count x y)"
-    oops
+    "(count x (hsort y)) = (count x y)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

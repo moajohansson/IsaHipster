@@ -8,9 +8,8 @@ begin
   "drop (Z) y = y"
   | "drop (S z) (Nil2) = Nil2"
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
-  hipster drop
+  (*hipster drop *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) (z :: 'a list) .
-       (drop x (drop y z)) = (drop y (drop x z))"
-    oops
+    "(drop x (drop y z)) = (drop y (drop x z))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

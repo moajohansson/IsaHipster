@@ -19,9 +19,9 @@ begin
   fun factorial :: "Nat => Nat" where
   "factorial (Z) = S Z"
   | "factorial (S n) = mult (S n) (factorial n)"
-  hipster plus mult pow lt factorial
+  (*hipster plus mult pow lt factorial *)
   theorem x0 :
-    "!! (n :: Nat) .
-       lt (pow (S (S Z)) (S (S (S (S n))))) (factorial (S (S (S (S n)))))"
-    oops
+    "lt
+       (pow (S (S Z)) (S (S (S (S n))))) (factorial (S (S (S (S n)))))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

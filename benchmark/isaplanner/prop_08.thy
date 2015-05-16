@@ -12,7 +12,6 @@ begin
   | "minus (S z) (S x2) = minus z x2"
   (*hipster plus minus *)
   theorem x0 :
-    "!! (k :: Nat) (m :: Nat) (n :: Nat) .
-       (minus (plus k m) (plus k n)) = (minus m n)"
-    by (hipster_induct_schemes)
+    "(minus (plus k m) (plus k n)) = (minus m n)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

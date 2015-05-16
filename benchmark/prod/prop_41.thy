@@ -20,9 +20,8 @@ begin
   "subset (Nil2) y = True"
   | "subset (Cons2 z xs) y =
        (if elem z y then subset xs y else False)"
-  hipster equal2 elem intersect subset
+  (*hipster equal2 elem intersect subset *)
   theorem x0 :
-    "!! (x :: Nat list) (y :: Nat list) .
-       (subset x y) ==> ((intersect x y) = x)"
-    oops
+    "(subset x y) ==> ((intersect x y) = x)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -16,9 +16,8 @@ begin
   "intersect (Nil2) y = Nil2"
   | "intersect (Cons2 z xs) y =
        (if elem z y then Cons2 z (intersect xs y) else intersect xs y)"
-  hipster equal2 elem intersect
+  (*hipster equal2 elem intersect *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat list) (z :: Nat list) .
-       (elem x y) ==> ((elem x z) ==> (elem x (intersect y z)))"
-    oops
+    "(elem x y) ==> ((elem x z) ==> (elem x (intersect y z)))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

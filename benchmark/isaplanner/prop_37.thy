@@ -18,6 +18,6 @@ begin
        (if equal2 x z then delete x xs else Cons2 z (delete x xs))"
   (*hipster equal2 elem delete *)
   theorem x0 :
-    "!! (x :: Nat) (xs :: Nat list) . ~ (elem x (delete x xs))"
-    by (hipster_induct_schemes)
+    "~ (elem x (delete x xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

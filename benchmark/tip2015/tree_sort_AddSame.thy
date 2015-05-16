@@ -25,10 +25,9 @@ begin
   "add x (Node q z q2) =
      (if le x z then Node (add x q) z q2 else Node q z (add x q2))"
   | "add x (Nil2) = Node (Nil2) x (Nil2)"
-  hipster le flatten equal2 count add
+  (*hipster le flatten equal2 count add *)
   theorem x0 :
-    "!! (x :: Nat) (t :: Nat Tree) .
-       (count x (flatten (add x t) (Nil2))) =
-         (S (count x (flatten t (Nil2))))"
-    oops
+    "(count x (flatten (add x t) (Nil2))) =
+       (S (count x (flatten t (Nil2))))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

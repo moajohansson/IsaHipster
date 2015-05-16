@@ -11,9 +11,8 @@ begin
   "add3 (Z) (Z) z = z"
   | "add3 (Z) (S y2) z = S (add3 Z y2 z)"
   | "add3 (S x2) y z = S (add3 x2 y z)"
-  hipster add3acc add3
+  (*hipster add3acc add3 *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) (z :: Nat) .
-       (add3 x y z) = (add3acc x y z)"
-    oops
+    "(add3 x y z) = (add3acc x y z)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -10,8 +10,8 @@ begin
   "even (Z) = True"
   | "even (S (Z)) = False"
   | "even (S (S z)) = even z"
-  hipster plus even
+  (*hipster plus even *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) . (even (plus x y)) = (even (plus y x))"
-    oops
+    "(even (plus x y)) = (even (plus y x))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

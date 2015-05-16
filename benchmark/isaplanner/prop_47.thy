@@ -16,6 +16,6 @@ begin
   | "height (Node l y r) = S (max2 (height l) (height r))"
   (*hipster mirror max2 height *)
   theorem x0 :
-    "!! (b :: 'a Tree) . (height (mirror b)) = (height b)"
-    by (hipster_induct_schemes)
+    "(height (mirror b)) = (height b)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

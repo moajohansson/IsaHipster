@@ -13,7 +13,6 @@ begin
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster butlast append *)
   theorem x0 :
-    "!! (xs :: 'a list) (x :: 'a) .
-       (butlast (append xs (Cons2 x (Nil2)))) = xs"
-    by (hipster_induct_schemes)
+    "(butlast (append xs (Cons2 x (Nil2)))) = xs"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

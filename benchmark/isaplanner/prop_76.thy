@@ -18,8 +18,7 @@ begin
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster equal2 count append *)
   theorem x0 :
-    "!! (n :: Nat) (m :: Nat) (xs :: Nat list) .
-       (~ (equal2 n m)) ==>
-         ((count n (append xs (Cons2 m (Nil2)))) = (count n xs))"
-    by (hipster_induct_schemes)
+    "(~ (equal2 n m)) ==>
+       ((count n (append xs (Cons2 m (Nil2)))) = (count n xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

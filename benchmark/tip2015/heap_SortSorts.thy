@@ -46,19 +46,19 @@ begin
   | "ordered (Cons2 y (Nil2)) = True"
   | "ordered (Cons2 y (Cons2 y2 xs)) =
        and2 (le y y2) (ordered (Cons2 y2 xs))"
-  hipster plus
-          le
-          merge
-          toList
-          insert2
-          toHeap
-          heapSize
-          toList2
-          dot
-          hsort
-          and2
-          ordered
+  (*hipster plus
+            le
+            merge
+            toList
+            insert2
+            toHeap
+            heapSize
+            toList2
+            dot
+            hsort
+            and2
+            ordered *)
   theorem x0 :
-    "!! (x :: Nat list) . ordered (hsort x)"
-    oops
+    "ordered (hsort x)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

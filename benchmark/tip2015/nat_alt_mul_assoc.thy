@@ -10,9 +10,8 @@ begin
   "altmul (Z) y = Z"
   | "altmul (S z) (Z) = Z"
   | "altmul (S z) (S x2) = S (plus (plus (altmul z x2) z) x2)"
-  hipster plus altmul
+  (*hipster plus altmul *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) (z :: Nat) .
-       (altmul x (altmul y z)) = (altmul (altmul x y) z)"
-    oops
+    "(altmul x (altmul y z)) = (altmul (altmul x y) z)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

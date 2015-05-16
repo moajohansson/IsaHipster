@@ -18,6 +18,6 @@ begin
   | "elem x (Cons2 z xs) = (if equal2 x z then True else elem x xs)"
   (*hipster equal2 ins1 elem *)
   theorem x0 :
-    "!! (x :: Nat) (xs :: Nat list) . elem x (ins1 x xs)"
-    by (hipster_induct_schemes)
+    "elem x (ins1 x xs)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

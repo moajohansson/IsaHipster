@@ -84,20 +84,19 @@ begin
   | "recognisePair x y (Cons2 (Pair s1 s2) xs) =
        or2
          (and2 (recognise x s1) (recognise y s2)) (recognisePair x y xs)"
-  hipster seq
-          plus
-          or2
-          eqA
-          Consfst
-          split
-          and2
-          eps
-          epsR
-          step
-          recognise
-          recognisePair
+  (*hipster seq
+            plus
+            or2
+            eqA
+            Consfst
+            split
+            and2
+            eps
+            epsR
+            step
+            recognise
+            recognisePair *)
   theorem x0 :
-    "!! (p :: R) (q :: R) (s :: A list) .
-       (recognise (Seq p q) s) = (recognisePair p q (split s))"
-    oops
+    "(recognise (Seq p q) s) = (recognisePair p q (split s))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

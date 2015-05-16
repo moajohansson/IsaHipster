@@ -35,11 +35,10 @@ begin
      rotate z (append x3 (Cons2 x2 (Nil2)))"
   | "rotate (S z) (Nil2) = Nil2"
   | "rotate (Z) y = y"
-  hipster take minus lt mod2 length drop append rotate
+  (*hipster take minus lt mod2 length drop append rotate *)
   theorem x0 :
-    "!! (n :: Nat) (xs :: 'a List2) .
-       (rotate n xs) =
-         (append
-            (drop (mod2 n (length xs)) xs) (take (mod2 n (length xs)) xs))"
-    oops
+    "(rotate n xs) =
+       (append
+          (drop (mod2 n (length xs)) xs) (take (mod2 n (length xs)) xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -16,9 +16,8 @@ begin
   "union (Nil2) y = y"
   | "union (Cons2 z xs) y =
        (if elem z y then union xs y else Cons2 z (union xs y))"
-  hipster equal2 elem union
+  (*hipster equal2 elem union *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat list) (z :: Nat list) .
-       (elem x y) ==> (elem x (union z y))"
-    oops
+    "(elem x y) ==> (elem x (union z y))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

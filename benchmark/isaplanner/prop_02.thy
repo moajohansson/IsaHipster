@@ -21,9 +21,6 @@ begin
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster plus equal2 count append *)
   theorem x0 :
-    "\<forall> (n :: Nat) (xs :: Nat list) (ys :: Nat list) .
-       (plus (count n xs) (count n ys)) = (count n (append xs ys))"
-    apply(rule allI)+
-    apply(tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
-    done
+    "(plus (count n xs) (count n ys)) = (count n (append xs ys))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

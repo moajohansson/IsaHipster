@@ -16,7 +16,6 @@ begin
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster last lastOfTwo append *)
   theorem x0 :
-    "!! (xs :: Nat list) (ys :: Nat list) .
-       (last (append xs ys)) = (lastOfTwo xs ys)"
-    by (hipster_induct_schemes)
+    "(last (append xs ys)) = (lastOfTwo xs ys)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

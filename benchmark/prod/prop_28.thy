@@ -15,8 +15,8 @@ begin
   fun revflat :: "('a list) list => 'a list" where
   "revflat (Nil2) = Nil2"
   | "revflat (Cons2 xs xss) = append (revflat xss) xs"
-  hipster append rev qrevflat revflat
+  (*hipster append rev qrevflat revflat *)
   theorem x0 :
-    "!! (x :: ('a list) list) . (revflat x) = (qrevflat x (Nil2))"
-    oops
+    "(revflat x) = (qrevflat x (Nil2))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

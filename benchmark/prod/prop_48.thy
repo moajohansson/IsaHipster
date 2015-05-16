@@ -18,8 +18,8 @@ begin
   fun isort :: "Nat list => Nat list" where
   "isort (Nil2) = Nil2"
   | "isort (Cons2 y xs) = insert2 y (isort xs)"
-  hipster length le insert2 isort
+  (*hipster length le insert2 isort *)
   theorem x0 :
-    "!! (x :: Nat list) . (length (isort x)) = (length x)"
-    oops
+    "(length (isort x)) = (length x)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

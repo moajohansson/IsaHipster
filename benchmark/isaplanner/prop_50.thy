@@ -22,7 +22,6 @@ begin
        Cons2 y (butlast (Cons2 x2 x3))"
   (*hipster take minus len butlast *)
   theorem x0 :
-    "!! (xs :: 'a list) .
-       (butlast xs) = (take (minus (len xs) (S Z)) xs)"
-    by (hipster_induct_schemes)
+    "(butlast xs) = (take (minus (len xs) (S Z)) xs)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

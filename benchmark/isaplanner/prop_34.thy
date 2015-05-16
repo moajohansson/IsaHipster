@@ -18,6 +18,6 @@ begin
   | "equal2 (S x2) (S y2) = equal2 x2 y2"
   (*hipster min2 le equal2 *)
   theorem x0 :
-    "!! (a :: Nat) (b :: Nat) . (equal2 (min2 a b) b) = (le b a)"
-    by (hipster_induct_schemes)
+    "(equal2 (min2 a b) b) = (le b a)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

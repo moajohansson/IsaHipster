@@ -30,9 +30,8 @@ begin
   fun mult :: "Nat => Nat => Nat" where
   "mult (Z) y = Z"
   | "mult (S n) y = plus y (mult n y)"
-  hipster s plus2 times plus toNat mult
+  (*hipster s plus2 times plus toNat mult *)
   theorem x0 :
-    "!! (x :: Bin) (y :: Bin) .
-       (toNat (times x y)) = (mult (toNat x) (toNat y))"
-    oops
+    "(toNat (times x y)) = (mult (toNat x) (toNat y))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

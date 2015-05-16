@@ -9,9 +9,8 @@ begin
   fun rev :: "'a list => 'a list" where
   "rev (Nil2) = Nil2"
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
-  hipster append rev
+  (*hipster append rev *)
   theorem x0 :
-    "!! (x :: 'a list) (y :: 'a list) .
-       (append (rev (rev x)) y) = (rev (rev (append x y)))"
-    oops
+    "(append (rev (rev x)) y) = (rev (rev (append x y)))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

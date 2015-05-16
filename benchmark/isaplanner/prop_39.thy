@@ -18,8 +18,7 @@ begin
        (if equal2 x z then S (count x ys) else count x ys)"
   (*hipster plus equal2 count *)
   theorem x0 :
-    "!! (n :: Nat) (x :: Nat) (xs :: Nat list) .
-       (plus (count n (Cons2 x (Nil2))) (count n xs)) =
-         (count n (Cons2 x xs))"
-    by (hipster_induct_schemes)
+    "(plus (count n (Cons2 x (Nil2))) (count n xs)) =
+       (count n (Cons2 x xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

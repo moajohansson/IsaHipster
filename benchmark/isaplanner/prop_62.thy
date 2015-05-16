@@ -13,7 +13,6 @@ begin
   | "last (Cons2 y (Cons2 x2 x3)) = last (Cons2 x2 x3)"
   (*hipster null last *)
   theorem x0 :
-    "!! (xs :: Nat list) (x :: Nat) .
-       (~ (null xs)) ==> ((last (Cons2 x xs)) = (last xs))"
-    by (hipster_induct_schemes)
+    "(~ (null xs)) ==> ((last (Cons2 x xs)) = (last xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

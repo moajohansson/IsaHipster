@@ -27,9 +27,8 @@ begin
   | "escape (Cons2 y xs) =
        (if isSpecial y then Cons2 ESC (Cons2 (code y) (escape xs)) else
           Cons2 y (escape xs))"
-  hipster isSpecial code escape
+  (*hipster isSpecial code escape *)
   theorem x0 :
-    "!! (xs :: Token list) (ys :: Token list) .
-       ((escape xs) = (escape ys)) ==> (xs = ys)"
-    oops
+    "((escape xs) = (escape ys)) ==> (xs = ys)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

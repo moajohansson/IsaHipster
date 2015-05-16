@@ -22,6 +22,6 @@ begin
   | "sort (Cons2 y xs) = insort y (sort xs)"
   (*hipster le sorted insort sort *)
   theorem x0 :
-    "!! (xs :: Nat list) . sorted (sort xs)"
-    by (hipster_induct_schemes)
+    "sorted (sort xs)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

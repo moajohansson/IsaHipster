@@ -21,7 +21,6 @@ begin
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
   (*hipster lt len last drop *)
   theorem x0 :
-    "!! (n :: Nat) (xs :: Nat list) .
-       (lt n (len xs)) ==> ((last (drop n xs)) = (last xs))"
-    by (hipster_induct_schemes)
+    "(lt n (len xs)) ==> ((last (drop n xs)) = (last xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

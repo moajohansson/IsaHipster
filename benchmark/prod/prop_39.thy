@@ -16,9 +16,8 @@ begin
   "drop (Z) y = y"
   | "drop (S z) (Nil2) = Nil2"
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
-  hipster equal2 elem drop
+  (*hipster equal2 elem drop *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) (z :: Nat list) .
-       (elem x (drop y z)) ==> (elem x z)"
-    oops
+    "(elem x (drop y z)) ==> (elem x z)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

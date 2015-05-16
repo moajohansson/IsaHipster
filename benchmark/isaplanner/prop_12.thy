@@ -13,7 +13,6 @@ begin
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
   (*hipster map2 drop *)
   theorem x0 :
-    "!! (n :: Nat) (f :: ('a1 => 'a)) (xs :: 'a1 list) .
-       (drop n (map2 f xs)) = (map2 f (drop n xs))"
-    by (hipster_induct_schemes)
+    "(drop n (map2 f xs)) = (map2 f (drop n xs))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -15,9 +15,8 @@ begin
   | "rotate (S z) (Nil2) = Nil2"
   | "rotate (S z) (Cons2 x2 x3) =
        rotate z (append x3 (Cons2 x2 (Nil2)))"
-  hipster length append rotate
+  (*hipster length append rotate *)
   theorem x0 :
-    "!! (x :: 'a list) (y :: 'a list) .
-       (rotate (length x) (append x y)) = (append y x)"
-    oops
+    "(rotate (length x) (append x y)) = (append y x)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

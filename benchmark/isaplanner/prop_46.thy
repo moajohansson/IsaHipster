@@ -10,6 +10,6 @@ begin
   | "zip (Cons2 z x2) (Cons2 x3 x4) = Cons2 (Pair z x3) (zip x2 x4)"
   (*hipster zip *)
   theorem x0 :
-    "!! (xs :: 'b list) . (zip (Nil2) xs) = (Nil2)"
-    by (hipster_induct_schemes)
+    "(zip (Nil2) xs) = (Nil2)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

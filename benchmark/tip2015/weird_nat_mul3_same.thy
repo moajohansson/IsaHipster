@@ -59,9 +59,8 @@ begin
             (add3
                (mul3 (S Z) x3 x4) (mul3 (S x7) (S Z) x4) (mul3 (S x7) x3 (S Z)))
             (add3 (S x7) x3 x4))"
-  hipster add3acc mul3acc add3 mul3
+  (*hipster add3acc mul3acc add3 mul3 *)
   theorem x0 :
-    "!! (x :: Nat) (y :: Nat) (z :: Nat) .
-       (mul3 x y z) = (mul3acc x y z)"
-    oops
+    "(mul3 x y z) = (mul3acc x y z)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

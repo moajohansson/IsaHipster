@@ -16,7 +16,6 @@ begin
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster takeWhile dropWhile append *)
   theorem x0 :
-    "!! (p :: ('a => bool)) (xs :: 'a list) .
-       (append (takeWhile p xs) (dropWhile p xs)) = xs"
-    by (hipster_induct_schemes)
+    "(append (takeWhile p xs) (dropWhile p xs)) = xs"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

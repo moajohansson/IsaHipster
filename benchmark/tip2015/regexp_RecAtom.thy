@@ -74,9 +74,8 @@ begin
   | "eqList (Cons2 x3 xs) (Nil2) = False"
   | "eqList (Cons2 x3 xs) (Cons2 y2 ys) =
        and2 (eqA x3 y2) (eqList xs ys)"
-  hipster seq plus or2 eqA and2 eps epsR step recognise eqList
+  (*hipster seq plus or2 eqA and2 eps epsR step recognise eqList *)
   theorem x0 :
-    "!! (a :: A) (s :: A list) .
-       (recognise (Atom a) s) = (eqList s (Cons2 a (Nil2)))"
-    oops
+    "(recognise (Atom a) s) = (eqList s (Cons2 a (Nil2)))"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

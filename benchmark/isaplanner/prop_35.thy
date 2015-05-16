@@ -9,6 +9,6 @@ begin
        (if x z then dropWhile x xs else Cons2 z xs)"
   (*hipster dropWhile *)
   theorem x0 :
-    "!! (xs :: 'a list) . (dropWhile (% (x :: 'a) => False) xs) = xs"
-    by (hipster_induct_schemes)
+    "(dropWhile (% (x :: 'a) => False) xs) = xs"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

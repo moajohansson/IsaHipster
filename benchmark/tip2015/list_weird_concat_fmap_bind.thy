@@ -17,9 +17,8 @@ begin
   fun bind :: "'a list => ('a => 'b list) => 'b list" where
   "bind (Nil2) y = Nil2"
   | "bind (Cons2 z xs) y = append (y z) (bind xs y)"
-  hipster weirdconcat fmap append bind
+  (*hipster weirdconcat fmap append bind *)
   theorem x0 :
-    "!! (f :: ('a => 'b list)) (xs :: 'a list) .
-       (weirdconcat (fmap f xs)) = (bind xs f)"
-    oops
+    "(weirdconcat (fmap f xs)) = (bind xs f)"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

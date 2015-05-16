@@ -63,24 +63,24 @@ begin
   "isPermutation (Nil2) y = null y"
   | "isPermutation (Cons2 z xs) y =
        and2 (elem z y) (isPermutation xs (delete z y))"
-  hipster plus
-          or2
-          null
-          le
-          merge
-          toList
-          insert2
-          toHeap
-          heapSize
-          toList2
-          equal2
-          elem
-          dot
-          hsort
-          delete
-          and2
-          isPermutation
+  (*hipster plus
+            or2
+            null
+            le
+            merge
+            toList
+            insert2
+            toHeap
+            heapSize
+            toList2
+            equal2
+            elem
+            dot
+            hsort
+            delete
+            and2
+            isPermutation *)
   theorem x0 :
-    "!! (x :: Nat list) . isPermutation (hsort x) x"
-    oops
+    "isPermutation (hsort x) x"
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end
