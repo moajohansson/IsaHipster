@@ -51,12 +51,10 @@ oops
 lemma unknown [thy_expl]: "prop_20.sort (prop_20.sort x) = prop_20.sort x"
 oops
 
+lemma notfound01 [thy_expl]: "len (insort t xs) = S (len xs)"
+by hipster_induct_schemes
 
-  theorem x0 :
+  theorem x0 :                      
     "(len (sort xs)) = (len xs)"
-    by (hipster_induct_schemes lemma_aa lemma_ab lemma_ac sort.simps len.simps insort.simps list.exhaust)
-    apply(induction xs rule: sort.induct)
-    apply(simp_all add: lemma_aa lemma_ab lemma_ac)
-    by (hipster_induct_schemes lemma_aa lemma_ab lemma_ac)
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

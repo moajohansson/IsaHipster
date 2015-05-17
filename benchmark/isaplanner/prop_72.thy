@@ -26,6 +26,36 @@ begin
   "rev (Nil2) = Nil2"
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
   (*hipster take minus len drop append rev *)
+
+lemma lemma_da [thy_expl]: "prop_72.drop x3 Nil2 = Nil2"
+by (hipster_induct_schemes prop_72.drop.simps)
+
+lemma lemma_daa [thy_expl]: "prop_72.drop (S Z) (prop_72.drop x3 y3) = prop_72.drop (S x3) y3"
+by (hipster_induct_schemes prop_72.drop.simps)
+
+lemma lemma_a [thy_expl]: "prop_72.minus x2 x2 = Z"
+by (hipster_induct_schemes prop_72.minus.simps)
+
+lemma lemma_aa [thy_expl]: "prop_72.minus x3 Z = x3"
+by (hipster_induct_schemes prop_72.minus.simps)
+
+lemma lemma_ab [thy_expl]: "prop_72.minus x2 (S x2) = Z"
+by (hipster_induct_schemes)
+
+lemma lemma_ac [thy_expl]: "prop_72.minus (S x2) x2 = S Z"
+by (hipster_induct_schemes)
+
+lemma lemma_ad [thy_expl]: "prop_72.minus (prop_72.minus x3 y3) (prop_72.minus y3 x3) =
+prop_72.minus x3 y3"
+by (hipster_induct_schemes prop_72.minus.simps)
+
+lemma lemma_ae [thy_expl]: "prop_72.minus (prop_72.minus x3 y3) (S Z) = prop_72.minus x3 (S y3)"
+by (hipster_induct_schemes prop_72.minus.simps)
+
+lemma lemma_af [thy_expl]: "prop_72.minus (prop_72.minus x4 y4) x4 = Z"
+by (hipster_induct_schemes prop_72.minus.simps)
+
+
   theorem x0 :
     "(rev (drop i xs)) = (take (minus (len xs) i) (rev xs))"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

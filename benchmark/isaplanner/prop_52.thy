@@ -30,6 +30,30 @@ by (hipster_induct_schemes prop_52.equal2.simps)
 lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
 by (hipster_induct_schemes prop_52.equal2.simps)
 
+lemma lemma_pa [thy_expl]: "prop_52.append x2 Nil2 = x2"
+by (hipster_induct_schemes prop_52.rev.simps)
+
+lemma lemma_paa [thy_expl]: "prop_52.append (prop_52.append x2 y2) z2 =
+prop_52.append x2 (prop_52.append y2 z2)"
+by (hipster_induct_schemes prop_52.rev.simps)
+
+lemma lemma_pab [thy_expl]: "prop_52.append (prop_52.rev x5) (prop_52.rev y5) =
+prop_52.rev (prop_52.append y5 x5)"
+by (hipster_induct_schemes prop_52.rev.simps)
+
+hipster count
+lemma unknown [thy_expl]: "equal2 (count x y) (S x) = equal2 (count x y) (S z)"
+oops
+
+lemma unknown [thy_expl]: "equal2 (S x) (count x y) = equal2 (count x y) (S z)"
+oops
+
+lemma unknown [thy_expl]: "equal2 (S x) (count Z y) = equal2 (count x y) (S z)"
+oops
+
+lemma unknown [thy_expl]: "equal2 (count Z x) (S y) = equal2 (count y x) (S z)"
+oops
+
   theorem x0 :
     "(count n xs) = (count n (rev xs))"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

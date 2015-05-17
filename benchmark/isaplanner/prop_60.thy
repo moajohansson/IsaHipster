@@ -31,7 +31,7 @@ oops
 
   theorem x0 :
     "(~ (null2 ys)) ==> ((last (append xs ys)) = (last ys))"
-
+    apply(induction xs)
     by (hipster_induct_schemes last.simps null.simps append.simps list.exhaust)
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})*)
 end

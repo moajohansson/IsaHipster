@@ -18,9 +18,16 @@ begin
 hipster mirror
 lemma lemma_a [thy_expl]: "mirror (mirror x2) = x2"
 by (hipster_induct_schemes prop_47.mirror.simps)
+(*
+lemma lemma_mx1 [thy_expl]: "max2 y Z = y"
+sledgehammer
+by hipster_induct_schemes
+*)
+lemma lemma_mx [thy_expl]: "max2 x y = max2 y x"
+by (hipster_induct_schemes Nat.exhaust max2.simps)
+
 (*hipster height*)
   theorem x0 :
     "(height (mirror b)) = (height b)"
-    apply(hipster_induct_schemes max2.simps mirror.simps height.simps Tree.exhaust)
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

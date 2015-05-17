@@ -61,7 +61,7 @@ by (hipster_induct_schemes prop_69.plus.simps)
 lemma lemma_ar [thy_expl]: "prop_69.plus (prop_69.plus x2 y2) (S z2) =
 prop_69.plus (prop_69.plus x2 z2) (S y2)"
 by (hipster_induct_schemes prop_69.plus.simps)
-
+(*
 lemma lemma_as [thy_expl]: "prop_69.plus (prop_69.plus x2 y2) (prop_69.plus z2 x2) =
 prop_69.plus (prop_69.plus z2 x2) (prop_69.plus x2 y2)"
 by (hipster_induct_schemes prop_69.plus.simps)
@@ -113,7 +113,7 @@ by (hipster_induct_schemes prop_69.plus.simps)
 lemma lemma_be [thy_expl]: "prop_69.plus (S x2) (prop_69.plus y2 x2) =
 prop_69.plus (prop_69.plus y2 x2) (S x2)"
 by (hipster_induct_schemes prop_69.plus.simps)
-
+*)
 lemma lemma_bf [thy_expl]: "prop_69.plus (S x2) (S y2) = prop_69.plus (S y2) (S x2)"
 by (hipster_induct_schemes prop_69.plus.simps)
 

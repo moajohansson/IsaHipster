@@ -42,8 +42,15 @@ lemma lemma_ae [thy_expl]: "le (S x2) x2 = False"
 by (hipster_induct_schemes prop_68.le.simps prop_68.len.simps)
 
 hipster delete len
+lemma lemma_af [thy_expl]: "delete x10 (delete y10 z10) = delete y10 (delete x10 z10)"
+by (hipster_induct_schemes prop_68.delete.simps prop_68.len.simps)
+
+lemma lemma_ag [thy_expl]: "delete x6 (delete x6 y6) = delete x6 y6"
+by (hipster_induct_schemes prop_68.delete.simps prop_68.len.simps)
 
   theorem x0 :
     "le (len (delete n xs)) (len xs)"
+    apply(hipster_induct_schemes len.simps delete.simps le.simps le.elims Nat.exhaust)
+
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

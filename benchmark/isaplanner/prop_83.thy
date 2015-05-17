@@ -24,6 +24,30 @@ begin
   "append (Nil2) y = y"
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster zip take len drop append *)
+
+lemma lemma_a [thy_expl]: "prop_83.drop x3 Nil2 = Nil2"
+by (hipster_induct_schemes prop_83.drop.simps)
+
+lemma lemma_aa [thy_expl]: "prop_83.drop (S Z) (prop_83.drop x3 y3) = prop_83.drop (S x3) y3"
+by (hipster_induct_schemes prop_83.drop.simps)
+
+lemma lemma_ai [thy_expl]: "prop_83.take x3 Nil2 = Nil2"
+by (hipster_induct_schemes prop_83.take.simps)
+
+lemma lemma_aj [thy_expl]: "prop_83.take x3 (prop_83.take x3 y3) = prop_83.take x3 y3"
+by (hipster_induct_schemes prop_83.take.simps)
+
+lemma lemma_ak [thy_expl]: "prop_83.take (S x3) (prop_83.take x3 y3) = prop_83.take x3 y3"
+by (hipster_induct_schemes prop_83.take.simps)
+
+hipster append
+lemma lemma_ab [thy_expl]: "prop_83.append x2 Nil2 = x2"
+by (hipster_induct_schemes prop_83.append.simps)
+
+lemma lemma_ac [thy_expl]: "prop_83.append (prop_83.append x2 y2) z2 =
+prop_83.append x2 (prop_83.append y2 z2)"
+by (hipster_induct_schemes prop_83.append.simps)
+
   theorem x0 :
     "(zip (append xs ys) zs) =
        (append (zip xs (take (len xs) zs)) (zip ys (drop (len xs) zs)))"

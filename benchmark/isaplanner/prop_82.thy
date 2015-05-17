@@ -14,7 +14,17 @@ begin
   | "take (S z) (Nil2) = Nil2"
   | "take (S z) (Cons2 x2 x3) = Cons2 x2 (take z x3)"
   (*hipster zip take *)
+lemma lemma_ai [thy_expl]: "prop_82.take x3 Nil2 = Nil2"
+by (hipster_induct_schemes prop_82.take.simps)
+
+lemma lemma_aj [thy_expl]: "prop_82.take x3 (prop_82.take x3 y3) = prop_82.take x3 y3"
+by (hipster_induct_schemes prop_82.take.simps)
+
+lemma lemma_ak [thy_expl]: "prop_82.take (S x3) (prop_82.take x3 y3) = prop_82.take x3 y3"
+by (hipster_induct_schemes prop_82.take.simps)
+
   theorem x0 :
     "(take n (zip xs ys)) = (zip (take n xs) (take n ys))"
+    apply(hispter_induct_schemes zip.simps zip.elims)
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

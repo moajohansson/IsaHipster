@@ -36,9 +36,8 @@ lemma unknown [thy_expl]: "prop_85.rev (prop_85.rev x) = x"
 oops
   theorem x0 :
     "((len xs) = (len ys)) ==>
-       ((zip (rev xs) (rev ys)) = (rev (zip xs ys)))"
+       ((zip (rev xs) (rev ys)) = (rev (zip xs ys)))"(*
     apply(induction xs ys rule: zip.induct)
 apply simp_all
-apply(metis  zip.simps)
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})*)
 end
