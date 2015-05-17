@@ -10,5 +10,6 @@ begin
   (*hipster min2 *)
   theorem x0 :
     "(min2 a b) = (min2 b a)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (hipster_induct_schemes Nat.exhaust min2.simps)
+
 end

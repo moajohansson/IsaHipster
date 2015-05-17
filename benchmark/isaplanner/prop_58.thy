@@ -14,6 +14,12 @@ begin
   | "drop (S z) (Nil2) = Nil2"
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
   (*hipster zip drop *)
+lemma lemma_a [thy_expl]: "prop_58.drop x3 Nil2 = Nil2"
+by (hipster_induct_schemes prop_58.drop.simps)
+
+lemma lemma_aa [thy_expl]: "prop_58.drop (S Z) (prop_58.drop x3 y3) = prop_58.drop (S x3) y3"
+by (hipster_induct_schemes prop_58.drop.simps)
+hipster zip
   theorem x0 :
     "(drop n (zip xs ys)) = (zip (drop n xs) (drop n ys))"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

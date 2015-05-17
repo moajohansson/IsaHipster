@@ -17,6 +17,15 @@ begin
   "elem x (Nil2) = False"
   | "elem x (Cons2 z xs) = (if equal2 x z then True else elem x xs)"
   (*hipster equal2 ins1 elem *)
+lemma lemma_a [thy_expl]: "equal2 x4 y4 = equal2 y4 x4"
+by (hipster_induct_schemes prop_29.equal2.simps)
+
+lemma lemma_aa [thy_expl]: "equal2 x2 x2 = True"
+by (hipster_induct_schemes prop_29.equal2.simps)
+
+lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
+by (hipster_induct_schemes prop_29.equal2.simps)
+
   theorem x0 :
     "elem x (ins1 x xs)"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

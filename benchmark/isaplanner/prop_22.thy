@@ -10,5 +10,7 @@ begin
   (*hipster max2 *)
   theorem x0 :
     "(max2 (max2 a b) c) = (max2 a (max2 b c))"
+    by (hipster_induct_schemes max2.simps Nat.exhaust)
+
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

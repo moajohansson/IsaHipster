@@ -1,39 +1,8 @@
-theory prop_54
+theory plus
 imports Main
-        "../../IsaHipster"
+
 begin
-  datatype Nat = Z | S "Nat"
-  fun plus :: "Nat => Nat => Nat" where
-  "plus (Z) y = y"
-  | "plus (S z) y = S (plus z y)"
-  fun minus :: "Nat => Nat => Nat" where
-  "minus (Z) y = Z"
-  | "minus (S z) (Z) = S z"
-  | "minus (S z) (S x2) = minus z x2"
-  (*hipster plus minus *)
-lemma lemma_a [thy_expl]: "prop_54.minus x2 x2 = Z"
-by (hipster_induct_schemes prop_54.minus.simps)
 
-lemma lemma_aa [thy_expl]: "prop_54.minus x3 Z = x3"
-by (hipster_induct_schemes prop_54.minus.simps)
-
-lemma lemma_ab [thy_expl]: "prop_54.minus x2 (S x2) = Z"
-by (hipster_induct_schemes)
-
-lemma lemma_ac [thy_expl]: "prop_54.minus (S x2) x2 = S Z"
-by (hipster_induct_schemes)
-
-lemma lemma_ad [thy_expl]: "prop_54.minus (prop_54.minus x3 y3) (prop_54.minus y3 x3) =
-prop_54.minus x3 y3"
-by (hipster_induct_schemes prop_54.minus.simps)
-
-lemma lemma_ae [thy_expl]: "prop_54.minus (prop_54.minus x3 y3) (S Z) = prop_54.minus x3 (S y3)"
-by (hipster_induct_schemes prop_54.minus.simps)
-
-lemma lemma_af [thy_expl]: "prop_54.minus (prop_54.minus x4 y4) x4 = Z"
-by (hipster_induct_schemes prop_54.minus.simps)
-
-hipster plus
 lemma lemma_ag [thy_expl]: "prop_54.plus x2 Z = x2"
 by (hipster_induct_schemes prop_54.plus.simps)
 
@@ -135,7 +104,4 @@ by (hipster_induct_schemes prop_54.plus.simps)
 lemma lemma_bh [thy_expl]: "prop_54.plus x2 (prop_54.plus y2 z2) = prop_54.plus y2 (prop_54.plus x2 z2)"
 by (hipster_induct_schemes prop_54.plus.simps)
 
-  theorem x0 :
-    "(minus (plus m n) n) = m"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

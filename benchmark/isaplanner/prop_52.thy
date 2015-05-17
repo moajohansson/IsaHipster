@@ -20,6 +20,16 @@ begin
   "rev (Nil2) = Nil2"
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
   (*hipster equal2 count append rev *)
+
+lemma lemma_a [thy_expl]: "equal2 x4 y4 = equal2 y4 x4"
+by (hipster_induct_schemes prop_52.equal2.simps)
+
+lemma lemma_aa [thy_expl]: "equal2 x2 x2 = True"
+by (hipster_induct_schemes prop_52.equal2.simps)
+
+lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
+by (hipster_induct_schemes prop_52.equal2.simps)
+
   theorem x0 :
     "(count n xs) = (count n (rev xs))"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

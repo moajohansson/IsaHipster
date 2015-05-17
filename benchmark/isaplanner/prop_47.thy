@@ -15,7 +15,12 @@ begin
   "height (Leaf) = Z"
   | "height (Node l y r) = S (max2 (height l) (height r))"
   (*hipster mirror max2 height *)
+hipster mirror
+lemma lemma_a [thy_expl]: "mirror (mirror x2) = x2"
+by (hipster_induct_schemes prop_47.mirror.simps)
+(*hipster height*)
   theorem x0 :
     "(height (mirror b)) = (height b)"
+    apply(hipster_induct_schemes max2.simps mirror.simps height.simps Tree.exhaust)
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

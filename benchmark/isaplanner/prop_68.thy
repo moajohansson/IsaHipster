@@ -21,6 +21,28 @@ begin
   | "delete x (Cons2 z xs) =
        (if equal2 x z then delete x xs else Cons2 z (delete x xs))"
   (*hipster len le equal2 delete *)
+
+lemma lemma_a [thy_expl]: "equal2 x4 y4 = equal2 y4 x4"
+by (hipster_induct_schemes prop_68.equal2.simps)
+
+lemma lemma_aa [thy_expl]: "equal2 x2 x2 = True"
+by (hipster_induct_schemes prop_68.equal2.simps)
+
+lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
+by (hipster_induct_schemes prop_68.equal2.simps)
+
+(*hipster le len*)
+lemma lemma_ac [thy_expl]: "le x2 x2 = True"
+by (hipster_induct_schemes prop_68.le.simps prop_68.len.simps)
+
+lemma lemma_ad [thy_expl]: "le x2 (S x2) = True"
+by (hipster_induct_schemes prop_68.le.simps prop_68.len.simps)
+
+lemma lemma_ae [thy_expl]: "le (S x2) x2 = False"
+by (hipster_induct_schemes prop_68.le.simps prop_68.len.simps)
+
+hipster delete len
+
   theorem x0 :
     "le (len (delete n xs)) (len xs)"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

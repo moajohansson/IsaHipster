@@ -20,6 +20,16 @@ begin
   | "drop (S z) (Nil2) = Nil2"
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
   (*hipster lt len last drop *)
+
+(*hipster lt len drop*)
+lemma lemma_a [thy_expl]: "lt x2 x2 = False"
+by (hipster_induct_schemes prop_63.lt.simps prop_63.len.simps)
+
+lemma lemma_aa [thy_expl]: "lt x2 (S x2) = True"
+by (hipster_induct_schemes prop_63.lt.simps prop_63.len.simps)
+
+lemma lemma_ab [thy_expl]: "lt (S x2) x2 = False"
+by (hipster_induct_schemes prop_63.lt.simps prop_63.len.simps)
   theorem x0 :
     "(lt n (len xs)) ==> ((last (drop n xs)) = (last xs))"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

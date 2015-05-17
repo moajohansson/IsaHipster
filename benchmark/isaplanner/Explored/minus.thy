@@ -1,17 +1,8 @@
-theory prop_07
+theory minus
 imports Main
-        "../../IsaHipster"
+
 begin
-  datatype Nat = Z | S "Nat"
-  fun plus :: "Nat => Nat => Nat" where
-  "plus (Z) y = y"
-  | "plus (S z) y = S (plus z y)"
-  fun minus :: "Nat => Nat => Nat" where
-  "minus (Z) y = Z"
-  | "minus (S z) (Z) = S z"
-  | "minus (S z) (S x2) = minus z x2"
-  (*hipster plus minus *)
-(*hipster minus*)
+
 lemma lemma_a [thy_expl]: "prop_07.minus x2 x2 = Z"
 by (hipster_induct_schemes prop_07.minus.simps)
 
@@ -34,7 +25,4 @@ by (hipster_induct_schemes prop_07.minus.simps)
 lemma lemma_af [thy_expl]: "prop_07.minus (prop_07.minus x4 y4) x4 = Z"
 by (hipster_induct_schemes prop_07.minus.simps)
 
-  theorem x0 :
-    "(minus (plus n m) n) = m"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end
