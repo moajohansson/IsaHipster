@@ -16,15 +16,37 @@ begin
   | "height (Node l y r) = S (max2 (height l) (height r))"
   (*hipster mirror max2 height *)
 hipster mirror
-lemma lemma_a [thy_expl]: "mirror (mirror x2) = x2"
+lemma lemma_ta [thy_expl]: "mirror (mirror x2) = x2"
 by (hipster_induct_schemes prop_47.mirror.simps)
 (*
 lemma lemma_mx1 [thy_expl]: "max2 y Z = y"
 sledgehammer
 by hipster_induct_schemes
 *)
-lemma lemma_mx [thy_expl]: "max2 x y = max2 y x"
+lemma lemma_mx []: "max2 x y = max2 y x"
 by (hipster_induct_schemes Nat.exhaust max2.simps)
+
+lemma lemma_a [thy_expl]: "max2 x x = x"
+by (hipster_induct_schemes max2.simps)
+
+lemma lemma_aa [thy_expl]: "max2 x Z = x"
+by (hipster_induct_schemes max2.simps)
+
+lemma lemma_ab [thy_expl]: "max2 x (max2 x y) = max2 x y"
+by (hipster_induct_schemes max2.simps)
+
+lemma lemma_ac [thy_expl]: "max2 x (max2 y x) = max2 y x"
+by (hipster_induct_schemes max2.simps)
+
+lemma lemma_ad [thy_expl]: "max2 (max2 x y) x = max2 x y"
+by (hipster_induct_schemes max2.simps)
+
+lemma lemma_ae [thy_expl]: "max2 (S x) y = max2 y (S x)"
+by (hipster_induct_schemes max2.simps)
+
+lemma lemma_af [thy_expl]: "max2 x y = max2 y x"
+by (hipster_induct_schemes max2.simps)
+
 
 (*hipster height*)
   theorem x0 :
