@@ -29,7 +29,7 @@ fun try_nxt_conj ctxt =
                                                                    |> try_nxt_conj end
                                                          else*)
       let 
-        val _ = @{print} ("before "^ @{make_string} c)
+        (*val _ = @{print} ("before "^ @{make_string} c)*)
         val r = SINGLE (Tactic_Data.routine_tac ctxt) c
         val lemma_str = (Syntax.string_of_term ctxt (Thm.concl_of c))
         (* XXX: why concl_of and not prop_of?
@@ -45,7 +45,6 @@ fun try_nxt_conj ctxt =
       | NONE =>
         let
           (* (Proof_Context.init_global (Thm.theory_of_thm c) *)
-          val _ = @{print} c
           val res = SINGLE (Tactic_Data.hard_tac ctxt) c
         in
           (* Only care about first proof found *)
@@ -116,9 +115,9 @@ fun proof_loop_w_prio ctxt facts fact_nms prio_goal_opt cand_lemmas_str =
 
 fun proof_loop ctxt facts fact_nms cand_lemmas_str = 
      let
-      val lemmas = (Library.split_lines (Library.trim_line cand_lemmas_str))
+      (*val lemmas = (Library.split_lines (Library.trim_line cand_lemmas_str))
       val culprit = filter (fn s => String.isSubstring "[]" s) (map (@{make_string}) lemmas)
-      val _ = @{print}culprit
+      val _ = @{print}culprit*)
       val ctxt' = ThyExpl_Data.init_expl ctxt facts fact_nms NONE
                                           (Library.split_lines (Library.trim_line cand_lemmas_str))
       fun recf ctxt = 
@@ -217,7 +216,7 @@ fun explore' cond_opt ctxt const_nms =
                        handle _ => []) fact_nms
                         
       val conjs = hipspec_explore ctxt cond_opt const_nms
-      val _ = @{print} conjs
+      (*val _ = @{print} conjs*)
       val res_ctxt = proof_loop ctxt facts fact_nms conjs
       val tac_str = Tactic_Data.hard_tac_str res_ctxt 
 

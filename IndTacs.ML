@@ -157,10 +157,10 @@ fun inductable_things_in_term thry t =
                       (Term.strip_all_vars t))
     end;
 
-fun inductable_things_in_sg i thm = let val _ = @{print} i in
+fun inductable_things_in_sg i thm = (*let val _ = @{print} i in*)
     inductable_things_in_term
       (Thm.theory_of_thm thm)
-      (Library.nth (prems_of thm) (i - 1)) end (* XXX: check how this might affect us *)
+      (Library.nth (prems_of thm) (i - 1)) (*end*) (* XXX: check how this might affect us *)
 
 fun infer_term x ctxt =
      let val (T, ctxt') = Proof_Context.inferred_param x ctxt
@@ -189,24 +189,24 @@ fun induct_on_var_tac ctxt rule var i goalthm =
       val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
         (* TODO: make better (otherfrees, etc.) *)
 
-      val _ = @{print} non_ithings
+      (*val _ = @{print} non_ithings
       val _ = Pretty.writeln (Pretty.str "I-things")
-      val _ = @{print} ithings
+      val _ = @{print} ithings*)
 
       val (otherfrees, inductfrees) = (case var of
                                         NONE => mk_induct_insts ithings []
                                       | SOME v => mk_induct_insts ithings v (*[v]*))
       (*val (tss, ctxt') = (fold_map o fold_map) infer_term [case var of NONE => [] | SOME v=> [v]] ctxt
       val instss = map (map (fn inst => SOME (NONE, (inst, false)))) tss;*)
-      val _ = @{print} inductfrees;
-      val _ = @{print} rule;
+      (*val _ = @{print} inductfrees;
+      val _ = @{print} rule;*)
       val insts = map (fn NONE => NONE | SOME v => 
                                           (* FIXME: Each variable paired with false?
                                            -- changed : testing : matters not in our case since we are wrapping them with 'Free' *)
                                           SOME (NONE : Binding.binding option,(Free v,false)))
                          inductfrees;
          (* Throw away Isar related stuff and only take the Thm.thm seq *)
-      val _ = Pretty.writeln (Pretty.block ( [Pretty.str "pinduct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
+      val _ = Pretty.writeln (Pretty.block ( [Pretty.str "induct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
         | SOME (_, (Free (v,_),false)) => v) insts)), Pretty.str "; otherfrees: ", Pretty.str (Library.space_implode ", "
           (map (fn (v,_) => v) otherfrees)) ]));
       val nw_thms' = (Induct.induct_tac ctxt false [insts] [non_ithings] [] rule [] i goalthm)
@@ -275,7 +275,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
       | ((n,r) :: rs) =>
           let val _ = Pretty.writeln (Pretty.str ("Rule: "^n))
               val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
-              val _ = @{print} vars
+              (*val _ = @{print} vars
               val ruleVars = map fst (filter (fn v => exists (fn tr => Type.could_match (tr,snd v)) argTyps) vars)
               fun filter_matching t vs = filter (fn v => Type.could_match (t, snd v)) vs
               val rulSss = map (fn t => filter_matching t vars) argTyps
@@ -287,12 +287,12 @@ fun try_induction_with ctxt scheme_rules strat vars i =
               val indvars = map (fn v => [v]) ruleVars @ paired ruleVars
               fun nonreptup [] = []
                 | nonreptup (vs:: vss) = fold (fn v => fn acc => acc @ (map (fn ts => v::ts) (nonreptup (map (filter (fn t => not (v = t))) vss)))) vs [] @ nonreptup vss
-              val _ = @{print} nonreptup ruleSets
+              val _ = @{print} nonreptup ruleSets*)
               val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
               val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)
               val instt = hd all_instances
-              val _ = @{print} instances
-              val _ = @{print} instt
+              (*val _ = @{print} instances
+              val _ = @{print} instt*)
               (* FIXME: vars types filter *)
           in
             try_induct_on ctxt ( r) strat (map (map fst) instt) i
@@ -309,7 +309,7 @@ fun try_induct_schemes ctxt strat i thm =
       val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
                         handle _ => (n, NONE) ) ((*"Naturals.leq.induct" ::*)distinct (op =) (map (fn c => (c^".induct")) consts))
       val schemes = rev (*the o snd*) (filter (Basics.is_some o snd) thinds)
-      val _ = Pretty.writeln (pretty_thm ctxt thm)
+      (*val _ = Pretty.writeln (pretty_thm ctxt thm)*)
       (* FIXME: distinct ... *)
     in (try_induction_with ctxt schemes strat (distinct (op =) vars) i) thm
     end;
@@ -344,13 +344,13 @@ fun induct_with_schemes ctxt facts thm =
       (*val _ = Pretty.writeln (Pretty.block (Pretty.str "Theorem: " :: [pretty_thm ctxt thm]))
       val _ = Pretty.writeln (Pretty.str ("Num cs = " ^ @{make_string} (length consts)))
       val _ = Pretty.writeln (Pretty.str (Library.space_implode " " (thynm ^ "-Consts: " :: consts))) *)
-      val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
-                        handle _ => (n, NONE) ) (map (fn c => (c^".induct")) consts)
+      (*val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
+                        handle _ => (n, NONE) ) (map (fn c => (c^".induct")) consts)*)
       (*val thinds' = map (fn n => (n,  (Attrib.thms n))
                          handle _ => (n, NONE) ) (map (fn c => (c^".induct")) consts)*)
-      val _ = Pretty.writeln (Pretty.block (maps (fn (n,thms) => (case thms of
+      (*val _ = Pretty.writeln (Pretty.block (maps (fn (n,thms) => (case thms of
            SOME ts => map Pretty.str ("\n"^n^" is: " :: (map (Pretty.string_of o pretty_thm ctxt) ts))
-         | NONE => [Pretty.str ("\n"^n^": has no induction scheme")]))  thinds))
+         | NONE => [Pretty.str ("\n"^n^": has no induction scheme")]))  thinds))*)
       (*val schemes = map (the o snd) (filter (Basics.is_some o snd) thinds)*)
     in
       ALLGOALS(try_induct_schemes ctxt (induct_simp_or_metis (facts,lemmas))) thm
