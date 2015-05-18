@@ -330,15 +330,6 @@ fun sorted :: "Nat List ⇒ bool" where
 | "sorted (Cons r (Cons t ts))  = (leq r t ∧ sorted (Cons t ts))"
 ```
 
-```isabelle
-?P Nil ⟹ (⋀a List. ?P List ⟹ ?P (Cons a List)) ⟹ ?P ?List
-```
-
-```isabelle
-?P Nil ⟹ (⋀uu_. ?P (Cons uu_ Nil)) ⟹
-(⋀r t ts. ?P (Cons t ts) ⟹ ?P (Cons r (Cons t ts))) ⟹ ?P ?a0.0
-```
-
 ---
 ## First stop: Recursion induction
 
@@ -359,7 +350,7 @@ fun sorted :: "Nat List ⇒ bool" where
 | "sorted (Cons r (Cons t ts))  = (leq r t ∧ sorted (Cons t ts))"
 
 ?P Nil ⟹
-( ⋀uu_. ?P (Cons uu_ Nil) ) ⟹
+( ⋀u. ?P (Cons u Nil) ) ⟹
 ( ⋀r t ts. ?P (Cons t ts) ⟹ ?P (Cons r (Cons t ts)) ) ⟹
 ?P ?a0.0
 ```
@@ -381,7 +372,7 @@ Exploit current system poss's
 
 ```isabelle
 ?P Nil ⟹
-( ⋀uu_. ?P (Cons uu_ Nil) ) ⟹
+( ⋀u. ?P (Cons u Nil) ) ⟹
 ( ⋀r t ts. ?P (Cons t ts) ⟹ ?P (Cons r (Cons t ts)) ) ⟹
 ?P ?a0.0
 ```
@@ -526,31 +517,18 @@ timeouts when no rules...
 ---
 name: take-drop
 
-## [1] take & drop
+## [2] take & drop
 
 ```isabelle
-(⋀ts. ?P Z ts) ⟹ (⋀v. ?P (S v) Nil) ⟹ 
-(⋀n t ts. ?P n ts ⟹ ?P (S n) (Cons t ts)) ⟹ ?P ?a0.0 ?a1.0
+( ⋀ts. ?P Z ts ) ⟹
+( ⋀v. ?P (S v) Nil ) ⟹
+( ⋀n t ts. ?P n ts ⟹ ?P (S n) (Cons t ts) ) ⟹
+?P ?a0.0 ?a1.0
 ```
 
 ```isabelle
 lemma dropTake : "ts = app (take n ts) (drop n ts)"
-apply(induction ts)
-sledgehammer
-apply (metis drop.simps(1) drop.simps(2) take.simps(1) take.simps(2)
-  Nat.exhaust app.simps(1))
-sledgehammer
-```
-
-=> Time-out
-
----
-template: take-drop
-
-```isabelle
-lemma dropTake : "ts = app (take n ts) (drop n ts)"
-apply(induction ts rule: take.induct)
-by simp_all
+by hipster_induct_schemes
 ```
 
 ???
@@ -561,10 +539,40 @@ Really benefits from induction scheme `drop.induct`
 
 ---
 template: take-drop
+name: take-drop2
 
 ```isabelle
-lemma dropTake : "ts = app (take n ts) (drop n ts)"
-by hipster_induct_schemes
+lemma initAsTake: "init ts = take (sub (len ts) (S Z)) ts"
+by (hipster_induct_schemes sub.simps Nat.exhaust)
+```
+
+---
+template: take-drop2
+
+```isabelle
+lemma initApp: "notNil ts ⟹ init (app rs ts) = app rs (init ts)"
+by (hipster_induct_schemes notNil.elims init.simps app.simps)
+```
+
+---
+name: simult
+
+## [3] simultaneous induction
+
+Common need for simultaneous induction
+
+```isabelle
+( ⋀u. ?P Nil u ) ⟹
+( ⋀v va. ?P (Cons v va) Nil ) ⟹
+( ⋀t ts r rs. ?P ts rs ⟹ ?P (Cons t ts) (Cons r rs) ) ⟹
+?P ?a0.0 ?a1.0
+```
+
+```isabelle
+lemma appZips: "len a = len b ⟹ app (zip a b) (zip c d) = zip (app a c) (app b d)"
+apply (induction a b rule: zip.induct)
+apply (simp_all)
+by (metis app.simps len.simps List.exhaust Nat.distinct)
 ```
 
 ???
@@ -572,6 +580,14 @@ by hipster_induct_schemes
 (new possible automated proofs)
 
 Automate choice: rule + var(s)
+
+---
+template: simult
+
+```isabelle
+lemma appZips: "len a = len b ⟹ app (zip a b) (zip c d) = zip (app a c) (app b d)"
+by (hipster_induct_schemes app.simps len.simps List.exhaust Nat.distinct)
+```
 
 ---
 
@@ -591,14 +607,7 @@ More refinement needed
 
 - Single induction per proof attempt - need for more: bound?
 
-- Common need for simultaneous induction
-  
-```isabelle 
-lemma appZips: "len a = len b ⟹ app (zip a b) (zip c d) = zip (app a c) (app b d)"
-apply(induction a b rule: zip.induct)
-apply(simp_all)
-by (metis app.simps len.simps List.exhaust Nat.distinct)
-```
+
 
 ???
 
@@ -618,7 +627,7 @@ reasonable bound to number of inductions?
 
 # Next: theory exploration
 
-## Underlying tools
+## Underlying tools
 
 - QuickSpeck (via HipSec)
 	* strong equational support
