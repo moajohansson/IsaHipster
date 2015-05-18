@@ -36,7 +36,7 @@ On-going MSc thesis
 
 Supervisor: **Moa Johansson**
 
-Work presednted at *2<sup>nd</sup> Workshop on Automated Inductive Theorem-proving*; March 2015
+Work presented at *2<sup>nd</sup> Workshop on Automated Inductive Theorem-proving*; March 2015
 
 .footnote[
   {created with [remark](http://remarkjs.com/)}
@@ -71,18 +71,25 @@ Gröbner => '65, '06 (Theorema)
 
 # Theory exploration & Hipster
 
-- diagram theory exploration
+**Theory exploration (Buchberger)**
 
----
+- Intending to imitate mathematicians' flow of work
 
-# Hipster
+  * introduce definitions and axioms
+  * prove simple lemmas
+  * reach more complex theorems supported on these
 
-- Hipster and induction proving => undecidability
-	* equational!
-	* Isabelle/HOL
-[example: rev rev]
+- Layering in increasing order of complexity
 
-Equational lemmas: useful properties and insight. - example
+
+**Hipster**
+
+- Inductive theories
+
+- Equational lemmas (on equality)
+
+- Isabelle/HOL - LCF based proof assistant
+
 
 ---
 
@@ -162,22 +169,31 @@ Gradual refining towards bigger theorems.
 
 ---
 
-.center[![](umbrella-s.gif)]
-
-Operation properties
+**Operation properties**
 
 ```isabelle
 xs ≠ [] ⟹  head (xs @ ys) = head xs
 ```
 
-Algorithm correctness
+```isabelle
+r ≠ t ⟹ count r (append ts (Cons t Nil)) = count r ts
+```
+
+**Algorithm correctness**
 
 ```isabelle
-sorted (isort ts)
+lemma isortSorts : "sorted (isort ts)"
+apply (induction ts)
+apply (simp_all)
+
+1. ⋀a x. sorted (isort x) ⟹ sorted (insert a (isort x))
 ```
-.footnote[
-  {img source - http://paulscottinfo.ipage.com/fractals/}
-]
+
+Need for a conditional lemma
+
+```isabelle
+sorted ts ⟹ sorted (insert t ts)
+```
 
 ???
 
@@ -189,29 +205,8 @@ Induction: repetition: recursion, iteration.
 
 `sorted (isort ts)` requires inductive cond. lemma
 
----
-
 .center[![](umbrella-s.gif)]
 
-Operation properties
-
-```isabelle
-xs ≠ [] ⟹  head (xs @ ys) = head xs
-
-```
-
-Algorithm correctness
-
-```isabelle
-sorted (isort ts)
-sorted ts ⟹ sorted (insert t ts)
-
-lemma isortSorts : "sorted (isort ts)"
-apply (induction ts)
-apply (simp_all)
-
-1. ⋀a x. sorted (isort x) ⟹ sorted (insert a (isort x))
-```
 .footnote[
   {img source - http://paulscottinfo.ipage.com/fractals/}
 ]
@@ -266,18 +261,17 @@ prune away trivial proofs
   
   * bound by constructor structure
   
-  * combinatorial problem - mege eg??
+  * combinatorial problem
 
 - Automated induction tactic extension: conditionals requiring induction
   
-  * undecidability
+  * undecidability: how far to induct
   
-  * combinatorial explosion
+  * combinatorial explosion: possible induction variables
 
----
-name: ingredients
+  * rewriting problem: filtering rules for simplification
 
-# A tactic (not only) for conditionals
+???
 
 Automation ingredients:
 
@@ -287,23 +281,11 @@ Automation ingredients:
 
 - Metis FO prover
 
-???
-
----
-template: ingredients
-
-But...
-
-* What to induct on?
-
-* Simplifier rules?
-
-* Facts for Metis?
 
 ---
 name: first-stop
 
-## First stop: Recursion induction
+# Recursion induction in a tactic (not only) for conditionals
 
 Conditionals:
 
@@ -595,19 +577,27 @@ by (hipster_induct_schemes app.simps len.simps List.exhaust Nat.distinct)
 
 **Advance towards automation**
 
-More refinement needed
+- Improvement in exploration results
 
-- Side-condition vs conclusion driven induction?
+- Standalone tactic choosing:
+  
+  * schemes
+  
+  * variables
 
-- Heuristics: variables to favour
-
-- Simpset?
 
 **Full automation is hard**
 
 - Single induction per proof attempt - need for more: bound?
 
-
+- Limitations:
+  
+  * explore all theories involved for better results
+  * possible non-termination linked to simplification/rewriting
+    
+      ```isabelle
+      Suc n < m ⟹ (n < m) = True
+      ```
 
 ???
 
@@ -622,6 +612,37 @@ More to look at
 - mutual inductions?
 
 reasonable bound to number of inductions?
+
+- Side-condition vs conclusion driven induction?
+
+- Heuristics: variables to favour
+
+- Simpset?
+
+---
+# Overall
+
+**Immediate possible improvements**
+
+- Heuristics
+
+  * variables to favour
+  
+  * side-condition vs conclusion driven induction?
+  
+  * order of proving discovered lemmas
+
+- Similar approach for
+  
+  * mutual induction
+  
+  * co-induction
+
+- Discovery
+
+  * limited to unary predicates
+  
+  * *Generating Constrained Random Data with Uniform Distribution* - K. Claessen, J. Duregard, and M. H. Pałka
 
 ---
 
