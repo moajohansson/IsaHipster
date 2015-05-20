@@ -110,10 +110,11 @@ by hipster_induct_simp_metis
     without any issues, however it won't do so with
       by (hipster_induct_schemes revA) nor by (hipster_induct_simp_metis revA) *)
 lemma revRev  : "rev (rev xs) = xs"
-by (hipster_induct_simp_metis revA) (*revA'*)
-(*apply(induction xs)
-apply(simp_all add: revA)
-done*)
+by (hipster_induct_simp_metis revA') (*revA'*)
+(*apply(induction xs rule: rev.induct)
+apply(simp_all)
+apply(metis rev.simps revA')
+*)
 
 (*hipster rev app*)
 lemma lemma_ab : "app (app x y) x = app x (app y x)"

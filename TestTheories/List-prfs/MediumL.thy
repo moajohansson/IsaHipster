@@ -75,7 +75,7 @@ lemma addS2[]: "add n (S m) = S (add n m)"
 by hipster_induct_simp_metis
 
 lemma setCountRev: "count t ts = count t (rev ts)"
-by (hipster_induct_simp_metis count03 addId addS2)
+by (hipster_induct_simp_metis count.simps rev.simps count03 addId addS2)
 (* TODO: Ill-typed instantiation::: check types before inducting with a rule that does not correspond
    HOWEVER: we cannot know in some cases immediately... XXX: how to extract which var's a rule inducts over? *)
 (*apply(induction ts)  (* XXX: no need for  rule: rev.induct ! *)

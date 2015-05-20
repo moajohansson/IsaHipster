@@ -57,14 +57,14 @@ fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);
 
 (* Apply simp to all subgoals *)
 fun simp_all ctxt lemmas thm = 
-    let(*
-       val _ = Pretty.writeln (Pretty.block [Pretty.str "simp_all: ", pretty_thm ctxt thm])*)
+    let
+       val _ = Pretty.writeln (Pretty.block [Pretty.str "simp_all: ", pretty_thm ctxt thm])
        (*val _ = @{print} thm  OR @{make_string} *)
        (*val ss = map @{print} lemmas*)
        val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                  (ctxt, lemmas)
     in
-      ALLGOALS (Simplifier.asm_full_simp_tac ctxt') thm
+      (PARALLEL_GOALS o ALLGOALS) (Simplifier.asm_full_simp_tac ctxt') thm
     end;
 
 (* Fails if all there are some subgoals left after application of simp *)
@@ -78,19 +78,34 @@ fun simp_all ctxt lemmas thm =
 
 (* Apply simp, if that doesn't work try metis.  *)
 fun timed_metis_tac ctxt facts i thm = 
-    (*let val _ = Pretty.writeln (Pretty.block [Pretty.str "timed_metis: ",pretty_thm ctxt thm]) in*)
+    let val _ = Pretty.writeln (Pretty.block [Pretty.str ("timed_metis: "^ @{make_string} i),pretty_thm ctxt thm]) in
     (SOLVE_TIMEOUT 1000
-    (Metis_Tactic.metis_tac [ATP_Proof_Reconstruct.full_type_enc]
-      ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm(* end*);
+    (Metis_Tactic.metis_tac [(*ATP_Proof_Reconstruct.full_type_enc*)]
+      ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm end;
 
+fun ALLsub tac st =
+  let val subgoals = nprems_of st
+      fun doall n max = if n < max then (tac(n) THEN_ELSE (doall n (max-1) ,doall(n+1) max)) else tac(n);
+  in  doall 1 subgoals st  end;
 
+fun ALLt tac st =
+  let fun doall i max th =
+        let val subgoals = nprems_of th
+            val n = if subgoals < max then i else (i + 1)
+        in (if n > subgoals then all_tac else (tac(n) THEN doall n subgoals)) th end; (*(if nprems_of th < max then tac(n) THEN doall n (nprems_of th)
+                                                        else tac(n+(max-(nprems_of th))) THEN doall n (nprems_of th)) th)*)
+        (*| doall n = tac(n) THEN_ELSE (doall(n-1),doall(n-1))*)
+  in  doall 0 (nprems_of st) st  end;
+
+fun xxx  ctxt facts tac =( ALLGOALS (Method.insert_tac facts) THEN
+        (CHANGED_PROP o PARALLEL_GOALS o ALLGOALS o tac) ctxt)
 (* First simp, and if nessecary, let Metis deal with the rest *)
-fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
-    (SOLVE_TIMEOUT 3000((simp_all ctxt []) (* TRY *) (* FIXME: both facts and lemmas? *)
+fun simp_or_metis ctxt (facts, lemmas) = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
+    SOLVE_TIMEOUT 3000 ((simp_all ctxt []) (* TRY *) (* FIXME: both facts and lemmas? *)
           THEN
           IF_UNSOLVED
-          (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))) thm (*end;*)
-
+          ((*REPEAT o FIRSTGOAL*) (PARALLEL_GOALS o ALLGOALS) (timed_metis_tac ctxt (facts@lemmas)))) (*end;*)
+(*REPEAT_FIRST*)
 
 (*-----------------------------------------------------------------------------------------*)
 (* Figure out what we can do induction on, and tries each variable until success.*) 

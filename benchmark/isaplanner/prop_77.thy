@@ -35,11 +35,19 @@ oops
 lemma unknown [thy_expl]: "prop_77.insort Z (prop_77.insort x y) =
 prop_77.insort x (prop_77.insort Z y)"
 oops
+
+lemma timpano [thy_expl]: "\<not> (le m n) \<Longrightarrow> le n m"
+by (hipster_induct_schemes le.simps)
+lemma tt []: "\<lbrakk> le m n; le n m \<rbrakk> \<Longrightarrow> m = n"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+
   theorem x0 :
     "(sorted xs) ==> (sorted (insort x xs))"
-    apply(induction xs rule:insort.induct)
-    apply simp_all
-    apply(metis insort.elims)
+    (*apply(hipster_induct_schemes insort.simps sorted.simps le.elims le.simps insort.elims)*)
+    apply(induction xs rule:sorted.induct)
+    apply (simp_all add: timpano)
+    (*apply(metis sorted.simps insort.simps timpano thy_expl)*)
+    (*apply(metis le.simps sorted.simps insort.simps thy_expl*)
     (*apply(metis insort.simps le.simps)*)
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -19,6 +19,8 @@ fun isort2 :: "nat list \<Rightarrow> nat list" where
 
 
 lemma insSortInvar : "sorted2 y \<Longrightarrow> sorted2 (insert x y)"
+apply(induction y)
+apply(simp_all)
 by hipster_induct_schemes
 
 lemma isortSorts [thy_expl]: "sorted2 (isort2 x)"

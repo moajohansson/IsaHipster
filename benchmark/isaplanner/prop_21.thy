@@ -10,6 +10,10 @@ begin
   "le (Z) y = True"
   | "le (S z) (Z) = False"
   | "le (S z) (S x2) = le z x2"
+
+(*hipster plus*)
+
+
   (*hipster plus le *)
   theorem x0 :
     "le n (plus n m)"

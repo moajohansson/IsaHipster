@@ -122,7 +122,14 @@ sorry
 
 lemma mergeS: "sorted2 ts \<and> sorted2 rs \<Longrightarrow> sorted2 (merge ts rs)"
 apply(induction ts rs rule: merge.induct)
+sledgehammer
+apply (metis merge.simps(1))
+sledgehammer
+apply (metis merge.simps(2))
+sledgehammer
+sledgehammer min [e] (cons1 mer4 mer5 merge.elims merge.simps(1) merge.simps(3) nat_induct ord.lexordp_eq.simps ord.lexordp_eq_simps(3) qsort.cases sorted2.simps(3))
 apply(simp_all add: mer1 mer2)
+sledgehammer
 by (metis mer4 mer5 merge.simps sorted2.simps)
 (*
 apply(cases rs)

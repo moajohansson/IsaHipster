@@ -35,11 +35,13 @@ lemma insSortInvarZ : "sorted ts \<Longrightarrow> sorted (insert Z ts)"
 by (hipster_induct_simp_metis)
 (* alternative: apply(case_tac ts) apply(simp_all) done *)
 
-lemma insSortInvar : "sorted ts \<Longrightarrow> sorted (insert t ts)"
-by (hipster_induct_schemes leqRev) (*
+lemma insSortInvar : "sorted ts \<Longrightarrow> sorted (insert t ts)"(*
+by (hipster_induct_schemes sorted.simps leqRev)*)
 apply(induction ts rule: sorted.induct)
-apply(simp_all add: leqRev)
-by metis*)
+apply(simp_all)
+apply(metis sorted.simps insert.simps leqRev)
+sledgehammer
+by (metis (full_types) leqRev)
 
 lemma isortSorts : "sorted (isort ts)"
 by (hipster_induct_simp_metis insSortInvar)

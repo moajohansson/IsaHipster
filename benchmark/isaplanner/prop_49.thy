@@ -15,7 +15,7 @@ begin
   "butlastConcat x (Nil2) = butlast x"
   | "butlastConcat x (Cons2 z x2) = append x (butlast (Cons2 z x2))"
   (*hipster butlast append butlastConcat *)
-hipster butlast append
+(*hipster butlast append*)
 lemma lemma_a [thy_expl]: "prop_49.append x2 Nil2 = x2"
 by (hipster_induct_schemes prop_49.butlast.simps prop_49.append.simps)
 
@@ -42,7 +42,7 @@ by (hipster_induct_schemes prop_49.butlast.simps prop_49.append.simps)
 lemma unknown [thy_expl]: "prop_49.butlast (prop_49.append x x) = prop_49.append x (prop_49.butlast x)"
 oops
 
-hipster butlastConcat butlast append
+(*hipster butlastConcat butlast append*)
 
   theorem x0 :
     "(butlast (append xs ys)) = (butlastConcat xs ys)"
@@ -67,5 +67,36 @@ Rule: prop_49.append.induct
 Rule: none 
  - vars: ["x"] 
 induct_on: x; otherfrees:  
-Proved: prop_49.append x (prop_49.butlast x) = butlastConcat x x; Saving to ThyExpl_Data: prop_49.append ?x2 (prop_49.butlast ?x2) = butlastConcat ?x2 ?x2 
+Proved: prop_49.append x (prop_49.butlast x) = butlastConcat x x; Saving to ThyExpl_Data: prop_49.append ?x2 (prop_49.butlast ?x2) = butlastConcat ?x2 ?x2
+Rule: prop_49.butlastConcat.induct 
+ - vars: ["x"] 
+Rule: prop_49.append.induct 
+ - vars: ["x"] 
+Rule: none 
+ - vars: ["x"] 
+induct_on: x; otherfrees:  
+induct_on: x; otherfrees:  
+induct_on: x; otherfrees:  
+Failed proving: butlastConcat x (prop_49.append x x) = prop_49.append x (butlastConcat x x) 
+Rule: prop_49.butlastConcat.induct 
+ - vars: ["x"] 
+Rule: prop_49.append.induct 
+ - vars: ["x"] 
+Rule: prop_49.butlast.induct 
+ - vars: ["x"] 
+Rule: none 
+ - vars: ["x"] 
+induct_on: x; otherfrees:  
+induct_on: x; otherfrees:  
+induct_on: x; otherfrees:  
+induct_on: x; otherfrees:  
+Failed proving: prop_49.butlast (prop_49.append x x) = butlastConcat x x 
+Rule: prop_49.butlast.induct 
+ - vars: ["x"] 
+Rule: prop_49.butlastConcat.induct 
+ - vars: ["x"] 
+Rule: none 
+ - vars: ["x"] 
+induct_on: x; otherfrees:  
+induct_on: x; otherfrees: 
 end
