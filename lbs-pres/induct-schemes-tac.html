@@ -185,7 +185,10 @@ r ≠ t ⟹ count r (append ts (Cons t Nil)) = count r ts
 lemma isortSorts : "sorted (isort ts)"
 apply (induction ts)
 apply (simp_all)
+```
 
+Yields subgoal
+```isabelle
 1. ⋀a x. sorted (isort x) ⟹ sorted (insert a (isort x))
 ```
 
@@ -622,7 +625,7 @@ reasonable bound to number of inductions?
 ---
 # Overall
 
-**Immediate possible improvements**
+**Possible improvements**
 
 - Heuristics
 
