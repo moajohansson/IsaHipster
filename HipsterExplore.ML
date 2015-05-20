@@ -218,15 +218,16 @@ fun explore' cond_opt ctxt const_nms =
       val conjs = hipspec_explore ctxt cond_opt const_nms
       (*val _ = @{print} conjs*)
       val res_ctxt = proof_loop ctxt facts fact_nms conjs
-      val tac_str = Tactic_Data.hard_tac_str res_ctxt 
+      val tac_str = Tactic_Data.hard_tac_str res_ctxt
 
       val output = Library.space_implode "\n\n"
-                     ((map (mk_lemma_str res_ctxt Thm.prop_of) 
-                           (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt res_ctxt))) 
+                     ((map (mk_lemma_str res_ctxt Thm.prop_of)
+                           (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt res_ctxt)))
                       @ (map (mk_lemma_str res_ctxt Thm.concl_of) 
                              (map (fn conj => (conj,"oops")) (ThyExpl_Data.failed_of_ctxt res_ctxt))))
+      (*val _ = ThyExpl_Data.set_proved []*)
     in
-      (res_ctxt, (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message) 
+      (res_ctxt, (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message)
          (Active.sendback_markup [Markup.padding_command] output))
     end;
 

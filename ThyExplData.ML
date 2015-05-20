@@ -141,13 +141,25 @@ fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
     let
       val thy = Proof_Context.theory_of ctxt
       (*val _ = @{print} lemma_strs*)
-      val conjs = lemma_strs
-                    |> map (Goal.init o (Thm.cterm_of thy) o (Syntax.read_prop ctxt))
-                    |> filter (is_present ctxt);
+
       (*val _ = @{print} prio_goal_opt
       val _ = @{print} conjs
       val culprit = filter (fn s => String.isSubstring "[]" s) (map (@{make_string}) conjs)
       val _ = @{print}culprit*)
+      fun total_vs t = let val (frs,als) = Hipster_Utils.dangling_vars t in length frs + length als end
+      fun term_var_ord (t1, t2) =
+        let val freedom1 = total_vs t1
+            val freedom2 = total_vs t2
+        in
+          bool_ord (freedom2 < freedom1, freedom1 < freedom2)
+        end
+      (*val sorted_conjs = sort term_var_ord conjs*)
+
+      val conjs = lemma_strs
+                    |> map (Syntax.read_prop ctxt)
+                    |> sort term_var_ord
+                    |> map (Goal.init o (Thm.cterm_of thy))
+                    |> filter (is_present ctxt);
     in
       ExplData.put
         (Data{open_conjs = conjs, failed = [], proved = [], facts = facts, fact_names = fact_names,
