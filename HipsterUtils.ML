@@ -2,12 +2,20 @@
 
 signature HIPSTER_UTILS =
 sig 
-  val typ_tfrees_of : Term.typ -> (string * sort) list 
+  val typ_tfrees_of : Term.typ -> (string * sort) list
   val thy_consts_of : string -> Thm.thm -> string list
-  val frees_of : Term.term -> (string * Term.typ) list 
+  val frees_of : Term.term -> (string * Term.typ) list
   val frees_and_tfrees_of_thm : Thm.thm -> string list * string list
+
+  val dangling_vars : Term.term -> (string * Term.typ) list * (string * Term.typ) list
 end
 
+val yup = @{term "!! x. x=y"}
+val tup = @{term "\<lambda> x . (\<lambda> y . x y) "}
+val sup = @{term "x = z (y t) (\<lambda> f. f r)"}
+
+val x1 = Term.add_frees sup []
+val x2 = Term.strip_all_vars sup
 
 structure Hipster_Utils : HIPSTER_UTILS =
 struct
@@ -30,6 +38,21 @@ fun add_typ_tfrees (Type(_,Ts),fs) = List.foldr add_typ_tfrees fs Ts
 
 fun frees_of t = map Term.dest_Free (add_term_frees (t,[]));
 fun typ_tfrees_of ty = add_typ_tfrees(ty,[]);
+
+(*
+@{term "(a::nat) + b = c"}
+> Const ("HOL.eq", ...) $
+> (Const ("Groups.plus_class.plus", ...) $ ... $ ...) $ ...
+datatype term =
+  Const of string * typ
+| Free of string * typ
+| Var of indexname * typ
+| Bound of int
+| Abs of string * typ * term
+| $ of term * term
+*)
+
+fun dangling_vars t = (Term.add_frees t [], Term.strip_all_vars t)
 
 (* Get a pair of (type-frees, term frees) without dups. *)
 fun frees_and_tfrees_of_thm thm = 

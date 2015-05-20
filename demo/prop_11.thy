@@ -1,6 +1,6 @@
 theory prop_11
 imports Main
-        "../../IsaHipster"
+        "../IsaHipster"
 begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
 
@@ -14,12 +14,25 @@ begin
 
 
 hipster append rev
+lemma lemma_a [thy_expl]: "prop_11.append x2 Nil2 = x2"
+by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
+
+lemma lemma_aa [thy_expl]: "prop_11.append (prop_11.append x2 y2) z2 =
+prop_11.append x2 (prop_11.append y2 z2)"
+by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
+
+lemma lemma_ab [thy_expl]: "prop_11.append (prop_11.rev x5) (prop_11.rev y5) =
+prop_11.rev (prop_11.append y5 x5)"
+by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
+
+lemma lemma_ac [thy_expl]: "prop_11.rev (prop_11.rev x5) = x5"
+by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
 
 
 
   theorem revAppend :
     "(rev (append (rev x) (rev y))) = (append y x)"
-    oops
+    by (hipster_induct_schemes rev.simps append.simps)
 
 
 (*

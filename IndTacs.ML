@@ -86,7 +86,7 @@ fun timed_metis_tac ctxt facts i thm =
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
 fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
-    (SOLVE_TIMEOUT 3000((simp_all ctxt (facts @ lemmas)) (* TRY *) (* FIXME: both facts and lemmas? *)
+    (SOLVE_TIMEOUT 3000((simp_all ctxt []) (* TRY *) (* FIXME: both facts and lemmas? *)
           THEN
           IF_UNSOLVED
           (ALLGOALS (timed_metis_tac ctxt (facts@lemmas))))) thm (*end;*)

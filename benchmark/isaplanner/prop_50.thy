@@ -41,7 +41,14 @@ lemma lemma_ae [thy_expl]: "prop_50.minus (prop_50.minus x3 y3) (S Z) = prop_50.
 by (hipster_induct_schemes prop_50.minus.simps)
 
 lemma lemma_af [thy_expl]: "prop_50.minus (prop_50.minus x4 y4) x4 = Z"
-by (hipster_induct_schemes prop_50.minus.simps)
+apply(induction x4 y4 rule: minus.induct)
+apply(simp_all)
+sledgehammer
+apply (metis minus.simps  thy_expl)
+apply(simp_all)
+apply (metis minus.simps  thy_expl)
+done (*
+by (hipster_induct_schemes prop_50.minus.simps)*)
 
   theorem x0 :
     "(butlast xs) = (take (minus (len xs) (S Z)) xs)"
