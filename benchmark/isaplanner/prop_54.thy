@@ -11,6 +11,7 @@ begin
   | "minus (S z) (Z) = S z"
   | "minus (S z) (S x2) = minus z x2"
   (*hipster plus minus *)
+hipster minus
 lemma lemma_a [thy_expl]: "prop_54.minus x2 x2 = Z"
 apply (hipster_induct_schemes prop_54.minus.simps)
 done

@@ -8,7 +8,9 @@ begin
   "zip (Nil2) y = Nil2"
   | "zip (Cons2 z x2) (Nil2) = Nil2"
   | "zip (Cons2 z x2) (Cons2 x3 x4) = Cons2 (Pair z x3) (zip x2 x4)"
+  
   hipster zip
+  
   theorem x0 :
     "(zip (Cons2 x xs) (Cons2 y ys)) = (Cons2 (Pair x y) (zip xs ys))"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

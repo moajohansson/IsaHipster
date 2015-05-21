@@ -13,7 +13,6 @@ begin
 
 (*hipster plus*)
 
-
   (*hipster plus le *)
   theorem x0 :
     "le n (plus n m)"

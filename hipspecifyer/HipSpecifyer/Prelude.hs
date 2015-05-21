@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveFunctor, FlexibleInstances, TypeOperators, ScopedTypeVariables, FlexibleContexts, GADTs #-}
-module HipSpecifyer.Prelude(genericArbitrary, HipSpecifyer.Prelude.genericCoarbitrary, Observe(..), genericObserve, obs0, obs1, obs2, obs3, obs4, obs5) where
+module HipSpecifyer.Prelude(genericArbitrary, genericCoarbitrary, Observe(..), genericObserve, obs0, obs1, obs2, obs3, obs4, obs5) where
 
 import Prelude hiding (Either(..))
-import Test.QuickCheck
+import qualified Test.QuickCheck as QC
 import Test.QuickCheck.Gen.Unsafe
 import GHC.Generics
 import Data.Typeable
@@ -13,31 +13,31 @@ import Test.QuickSpec
 import Data.Monoid
 
 -- Generate a value generically.
-genericArbitrary :: forall a. (Typeable a, Arbitrary a, Generic a, GArbitrary (Rep a)) => Gen a
+genericArbitrary :: forall a. (Typeable a, QC.Arbitrary a, Generic a, GArbitrary (Rep a)) => QC.Gen a
 genericArbitrary =
-  sized $ \n ->
+  QC.sized $ \n ->
     -- If the size is 0, only consider non-recursive constructors.
     if n > 0
-    then oneof (map gen constructors)
-    else oneof (map gen (filter (not . recursive) constructors))
+    then QC.oneof (map gen constructors)
+    else QC.oneof (map gen (filter (not . recursive) constructors))
   where
-    constructors = map (fmap to) (garbitrary (arbitrary :: Gen a))
+    constructors = map (fmap to) (garbitrary (QC.arbitrary :: QC.Gen a))
     recursive b = recursion b > 0
 
 -- Generating random values of a datatype
 class GArbitrary f where
   -- Argument is a generator for the datatype itself, which will be used
   -- when the datatype is recursive
-  garbitrary :: Typeable a => Gen a -> [Constr (f b)]
+  garbitrary :: Typeable a => QC.Gen a -> [Constr (f b)]
 
 -- Generating random constructors
 class GConstr f where
-  gconstructor :: Typeable a => Gen a -> Constr (f b)
+  gconstructor :: Typeable a => QC.Gen a -> Constr (f b)
 
 -- Represents a generator for one constructor of a datatype
 data Constr a = Constr {
   -- The generator itself
-  gen :: Gen a,
+  gen :: QC.Gen a,
   -- Is the constructor recursive and if so, how many times does the datatype appear
   recursion :: Int
   } deriving Functor
@@ -50,18 +50,18 @@ instance GConstr f => GArbitrary (C1 c f) where
   -- times the datatype appears recursively in the constructor
   garbitrary gen = [b]
     where
-      b = gconstructor (sized $ \m -> resize (newSize m) gen)
+      b = gconstructor (QC.sized $ \m -> QC.resize (newSize m) gen)
       newSize m
         | recursion b == 1 = m-1
         | otherwise = m `div` recursion b
 
-instance (Typeable a, Arbitrary a) => GConstr (K1 i a) where
+instance (Typeable a, QC.Arbitrary a) => GConstr (K1 i a) where
   -- An argument to a constructor: see if the argument is recursive or not
   gconstructor gen =
     case gcast gen of
       Nothing ->
         -- Not recursive: use normal generator
-        Constr (fmap K1 arbitrary) 0
+        Constr (fmap K1 QC.arbitrary) 0
       Just gen' ->
         -- Recursive: use recursive generator
         Constr (fmap K1 gen') 1
@@ -87,21 +87,21 @@ instance GArbitrary f => GArbitrary (D1 c f) where
   garbitrary gen = map (fmap M1) (garbitrary gen)
 
 -- All the same but for coarbitrary. Sigh...
-genericCoarbitrary :: (Generic a, GCoarbitrary (Rep a)) => a -> Gen b -> Gen b
+genericCoarbitrary :: (Generic a, GCoarbitrary (Rep a)) => a -> QC.Gen b -> QC.Gen b
 genericCoarbitrary x = gcoarbitrary (from x)
 
 class GCoarbitrary f where
-  gcoarbitrary :: f a -> Gen b -> Gen b
+  gcoarbitrary :: f a -> QC.Gen b -> QC.Gen b
 
 instance (GCoarbitrary f, GCoarbitrary g) => GCoarbitrary (f :*: g) where
   gcoarbitrary (x :*: y) = gcoarbitrary x . gcoarbitrary y
 
 instance (GCoarbitrary f, GCoarbitrary g) => GCoarbitrary (f :+: g) where
-  gcoarbitrary (L1 x) = variant 0 . gcoarbitrary x
-  gcoarbitrary (R1 x) = variant 1 . gcoarbitrary x
+  gcoarbitrary (L1 x) = QC.variant 0 . gcoarbitrary x
+  gcoarbitrary (R1 x) = QC.variant 1 . gcoarbitrary x
 
-instance CoArbitrary a => GCoarbitrary (K1 i a) where
-  gcoarbitrary (K1 x) = coarbitrary x
+instance QC.CoArbitrary a => GCoarbitrary (K1 i a) where
+  gcoarbitrary (K1 x) = QC.coarbitrary x
 
 instance GCoarbitrary U1 where
   gcoarbitrary U1 = id
@@ -111,7 +111,7 @@ instance GCoarbitrary f => GCoarbitrary (M1 i c f) where
 
 -- A type class of things that can be randomly tested for equality.
 class Observe a where
-  observe :: a -> Gen Observation
+  observe :: a -> QC.Gen Observation
 
 data Observation where
   Base :: (Typeable a, Ord a) => a -> Observation
@@ -119,7 +119,7 @@ data Observation where
   Left :: Observation -> Observation
   Right :: Observation -> Observation
 
-ord :: (Typeable a, Ord a) => a -> Gen Observation
+ord :: (Typeable a, Ord a) => a -> QC.Gen Observation
 ord x = return (Base x)
 
 instance Eq Observation where
@@ -148,20 +148,20 @@ instance Observe Int where
 instance Observe A where
   observe = ord
 
-instance (Arbitrary a, Observe b) => Observe (a -> b) where
+instance (QC.Arbitrary a, Observe b) => Observe (a -> b) where
   observe f = do
-    x <- arbitrary
+    x <- QC.arbitrary
     observe (f x)
 
 instance Observe a => Observe [a] where
   observe = genericObserve
 
 -- Now for Observe...
-genericObserve :: (Generic a, GObserve (Rep a)) => a -> Gen Observation
+genericObserve :: (Generic a, GObserve (Rep a)) => a -> QC.Gen Observation
 genericObserve = gobserve . from
 
 class GObserve f where
-  gobserve :: f a -> Gen Observation
+  gobserve :: f a -> QC.Gen Observation
 
 instance (GObserve f, GObserve g) => GObserve (f :*: g) where
   gobserve (x :*: y) = liftM2 Pair (gobserve x) (gobserve y)
@@ -191,7 +191,7 @@ obs1 x f = blind1 x f
            `mappend` observer (f undefined)
 
 -- | A binary function.
-obs2 :: (Typeable a, Typeable b,
+obs2 :: (Typeable a, Typeable b, {-Observe a, Observe b,-}
          Typeable c, Observe c) =>
         String -> (a -> b -> c) -> Sig
 obs2 x f = blind2 x f
