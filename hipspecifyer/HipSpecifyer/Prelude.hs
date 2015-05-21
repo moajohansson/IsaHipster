@@ -153,6 +153,12 @@ instance (QC.Arbitrary a, Observe b) => Observe (a -> b) where
     x <- QC.arbitrary
     observe (f x)
 
+instance Observe a => Observe (Maybe a) where
+  observe = genericObserve
+
+instance (Observe a, Observe b) => Observe (a, b) where
+  observe = genericObserve
+
 instance Observe a => Observe [a] where
   observe = genericObserve
 
