@@ -16,11 +16,13 @@ will need to have Git installed):
     cabal update
     cabal install 
 
-When you have installed the above, return to the IsaHipster directory and open the file called `IsaHipster.thy`. Edit the ML value `basepath` to point to your IsaHipster directory (yes, we know, this is not so nice, we'll fix it...). 
-
 You will also have to compile the "HipSpecifyer":
 
     cabal install hipspecifyer/
+    
+Finally, you should set the environment variable $HIPSTER_HOME (e.g. in your .profile file) to the path for the IsaHipster directory you just cloned. If you want to use Hipster from an Isabelle file, it needs to import the IsaHipster.thy file (which essentially sets up Hipster) by including the line: 
+    
+    imports "$HIPSTER_HOME/IsaHipster"
     
 Now, you should be able to try Hipster. Start up Isabelle on for example Examples/TreeDemo.thy and have a go.
 
