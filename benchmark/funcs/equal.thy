@@ -20,5 +20,10 @@ by (hipster_induct_schemes equal.equal2.simps)
 lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
 by (hipster_induct_schemes equal.equal2.simps)
 
+(*hipster_cond equal2*)
+
+lemma lemma_ac [thy_expl]: "equal2 y2 x2 \<Longrightarrow> x2 = y2"
+by (hipster_induct_schemes equal.equal2.simps)
+
 end
 
