@@ -56,20 +56,6 @@ fun rprems_tac ctxt = Goal.norm_hhf_tac ctxt THEN' CSUBGOAL (fn (goal, i) =>
   ); *}
 
 lemma unknown [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x y = True"
-apply(induction x)
-apply(induction z)
-apply(induction y)
-
-apply(simp_all)
-apply(auto)
-apply (tactic {* rprems_tac @{context} 1*})
-
-apply(rule meta_mp)
-apply(simp_all)
-(*apply (drule meta_spec)+
-, )
-*)
-sledgehammer
 oops
 
 lemma unknown [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x (S y) = True"
