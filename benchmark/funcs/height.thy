@@ -1,6 +1,7 @@
-theory mirror
+theory height
 imports Main
         "../data/Tree"
+        "../data/Natu"
         "../funcs/max"
         "../../IsaHipster"
 

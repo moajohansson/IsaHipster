@@ -1,8 +1,8 @@
 theory ins1
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../data/list"
-        "../function/equal"
+        "../funcs/equal"
         "../../IsaHipster"
 
 begin

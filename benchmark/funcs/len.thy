@@ -1,6 +1,7 @@
-theory lem
+theory len
 imports Main
         "../data/list"
+        "../data/Natu"
         "../../IsaHipster"
 
 begin

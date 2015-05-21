@@ -1,6 +1,6 @@
 theory max
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../../IsaHipster"
 
 begin
@@ -10,6 +10,8 @@ fun max2 :: "Nat => Nat => Nat" where
 | "max2 (Z) (S y) = y"
 | "max2 (S z) (Z) = S z"
 | "max2 (S z) (S x2) = S (max2 z x2)"
+
+hipster max2
 
 lemma lemma_a [thy_expl]: "max2 x x = x"
 by (hipster_induct_schemes max2.simps)

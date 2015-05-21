@@ -1,6 +1,6 @@
 theory drop
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../data/list"
         "../../IsaHipster"
 
@@ -11,18 +11,23 @@ fun drop :: "Nat => 'a list => 'a list" where
 | "drop (S z) (Nil2) = Nil2"
 | "drop (S z) (Cons2 x2 x3) = drop z x3"
 
-lemma lemma_a [thy_expl]: "drop x3 Nil2 = Nil2"
-by (hipster_induct_schemes drop.simps)
+hipster drop
+lemma lemma_a [thy_expl]: "drop.drop x1 Nil2 = Nil2"
+by (hipster_induct_schemes drop.drop.simps)
 
-lemma lemma_aa [thy_expl]: "drop (S Z) (drop x3 y3) = drop (S x3) y3"
-by (hipster_induct_schemes drop.simps)
+lemma lemma_aa [thy_expl]: "drop.drop (S Z) (drop.drop x2 y2) = drop.drop (S x2) y2"
+by (hipster_induct_schemes drop.drop.simps)
 
-lemma unknown [thy_expl]: "drop x (drop y z) = drop y (drop x z)"
+lemma unknown []: "drop.drop x (drop.drop y z) = drop.drop y (drop.drop x z)"
 oops
 
-lemma unknown [thy_expl]: "drop (S x) (drop y z) =
-drop (S y) (drop x z)"
+lemma unknown []: "drop.drop (S x) (drop.drop y z) = drop.drop (S y) (drop.drop x z)"
 oops
+
+(* false
+lemma unknown [thy_expl]: "drop.drop (S x) (drop.drop x y) = drop.drop (S x) y"
+oops *)
+
 
 end
 

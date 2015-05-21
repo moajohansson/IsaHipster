@@ -1,11 +1,12 @@
 theory rotate
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../data/list"
         "../funcs/append"
         "../../IsaHipster"
 
 begin
+
 fun rotate :: "Nat => 'a list => 'a list" where
   "rotate (Z) y = y"
 | "rotate (S z) (Nil2) = Nil2"

@@ -1,6 +1,6 @@
 theory elem
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../data/list"
         "../funcs/equal"
         "../../IsaHipster"

@@ -1,8 +1,8 @@
-theory ins1
+theory insert2
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../data/list"
-        "../function/le"
+        "../funcs/le"
         "../../IsaHipster"
 
 begin

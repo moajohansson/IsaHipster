@@ -1,6 +1,6 @@
 theory exp
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../funcs/mult"
         "../../IsaHipster"
 begin

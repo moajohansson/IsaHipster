@@ -1,7 +1,7 @@
 theory ins
 imports Main
         "../data/list"
-        "../data/Nat"
+        "../data/Natu"
         "../funcs/lt"
         "../../IsaHipster"
 

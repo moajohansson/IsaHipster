@@ -1,7 +1,7 @@
 theory delete
 imports Main
         "../data/list"
-        "../data/Nat"
+        "../data/Natu"
         "../funcs/equal"
         "../../IsaHipster"
 

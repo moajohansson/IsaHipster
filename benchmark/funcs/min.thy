@@ -1,6 +1,6 @@
 theory min
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../../IsaHipster"
 
 begin

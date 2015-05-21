@@ -1,6 +1,6 @@
 theory le
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../../IsaHipster"
 
 begin

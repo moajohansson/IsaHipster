@@ -1,6 +1,6 @@
 theory half
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../../IsaHipster"
 
 begin

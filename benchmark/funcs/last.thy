@@ -1,6 +1,6 @@
 theory last
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../data/list"
         "../../IsaHipster"
 

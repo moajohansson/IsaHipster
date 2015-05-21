@@ -1,6 +1,6 @@
 theory union
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../data/list"
         "../funcs/elem"
         "../../IsaHipster"

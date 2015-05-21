@@ -1,13 +1,13 @@
 theory unequal
 imports Main
-        "../data/Nat"
-        "../function/equal"
+        "../data/Natu"
+        "../funcs/equal"
         "../../IsaHipster"
 
 begin
 
 fun unequal :: "Nat => Nat => bool" where
-  "unequal x y = ~ (equal2 x y)"
+  "unequal x y = (\<not> (equal2 x y))"
  
 end
 

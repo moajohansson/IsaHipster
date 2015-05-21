@@ -1,4 +1,4 @@
-theory qrevflat
+theory revflat
 imports Main
         "../data/list"
         "../funcs/append"

@@ -1,6 +1,6 @@
-theory plus
+theory minus
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../../IsaHipster"
 begin
 
@@ -21,8 +21,7 @@ by (hipster_induct_schemes)
 lemma lemma_ac [thy_expl]: "minus (S x2) x2 = S Z"
 by (hipster_induct_schemes)
 
-lemma lemma_ad [thy_expl]: "minus (minus x3 y3) (minus y3 x3) =
-minus x3 y3"
+lemma lemma_ad [thy_expl]: "minus (minus x3 y3) (minus y3 x3) = minus x3 y3"
 by (hipster_induct_schemes minus.simps)
 
 lemma lemma_ae [thy_expl]: "minus (minus x3 y3) (S Z) = minus x3 (S y3)"

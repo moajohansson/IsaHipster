@@ -1,6 +1,6 @@
 theory lt
 imports Main
-        "../data/Nat"
+        "../data/Natu"
         "../../IsaHipster"
 
 begin

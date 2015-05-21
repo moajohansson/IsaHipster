@@ -58,7 +58,7 @@ fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);
 (* Apply simp to all subgoals *)
 fun simp_all ctxt lemmas thm = 
     let
-       val _ = Pretty.writeln (Pretty.block [Pretty.str "simp_all: ", pretty_thm ctxt thm])
+       (*val _ = Pretty.writeln (Pretty.block [Pretty.str "simp_all: ", pretty_thm ctxt thm])*)
        (*val _ = @{print} thm  OR @{make_string} *)
        (*val ss = map @{print} lemmas*)
        val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
@@ -78,10 +78,10 @@ fun simp_all ctxt lemmas thm =
 
 (* Apply simp, if that doesn't work try metis.  *)
 fun timed_metis_tac ctxt facts i thm = 
-    let val _ = Pretty.writeln (Pretty.block [Pretty.str ("timed_metis: "^ @{make_string} i),pretty_thm ctxt thm]) in
+    (*let val _ = Pretty.writeln (Pretty.block [Pretty.str ("timed_metis: "^ @{make_string} i),pretty_thm ctxt thm]) in*)
     (SOLVE_TIMEOUT 1000
     (Metis_Tactic.metis_tac [(*ATP_Proof_Reconstruct.full_type_enc*)]
-      ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm end;
+      ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm (* end; *)
 
 fun ALLsub tac st =
   let val subgoals = nprems_of st

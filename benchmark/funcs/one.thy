@@ -1,11 +1,11 @@
 theory one
 imports Main
-        "../data/one"
+        "../data/Natu"
         "../../IsaHipster"
 
 begin
 
-fun one :: "Nat" where
+definition one :: "Nat" where
   "one = S Z"
 
 end

@@ -10,7 +10,7 @@ fun mirror :: "'a Tree => 'a Tree" where
 | "mirror (Node l y r) = Node (mirror r) y (mirror l)"
 
 lemma lemma_ta [thy_expl]: "mirror (mirror x2) = x2"
-by (hipster_induct_schemes prop_47.mirror.simps)
+by (hipster_induct_schemes mirror.simps)
 
 end
 
