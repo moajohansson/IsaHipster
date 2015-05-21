@@ -24,6 +24,8 @@ begin
   "elem x (Nil2) = False"
   | "elem x (Cons2 z xs) = (if equal2 x z then True else elem x xs)"
   (*hipster le insert2 isort equal2 elem *)
+hipster_cond elem isort equal2
+
   theorem x0 :
     "(elem x (isort y)) ==> (elem x y)"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

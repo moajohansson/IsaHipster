@@ -11,7 +11,7 @@ begin
   | "minus (S z) (Z) = S z"
   | "minus (S z) (S x2) = minus z x2"
   (*hipster plus minus *)
-hipster minus
+(*hipster minus*)
 lemma lemma_a [thy_expl]: "prop_54.minus x2 x2 = Z"
 apply (hipster_induct_schemes prop_54.minus.simps)
 done
@@ -60,10 +60,10 @@ by (hipster_induct_schemes prop_54.plus.simps)
 
 lemma lemma_an [thy_expl]: "prop_54.plus (S x2) y2 = S (prop_54.plus y2 x2)"
 by (hipster_induct_schemes prop_54.plus.simps)
-(*
+
 lemma lemma_ao [thy_expl]: "prop_54.plus (prop_54.plus x3 y3) (prop_54.plus x3 z3) =
 prop_54.plus (prop_54.plus x3 z3) (prop_54.plus x3 y3)"
-by (hipster_induct_schemes prop_54.plus.simps)*)
+by (hipster_induct_schemes prop_54.plus.simps)
 
 lemma lemma_ap [thy_expl]: "prop_54.plus (prop_54.plus x2 y2) (prop_54.plus z2 y2) =
 prop_54.plus (prop_54.plus x2 z2) (prop_54.plus y2 y2)"
@@ -76,7 +76,7 @@ by (hipster_induct_schemes prop_54.plus.simps)
 lemma lemma_ar [thy_expl]: "prop_54.plus (prop_54.plus x2 y2) (S z2) =
 prop_54.plus (prop_54.plus x2 z2) (S y2)"
 by (hipster_induct_schemes prop_54.plus.simps)
-(*
+
 lemma lemma_as [thy_expl]: "prop_54.plus (prop_54.plus x2 y2) (prop_54.plus z2 x2) =
 prop_54.plus (prop_54.plus z2 x2) (prop_54.plus x2 y2)"
 by (hipster_induct_schemes prop_54.plus.simps)
@@ -88,7 +88,7 @@ by (hipster_induct_schemes prop_54.plus.simps)
 lemma lemma_au [thy_expl]: "prop_54.plus (prop_54.plus x3 y3) (prop_54.plus z3 z3) =
 prop_54.plus (prop_54.plus z3 x3) (prop_54.plus z3 y3)"
 by (hipster_induct_schemes prop_54.plus.simps)
-*)
+
 lemma lemma_av [thy_expl]: "prop_54.plus (prop_54.plus x2 y2) (S z2) =
 prop_54.plus (prop_54.plus z2 x2) (S y2)"
 by (hipster_induct_schemes prop_54.plus.simps)

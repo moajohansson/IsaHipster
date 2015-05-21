@@ -25,6 +25,27 @@ begin
   | "count x (Cons2 z xs) =
        (if equal2 x z then S (count x xs) else count x xs)"
   (*hipster le insert2 isort equal2 count *)
+hipster count equal2
+lemma lemma_a [thy_expl]: "equal2 x2 x2 = True"
+by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+
+lemma lemma_aa [thy_expl]: "equal2 Z x2 = equal2 x2 Z"
+by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+
+lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
+by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+
+lemma lemma_ac [thy_expl]: "equal2 (S x2) x2 = False"
+by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+
+lemma lemma_ad [thy_expl]: "equal2 (S Z) x2 = equal2 x2 (S Z)"
+by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+
+lemma lemma_ae [thy_expl]: "equal2 x2 y2 = equal2 y2 x2"
+by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+
+hipster count insert2 isort le
+
   theorem x0 :
     "(count x (isort y)) = (count x y)"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

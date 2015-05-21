@@ -1,0 +1,13 @@
+theory map
+imports Main
+        "../data/list"
+        "../../IsaHipster"
+
+begin
+
+fun map2 :: "('a => 'b) => 'a list => 'b list" where
+  "map2 x (Nil2) = Nil2"
+| "map2 x (Cons2 z xs) = Cons2 (x z) (map2 x xs)"
+
+end
+

@@ -9,7 +9,7 @@ begin
   | "len (Cons2 y xs) = S (len xs)"
   fun le :: "Nat => Nat => bool" where
   "le (Z) y = True"
-  | "le (S z) (Z) = False"
+  | "le (y) (Z) = False"
   | "le (S z) (S x2) = le z x2"
   fun insort :: "Nat => Nat list => Nat list" where
   "insort x (Nil2) = Cons2 x (Nil2)"
@@ -50,6 +50,38 @@ oops
 
 lemma unknown [thy_expl]: "prop_20.sort (prop_20.sort x) = prop_20.sort x"
 oops
+
+(*hipster_cond le*)
+lemma le_a : "(le (S Z) (S x) = True)"
+by (tactic {* Tactic_Data.routine_tac @{context}*})
+
+lemma le_aa [thy_expl]: "(le x y \<Longrightarrow> le x (S y))"
+by (hipster_induct_schemes)
+
+lemma le_ab [thy_expl]: "(le y x \<Longrightarrow> le (S x) y = False)"
+by (hipster_induct_schemes)
+
+lemma le_ac: "(le x y \<Longrightarrow> le (S x) (S y) = True)"
+by (tactic {* Tactic_Data.routine_tac @{context}*})
+
+lemma le_ad [thy_expl]: "le y x \<and> le x y \<Longrightarrow> x = y"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+(*
+lemma le_ae: "(\<lbrakk> le x z; le z y \<rbrakk> \<Longrightarrow> le x y)"
+oops
+
+lemma le_af: "(le z y \<and> le x z \<Longrightarrow> le x (S y) = True)"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+
+lemma le_ag: "(le z x \<and> le y z \<Longrightarrow> le (S x) y = False)"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+
+lemma le_ah: "(le z y \<and> le x z \<Longrightarrow> le (S x) (S y) = True)"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+*)
+(*
+lemma le_ai: "(le x y \<and> le x z \<Longrightarrow> le x (S Z) = True)"
+by (hipster_induct_schemes le.simps Nat.exhaust)*)
 
 lemma notfound01 [thy_expl]: "len (insort t xs) = S (len xs)"
 by hipster_induct_schemes
