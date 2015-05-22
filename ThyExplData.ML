@@ -154,17 +154,17 @@ fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
           bool_ord (freedom2 < freedom1, freedom1 < freedom2)
         end
       (*val sorted_conjs = sort term_var_ord conjs*)
-
+      
       val conjs = lemma_strs
                     |> map (Syntax.read_prop ctxt)
                     (*|> sort term_var_ord*)
                     |> map (Goal.init o (Thm.cterm_of thy))
                     |> filter (is_present ctxt);
-      val _ = lemma_strs
+      (*val _ = lemma_strs
                     |> map (Syntax.read_prop ctxt)
                     |> map (Goal.init o (Thm.cterm_of thy))
                     |> filter (is_present ctxt)
-                    |> map @{print}
+                    |> map @{print}*)
     in
       ExplData.put
         (Data{open_conjs = conjs, failed = [], proved = [], facts = facts, fact_names = fact_names,

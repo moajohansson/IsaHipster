@@ -11,7 +11,7 @@ fun drop :: "Nat => 'a list => 'a list" where
 | "drop (S z) (Nil2) = Nil2"
 | "drop (S z) (Cons2 x2 x3) = drop z x3"
 
-hipster drop
+(*hipster drop*)
 lemma lemma_a [thy_expl]: "drop.drop x1 Nil2 = Nil2"
 by (hipster_induct_schemes drop.drop.simps)
 

@@ -55,8 +55,11 @@ fun rprems_tac ctxt = Goal.norm_hhf_tac ctxt THEN' CSUBGOAL (fn (goal, i) =>
       in eresolve_tac ethms i end
   ); *}
 
-lemma unknown [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x y = True"
-oops
+lemma le_trans []: "le z y \<and> le x z \<Longrightarrow> le x y = True"
+apply(induct x arbitrary: y rule: le.induct) (* or: x, z *)
+apply(simp_all)
+apply(metis le.simps  thy_expl)
+by(metis le.simps Nat.exhaust thy_expl)
 
 lemma unknown [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x (S y) = True"
 oops
