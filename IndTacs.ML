@@ -224,7 +224,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
       val _ = Pretty.writeln (Pretty.block ( [Pretty.str "induct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
         | SOME (_, (Free (v,_),false)) => v) insts)), Pretty.str "; otherfrees: ", Pretty.str (Library.space_implode ", "
           (map (fn (v,_) => v) otherfrees)) ]));
-      val nw_thms' = (Induct.induct_tac ctxt false [insts] [non_ithings] [] rule [] i goalthm)
+      val nw_thms' = (Induct.induct_tac ctxt false [insts] [(*non_ithings*)otherfrees] [] rule [] i goalthm)
             handle ERROR t => Seq.empty (* let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end *)
       in
         Seq.map snd nw_thms'

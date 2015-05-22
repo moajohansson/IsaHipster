@@ -39,7 +39,7 @@ by (hipster_induct_schemes prop_19.minus.simps)
 lemma lemma_af [thy_expl]: "prop_19.minus (prop_19.minus x4 y4) x4 = Z"
 by (hipster_induct_schemes prop_19.minus.simps)
 
-lemma woop [thy_expl]: "prop_19.minus (prop_19.minus x y) z = prop_19.minus (prop_19.minus x z) y"
+lemma woop []: "prop_19.minus (prop_19.minus x y) z = prop_19.minus (prop_19.minus x z) y"
 apply(induction x y rule: minus.induct)
 apply (simp_all add: lemma_af lemma_ae lemma_ad lemma_ac lemma_ab lemma_aa)
 proof -

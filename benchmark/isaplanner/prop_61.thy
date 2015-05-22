@@ -11,7 +11,7 @@ begin
   fun lastOfTwo :: "Nat list => Nat list => Nat" where
   "lastOfTwo x (Nil2) = last x"
   | "lastOfTwo x (Cons2 z x2) = last (Cons2 z x2)"
-  fun append :: "'a list => 'a list => 'a list" where
+  fun append :: "Nat list => Nat list => Nat list" where
   "append (Nil2) y = y"
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster last lastOfTwo append *)
@@ -20,12 +20,19 @@ begin
 lemma lemma_a [thy_expl]: "prop_61.last x2 = lastOfTwo x2 x2"
 by (hipster_induct_schemes prop_61.lastOfTwo.simps)
 hipster append last
+
+lemma unknown [thy_expl]: "prop_61.last (prop_61.append x x) = prop_61.last x"
+oops
+
 lemma lemma_aa [thy_expl]: "prop_61.append x2 Nil2 = x2"
 by (hipster_induct_schemes prop_61.append.simps prop_61.last.simps)
 
 lemma lemma_ab [thy_expl]: "prop_61.append (prop_61.append x2 y2) z2 =
 prop_61.append x2 (prop_61.append y2 z2)"
 by (hipster_induct_schemes prop_61.append.simps prop_61.last.simps)
+
+hipster lastOfTwo last append
+
   theorem x0 :
     "(last (append xs ys)) = (lastOfTwo xs ys)"
     apply(hipster_induct_schemes)

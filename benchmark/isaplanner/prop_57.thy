@@ -52,7 +52,7 @@ lemma unknown [thy_expl]: "prop_57.drop (S x) (prop_57.drop y z) =
 prop_57.drop (S y) (prop_57.drop x z)"
 oops
 
-hipster take
+(*hipster take*)
 lemma lemma_ai [thy_expl]: "prop_57.take x3 Nil2 = Nil2"
 by (hipster_induct_schemes prop_57.take.simps)
 

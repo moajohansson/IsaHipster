@@ -52,8 +52,17 @@ by (hipster_induct_schemes prop_53.insort.simps)
 
 lemma lemma_ah [thy_expl]: "le (S x2) x2 = False"
 by (hipster_induct_schemes prop_53.insort.simps)
+
 lemma lemma_ai [thy_expl]: "prop_53.insort Z (prop_53.sort x2) = prop_53.sort (prop_53.insort Z x2)"
 by (hipster_induct_schemes  prop_53.sort.simps)
+
+hipster_cond le insort
+
+
+hipster_cond equal2 count sort
+
+hipster insort sort count
+
 
   theorem x0 :
     "(count n xs) = (count n (sort xs))"

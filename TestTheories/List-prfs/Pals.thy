@@ -59,7 +59,7 @@ lemma lemma_ac2 []: "leq x2 Z = lez x2" (* NB: used to be problematic *)
 by (hipster_induct_simp_metis)
 
 lemma leqLeqEq : "\<lbrakk> leq r t ; leq t r \<rbrakk> \<Longrightarrow> r = t"  (* schemes ... *)
-by (hipster_induct_schemes lemma_ac2)
+by (hipster_induct_schemes leq.simps Nat.exhaust)
 
 lemma dropTake : "ts = app (take n ts) (drop n ts)"
 by hipster_induct_schemes (*
@@ -75,7 +75,10 @@ lemma isortIds : "sorted ts \<Longrightarrow> isort ts = ts"
 by hipster_induct_schemes (* sorted.induct *)
 
 lemma insSortInvar : "sorted ts \<Longrightarrow> sorted (insert t ts)"
-by hipster_induct_schemes (* sorted.induct *)
+apply(induction ts arbitrary: t rule: sorted.induct)
+apply(simp_all)
+apply(metis (full_types) sorted.simps insert.simps)
+by (hipster_induct_schemes sorted.simps insert.simps  ) (* sorted.induct *)
 
 lemma isortSorts : "sorted (isort ts)"
 by (hipster_induct_simp_metis insSortInvar)
