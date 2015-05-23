@@ -17,7 +17,7 @@ begin
   (*hipster mirror max2 height *)
 hipster mirror
 lemma lemma_ta [thy_expl]: "mirror (mirror x2) = x2"
-by (hipster_induct_schemes prop_47.mirror.simps)
+by (hipster_induct_schemes mirror.simps)
 (*
 lemma lemma_mx1 [thy_expl]: "max2 y Z = y"
 sledgehammer

@@ -10,16 +10,16 @@ begin
   | "take (S z) (Cons2 x2 x3) = Cons2 x2 (take z x3)"
   (*hipster take *)
 hipster take
-lemma lemma_a [thy_expl]: "prop_40.take x3 Nil2 = Nil2"
-by (hipster_induct_schemes prop_40.take.simps)
+lemma lemma_a [thy_expl]: "take x3 Nil2 = Nil2"
+by (hipster_induct_schemes take.simps)
 
-lemma lemma_aa [thy_expl]: "prop_40.take x3 (prop_40.take x3 y3) = prop_40.take x3 y3"
-by (hipster_induct_schemes prop_40.take.simps)
+lemma lemma_aa [thy_expl]: "take x3 (take x3 y3) = take x3 y3"
+by (hipster_induct_schemes take.simps)
 
-lemma lemma_ab [thy_expl]: "prop_40.take (S x3) (prop_40.take x3 y3) = prop_40.take x3 y3"
-by (hipster_induct_schemes prop_40.take.simps)
+lemma lemma_ab [thy_expl]: "take (S x3) (take x3 y3) = take x3 y3"
+by (hipster_induct_schemes take.simps)
 
-lemma unknown [thy_expl]: "prop_40.take x (prop_40.take y z) = prop_40.take y (prop_40.take x z)"
+lemma unknown [thy_expl]: "take x (take y z) = take y (take x z)"
 oops
 
   theorem x0 :

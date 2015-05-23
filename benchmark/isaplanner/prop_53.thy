@@ -27,36 +27,37 @@ begin
   (*hipster le insort sort equal2 count *)
 
 lemma lemma_a [thy_expl]: "equal2 x4 y4 = equal2 y4 x4"
-by (hipster_induct_schemes prop_53.equal2.simps)
+by (hipster_induct_schemes equal2.simps)
 
 lemma lemma_aa [thy_expl]: "equal2 x2 x2 = True"
-by (hipster_induct_schemes prop_53.equal2.simps)
+by (hipster_induct_schemes equal2.simps)
 
 lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
-by (hipster_induct_schemes prop_53.equal2.simps)
-hipster le
+by (hipster_induct_schemes equal2.simps)
+
+(*hipster le*)
 lemma lemma_ac [thy_expl]: "le x2 x2 = True"
-by (hipster_induct_schemes prop_53.le.simps)
+by (hipster_induct_schemes le.simps)
 
 lemma lemma_ad [thy_expl]: "le x2 (S x2) = True"
-by (hipster_induct_schemes prop_53.le.simps)
+by (hipster_induct_schemes le.simps)
 
 lemma lemma_ae [thy_expl]: "le (S x2) x2 = False"
-by (hipster_induct_schemes prop_53.le.simps)
+by (hipster_induct_schemes le.simps)
 
 lemma lemma_af [thy_expl]: "le x2 x2 = True"
-by (hipster_induct_schemes prop_53.insort.simps)
+by (hipster_induct_schemes insort.simps)
 
 lemma lemma_ag [thy_expl]: "le x2 (S x2) = True"
-by (hipster_induct_schemes prop_53.insort.simps)
+by (hipster_induct_schemes insort.simps)
 
 lemma lemma_ah [thy_expl]: "le (S x2) x2 = False"
-by (hipster_induct_schemes prop_53.insort.simps)
+by (hipster_induct_schemes insort.simps)
 
-lemma lemma_ai [thy_expl]: "prop_53.insort Z (prop_53.sort x2) = prop_53.sort (prop_53.insort Z x2)"
-by (hipster_induct_schemes  prop_53.sort.simps)
-
-hipster_cond le insort
+lemma lemma_ai [thy_expl]: "insort Z (sort x2) = sort (insort Z x2)"
+by (hipster_induct_schemes  sort.simps)
+(*
+hipster_cond le insort\<exclamdown>d
 
 
 hipster_cond equal2 count sort

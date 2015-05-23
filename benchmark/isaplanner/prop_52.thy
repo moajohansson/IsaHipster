@@ -22,30 +22,29 @@ begin
   (*hipster equal2 count append rev *)
 
 lemma lemma_a [thy_expl]: "equal2 x4 y4 = equal2 y4 x4"
-by (hipster_induct_schemes prop_52.equal2.simps)
+by (hipster_induct_schemes equal2.simps)
 
 lemma lemma_aa [thy_expl]: "equal2 x2 x2 = True"
-by (hipster_induct_schemes prop_52.equal2.simps)
+by (hipster_induct_schemes equal2.simps)
 
 lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
-by (hipster_induct_schemes prop_52.equal2.simps)
+by (hipster_induct_schemes equal2.simps)
 
-lemma lemma_pa [thy_expl]: "prop_52.append x2 Nil2 = x2"
-by (hipster_induct_schemes prop_52.rev.simps)
+lemma lemma_pa [thy_expl]: "append x2 Nil2 = x2"
+by (hipster_induct_schemes rev.simps)
 
-lemma lemma_paa [thy_expl]: "prop_52.append (prop_52.append x2 y2) z2 =
-prop_52.append x2 (prop_52.append y2 z2)"
-by (hipster_induct_schemes prop_52.rev.simps)
+lemma lemma_paa [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
+by (hipster_induct_schemes rev.simps)
 
-lemma lemma_pab [thy_expl]: "prop_52.append (prop_52.rev x5) (prop_52.rev y5) =
-prop_52.rev (prop_52.append y5 x5)"
-by (hipster_induct_schemes prop_52.rev.simps)
+lemma lemma_pab [thy_expl]: "append (rev x5) (rev y5) = rev (append y5 x5)"
+by (hipster_induct_schemes rev.simps append.simps list.exhaust)
 
-hipster count
+(*trivial
+hipster count*)
 
 (*hipster_cond equal2 count append*)
 lemma lemma_ac [thy_expl]: "equal2 y2 x2 \<Longrightarrow> x2 = y2"
-by (hipster_induct_schemes prop_52.equal2.simps prop_52.count.simps prop_52.append.simps)
+by (hipster_induct_schemes equal2.simps count.simps append.simps)
 
 lemma missed: "equal2 x z \<Longrightarrow> count x (Cons2 z xs) = S (count z xs)"
 by (hipster_induct_simp_metis count.simps equal2.simps)
@@ -53,15 +52,15 @@ by (hipster_induct_simp_metis count.simps equal2.simps)
 lemma missed': "\<not> equal2 x z \<Longrightarrow> count x (Cons2 z xs) = count x xs"
 by (hipster_induct_simp_metis count.simps equal2.simps)
 
-lemma missed2: "S (count x (prop_52.append z ys)) = count x (prop_52.append z (Cons2 x ys))"
+lemma missed2: "S (count x (append z ys)) = count x (append z (Cons2 x ys))"
 by hipster_induct_schemes
 
-lemma aux2: "\<not> equal2 x za \<Longrightarrow> count x (prop_52.append z ys) = count x (prop_52.append z (Cons2 za ys))"
+lemma aux2: "\<not> equal2 x za \<Longrightarrow> count x (append z ys) = count x (append z (Cons2 za ys))"
 by hipster_induct_schemes
 
 (*hipster count append*)
-lemma could_not [thy_expl]: "count x (prop_52.append y z) = count x (prop_52.append z y)"
-by (hipster_induct_schemes prop_52.equal2.simps prop_52.count.simps prop_52.append.simps missed2 aux2)
+lemma could_not [thy_expl]: "count x (append y z) = count x (append z y)"
+by (hipster_induct_schemes equal2.simps count.simps append.simps missed2 aux2)
 
 
 (*hipster append count*)
@@ -69,7 +68,7 @@ by (hipster_induct_schemes prop_52.equal2.simps prop_52.count.simps prop_52.appe
 
   theorem x0 :
     "(count n xs) = (count n (rev xs))"
-    by (hipster_induct_schemes rev.simps prop_52.count.simps prop_52.append.simps)
+    by (hipster_induct_schemes rev.simps count.simps append.simps)
 (*
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})*)
 
