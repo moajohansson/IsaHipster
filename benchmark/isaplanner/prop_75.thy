@@ -19,45 +19,43 @@ begin
   (*hipster plus equal2 count *)
 (*hipster count*)
 lemma lemma_a [thy_expl]: "equal2 x4 y4 = equal2 y4 x4"
-by (hipster_induct_schemes prop_75.count.simps)
+by (hipster_induct_schemes count.simps)
 
 lemma lemma_aa [thy_expl]: "equal2 x2 x2 = True"
-by (hipster_induct_schemes prop_75.count.simps)
+by (hipster_induct_schemes count.simps)
 
 lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
-by (hipster_induct_schemes prop_75.count.simps)
+by (hipster_induct_schemes count.simps)
 
-lemma lemma_ag [thy_expl]: "prop_75.plus x2 Z = x2"
-by (hipster_induct_schemes prop_75.plus.simps)
+lemma lemma_ag [thy_expl]: "plus x2 Z = x2"
+by (hipster_induct_schemes plus.simps)
 
-lemma lemma_ah [thy_expl]: "prop_75.plus (prop_75.plus x2 y2) z2 = prop_75.plus x2 (prop_75.plus y2 z2)"
-by (hipster_induct_schemes prop_75.plus.simps)
+lemma lemma_ah [thy_expl]: "plus (plus x2 y2) z2 = plus x2 (plus y2 z2)"
+by (hipster_induct_schemes plus.simps)
 
-lemma lemma_ai [thy_expl]: "prop_75.plus x2 (S y2) = S (prop_75.plus x2 y2)"
-by (hipster_induct_schemes prop_75.plus.simps)
+lemma lemma_ai [thy_expl]: "plus x2 (S y2) = S (plus x2 y2)"
+by (hipster_induct_schemes plus.simps)
 
-lemma lemma_aj [thy_expl]: "prop_75.plus x2 (prop_75.plus y2 x2) = prop_75.plus y2 (prop_75.plus x2 x2)"
-by (hipster_induct_schemes prop_75.plus.simps)
+lemma lemma_aj [thy_expl]: "plus x2 (plus y2 x2) = plus y2 (plus x2 x2)"
+by (hipster_induct_schemes plus.simps)
 
-lemma lemma_ak [thy_expl]: "prop_75.plus x2 (prop_75.plus y2 y2) = prop_75.plus y2 (prop_75.plus y2 x2)"
-by (hipster_induct_schemes prop_75.plus.simps)
+lemma lemma_ak [thy_expl]: "plus x2 (plus y2 y2) = plus y2 (plus y2 x2)"
+by (hipster_induct_schemes plus.simps)
 
-lemma lemma_al [thy_expl]: "prop_75.plus x2 (S y2) = S (prop_75.plus y2 x2)"
-by (hipster_induct_schemes prop_75.plus.simps)
+lemma lemma_al [thy_expl]: "plus x2 (S y2) = S (plus y2 x2)"
+by (hipster_induct_schemes plus.simps)
 
-lemma lemma_am [thy_expl]: "prop_75.plus (prop_75.plus x2 y2) x2 = prop_75.plus x2 (prop_75.plus x2 y2)"
-by (hipster_induct_schemes prop_75.plus.simps)
+lemma lemma_am [thy_expl]: "plus (plus x2 y2) x2 = plus x2 (plus x2 y2)"
+by (hipster_induct_schemes plus.simps)
 
-lemma lemma_an [thy_expl]: "prop_75.plus (S x2) y2 = S (prop_75.plus y2 x2)"
-by (hipster_induct_schemes prop_75.plus.simps)
+lemma lemma_an [thy_expl]: "plus (S x2) y2 = S (plus y2 x2)"
+by (hipster_induct_schemes plus.simps)
 
-lemma lemma_ao [thy_expl]: "prop_75.plus (prop_75.plus x3 y3) (prop_75.plus x3 z3) =
-prop_75.plus (prop_75.plus x3 z3) (prop_75.plus x3 y3)"
-by (hipster_induct_schemes )
+lemma lemma_ao [thy_expl]: "plus (plus x3 y3) (plus x3 z3) = plus (plus x3 z3) (plus x3 y3)"
+by (hipster_induct_schemes Nat.exhaust)
 
 
   theorem x0 :
-    "(plus (count n xs) (count n (Cons2 m (Nil2)))) =
-       (count n (Cons2 m xs))"
+    "(plus (count n xs) (count n (Cons2 m (Nil2)))) = (count n (Cons2 m xs))"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

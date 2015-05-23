@@ -27,7 +27,7 @@ by (hipster_induct_schemes prop_58.zip2.simps)
 lemma lemma_ac [thy_expl]: "zip2 Nil2 x1 = zip2 y1 Nil2"
 by (hipster_induct_schemes prop_58.zip2.simps)
 
-hipster zip2 drop
+(*hipster zip2 drop*)
 
   theorem x0 :
     "(drop n (zip2 xs ys)) = (zip2 (drop n xs) (drop n ys))"

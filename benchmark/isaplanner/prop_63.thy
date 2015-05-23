@@ -23,13 +23,16 @@ begin
 
 (*hipster lt len drop*)
 lemma lemma_a [thy_expl]: "lt x2 x2 = False"
-by (hipster_induct_schemes prop_63.lt.simps prop_63.len.simps)
+by (hipster_induct_schemes lt.simps len.simps)
 
 lemma lemma_aa [thy_expl]: "lt x2 (S x2) = True"
-by (hipster_induct_schemes prop_63.lt.simps prop_63.len.simps)
+by (hipster_induct_schemes lt.simps len.simps)
 
 lemma lemma_ab [thy_expl]: "lt (S x2) x2 = False"
-by (hipster_induct_schemes prop_63.lt.simps prop_63.len.simps)
+by (hipster_induct_schemes lt.simps len.simps)
+
+hipster_cond lt
+
   theorem x0 :
     "(lt n (len xs)) ==> ((last (drop n xs)) = (last xs))"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

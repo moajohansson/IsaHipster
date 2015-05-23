@@ -23,8 +23,18 @@ by (hipster_induct_schemes prop_82.take.simps)
 lemma lemma_ak [thy_expl]: "prop_82.take (S x3) (prop_82.take x3 y3) = prop_82.take x3 y3"
 by (hipster_induct_schemes prop_82.take.simps)
 
+lemma lemma_ab [thy_expl]: "zip Nil2 x1 = zip x1 Nil2"
+by (hipster_induct_schemes zip.simps)
+
+lemma lemma_ac [thy_expl]: "zip Nil2 x1 = zip y1 Nil2"
+by (hipster_induct_schemes zip.simps)
+
   theorem x0 :
     "(take n (zip xs ys)) = (zip (take n xs) (take n ys))"
-    apply(hispter_induct_schemes zip.simps zip.elims)
+    apply(induction xs ys arbitrary: n rule: zip.induct)
+    apply(simp_all)
+    apply(metis thy_expl zip.simps take.simps)
+    apply(metis thy_expl zip.simps take.simps)
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+
 end

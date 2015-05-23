@@ -15,48 +15,43 @@ begin
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
   (*hipster filter append rev *)
 
-hipster filter2 rev
-lemma lemma_a [thy_expl]: "prop_73.append x2 Nil2 = x2"
-by (hipster_induct_schemes prop_73.filter2.simps prop_73.rev.simps)
+(*hipster filter2 rev*)
+lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
+by (hipster_induct_schemes filter2.simps rev.simps)
 
 lemma lemma_aa [thy_expl]: "filter2 x13 (filter2 y13 z13) = filter2 y13 (filter2 x13 z13)"
-by (hipster_induct_schemes prop_73.filter2.simps prop_73.rev.simps)
+by (hipster_induct_schemes filter2.simps rev.simps)
 
-lemma lemma_ab [thy_expl]: "prop_73.append (prop_73.append x2 y2) z2 =
-prop_73.append x2 (prop_73.append y2 z2)"
-by (hipster_induct_schemes prop_73.filter2.simps prop_73.rev.simps)
+lemma lemma_ab [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
+by (hipster_induct_schemes filter2.simps rev.simps)
 
 lemma lemma_ac [thy_expl]: "filter2 x9 (filter2 x9 y9) = filter2 x9 y9"
-by (hipster_induct_schemes prop_73.filter2.simps prop_73.rev.simps)
+by (hipster_induct_schemes filter2.simps rev.simps)
 
-lemma lemma_ad [thy_expl]: "prop_73.append (filter2 x6 y6) (filter2 x6 z6) =
-filter2 x6 (prop_73.append y6 z6)"
-by (hipster_induct_schemes prop_73.filter2.simps prop_73.rev.simps)
+lemma lemma_ad [thy_expl]: "append (filter2 x6 y6) (filter2 x6 z6) = filter2 x6 (append y6 z6)"
+by (hipster_induct_schemes filter2.simps rev.simps)
 
-lemma unknown [thy_expl]: "prop_73.rev (filter2 x y) = filter2 x (prop_73.rev y)"
-oops
+(*hipster rev append filter2*)
+lemma lemma_ae [thy_expl]: "append (rev x4) (rev y4) = rev (append y4 x4)"
+by (hipster_induct_schemes rev.simps append.simps filter2.simps)
 
-lemma unknown [thy_expl]: "prop_73.rev (prop_73.rev x) = x"
-oops
+lemma lemma_af [thy_expl]: "rev (rev x3) = x3"
+by (hipster_induct_schemes rev.simps append.simps filter2.simps)
 
-lemma unknown [thy_expl]: "prop_73.append (prop_73.rev x) (prop_73.rev y) =
-prop_73.rev (prop_73.append y x)"
-oops
+lemma ss: "f x \<Longrightarrow> filter2 f (Cons2 x y) = Cons2 x (filter2 f y)"
+by simp
 
-lemma unknown [thy_expl]: "prop_73.append (prop_73.rev x) (prop_73.rev x) =
-prop_73.rev (prop_73.append x x)"
-oops
+lemma sst: "\<not> f x \<Longrightarrow> filter2 f (Cons2 x y) = (filter2 f y)"
+by simp
 
-lemma lemma_fa [thy_expl]: "filter2 x13 (filter2 y13 z13) = filter2 y13 (filter2 x13 z13)"
-by (hipster_induct_schemes prop_73.filter2.simps)
+lemma unknown [thy_expl]: "rev (filter2 x y) = filter2 x (rev y)"
+apply(induction y arbitrary: x rule: rev.induct)
+apply(simp_all)
+by (metis filter2.simps lemma_ad lemma_a lemma_ab lemma_ac lemma_ae lemma_af)
 
-lemma lemma_faa [thy_expl]: "filter2 x9 (filter2 x9 y9) = filter2 x9 y9"
-by (hipster_induct_schemes prop_73.filter2.simps)
 
   theorem x0 :
     "(rev (filter2 p xs)) = (filter2 p (rev xs))"
-    apply(induction xs rule: rev.induct)
-    apply simp_all
-    
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end
+

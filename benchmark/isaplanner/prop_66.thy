@@ -18,22 +18,42 @@ begin
   (*hipster len le filter *)
 hipster len filter2
 lemma lemma_a [thy_expl]: "filter2 x13 (filter2 y13 z13) = filter2 y13 (filter2 x13 z13)"
-by (hipster_induct_schemes prop_66.len.simps prop_66.filter2.simps)
+by (hipster_induct_schemes len.simps filter2.simps)
 
 lemma lemma_aa [thy_expl]: "filter2 x9 (filter2 x9 y9) = filter2 x9 y9"
-by (hipster_induct_schemes prop_66.len.simps prop_66.filter2.simps)
+by (hipster_induct_schemes len.simps filter2.simps)
 
-hipster le
+(*hipster le*)
 lemma lemma_ab [thy_expl]: "le x2 x2 = True"
-by (hipster_induct_schemes prop_66.le.simps)
+by (hipster_induct_schemes le.simps)
 
 lemma lemma_ac [thy_expl]: "le x2 (S x2) = True"
-by (hipster_induct_schemes prop_66.le.simps)
+by (hipster_induct_schemes le.simps)
 
 lemma lemma_ad [thy_expl]: "le (S x2) x2 = False"
-by (hipster_induct_schemes prop_66.le.simps)
+by (hipster_induct_schemes le.simps)
+
+(*hipster_cond le len*)
+lemma lemma_ae [thy_expl]: "le x2 y2 \<Longrightarrow> le x2 (S y2) = True"
+by (hipster_induct_schemes le.simps len.simps)
+
+lemma lemma_af [thy_expl]: "le y2 x2 \<Longrightarrow> le (S x2) y2 = False"
+by (hipster_induct_schemes le.simps)
+
+lemma lemma_ag [thy_expl]: "le y x \<and> le x y \<Longrightarrow> x = y"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+
+lemma lemma_ah [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x y = True"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+
+(* Trivial
+lemma lemma_ai [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x (S y) = True"
+lemma lemma_aj [thy_expl]: "le z x \<and> le y z \<Longrightarrow> le (S x) y = False"
+lemma lemma_ak [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le (S x) (S y) = True"
+*)
 
   theorem x0 :
     "le (len (filter2 q xs)) (len xs)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (hipster_induct_schemes le.simps len.simps filter2.simps)
+
 end
