@@ -2,6 +2,16 @@
 (* Data to be stored during theory exploration *)
 (*-----------------------------------------------------------------------------------------*)
 
+(*structure ThyExpl_Opts =
+struct
+
+datatype T = Data of
+    { val cond_count : int,
+      val ind_count : int,
+    }
+end;*)
+
+
 structure ThyExpl_Data =
 struct
 

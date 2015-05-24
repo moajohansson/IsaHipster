@@ -55,6 +55,9 @@ lemma unknong [thy_expl]: "isort2 (isort2 x) = isort2 x"
 by (hipster_induct_simp_metis sorted2.simps insert.simps isort2.simps)
 
 lemma unknoni []: "sorted2 y \<Longrightarrow> sorted2 (insert x y) = True"
+(*apply(induction y rule: sorted2.induct)
+apply(simp_all)
+apply (metis (full_types) thy_expl sorted2.simps insert.simps)*)
 by (hipster_induct_schemes sorted2.simps insert.simps isort2.simps)
 
 lemma unknonf [thy_expl]: "sorted2 (isort2 x) = True"

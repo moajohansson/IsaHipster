@@ -35,6 +35,7 @@ ML_file "SchemeInstances.ML"
 ML_file "ThyExplData.ML"
 ML_file "HipsterTacs.ML"
 
+ML_file "HipTacOps.ML"
 ML_file "IndTacs.ML"
 
 ML_file "TacticData.ML"

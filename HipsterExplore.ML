@@ -20,14 +20,6 @@ fun try_nxt_conj ctxt =
             else NONE
 
     | (c::cs) => (* try proving next open conj *)
-      (*if length ( ThyExpl_Data.proved_of_ctxt ctxt) > 50 then SOME (ctxt |> ThyExpl_Data.set_open_conjs_ctxt cs
-                                                                         |> ThyExpl_Data.add_failed_ctxt c)
-                                                         else*)
-       (*  if (length (snd (Hipster_Utils.frees_and_tfrees_of_thm c)) > 20) then let val _ = @{print} (snd (Hipster_Utils.frees_and_tfrees_of_thm c)) in
-                                                              ctxt |> ThyExpl_Data.set_open_conjs_ctxt cs
-                                                                   |> ThyExpl_Data.add_failed_ctxt c
-                                                                   |> try_nxt_conj end
-                                                         else*)
       let 
         (*val _ = @{print} ("before "^ @{make_string} c)*)
         val r = SINGLE (Tactic_Data.routine_tac ctxt) c
@@ -60,7 +52,7 @@ fun try_nxt_conj ctxt =
                (* TODO: remove final_str and its printing in the message - debugging *)
                val final_str = (Syntax.string_of_term ctxt (Thm.prop_of final_thm))
                val _ = (Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message)
-                 ("Proved: " ^ lemma_str ^ "; Saving to ThyExpl_Data: " ^ final_str)
+                 ("Proved: " ^ lemma_str)
              in
                SOME (ctxt'
                        |> ThyExpl_Data.set_open_conjs_ctxt cs

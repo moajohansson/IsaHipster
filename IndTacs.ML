@@ -9,7 +9,7 @@ sig
   type hardtac
   val simp_all : Proof.context -> thm list -> tactic
   val prove_by_simp : Proof.context -> thm list -> tactic
-  val timed_metis_tac : Proof.context -> Thm.thm list -> int -> tactic
+  val timed_metis_tac : Proof.context -> bool -> Thm.thm list -> int -> tactic
   val simp_or_metis : Proof.context -> (thm list * thm list) -> tactic 
 
   val induct_and_simp : thm list -> hardtac
@@ -52,7 +52,7 @@ fun SOLVE_TIMEOUT mseconds tac t =
 (*-----------------------------------------------------------------------------------------*)
 (* Simp tactics *) 
 (*-----------------------------------------------------------------------------------------*)
-fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);
+(*fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);*)
 
 
 (* Apply simp to all subgoals *)
@@ -77,13 +77,16 @@ fun simp_all ctxt lemmas thm =
 
 
 (* Apply simp, if that doesn't work try metis.  *)
-fun timed_metis_tac ctxt facts i thm = 
-    (*let val _ = Pretty.writeln (Pretty.block [Pretty.str ("timed_metis: "^ @{make_string} i),pretty_thm ctxt thm]) in*)
-    (SOLVE_TIMEOUT 400
-    (Metis_Tactic.metis_tac [(*ATP_Proof_Reconstruct.full_type_enc*)]
-      ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm (* end; *)
+  (*  val _ = Pretty.writeln (Pretty.block [Pretty.str ("timed_metis: "^ @{make_string} i),pretty_thm ctxt thm]) in*)
+fun timed_metis_tac ctxt full facts i thm = 
+  let val timeout = Hip_Tac_Ops.metis_to ctxt
+      val args_metis = (if full then [ATP_Proof_Reconstruct.full_type_enc] else [])
+  in (SOLVE_TIMEOUT timeout
+       (Metis_Tactic.metis_tac args_metis
+        ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm
+ end;
 
-fun ALLsub tac st =
+(*fun ALLsub tac st =
   let val subgoals = nprems_of st
       fun doall n max = if n < max then (tac(n) THEN_ELSE (doall n (max-1) ,doall(n+1) max)) else tac(n);
   in  doall 1 subgoals st  end;
@@ -98,14 +101,21 @@ fun ALLt tac st =
   in  doall 0 (nprems_of st) st  end;
 
 fun xxx  ctxt facts tac =( ALLGOALS (Method.insert_tac facts) THEN
-        (CHANGED_PROP o PARALLEL_GOALS o ALLGOALS o tac) ctxt)
+        (CHANGED_PROP o PARALLEL_GOALS o ALLGOALS o tac) ctxt)*)
+
 (* First simp, and if nessecary, let Metis deal with the rest *)
 fun simp_or_metis ctxt (facts, lemmas) = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
-    (*SOLVE_TIMEOUT 2000*) ((simp_all ctxt []) (* TRY *) (* FIXME: both facts and lemmas? *)
-          THEN
-          IF_UNSOLVED
-          ((*REPEAT o FIRSTGOAL*) (PARALLEL_GOALS o ALLGOALS) (timed_metis_tac ctxt (facts@lemmas)))) (*end;*)
-(*REPEAT_FIRST*)
+  let
+    val do_full = Hip_Tac_Ops.use_full_types ctxt
+    val simp_adds = filter (hd (Hip_Tac_Ops.simp_cond ctxt)) lemmas
+    val metis_adds = filter (hd (Hip_Tac_Ops.metis_cond ctxt)) (facts @ lemmas)
+  in
+    (simp_all ctxt simp_adds) (* FIXME: both facts and lemmas? *)     (*SOLVE_TIMEOUT 2000*) 
+    THEN
+    IF_UNSOLVED
+    ((PARALLEL_GOALS o ALLGOALS) (timed_metis_tac ctxt do_full metis_adds))
+  end;
+(*REPEAT o FIRSTGOAL*) (*REPEAT_FIRST*)
 
 (*-----------------------------------------------------------------------------------------*)
 (* Figure out what we can do induction on, and tries each variable until success.*) 
@@ -129,12 +139,11 @@ fun mk_induct_insts ithings indnames =
     let 
       fun faux ithings [] L = (ithings, rev L)
         | faux ithings (h :: t) L = 
-          if h = "_" then (faux ithings t (NONE :: L))
-          else 
-            (case pull_elem (fn (n,_) => n = h) ithings of 
-               NONE => 
-               raise ERROR ("No such variable to do induction on: " ^ h)
-             | SOME (v, ithings') => (faux ithings' t ((SOME v) :: L)));
+          if h = "_"
+            then (faux ithings t (NONE :: L))
+            else (case pull_elem (fn (n,_) => n = h) ithings of 
+                    NONE => raise ERROR ("No such variable to do induction on: " ^ h)
+                  | SOME (v, ithings') => (faux ithings' t ((SOME v) :: L)));
     in faux ithings indnames [] end;
 
 (*   val find_inductT: Proof.context -> typ -> thm list *)
@@ -168,8 +177,8 @@ fun inductable_things_in_term thry t =
       (* Return frees and forall quantified vars (if any) *)
       (* Split into those we can do structural induction over, and the rest *)
        List.partition (datatype_chk o snd)
-                     ((Hipster_Utils.frees_of t) @
-                      (Term.strip_all_vars t))
+                      ((Hipster_Utils.frees_of t) @
+                       (Term.strip_all_vars t))
     end;
 
 fun inductable_things_in_sg i thm = (*let val _ = @{print} i in*)
@@ -199,10 +208,7 @@ fun induct_for_me ctxt xss rule i =
 (* var is the variable we want to do induction on *)
 fun induct_on_var_tac ctxt rule var i goalthm = 
     let
-        (*Dummy context for the sake of Isar*)
-      (*val ctxt = Proof_Context.init_global (Thm.theory_of_thm goalthm);*)
       val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
-        (* TODO: make better (otherfrees, etc.) *)
 
       (*val _ = @{print} non_ithings
       val _ = Pretty.writeln (Pretty.str "I-things")
@@ -225,7 +231,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
         | SOME (_, (Free (v,_),false)) => v) insts)), Pretty.str "; otherfrees: ", Pretty.str (Library.space_implode ", "
           (map (fn (v,_) => v) otherfrees)) ]));
       val nw_thms' = (Induct.induct_tac ctxt false [insts] [(*non_ithings*)otherfrees] [] rule [] i goalthm)
-            handle ERROR t => Seq.empty (* let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end *)
+            handle ERROR _ => Seq.empty (* let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end *)
       in
         Seq.map snd nw_thms'
       end;
@@ -304,7 +310,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
                 | nonreptup (vs:: vss) = fold (fn v => fn acc => acc @ (map (fn ts => v::ts) (nonreptup (map (filter (fn t => not (v = t))) vss)))) vs [] @ nonreptup vss
               val _ = @{print} nonreptup ruleSets*)
               val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
-              val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)
+              (*val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)*)
               val instt = hd all_instances
               (*val _ = @{print} instances
               val _ = @{print} instt*)
@@ -318,7 +324,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
 fun try_induct_schemes ctxt strat i thm =
     let
       val vars = fst (inductable_things_in_sg i thm) (* map fst ... *)
-      val lemmas = ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt
+      (*val lemmas = ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt*)
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
@@ -354,8 +360,8 @@ fun update k v = Data.map (Symtab.update (k, v)) *)
 fun induct_with_schemes ctxt facts thm =
     let
       val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-      val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
-      val consts = Hipster_Utils.thy_consts_of thynm thm
+      (*val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
+      val consts = Hipster_Utils.thy_consts_of thynm thm*)
       (*val _ = Pretty.writeln (Pretty.block (Pretty.str "Theorem: " :: [pretty_thm ctxt thm]))
       val _ = Pretty.writeln (Pretty.str ("Num cs = " ^ @{make_string} (length consts)))
       val _ = Pretty.writeln (Pretty.str (Library.space_implode " " (thynm ^ "-Consts: " :: consts))) *)
