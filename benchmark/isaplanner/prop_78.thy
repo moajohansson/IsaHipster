@@ -71,6 +71,9 @@ by (hipster_induct_schemes nole.simps)
 lemma lemma_aj [thy_expl]: "nole x2 y2 \<Longrightarrow> le x2 Z = False"
 by (hipster_induct_schemes nole.simps)
 
+setup{* Hip_Tac_Ops.toggle_full_types @{context} ;*}
+setup{* Hip_Tac_Ops.set_metis_to @{context} 1000;*}
+
 lemma lemma_ak [thy_expl]: "sorted y \<Longrightarrow> sorted (insort x y) = True"
 apply(induction y arbitrary: x rule: sorted.induct)
 apply(simp_all)
