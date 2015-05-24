@@ -79,7 +79,7 @@ fun simp_all ctxt lemmas thm =
 (* Apply simp, if that doesn't work try metis.  *)
 fun timed_metis_tac ctxt facts i thm = 
     (*let val _ = Pretty.writeln (Pretty.block [Pretty.str ("timed_metis: "^ @{make_string} i),pretty_thm ctxt thm]) in*)
-    (SOLVE_TIMEOUT 1000
+    (SOLVE_TIMEOUT 400
     (Metis_Tactic.metis_tac [(*ATP_Proof_Reconstruct.full_type_enc*)]
       ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm (* end; *)
 
@@ -101,7 +101,7 @@ fun xxx  ctxt facts tac =( ALLGOALS (Method.insert_tac facts) THEN
         (CHANGED_PROP o PARALLEL_GOALS o ALLGOALS o tac) ctxt)
 (* First simp, and if nessecary, let Metis deal with the rest *)
 fun simp_or_metis ctxt (facts, lemmas) = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
-    SOLVE_TIMEOUT 3000 ((simp_all ctxt []) (* TRY *) (* FIXME: both facts and lemmas? *)
+    (*SOLVE_TIMEOUT 2000*) ((simp_all ctxt []) (* TRY *) (* FIXME: both facts and lemmas? *)
           THEN
           IF_UNSOLVED
           ((*REPEAT o FIRSTGOAL*) (PARALLEL_GOALS o ALLGOALS) (timed_metis_tac ctxt (facts@lemmas)))) (*end;*)

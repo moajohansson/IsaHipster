@@ -12,8 +12,9 @@ begin
     "rev (Nil2) = Nil2"
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
 
+declare [[thy_interesting = true]]
 
-hipster append rev
+(*hipster append rev*)
 lemma lemma_a [thy_expl]: "prop_11.append x2 Nil2 = x2"
 by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
 
@@ -34,6 +35,38 @@ by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
     "(rev (append (rev x) (rev y))) = (append y x)"
     by (hipster_induct_schemes rev.simps append.simps)
 
+ML_val {*
+  (*proof body with digest*)
+  val body = Proofterm.strip_thm (Thm.proof_body_of @{thm revAppend});
+  (*proof term only*)
+  val prf = Proofterm.proof_of body;
+  Pretty.writeln (Proof_Syntax.pretty_proof @{context} prf);
+  (*all theorems used in the graph of nested proofs*)
+  val all_thms =
+    Proofterm.fold_body_thms
+      (fn (name, _, _) => insert (op =) name) [body] [];
+  map 
+*}
+
+thm prop_11.list.rec
+find_theorems
+
+
+ML {*
+  Datatype.distinct_lemma ;
+  val _ = Pretty.writeln (Proof_Syntax.pretty_proof @{context} (Thm.proof_of @{thm revAppend}))
+*}
+
+help find
+find_consts
+find_theorems
+find_unused_assms
+print_options
+
+thm_deps lemma_a
+thm append_sumC_def
+thm append.elims
+thm append.simps
 
 (*
 lemma lemma_a [thy_expl]: "prop_11.append x2 Nil2 = x2"

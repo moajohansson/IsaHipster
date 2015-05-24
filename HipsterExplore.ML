@@ -158,7 +158,7 @@ fun hipspec_cond cond_name consts file =
     let 
       val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts
     in
-      "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^ (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=400"
+      "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^ (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
     end;
 
 (* 'const_nms' are the name of the constants we wish to include in the Haskell 
@@ -203,8 +203,8 @@ fun prep_conjs ctxt conjs =
       val thynm = Context.theory_name thy
     in
       if (Config.get ctxt thy_interesting = false)
-      then conjs (* Want eqs about all functions, also those not about funs def in this thy *)
-      else filter (fn c => (not((Hipster_Utils.thy_consts_of thynm c) = []))) conjs
+        then conjs (* Want eqs about all functions, also those not about funs def in this thy *)
+        else filter (fn c => (not((Hipster_Utils.thy_consts_of thynm c) = []))) conjs
     end;
                                                                  
 (* Outputs snippets of proof script with the discovered lemmas that can be pasted into the theory file. *)
