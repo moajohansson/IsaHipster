@@ -142,7 +142,7 @@ fun hipspec_plain consts file =
     let 
       val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts
     in
-      "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --tests=300"
+      "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --tests=600"
     end;
 
 (* FIXME: make cond-count a proper parameter controlled by user. *)

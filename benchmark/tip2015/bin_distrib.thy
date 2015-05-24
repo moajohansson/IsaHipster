@@ -24,7 +24,7 @@ fun times :: "Bin => Bin => Bin" where
 | "times (ZeroAnd xs) y = ZeroAnd (times xs y)"
 | "times (OneAnd ys) y = plus (ZeroAnd (times ys y)) y"
 
-(*hipster s plus times *)
+hipster s plus times
 
 theorem x0 :
   "!! (x :: Bin) (y :: Bin) (z :: Bin) .

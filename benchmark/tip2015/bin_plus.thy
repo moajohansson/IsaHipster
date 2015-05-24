@@ -30,7 +30,7 @@ fun toNat :: "Bin => Nat" where
 | "toNat (ZeroAnd xs) = plus (toNat xs) (toNat xs)"
 | "toNat (OneAnd ys) = S (plus (toNat ys) (toNat ys))"
 
-(*hipster s plus2 plus toNat *)
+hipster s plus2 plus toNat
 
 theorem x0 :
   "!! (x :: Bin) (y :: Bin) .

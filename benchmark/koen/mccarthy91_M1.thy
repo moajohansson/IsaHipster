@@ -3,8 +3,9 @@ imports Main
         "../../IsaHipster"
 begin
 
-fun m :: "int => int" where
+function m :: "int => int" where
 "m x = (if x > 100 then x - 10 else m (m (x + 11)))"
+by pat_completeness auto
 
 (*hipster m *)
 

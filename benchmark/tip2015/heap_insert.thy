@@ -19,7 +19,7 @@ fun le :: "Nat => Nat => bool" where
 | "le (S z) (S x2) = le z x2"
 
 fun listInsert :: "Nat => Nat list => Nat list" where
-"listInsert x (Nil2) = Cons2 x (Nil2)"
+"listInsert x (list.Nil2) = Cons2 x (list.Nil2)"
 | "listInsert x (Cons2 z ys) =
      (if le x z then Cons2 x (Cons2 z ys) else
         Cons2 z (listInsert x ys))"
@@ -32,10 +32,10 @@ fun merge :: "Heap => Heap => Heap" where
 | "merge (Nil2) y = y"
 
 fun toList :: "Nat => Heap => Nat list" where
-"toList (Z) y = Nil2"
+"toList (Z) y = list.Nil2"
 | "toList (S z) (Node x2 x3 x4) =
      Cons2 x3 (toList z (merge x2 x4))"
-| "toList (S z) (Nil2) = Nil2"
+| "toList (S z) (Heap.Nil2) = list.Nil2"
 
 fun insert2 :: "Nat => Heap => Heap" where
 "insert2 x y = merge (Node Nil2 x Nil2) y"
