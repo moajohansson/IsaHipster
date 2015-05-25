@@ -147,11 +147,19 @@ hipster_cond equal2 leneq len appendb
 
 hipster_cond leneq appendb revb equal2*)
 
+hipster append len
 
+lemma xx[thy_expl]: "len (append xs (Cons2 y ys)) = S (len (prop_85.append xs ys))"
+sorry
 lemma lemma_applen [thy_expl]: "len (append x y) = len (append y x)"
-apply(induction x)
+by (hipster_induct_schemes append.simps len.simps list.exhaust)
+
+apply(induction x y rule: zip2.induct)
 apply(simp_all)
 apply(metis thy_expl append.simps len.simps list.exhaust)
+apply(metis thy_expl zip2.simps append.simps len.simps list.exhaust)
+apply(metis (full_types) thy_expl zip2.simps append.simps len.simps list.exhaust)
+
 by (hipster_induct_schemes append.simps len.simps list.exhaust)
 
 

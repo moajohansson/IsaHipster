@@ -65,6 +65,7 @@ fun nole:: "Nat \<Rightarrow> Nat \<Rightarrow> bool" where
   "nole x y = (\<not> le x y)"
 
 (*hipster_cond nole*)
+hipster nole le
 lemma lemma_ai [thy_expl]: "le (S x2) y2 = nole y2 x2"
 by (hipster_induct_schemes nole.simps)
 
@@ -75,7 +76,7 @@ setup{* Hip_Tac_Ops.toggle_full_types @{context} ;*}
 setup{* Hip_Tac_Ops.set_metis_to @{context} 1000;*}
 
 lemma lemma_ak [thy_expl]: "sorted y \<Longrightarrow> sorted (insort x y) = True"
-by (hipster_induct_schemes nole.simps sorted.simps insort.simps le.simps)
+by (hipster_induct_schemes nole.simps  sorted.simps insort.simps le.simps)
 (*
 apply(induction y arbitrary: x rule: sorted.induct)
 apply(simp_all)
