@@ -56,9 +56,9 @@ fun reverse :: "'t list => 't list" where
 function stooge1sort2 :: "int list => int list"
          and stoogesort :: "int list => int list"
          and stooge1sort1 :: "int list => int list" where
-"stooge1sort2 x = (case (zsplitAt (zlength x / 3) (reverse x)) of
+"stooge1sort2 x = (case (zsplitAt ((op div) (zlength x) 3) (reverse x)) of
                     Pair ys zs \<Rightarrow>
-                      case zsplitAt ((zlength x) / 3) (reverse x) of
+                      case zsplitAt ((op div) (zlength x)  3) (reverse x) of
                         Pair xs zs2 => append (stoogesort zs) (reverse xs))"
 | "stoogesort (Nil2) = Nil2"
 | "stoogesort (Cons2 y (Nil2)) = Cons2 y (Nil2)"
@@ -67,12 +67,10 @@ function stooge1sort2 :: "int list => int list"
      stooge1sort2
        (stooge1sort1 (stooge1sort2 (Cons2 y (Cons2 y2 (Cons2 x3 x4)))))"
 | "stooge1sort1 x =
-     case zsplitAt (div (zlength x) 3) x of
-       | Pair ys zs =>
-           case zsplitAt (div (zlength x) 3) x of
-             | Pair xs zs2 => append ys (stoogesort zs2)
-           end
-     end"
+     (case zsplitAt ((op div) (zlength x) 3) x of
+        Pair ys zs =>
+           case zsplitAt ((op div) (zlength x) 3) x of
+              Pair xs zs2 => append ys (stoogesort zs2))"
 by pat_completeness auto
 
 (*hipster ztake
@@ -90,6 +88,12 @@ by pat_completeness auto
 
 theorem x0 :
   "!! (x :: int list) . (stoogesort x) = (isort x)"
+  proof-
+    fix x
+    show "(stoogesort x) = (isort x)"
+      apply(induction x rule:isort.induct)
+      apply(simp_all)
+      apply(metis isort.simps list.exhaust stoogesort.simps)
   by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 
 end
