@@ -65,18 +65,28 @@ fun nole:: "Nat \<Rightarrow> Nat \<Rightarrow> bool" where
   "nole x y = (\<not> le x y)"
 
 (*hipster_cond nole*)
-hipster nole le
+(*hipster nole le*)
 lemma lemma_ai [thy_expl]: "le (S x2) y2 = nole y2 x2"
 by (hipster_induct_schemes nole.simps)
 
 lemma lemma_aj [thy_expl]: "nole x2 y2 \<Longrightarrow> le x2 Z = False"
-by (hipster_induct_schemes nole.simps)
+apply(unfold nole.simps)
+by (hipster_induct_schemes le.simps)
+
+ML{*
+  val _ = Local_Defs.unfold_tac
+  val _ = Raw_Simplifier.rewrite_goals_rule
+  val simple_prover = SINGLE o (fn ctxt => ALLGOALS (resolve_tac (Raw_Simplifier.prems_of ctxt)));
+  val _ =   Conv.fconv_rule (Conv.prems_conv ~1 (Raw_Simplifier.rewrite_cterm (true, true, true) simple_prover
+    (empty_simpset @{context} addsimps @{thms nole.simps})))
+  val _ = Pattern.rewrite_term
+*}
 
 setup{* Hip_Tac_Ops.toggle_full_types @{context} ;*}
 setup{* Hip_Tac_Ops.set_metis_to @{context} 1000;*}
 
 lemma lemma_ak [thy_expl]: "sorted y \<Longrightarrow> sorted (insort x y) = True"
-by (hipster_induct_schemes nole.simps  sorted.simps insort.simps le.simps)
+by (hipster_induct_schemes sorted.simps insort.simps le.simps)
 (*
 apply(induction y arbitrary: x rule: sorted.induct)
 apply(simp_all)

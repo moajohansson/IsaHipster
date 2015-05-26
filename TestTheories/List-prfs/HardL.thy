@@ -51,7 +51,7 @@ lemma eqEq: "eqN r t = (r = t)"
 by hipster_induct_schemes
 
 lemma countIns0: "\<not> eqN r t \<Longrightarrow> count t ts = count t (insert r ts)"
-by hipster_induct_simp_metis
+by hipster_induct_schemes
 
 lemma setCountSort: "count t ts = count t (isort ts)"
 by (hipster_induct_schemes eqEq countIns0 countIns)  (* XXX: something weird with regular induct: shouldn't *)
@@ -83,7 +83,7 @@ by (hipster_induct_simp_metis insLen)
 lemma appZips  : "len a = len b \<Longrightarrow> app (zip a b) (zip c d) = zip (app a c) (app b d)"
 (*apply(hipster_induct_schemes app.simps len.simps List.exhaust Nat.distinct)*)
 (*apply hipster_induct_schemes*)
-apply (hipster_induct_schemes app.simps len.simps List.exhaust Nat.distinct)
+apply (hipster_induct_schemes app.simps len.simps List.exhaust Nat.exhaust)
 done
 (*by (tactic {* let 
       val lemmas = [] (* (ThyExpl_Data.proved_of_ctxt @{context}) @ (Hipster_Rules.get @{context})*)

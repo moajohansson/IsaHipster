@@ -43,14 +43,14 @@ Hip_Tac_Ops.metis_to @{context} ;
 Hip_Tac_Ops.use_full_types @{context}; *}
 
 lemma insSortInvar : "sorted ts \<Longrightarrow> sorted (insert t ts)"
-apply(hipster_induct_schemes sorted.simps insert.simps Nat.exhaust leqRev)
+by (hipster_induct_schemes sorted.simps insert.simps Nat.exhaust leqRev list.exhaust)
 (*
-by (hipster_induct_schemes sorted.simps leqRev)*)
+by (hipster_induct_schemes sorted.simps leqRev)
 apply(induction ts rule: sorted.induct)
 apply(simp_all)
 apply(metis sorted.simps insert.simps leqRev)
 sledgehammer
-by (metis (full_types) leqRev)
+by (metis (full_types) leqRev)*)
 
 lemma isortSorts : "sorted (isort ts)"
 by (hipster_induct_simp_metis insSortInvar)
