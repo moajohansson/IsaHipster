@@ -23,7 +23,7 @@ by (hipster_induct_schemes length.simps append.simps)
 lemma lemma_aa [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
 by (hipster_induct_schemes length.simps append.simps)
 
-(*hipster double length append*)
+hipster double length append
 lemma unknown []: "length (append x y) = length (append y x)"
 oops
 

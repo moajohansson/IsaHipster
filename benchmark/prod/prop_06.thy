@@ -107,7 +107,7 @@ by (metis length.simps(2) append.simps(2))
 lemma ax2[]: "length (append y (Cons2 ya xs)) = S (length (append y xs))"
 by(hipster_induct_schemes)*)
 
-hipster length plus append rev
+(*hipster length plus append rev*)
 lemma lemma_ad [thy_expl]: "plus (length x2) (length y2) = length (append x2 y2)"
 by (hipster_induct_schemes length.simps plus.simps append.simps rev.simps)
 
