@@ -24,8 +24,6 @@ fun try_nxt_conj ctxt =
         (*val _ = @{print} ("before "^ @{make_string} c)*)
         val r = SINGLE (Tactic_Data.routine_tac ctxt) c
         val lemma_str = (Syntax.string_of_term ctxt (Thm.concl_of c))
-        (* XXX: why concl_of and not prop_of?
-                FOUND: for it to be thm in type at this stage the form is: a \<Longrightarrow> #(a) *)
       in
       case r of (* Discard this, it is trivial *)
         SOME _ =>
@@ -89,7 +87,7 @@ fun try_prove_priority_goal ctxt goal =
 fun proof_loop_w_prio ctxt facts fact_nms prio_goal_opt cand_lemmas_str =
     let 
       val ctxt' = ThyExpl_Data.init_expl ctxt facts fact_nms prio_goal_opt
-                                          (Library.split_lines (Library.trim_line cand_lemmas_str))     
+                    (Library.split_lines (Library.trim_line cand_lemmas_str))     
       fun recf ctxt = 
           case (try_nxt_conj ctxt) of
             NONE => NONE (*ctxt *) (* No more lemmas to prove, not proved prio goal, fail. *)
@@ -111,7 +109,7 @@ fun proof_loop ctxt facts fact_nms cand_lemmas_str =
       val culprit = filter (fn s => String.isSubstring "[]" s) (map (@{make_string}) lemmas)
       val _ = @{print}culprit*)
       val ctxt' = ThyExpl_Data.init_expl ctxt facts fact_nms NONE
-                                          (Library.split_lines (Library.trim_line cand_lemmas_str))
+                    (Library.split_lines (Library.trim_line cand_lemmas_str))
       fun recf ctxt = 
           case (try_nxt_conj ctxt) of
             NONE => ctxt
@@ -203,14 +201,16 @@ fun prep_conjs ctxt conjs =
 fun explore' cond_opt ctxt const_nms =
     let
       (* XXX: more principled way of obtaining simps? *)
-      val fact_nms = map (fn c => c^".simps") const_nms
-      val facts = maps (fn n => Sledgehammer_Util.thms_of_name ctxt n
-                       handle _ => []) fact_nms
-                        
+      val ctts = map (fn n => (n^".simps", Sledgehammer_Util.thms_of_name ctxt (n^".simps"))
+                       handle _ => (n^".psimps", Sledgehammer_Util.thms_of_name ctxt (n^".psimps"))
+                       handle _ => (n^"_def", Sledgehammer_Util.thms_of_name ctxt (n^"_def"))
+                       handle _ => (n,[])) const_nms
+      val (fact_nms, facts) = Library.split_list (filter (not o null o snd) ctts)
+
       val conjs = hipspec_explore ctxt cond_opt const_nms
       (*val _ = @{print} conjs*)
 
-      val res_ctxt = proof_loop ctxt facts fact_nms conjs
+      val res_ctxt = proof_loop ctxt (List.concat facts) fact_nms conjs
       val tac_str = Tactic_Data.hard_tac_str res_ctxt
 
       val output = Library.space_implode "\n\n"

@@ -228,7 +228,7 @@ lemma noElems: "count t Nil = Z"
 by simp
 
 lemma appNil: "app ts Nil = ts"
-by (hipster_induct_simp_metis Listing.app.simps )
+by (hipster_induct_simp_metis app.simps )
 (*
 hipster_cond notNil app init*)
 
@@ -236,7 +236,7 @@ hipster_cond notNil app init*)
   eg: inner-most-left-most *)
 lemma initLast: "ts \<noteq> Nil \<Longrightarrow> app (init ts) (Cons (last ts) Nil) = ts"
 by (hipster_induct_schemes)
-(*by (hipster_induct_schemes Listing.notNil.simps Listing.init.simps Listing.app.simps Listing.last.simps)*)
+(*by (hipster_induct_schemes Listing.notNil.simps Listing.init.simps app.simps Listing.last.simps)*)
 (* by hipster_induct_schemes : succeeds but takes long because it tries first notNil.induct, app.induct
     and then init.induct *)(*
 apply(induction ts rule: init.induct)
@@ -260,7 +260,7 @@ apply(simp_all)
 done*)
 
 lemma initAppNil: "\<not> notNil ts \<Longrightarrow> init (app rs ts) = init rs"
-by (hipster_induct_schemes Listing.notNil.simps Listing.app.simps Listing.init.simps appNil)
+by (hipster_induct_schemes Listing.notNil.simps app.simps Listing.init.simps appNil)
 (* before: apply(induction ts rule: init.induct) apply(simp_all add: appNil) *)
 
 lemma lastCons: "notNil ts \<Longrightarrow> last (Cons t ts) = last ts"
