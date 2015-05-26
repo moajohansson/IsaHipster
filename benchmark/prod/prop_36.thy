@@ -16,6 +16,7 @@ begin
   "append (Nil2) y = y"
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster equal2 elem append *)
+
   theorem x0 :
     "(elem x y) ==> (elem x (append y z))"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

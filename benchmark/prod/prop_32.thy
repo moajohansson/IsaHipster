@@ -17,54 +17,43 @@ begin
        rotate z (append x3 (Cons2 x2 (Nil2)))"
   (*hipster length append rotate *)
 hipster length append rotate
-lemma lemma_a [thy_expl]: "prop_32.append x2 Nil2 = x2"
-by (hipster_induct_schemes prop_32.length.simps prop_32.append.simps prop_32.rotate.simps)
+lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
+by (hipster_induct_schemes length.simps append.simps rotate.simps)
 
-lemma lemma_aa [thy_expl]: "prop_32.rotate x3 Nil2 = Nil2"
-by (hipster_induct_schemes prop_32.length.simps prop_32.append.simps prop_32.rotate.simps)
+lemma lemma_aa [thy_expl]: "rotate x1 Nil2 = Nil2"
+by (hipster_induct_schemes length.simps append.simps rotate.simps)
 
-lemma lemma_ab [thy_expl]: "prop_32.append (prop_32.append x2 y2) z2 =
-prop_32.append x2 (prop_32.append y2 z2)"
-by (hipster_induct_schemes prop_32.length.simps prop_32.append.simps prop_32.rotate.simps)
+lemma lemma_ab [thy_expl]: "append (append x1 y1) z1 = append x1 (append y1 z1)"
+by (hipster_induct_schemes length.simps append.simps rotate.simps)
 
-lemma lemma_ac [thy_expl]: "prop_32.rotate x2 (Cons2 y2 Nil2) = Cons2 y2 Nil2"
-by (hipster_induct_schemes prop_32.length.simps prop_32.append.simps prop_32.rotate.simps)
+lemma lemma_ac [thy_expl]: "rotate x2 (Cons2 y2 Nil2) = Cons2 y2 Nil2"
+by (hipster_induct_schemes length.simps append.simps rotate.simps)
 
-lemma lemma_ad [thy_expl]: "prop_32.append (prop_32.rotate x3 y3) (prop_32.rotate x3 y3) =
-prop_32.rotate x3 (prop_32.append y3 y3)"
-by (hipster_induct_schemes prop_32.length.simps prop_32.append.simps prop_32.rotate.simps)
+lemma lemma_ad [thy_expl]: "append (rotate x3 y3) (rotate x3 y3) = rotate x3 (append y3 y3)"
+by (hipster_induct_schemes length.simps append.simps rotate.simps)
 
-lemma lemma_ae [thy_expl]: "prop_32.rotate (S Z) (prop_32.rotate x3 y3) = prop_32.rotate (S x3) y3"
-by (hipster_induct_schemes prop_32.length.simps prop_32.append.simps prop_32.rotate.simps)
+lemma lemma_ae [thy_expl]: "rotate (length x4) (append x4 y4) = append y4 x4"
+by (hipster_induct_schemes length.simps append.simps rotate.simps)
 
-lemma unknown [thy_expl]: "prop_32.rotate x (prop_32.rotate y z) =
-prop_32.rotate y (prop_32.rotate x z)"
+lemma lemma_af [thy_expl]: "rotate (S Z) (rotate x2 y2) = rotate (S x2) y2"
+by (hipster_induct_schemes length.simps append.simps rotate.simps)
+
+lemma unknown [thy_expl]: "rotate x (rotate y z) = rotate y (rotate x z)"
 oops
 
-lemma unknown [thy_expl]: "prop_32.length (prop_32.append x y) = prop_32.length (prop_32.append y x)"
+lemma unknown [thy_expl]: "length (append x y) = length (append y x)"
 oops
 
-lemma unknown [thy_expl]: "prop_32.length (prop_32.rotate x y) = prop_32.length y"
+lemma unknown [thy_expl]: "length (rotate x y) = length y"
 oops
 
-lemma unknown [thy_expl]: "prop_32.rotate (prop_32.length x) x = x"
+lemma unknown [thy_expl]: "rotate (S x) (rotate y z) = rotate (S y) (rotate x z)"
 oops
 
-lemma unknown [thy_expl]: "prop_32.rotate (S x) (prop_32.rotate y z) =
-prop_32.rotate (S y) (prop_32.rotate x z)"
-oops
-
-lemma unknown [thy_expl]: "prop_32.rotate (prop_32.length x) (prop_32.append x y) = prop_32.append y x"
-oops
-
-lemma unknown [thy_expl]: "prop_32.rotate (prop_32.length x) (prop_32.rotate y x) = prop_32.rotate y x"
-oops
-
-lemma unknown [thy_expl]: "prop_32.rotate (prop_32.length x) (prop_32.append x x) = prop_32.append x x"
+lemma unknown [thy_expl]: "rotate (length x) (rotate y x) = rotate y x"
 oops
 
   theorem x0 :
     "(rotate (length x) x) = x"
-    by hipster_induct_schemes
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

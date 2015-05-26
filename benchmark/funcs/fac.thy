@@ -8,6 +8,9 @@ begin
 fun fac :: "Nat => Nat" where
   "fac (Z) = S Z"
 | "fac (S y) = mult (S y) (fac y)"
+
+hipster fac mult
+
  
 end
 

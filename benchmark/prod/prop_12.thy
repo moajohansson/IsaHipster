@@ -13,7 +13,28 @@ begin
   "rev (Nil2) = Nil2"
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
   (*hipster qrev append rev *)
+
+(*hipster qrev append rev*)
+lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
+by (hipster_induct_schemes qrev.simps append.simps rev.simps)
+
+lemma lemma_aa [thy_expl]: "append (append x1 y1) z1 = append x1 (append y1 z1)"
+by (hipster_induct_schemes qrev.simps append.simps rev.simps)
+
+lemma lemma_ab [thy_expl]: "append (qrev x1 y1) z1 = qrev x1 (append y1 z1)"
+by (hipster_induct_schemes qrev.simps append.simps rev.simps)
+
+lemma lemma_ac [thy_expl]: "qrev (append x1 y1) z1 = qrev y1 (qrev x1 z1)"
+by (hipster_induct_schemes qrev.simps append.simps rev.simps)
+
+lemma lemma_ad [thy_expl]: "qrev (qrev x1 y1) z1 = qrev y1 (append x1 z1)"
+by (hipster_induct_schemes qrev.simps append.simps rev.simps)
+
+lemma lemma_ae [thy_expl]: "append (rev x3) y3 = qrev x3 y3"
+by (hipster_induct_schemes qrev.simps append.simps rev.simps)
+
   theorem x0 :
     "(qrev x y) = (append (rev x) y)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (hipster_induct_schemes append.simps qrev.simps)
+
 end

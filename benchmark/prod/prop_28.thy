@@ -16,6 +16,25 @@ begin
   "revflat (Nil2) = Nil2"
   | "revflat (Cons2 xs xss) = append (revflat xss) xs"
   (*hipster append rev qrevflat revflat *)
+
+lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
+by (hipster_induct_schemes  append.simps)
+
+lemma lemma_aa [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
+by (hipster_induct_schemes append.simps)
+
+lemma lemma_ab [thy_expl]: "append (rev x4) (rev y4) = rev (append y4 x4)"
+by (hipster_induct_schemes rev.simps append.simps)
+
+lemma lemma_ac [thy_expl]: "rev (rev x3) = x3"
+by (hipster_induct_schemes rev.simps append.simps)
+
+hipster qrevflat revflat append rev
+lemma lemma_ad [thy_expl]: "append (qrevflat x3 y3) z3 = qrevflat x3 (append y3 z3)"
+by (hipster_induct_schemes qrevflat.simps revflat.simps append.simps)
+
+hipster qrevflat revflat append rev
+
   theorem x0 :
     "(revflat x) = (qrevflat x (Nil2))"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

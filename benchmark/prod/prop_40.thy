@@ -21,6 +21,7 @@ begin
   | "union (Cons2 z xs) y =
        (if elem z y then union xs y else Cons2 z (union xs y))"
   (*hipster equal2 elem subset union *)
+
   theorem x0 :
     "(subset x y) ==> ((union x y) = y)"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

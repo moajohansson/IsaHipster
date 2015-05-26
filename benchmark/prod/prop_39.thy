@@ -17,6 +17,7 @@ begin
   | "drop (S z) (Nil2) = Nil2"
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
   (*hipster equal2 elem drop *)
+
   theorem x0 :
     "(elem x (drop y z)) ==> (elem x z)"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

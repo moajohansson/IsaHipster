@@ -13,20 +13,20 @@ fun le :: "Nat => Nat => bool" where
 (*hipster le*)
 
 lemma lemma_a [thy_expl]: "le x2 x2 = True"
-by (hipster_induct_schemes le.le.simps)
+by (hipster_induct_schemes le.simps)
 
 lemma lemma_aa [thy_expl]: "le x2 (S x2) = True"
-by (hipster_induct_schemes le.le.simps)
+by (hipster_induct_schemes le.simps)
 
 lemma lemma_ab [thy_expl]: "le (S x2) x2 = False"
-by (hipster_induct_schemes le.le.simps)
+by (hipster_induct_schemes le.simps)
 
 (*hipster_cond le*)
 lemma lemma_ac [thy_expl]: "le x2 y2 \<Longrightarrow> le x2 (S y2) = True"
-by (hipster_induct_schemes le.le.simps)
+by (hipster_induct_schemes le.simps)
 
 lemma lemma_ad [thy_expl]: "le y2 x2 \<Longrightarrow> le (S x2) y2 = False"
-by (hipster_induct_schemes le.le.simps)
+by (hipster_induct_schemes le.simps)
 
 (* false
 lemma unknown [thy_expl]: "le y y \<and> le x z \<Longrightarrow> le x (S Z) = le x (S y)"
@@ -55,20 +55,13 @@ fun rprems_tac ctxt = Goal.norm_hhf_tac ctxt THEN' CSUBGOAL (fn (goal, i) =>
       in eresolve_tac ethms i end
   ); *}
 
-lemma le_trans []: "le z y \<and> le x z \<Longrightarrow> le x y = True"
+lemma le_trans [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x y = True"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+(*
 apply(induct x arbitrary: y rule: le.induct) (* or: x, z *)
 apply(simp_all)
 apply(metis le.simps  thy_expl)
-by(metis le.simps Nat.exhaust thy_expl)
-
-lemma unknown [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x (S y) = True"
-oops
-
-lemma unknown [thy_expl]: "le z x \<and> le y z \<Longrightarrow> le (S x) y = False"
-oops
-
-lemma unknown [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le (S x) (S y) = True"
-oops
+by(metis le.simps Nat.exhaust thy_expl)*)
 
 (* false
 lemma unknown [thy_expl]: "le x z \<and> le z z \<Longrightarrow> le x (S y) = True"

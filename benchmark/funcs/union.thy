@@ -12,5 +12,8 @@ fun union :: "Nat list => Nat list => Nat list" where
 | "union (Cons2 z xs) y =
      (if elem z y then union xs y else Cons2 z (union xs y))"
 
+(*hipster union elem equal2
+*)
+
 end
 

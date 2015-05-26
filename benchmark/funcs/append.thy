@@ -14,8 +14,7 @@ fun append :: "'a list => 'a list => 'a list" where
 lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
 by (hipster_induct_schemes  append.simps)
 
-lemma lemma_aa [thy_expl]: "append (append x2 y2) z2 =
-append x2 (append y2 z2)"
+lemma lemma_aa [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
 by (hipster_induct_schemes append.simps)
 
 end

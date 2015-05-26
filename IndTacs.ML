@@ -40,7 +40,7 @@ type hardtac = Proof.context -> thm list option -> string list option -> int -> 
 fun SOLVE_TIMEOUT mseconds tac t = 
     let
       val res = TimeLimit.timeLimit (Time.fromMilliseconds mseconds)
-                 (fn () => SINGLE (SOLVE tac) t) ()
+                 (fn () => SINGLE ( tac) t) ()
                  handle TimeLimit.TimeOut => NONE
                       | ERROR _ => NONE
     in
@@ -243,11 +243,11 @@ fun induct_on_var_tac ctxt rule var i goalthm =
 
 (* Apply induction on var and try to prove all cases by simp *)
 fun induct_and_simp lemmas ctxt rule var i = 
-     (induct_on_var_tac ctxt rule var i) THEN (prove_by_simp ctxt lemmas);
+     DEPTH_SOLVE ((induct_on_var_tac ctxt rule var i) THEN (prove_by_simp ctxt lemmas));
 
 (* Induction on var, then try to prove resulting subgoals by simp or metis *)
 fun induct_simp_or_metis (facts, lemmas) ctxt rule var i = 
-    (induct_on_var_tac ctxt rule var i) THEN (simp_or_metis ctxt (facts,lemmas));
+    DEPTH_SOLVE ((induct_on_var_tac ctxt rule var i) THEN (simp_or_metis ctxt (facts,lemmas)));
 
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
@@ -407,9 +407,9 @@ end
 structure Simp_Metis_T : EXPL_TACS =
 struct
 
-fun routine_tac ctxt = 
+fun routine_tac ctxt = DEPTH_SOLVE (
        Ind_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt, 
-                                    ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt);
+                                    ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt));
 
 val routine_tac_str = "by (tactic {* Simp_Metis_Tacs.routine_tac @{context} *})"; 
 
@@ -440,9 +440,9 @@ end
 structure Ind_Schemes_T : EXPL_TACS =
 struct
 
-fun routine_tac ctxt =
+fun routine_tac ctxt = DEPTH_SOLVE (
        Ind_Tacs.simp_or_metis ctxt (ThyExpl_Data.facts_of_ctxt ctxt,
-                                    ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt);
+                                    ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt));
 val routine_tac_str = "by (tactic {* Ind_Schemes_Tacs.routine_tac @{context} *})"; 
 
 fun hard_tac ctxt = 
