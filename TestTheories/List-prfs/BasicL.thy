@@ -161,14 +161,13 @@ by hipster_induct_simp_metis (* just metis *)
 apply(simp_all)
 done*)
 
-
+setup{* Hip_Tac_Ops.set_full_types @{context} true *}
 (* internally goes into conditional which Hipster cannot solve right now *)
 (* FIXME: we rev the list so that it doesn't get stuck in maps.induct BUT we should control this
   behaviour! \<Rightarrow> limit simp_or_metis... *)
 lemma unknown01 [thy_expl]: "init (maps x y) = maps x (init y)"
-(*apply(induction arbitrary: x rule: maps.induct )
-apply simp_all*)
-by (hipster_induct_schemes)(*
+by hipster_induct_schemes
+(*
 apply(induction y rule: init.induct)
 apply(simp_all)
 done*)
