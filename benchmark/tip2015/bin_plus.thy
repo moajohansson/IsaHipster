@@ -30,7 +30,45 @@ fun toNat :: "Bin => Nat" where
 | "toNat (ZeroAnd xs) = plus (toNat xs) (toNat xs)"
 | "toNat (OneAnd ys) = S (plus (toNat ys) (toNat ys))"
 
-hipster s plus2 plus toNat
+(*hipster s plus*)
+lemma lemma_a [thy_expl]: "ZeroAnd x2 = plus2 x2 x2"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_aa [thy_expl]: "plus2 x2 One = s x2"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_ab [thy_expl]: "s (plus2 x2 y2) = plus2 x2 (s y2)"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_ac [thy_expl]: "plus2 (s x2) y2 = plus2 x2 (s y2)"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_ad [thy_expl]: "plus2 (plus2 x1 x1) x1 = plus2 x1 (plus2 x1 x1)"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_ae [thy_expl]: "plus2 (s x2) (plus2 y2 z2) = plus2 (plus2 x2 y2) (s z2)"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_af [thy_expl]: "plus2 (s x2) (plus2 y2 z2) = plus2 (plus2 y2 z2) (s x2)"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_ag [thy_expl]: "plus2 (plus2 x2 x2) (plus2 x2 y2) = plus2 (plus2 x2 y2) (plus2 x2 x2)"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_ah [thy_expl]: "plus2 (plus2 x2 x2) (plus2 y2 x2) = plus2 (plus2 y2 x2) (plus2 x2 x2)"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_ai [thy_expl]: "plus2 (plus2 x2 x2) (plus2 y2 y2) = ZeroAnd (plus2 y2 x2)"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_aj [thy_expl]: "plus2 x1 y1 = plus2 y1 x1"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_ak [thy_expl]: "plus2 x2 (plus2 y2 z2) = plus2 y2 (plus2 x2 z2)"
+by (hipster_induct_schemes s.simps plus2.simps)
+
+lemma lemma_al [thy_expl]: "plus2 (plus2 x2 y2) (plus2 z2 y2) = plus2 (plus2 x2 z2) (plus2 y2 y2)"
+by (hipster_induct_schemes s.simps plus2.simps)
 
 theorem x0 :
   "!! (x :: Bin) (y :: Bin) .

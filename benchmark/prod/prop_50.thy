@@ -44,7 +44,7 @@ by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
 lemma lemma_ae [thy_expl]: "equal2 x2 y2 = equal2 y2 x2"
 by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
 
-hipster count insert2 isort le
+(*hipster count insert2 isort le*)
 
   theorem x0 :
     "(count x (isort y)) = (count x y)"

@@ -18,6 +18,16 @@ fun bind :: "'a list => ('a => 'b list) => 'b list" where
 
 (*hipster return append bind *)
 
+hipster append bind
+lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
+by (hipster_induct_schemes append.simps bind.simps)
+
+lemma lemma_aa [thy_expl]: "append (append x1 y1) z1 = append x1 (append y1 z1)"
+by (hipster_induct_schemes append.simps bind.simps)
+
+lemma lemma_ab [thy_expl]: "append (bind x1 y1) (bind z1 y1) = bind (append x1 z1) y1"
+by (hipster_induct_schemes append.simps bind.simps)
+
 theorem x0 :
   "!! (x :: 'a) (f :: ('a => 'b list)) . (bind (return x) f) = (f x)"
   by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})

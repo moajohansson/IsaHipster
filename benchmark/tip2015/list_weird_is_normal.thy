@@ -10,6 +10,7 @@ fun weirdconcat :: "('a list) list => 'a list" where
 | "weirdconcat (Cons2 (Nil2) xss) = weirdconcat xss"
 | "weirdconcat (Cons2 (Cons2 z xs) xss) =
      Cons2 z (weirdconcat (Cons2 xs xss))"
+by pat_completeness auto
 
 fun append :: "'a list => 'a list => 'a list" where
 "append (Nil2) y = y"

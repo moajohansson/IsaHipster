@@ -152,7 +152,7 @@ lemma map_snd_zip[simp]:
   "length xs = length ys ==> map snd (zip xs ys) = ys"
 by (induct rule:list_induct2, simp_all)
 *)
-lemma map_snd_zip: "len xs = len ys \<Longrightarrow> maps snd (zip xs ys) = y"
+lemma map_snd_zip: "len xs = len ys \<Longrightarrow> maps snd (zip xs ys) = ys"
 oops
 
 lemma lemma_ac [thy_expl]: "(Nil \<noteq> (maps x2 y2)) = (Nil \<noteq> y2)"
