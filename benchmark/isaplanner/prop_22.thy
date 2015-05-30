@@ -4,7 +4,7 @@ imports Main
 begin
   datatype Nat = Z | S "Nat"
   fun max2 :: "Nat => Nat => Nat" where
-  (*"max2 Z Z = Z"*)
+    (*"max2 Z Z = Z"*)
    "max2 (Z) ( y) = y"
   | "max2 (S z) (Z) = S z"
   | "max2 (S z) (S x2) = S (max2 z x2)"
@@ -46,12 +46,14 @@ apply (simp_all add:lemma_aa lemma_a lemma_ab lemma_ac lemma_ad dd triv_a)
 lemma aa: "max2 (max2 a b) c = max2 a (max2 b c) \<Longrightarrow> max2 (max2 a b) (S c) = max2 a (max2 b (S c))"
 apply hipster_induct_schemes*)
 
+
+
   theorem x0 :
     "(max2 (max2 a b) c) = (max2 a (max2 b c))"
     apply(induction a b arbitrary: c rule: max2.induct)
-    apply(simp_all add: thy_expl)
-    apply(metis max2.simps Nat.exhaust thy_expl)
-    done
+    apply(simp_all)
+    by (metis max2.simps Nat.exhaust)
+
     (*
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})*)
 end

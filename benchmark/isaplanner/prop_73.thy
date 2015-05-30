@@ -47,7 +47,7 @@ by simp
 lemma unknown [thy_expl]: "rev (filter2 x y) = filter2 x (rev y)"
 apply(induction y arbitrary: x rule: rev.induct)
 apply(simp_all)
-by (metis filter2.simps lemma_ad lemma_a lemma_ab lemma_ac lemma_ae lemma_af)
+by (metis (hide_lams)filter2.simps lemma_ad lemma_a lemma_ab lemma_ac lemma_ae lemma_af)
 
 
   theorem x0 :

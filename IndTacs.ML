@@ -104,16 +104,16 @@ fun xxx  ctxt facts tac =( ALLGOALS (Method.insert_tac facts) THEN
         (CHANGED_PROP o PARALLEL_GOALS o ALLGOALS o tac) ctxt)*)
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
-fun simp_or_metis ctxt (facts, lemmas) = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
+fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
   let
     val do_full = Hip_Tac_Ops.use_full_types ctxt
-    val simp_adds = filter (hd (Hip_Tac_Ops.simp_cond ctxt)) lemmas
-    val metis_adds = filter (hd (Hip_Tac_Ops.metis_cond ctxt)) (facts @ lemmas)
+    val simp_adds = filter (fn lem => hd (Hip_Tac_Ops.simp_cond ctxt) (thm,lem)) lemmas
+    val metis_adds = filter (fn lem => hd (Hip_Tac_Ops.metis_cond ctxt) (thm,lem)) (facts @ lemmas)
   in
-    (simp_all ctxt simp_adds) (* FIXME: both facts and lemmas? *)     (*SOLVE_TIMEOUT 2000*) 
-    THEN
-    IF_UNSOLVED
-    ((PARALLEL_GOALS o ALLGOALS) (timed_metis_tac ctxt do_full metis_adds))
+    ((simp_all ctxt simp_adds) (* FIXME: both facts and lemmas? *)     (*SOLVE_TIMEOUT 2000*) 
+     THEN
+     IF_UNSOLVED
+     ((PARALLEL_GOALS o ALLGOALS) (timed_metis_tac ctxt do_full metis_adds))) thm
   end;
 (*REPEAT o FIRSTGOAL*) (*REPEAT_FIRST*)
 

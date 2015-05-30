@@ -4,8 +4,8 @@ struct
 
 datatype T = Data of
     { with_full_types : bool,
-      simp_filter : (thm -> bool) list,
-      metis_filter : (thm -> bool) list,
+      simp_filter : (thm * thm -> bool) list,
+      metis_filter : (thm * thm -> bool) list,
       metis_to : int,
       whole_to : int
     }
