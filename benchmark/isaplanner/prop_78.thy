@@ -86,7 +86,7 @@ setup{* Hip_Tac_Ops.toggle_full_types @{context} ;*}
 setup{* Hip_Tac_Ops.set_metis_to @{context} 1000;*}
 
 lemma lemma_ak [thy_expl]: "sorted y \<Longrightarrow> sorted (insort x y) = True"
-by (hipster_induct_schemes sorted.simps insort.simps le.simps)
+by (hipster_induct_schemes sorted.simps nole.simps insort.simps le.simps)
 (*
 apply(induction y arbitrary: x rule: sorted.induct)
 apply(simp_all)

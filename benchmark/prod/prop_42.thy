@@ -33,7 +33,18 @@ by (hipster_induct_schemes equal2.simps)
 lemma lemma_ac [thy_expl]: "equal2 y2 x2 \<Longrightarrow> x2 = y2"
 by (hipster_induct_schemes equal2.simps)
 
+lemma lemma_ae [thy_expl]: "elem x9 z9 \<Longrightarrow> elem x9 (union y9 z9) = True"
+by (hipster_induct_schemes elem.simps equal2.simps union.simps elem.simps)
+
+lemma lemma_af [thy_expl]: "elem x1 z1 \<Longrightarrow> union (Cons2 x1 y1) (union z1 xa1) = union y1 (union z1 xa1)"
+by (hipster_induct_schemes elem.simps equal2.simps union.simps elem.simps)
+
+lemma lemma_ag [thy_expl]: "elem x1 y1 \<Longrightarrow> union (Cons2 x1 Nil2) (union y1 z1) = union y1 z1"
+by (hipster_induct_schemes elem.simps equal2.simps union.simps elem.simps)
+
   theorem x0 :
     "(elem x y) ==> (elem x (union y z))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (hipster_induct_schemes equal2.simps union.simps elem.simps)
+
 end
+
