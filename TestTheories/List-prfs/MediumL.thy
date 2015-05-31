@@ -42,8 +42,6 @@ by (hipster_induct_simp_metis)
 
 lemma inRev: "elem t ts \<Longrightarrow> elem t (rev ts)"
 (*apply(induction ts)  apply(simp_all)  by (metis elem.simps(2) elem02 elem03)*)
-(* XXX: for some reason it requires elem.simps(2) to be specified even though elem.simps is
-        artificially added within Hipster *)
 by (hipster_induct_simp_metis elem02 elem03 elem.simps(2))
 
 lemma lastAfterCons: "ts \<noteq> Nil \<Longrightarrow> last ts = last (Cons t ts)"

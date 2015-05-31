@@ -46,6 +46,35 @@ lemma lemma_ai [thy_expl]: "plus x2 (plus y2 z2) = plus y2 (plus z2 x2)"
 by (hipster_induct_schemes plus.simps)
 
 hipster mult plus
+lemma lemma_aj [thy_expl]: "mult x2 Z = Z"
+by (hipster_induct_schemes mult.simps plus.simps)
+
+lemma lemma_ak [thy_expl]: "mult (plus x9 x9) y9 = mult x9 (plus y9 y9)"
+by (hipster_induct_schemes mult.simps plus.simps)
+
+lemma lemma_al [thy_expl]: "plus (mult x9 y9) (mult x9 z9) = mult x9 (plus y9 z9)"
+by (hipster_induct_schemes mult.simps plus.simps)
+
+lemma lemma_am [thy_expl]: "plus (mult x10 x10) (mult y10 y10) = plus (mult y10 y10) (mult x10 x10)"
+by (hipster_induct_schemes mult.simps plus.simps)
+
+lemma lemma_an [thy_expl]: "mult x2 (S Z) = x2"
+by (hipster_induct_schemes mult.simps plus.simps)
+
+lemma lemma_ao [thy_expl]: "mult (mult x10 x10) (plus x10 x10) = mult (plus x10 x10) (mult x10 x10)"
+by (hipster_induct_schemes mult.simps plus.simps)
+
+lemma lemma_ap [thy_expl]: "mult (S x10) (plus x10 x10) = mult (plus x10 x10) (S x10)"
+by (hipster_induct_schemes mult.simps plus.simps)
+
+lemma lemma_aq [thy_expl]: "mult x10 y10 = mult y10 x10"
+by (hipster_induct_schemes mult.simps plus.simps)
+
+lemma lemma_ar [thy_expl]: "mult x10 (mult y10 z10) = mult y10 (mult x10 z10)"
+by (hipster_induct_schemes mult.simps plus.simps)
+
+lemma lemma_as [thy_expl]: "mult (plus x9 x9) (mult y9 y9) = mult (mult y9 x9) (plus y9 y9)"
+by (hipster_induct_schemes mult.simps plus.simps)
 
 
 

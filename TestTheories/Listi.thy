@@ -1,94 +1,94 @@
-theory Listing
+theory Listi
 imports Main
         Naturals
 begin
 
-datatype 'a List = Nil | Cons 'a "'a List"
+datatype NL = Nil | Cons Nat NL
+datatype 'a List = LNil | LCons 'a "'a List"
 
-fun len :: "'a List \<Rightarrow> Nat" where
+fun len :: "NL \<Rightarrow> Nat" where
   "len Nil = Z"
 | "len (Cons _ as) = S (len as)"
 
-fun app :: "'a List \<Rightarrow> 'a List \<Rightarrow> 'a List" where
+fun app :: "NL \<Rightarrow> NL \<Rightarrow> NL" where
   "app Nil         ts = ts"
 | "app (Cons r rs) ts = Cons r (app rs ts)"
 
-fun rev :: "'a List \<Rightarrow> 'a List" where
+fun rev :: "NL \<Rightarrow> NL" where
   "rev Nil = Nil"
 | "rev (Cons r ts) = app (rev ts) (Cons r Nil)"
 
-fun qrev :: "'a List \<Rightarrow> 'a List \<Rightarrow> 'a List" where
+fun qrev :: "NL \<Rightarrow> NL \<Rightarrow> NL" where
   "qrev Nil         a = a"
 | "qrev (Cons b bs) a = qrev bs (Cons b a)"
 
-fun take :: "Nat \<Rightarrow> 'a List \<Rightarrow> 'a List" where
+fun take :: "Nat \<Rightarrow> NL \<Rightarrow> NL" where
   "take Z     _           = Nil"
 | "take _     Nil         = Nil"
 | "take (S n) (Cons t ts) = Cons t (take n ts)"
 
-fun drop :: "Nat \<Rightarrow> 'a List \<Rightarrow> 'a List" where
+fun drop :: "Nat \<Rightarrow> NL \<Rightarrow> NL" where
   "drop Z     ts          = ts"
 | "drop _     Nil         = Nil"
 | "drop (S n) (Cons t ts) = drop n ts"
 
-fun count :: "Nat \<Rightarrow> Nat List \<Rightarrow> Nat" where
+fun count :: "Nat \<Rightarrow> NL \<Rightarrow> Nat" where
   "count _ Nil = Z"
 | "count n (Cons t ts) = (if eqN n t then S (count n ts) else count n ts)"
 
-fun elem :: "Nat \<Rightarrow> Nat List \<Rightarrow> bool" where
+fun elem :: "Nat \<Rightarrow> NL \<Rightarrow> bool" where
   "elem _ Nil = False"
 | "elem r (Cons t ts) = (if eqN r t then True else elem r ts)"
 
 (* maybe remove *)
-fun head :: "'a List \<Rightarrow> 'a" where
+fun head :: "NL \<Rightarrow> Nat" where
   "head (Cons t _) = t"
 
-fun last :: "'a List \<Rightarrow> 'a" where
+fun last :: "NL \<Rightarrow> Nat" where
   "last (Cons t Nil) = t"
 | "last (Cons _ ts)  = last ts"
 (* till here (?) *)
 
-fun init :: "'a List \<Rightarrow> 'a List" where
+fun init :: "NL \<Rightarrow> NL" where
   "init Nil          = Nil"
 | "init (Cons _ Nil) = Nil"
 | "init (Cons t ts)  = Cons t (init ts)"
 
-fun tail :: "'a List \<Rightarrow> 'a List" where
+fun tail :: "NL \<Rightarrow> NL" where
   "tail Nil         = Nil"
 | "tail (Cons _ ts) = ts"
 
-fun maps :: "('a \<Rightarrow> 'b) \<Rightarrow> 'a List \<Rightarrow> 'b List" where
+fun maps :: "(Nat \<Rightarrow> Nat) \<Rightarrow> NL \<Rightarrow> NL" where
   "maps _ Nil = Nil"
 | "maps f (Cons a as) = Cons (f a) (maps f as)"
 
-fun zip :: "'a List \<Rightarrow> 'b List \<Rightarrow> ('a * 'b) List" where
-  "zip Nil _   = Nil"
-| "zip _   Nil = Nil"
-| "zip (Cons t ts) (Cons r rs) = Cons (t,r) (zip ts rs)"
+fun zip :: "NL \<Rightarrow> NL \<Rightarrow> (Nat * Nat) List" where
+  "zip Nil _   = LNil"
+| "zip _   Nil = LNil"
+| "zip (Cons t ts) (Cons r rs) = LCons (t,r) (zip ts rs)"
 
-fun notNil :: "'a List \<Rightarrow> bool" where
+fun notNil :: "NL \<Rightarrow> bool" where
   "notNil Nil = False"
 | "notNil _   = True"
 
-fun null2:: "'a List \<Rightarrow> bool" where
+fun null2:: "NL \<Rightarrow> bool" where
   "null2 Nil = True"
 | "null2 _   = False"
 
-fun rotate :: "Nat \<Rightarrow> 'a List \<Rightarrow> 'a List" where
+fun rotate :: "Nat \<Rightarrow> NL \<Rightarrow> NL" where
   "rotate Z     xs          = xs"
 | "rotate (S n) (Cons x xs) = rotate n (app xs (Cons x Nil))"
 | "rotate n     Nil         = Nil"
 
-fun intersperse :: "'a \<Rightarrow> 'a List \<Rightarrow> 'a List" where
+fun intersperse :: "Nat \<Rightarrow> NL \<Rightarrow> NL" where
   "intersperse x Nil = Nil"
 | "intersperse x (Cons y Nil) = Cons y Nil"
 | "intersperse x (Cons y ys) = Cons y (Cons x (intersperse x ys))"
 
-fun insert :: "Nat \<Rightarrow> Nat List \<Rightarrow> Nat List" where
+fun insert :: "Nat \<Rightarrow> NL \<Rightarrow> NL" where
   "insert r Nil         = Cons r Nil"
 | "insert r (Cons t ts) = (if leq r t then Cons r (Cons t ts) else (Cons t (insert r ts)))"
 
-datatype NL = NN | NC Nat NL
 
 
 (*hipster drop take app*)
@@ -96,31 +96,12 @@ datatype NL = NN | NC Nat NL
 (*hipster_cond notNil tail app*)
 
 fun id :: "'a \<Rightarrow> 'a" where "id x = x"
-fun remDrop :: "Nat \<Rightarrow> 'a List \<Rightarrow> Nat" where "remDrop n ts = len (drop n ts)"
+fun remDrop :: "Nat \<Rightarrow> NL \<Rightarrow> Nat" where "remDrop n ts = len (drop n ts)"
 
 lemma example : "len b = len a \<Longrightarrow> app (zip a b) (zip c d) = zip (app a c) (app b d)"
 apply(induction a b  rule: zip.induct)
 apply (simp_all)
 by (metis Nat.distinct(1) app.simps(1) len.simps(2) List.exhaust)
-
-lemma eg : "maps f (init xs) = init (maps f xs)"
-apply(induction f xs rule: maps.induct)
-apply simp_all
-(* ( {* Drule.flexflex_unique*}*)
-(*apply (tactic {*  prune_params_tac @{context} *})
-apply (tactic {*  flexflex_tac *})*)
-proof -
-  fix fa :: "'b \<Rightarrow> 'a" and a :: 'b and as :: "'b List"
-  assume a1: "maps fa (init as) = init (maps fa as)"
-  obtain esk1\<^sub>1 :: "'b List \<Rightarrow> 'b" and esk2\<^sub>1 :: "'b List \<Rightarrow> 'b List" where f2: "\<forall>x\<^sub>4. x\<^sub>4 = Listing.List.Cons (esk1\<^sub>1 x\<^sub>4) (esk2\<^sub>1 x\<^sub>4) \<or> x\<^sub>4 = Listing.List.Nil" by (metis head.cases)
-  hence f3: "\<And>x1 x2. init (Listing.List.Cons (x1\<Colon>'b) x2) = Listing.List.Cons x1 (init x2) \<or> Listing.List.Nil = x2" by (metis init.simps(3))
-  have f4: "\<And>x1 x2 x\<^sub>3 x\<^sub>4. init (Listing.List.Cons (x1\<Colon>'a) (maps x2 (Listing.List.Cons (x\<^sub>3\<Colon>'b) x\<^sub>4))) = Listing.List.Cons x1 (init (maps x2 (Listing.List.Cons x\<^sub>3 x\<^sub>4)))" by simp
-  have "as = Listing.List.Nil \<longrightarrow> init (maps fa (Listing.List.Cons a as)) = maps fa (init (Listing.List.Cons a as))" by simp
-  thus "maps fa (init (Listing.List.Cons a as)) = init (Listing.List.Cons (fa a) (maps fa as))" using a1 f2 f3 f4 by (metis maps.simps(2))
-qed
-(*by (metis head.cases init.simps(2) init.simps(3) maps.simps(1) maps.simps(2))
-by (metis List.distinct(1) head.cases init.simps(2) init.simps(3) maps.elims maps.simps(1) maps.simps(2))
-*)
 
 lemma eg2 : "leq (S n) (len ts) \<Longrightarrow> (drop n ts) \<noteq> Nil"
 apply (induction n ts rule: drop.induct)
