@@ -15,16 +15,10 @@ begin
   "height (Leaf) = Z"
   | "height (Node l y r) = S (max2 (height l) (height r))"
   (*hipster mirror max2 height *)
-hipster mirror
-lemma lemma_ta [thy_expl]: "mirror (mirror x2) = x2"
-by (hipster_induct_schemes mirror.simps)
-(*
-lemma lemma_mx1 [thy_expl]: "max2 y Z = y"
-sledgehammer
-by hipster_induct_schemes
-*)
-lemma lemma_mx []: "max2 x y = max2 y x"
-by (hipster_induct_schemes Nat.exhaust max2.simps)
+
+(*hipster mirror
+lemma lemma_ta []: "mirror (mirror x2) = x2"
+by (hipster_induct_schemes mirror.simps)*)
 
 lemma lemma_a [thy_expl]: "max2 x x = x"
 by (hipster_induct_schemes max2.simps)

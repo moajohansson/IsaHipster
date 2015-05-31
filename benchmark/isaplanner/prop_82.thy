@@ -29,6 +29,8 @@ by (hipster_induct_schemes zip.simps)
 lemma lemma_ac [thy_expl]: "zip Nil2 x1 = zip y1 Nil2"
 by (hipster_induct_schemes zip.simps)
 
+
+
   theorem x0 :
     "(take n (zip xs ys)) = (zip (take n xs) (take n ys))"
     apply(induction xs ys arbitrary: n rule: zip.induct)

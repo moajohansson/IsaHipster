@@ -41,15 +41,7 @@ lemma lemma_ae [thy_expl]: "minus (minus x3 y3) (S Z) = minus x3 (S y3)"
 by (hipster_induct_schemes minus.simps)
 
 lemma lemma_af [thy_expl]: "minus (minus x4 y4) x4 = Z"
-by (hipster_induct_schemes minus.simps)(*
-apply(induction x4 y4 rule: minus.induct)
-apply(simp_all)
-sledgehammer
-apply (metis minus.simps  thy_expl)
-apply(simp_all)
-apply (metis minus.simps  thy_expl)
-done
-by (hipster_induct_schemes minus.simps)*)
+by (hipster_induct_schemes minus.simps)
 
   theorem x0 :
     "(butlast xs) = (take (minus (len xs) (S Z)) xs)"

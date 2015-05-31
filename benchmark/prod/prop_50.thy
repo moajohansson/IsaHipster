@@ -26,23 +26,42 @@ begin
        (if equal2 x z then S (count x xs) else count x xs)"
   (*hipster le insert2 isort equal2 count *)
 hipster count equal2
-lemma lemma_a [thy_expl]: "equal2 x2 x2 = True"
-by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+lemma lemma_a [thy_expl]: "equal2 x2 y2 = equal2 y2 x2"
+by (hipster_induct_schemes count.simps equal2.simps)
 
-lemma lemma_aa [thy_expl]: "equal2 Z x2 = equal2 x2 Z"
-by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+lemma lemma_aa [thy_expl]: "equal2 x2 x2 = True"
+by (hipster_induct_schemes count.simps equal2.simps)
 
 lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
-by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+by (hipster_induct_schemes count.simps equal2.simps)
 
-lemma lemma_ac [thy_expl]: "equal2 (S x2) x2 = False"
-by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+lemma lemma_ac [thy_expl]: "equal2 y2 x2 \<Longrightarrow> x2 = y2"
+by (hipster_induct_schemes equal2.simps count.simps)
 
-lemma lemma_ad [thy_expl]: "equal2 (S Z) x2 = equal2 x2 (S Z)"
-by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+lemma lemma_ad [thy_expl]: "le x2 x2 = True"
+by (hipster_induct_schemes le.simps)
 
-lemma lemma_ae [thy_expl]: "equal2 x2 y2 = equal2 y2 x2"
-by (hipster_induct_schemes prop_50.count.simps prop_50.equal2.simps)
+lemma lemma_ae [thy_expl]: "le x2 (S x2) = True"
+by (hipster_induct_schemes le.simps)
+
+lemma lemma_af [thy_expl]: "le (S x2) x2 = False"
+by (hipster_induct_schemes le.simps)
+
+(*hipster_cond le*)
+lemma lemma_ag [thy_expl]: "le x2 y2 \<Longrightarrow> le x2 (S y2) = True"
+by (hipster_induct_schemes le.simps)
+
+lemma lemma_ah [thy_expl]: "le y2 x2 \<Longrightarrow> le (S x2) y2 = False"
+by (hipster_induct_schemes le.simps)
+
+lemma lemma_ai [thy_expl]: "le y x \<and> le x y \<Longrightarrow> x = y"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+
+lemma le_trans [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x y = True"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+
+hipster_cond le equal2 insert2 isort count
+
 
 (*hipster count insert2 isort le*)
 

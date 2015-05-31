@@ -27,6 +27,9 @@ oops
 
 (*hipster length half append*)
 
+lemma ax2[thy_expl]: "length (append y (Cons2 ya xs)) = S (length (append y xs))"
+by(hipster_induct_schemes)
+
   theorem x0 :
     "(half (length (append x y))) = (half (length (append y x)))"
     by (hipster_induct_schemes length.simps append.simps half.simps list.exhaust Nat.exhaust)

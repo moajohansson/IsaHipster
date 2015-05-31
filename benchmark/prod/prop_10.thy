@@ -26,6 +26,6 @@ oops
 
   theorem x0 :
     "(rev (rev x)) = x"
-    by(hipster_induct_schemes rev.simps append.simps thy_expl)
+    by(hipster_induct_schemes rev.simps append.simps)
     (* by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})*)
 end

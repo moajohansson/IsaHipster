@@ -16,7 +16,7 @@ begin
   | "rotate (S z) (Cons2 x2 x3) =
        rotate z (append x3 (Cons2 x2 (Nil2)))"
   (*hipster length append rotate *)
-hipster length append rotate
+(*hipster length append rotate*)
 lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
 by (hipster_induct_schemes length.simps append.simps rotate.simps)
 

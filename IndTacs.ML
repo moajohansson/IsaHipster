@@ -64,7 +64,7 @@ fun simp_all ctxt lemmas thm =
        val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                  (ctxt, lemmas)
     in
-      (PARALLEL_GOALS o ALLGOALS) (Simplifier.asm_full_simp_tac ctxt') thm
+      (PARALLEL_GOALS o ALLGOALS) (fn i => SOLVE_TIMEOUT 500 (Simplifier.asm_full_simp_tac ctxt' i)) thm
     end;
 
 (* Fails if all there are some subgoals left after application of simp *)
@@ -86,6 +86,16 @@ fun timed_metis_tac ctxt full facts i thm =
         ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm
  end;
 
+val has_tvar = exists_type (exists_subtype (fn TVar _ => true | _ => false)) o prop_of
+
+fun metis_method ((override_type_encs, lam_trans), ths) ctxt facts =
+  let val (schem_facts, nonschem_facts) = List.partition has_tvar facts
+      val timeout = Hip_Tac_Ops.metis_to ctxt
+  in
+     (Method.insert_tac nonschem_facts THEN'
+      CHANGED_PROP o (SOLVE_TIMEOUT timeout) o Metis_Tactic.metis_tac (these override_type_encs)
+        (the_default ATP_Proof_Reconstruct.default_metis_lam_trans lam_trans) ctxt (schem_facts @ ths)) end
+
 (*fun ALLsub tac st =
   let val subgoals = nprems_of st
       fun doall n max = if n < max then (tac(n) THEN_ELSE (doall n (max-1) ,doall(n+1) max)) else tac(n);
@@ -106,17 +116,17 @@ fun xxx  ctxt facts tac =( ALLGOALS (Method.insert_tac facts) THEN
 (* First simp, and if nessecary, let Metis deal with the rest *)
 fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
   let
-    val do_full = Hip_Tac_Ops.use_full_types ctxt
+    val type_enc = if Hip_Tac_Ops.use_full_types ctxt then (SOME [ATP_Proof_Reconstruct.full_type_enc]) else NONE
     val simp_adds = filter (fn lem => hd (Hip_Tac_Ops.simp_cond ctxt) (thm,lem)) lemmas
     val metis_adds = filter (fn lem => hd (Hip_Tac_Ops.metis_cond ctxt) (thm,lem)) (facts @ lemmas)
   in
     ((simp_all ctxt simp_adds) (* FIXME: both facts and lemmas? *)     (*SOLVE_TIMEOUT 2000*) 
      THEN
      IF_UNSOLVED
-     ((PARALLEL_GOALS o ALLGOALS) (timed_metis_tac ctxt do_full metis_adds))) thm
+     ((PARALLEL_GOALS o ALLGOALS) (metis_method ((type_enc,NONE), metis_adds) ctxt facts))) thm
   end;
 (*REPEAT o FIRSTGOAL*) (*REPEAT_FIRST*)
-
+(*((REPEAT_ALL_NEW (metis_method ((NONE,NONE), lemmas) ctxt facts))))*)
 (*-----------------------------------------------------------------------------------------*)
 (* Figure out what we can do induction on, and tries each variable until success.*) 
 (* Stolen from IsaPlanner...                                                               *)
@@ -281,21 +291,6 @@ fun try_inductable_vars ctxt strat i thm =
   fastype_of1 ([],@{term "Cons Z Nil"});
   Type.could_match(hd (tl ump), tumf);*)
 
-  fun reP uu = case uu of
-        Var (_,t) => t
-      | (t$_) => reP t
-      | (Abs (_, t, _)) => t
-      | (Free (_, t)) => t; (* TODO: Bound, Const *)
-
-fun try_induction_with ctxt scheme_rules strat vars i =
-    (* let val vars = map fst (fst (inductable_things_in_sg i thm)) *)
-    (* TODO:  modify to make vars so that the rule can be applied *)
-    case scheme_rules of
-        [] =>  let val _ = Pretty.writeln (Pretty.str "Rule: none")
-               in try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i end
-      | ((n,r) :: rs) =>
-          let val _ = Pretty.writeln (Pretty.str ("Rule: "^n))
-              val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
               (*val _ = @{print} vars
               val ruleVars = map fst (filter (fn v => exists (fn tr => Type.could_match (tr,snd v)) argTyps) vars)
               fun filter_matching t vs = filter (fn v => Type.could_match (t, snd v)) vs
@@ -309,16 +304,34 @@ fun try_induction_with ctxt scheme_rules strat vars i =
               fun nonreptup [] = []
                 | nonreptup (vs:: vss) = fold (fn v => fn acc => acc @ (map (fn ts => v::ts) (nonreptup (map (filter (fn t => not (v = t))) vss)))) vs [] @ nonreptup vss
               val _ = @{print} nonreptup ruleSets*)
-              val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
+
+  fun reP uu = case uu of
+        Var (_,t) => t
+      | (t$_) => reP t
+      | (Abs (_, t, _)) => t
+      | (Free (_, t)) => t; (* TODO: Bound, Const *)
+
+fun try_induction_with ctxt scheme_rules strat vars i =
+    (* let val vars = map fst (fst (inductable_things_in_sg i thm)) *)
+    let val struct_tac =
+          let val _ = Pretty.writeln (Pretty.str "Rule: none")
+          in try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i end
+        fun rec_ind_tac rules =
+              case rules of
+                []            => no_tac
+              | ((n,r) :: rs) =>
+                  let val _ = Pretty.writeln (Pretty.str ("Rule: "^n))
+                      val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
+                      val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
               (*val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)*)
-              val instt = hd all_instances
-              (*val _ = @{print} instances
-              val _ = @{print} instt*)
+                      val instt = hd all_instances
+              (*val _ = @{print} instances   val _ = @{print} instt*)
               (* FIXME: vars types filter *)
-          in
-            try_induct_on ctxt ( r) strat (map (map fst) instt) i
-            ORELSE
-            (try_induction_with ctxt rs strat vars i) end;
+                  in
+                    try_induct_on ctxt r strat (map (map fst) instt) i
+                    ORELSE
+                    (rec_ind_tac rs) (*ctxt rs strat vars i*) end;
+    in struct_tac ORELSE rec_ind_tac scheme_rules end;
 
 
 fun try_induct_schemes ctxt strat i thm =

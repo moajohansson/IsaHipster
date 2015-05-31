@@ -15,23 +15,23 @@ begin
   "append (Nil2) y = y"
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster null last append *)
-(*hipster last null2 append*)
-lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
+(*hipster last null2 append*)(*
+lemma lemma_a []: "append x2 Nil2 = x2"
 by (hipster_induct_schemes last.simps null2.simps append.simps)
 
-lemma lemma_aa [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
+lemma lemma_aa []: "append (append x2 y2) z2 = append x2 (append y2 z2)"
 by (hipster_induct_schemes last.simps null2.simps append.simps)
 
-lemma lemma_ab [thy_expl]: "null2 (append x2 x2) = null2 x2"
+lemma lemma_ab []: "null2 (append x2 x2) = null2 x2"
 by (hipster_induct_schemes last.simps null2.simps append.simps)
 
 (*hipster null2 append*)
-lemma unknown [thy_expl]: "null2 (append x y) = null2 (append y x)"
+lemma unknown []: "null2 (append x y) = null2 (append y x)"
 by (hipster_induct_schemes last.simps null2.simps append.simps list.exhaust)
 
 (*hipster_cond null2 append*)
-lemma lemma_ac [thy_expl]: "null2 x2 \<Longrightarrow> append x2 y2 = y2"
-by (hipster_induct_schemes null2.simps append.simps)
+lemma lemma_ac []: "null2 x2 \<Longrightarrow> append x2 y2 = y2"
+by (hipster_induct_schemes null2.simps append.simps)*)
 
   theorem x0 :
     "(~ (null2 ys)) ==> ((last (append xs ys)) = (last ys))"

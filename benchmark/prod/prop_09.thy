@@ -18,14 +18,14 @@ lemma lemma_aa [thy_expl]: "drop (S Z) (drop x2 y2) = drop (S x2) y2"
 by (hipster_induct_schemes drop.simps)
 
 lemma lemma_ab [thy_expl]: "drop x (drop y z) = drop y (drop x z)"
-by (hipster_induct_schemes drop.simps thy_expl list.exhaust)
+by (hipster_induct_schemes drop.simps  list.exhaust)
 
 lemma lemma_ac [thy_expl]: "drop (S x) (drop y z) = drop (S y) (drop x z)"
-by (hipster_induct_schemes drop.simps thy_expl list.exhaust)
+by (hipster_induct_schemes drop.simps  list.exhaust)
 
 
   theorem x0 :
     "(drop w (drop x (drop y z))) = (drop y (drop x (drop w z)))"
-    by (hipster_induct_schemes drop.simps thy_expl list.exhaust)
+    by (hipster_induct_schemes drop.simps  list.exhaust)
 
 end

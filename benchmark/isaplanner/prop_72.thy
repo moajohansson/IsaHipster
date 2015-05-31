@@ -4,7 +4,7 @@ imports Main
 begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
-  fun take :: "Nat => 'a list => 'a list" where
+  fun take :: "Nat => Nat list => Nat list" where
   "take (Z) y = Nil2"
   | "take (S z) (Nil2) = Nil2"
   | "take (S z) (Cons2 x2 x3) = Cons2 x2 (take z x3)"
@@ -19,10 +19,10 @@ begin
   "drop (Z) y = y"
   | "drop (S z) (Nil2) = Nil2"
   | "drop (S z) (Cons2 x2 x3) = drop z x3"
-  fun append :: "'a list => 'a list => 'a list" where
+  fun append :: "Nat list => Nat list => Nat list" where
   "append (Nil2) y = y"
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
-  fun rev :: "'a list => 'a list" where
+  fun rev :: "Nat list => Nat list" where
   "rev (Nil2) = Nil2"
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
   (*hipster take minus len drop append rev *)
@@ -80,7 +80,7 @@ by (hipster_induct_schemes append.simps take.simps)
 
 lemma lemma_ay [thy_expl]: "rev (rev x3) = x3"
 by (hipster_induct_schemes rev.simps append.simps take.simps drop.simps len.simps minus.simps)
-
+(*
 lemma lemma_applen [thy_expl]: "len (append x y) = len (append y x)"
 apply(induction x)
 apply(simp_all)
@@ -94,7 +94,17 @@ lemma lemma_takerev [thy_expl]: "take (len x) (rev x) = rev x"
 by (hipster_induct_schemes take.simps len.simps rev.simps append.simps)
 
 lemma lemma_droprev [thy_expl]: "drop (len x) (rev x) = Nil2"
-by (hipster_induct_schemes)
+by (hipster_induct_schemes)*)
+hipster len append rev drop take
+lemma lemma_ag [thy_expl]: "prop_72.drop (len x2) x2 = Nil2"
+by (hipster_induct_schemes prop_72.len.simps prop_72.append.simps prop_72.rev.simps prop_72.drop.simps prop_72.take.simps)
+
+lemma unknown [thy_expl]: "prop_72.drop x (prop_72.drop y z) = prop_72.drop y (prop_72.drop x z)"
+oops
+
+lemma unknown [thy_expl]: "prop_72.drop (S x) (prop_72.drop y z) =
+prop_72.drop (S y) (prop_72.drop x z)"
+oops
 
   theorem x0 :
     "(rev (drop i xs)) = (take (minus (len xs) i) (rev xs))"

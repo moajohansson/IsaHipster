@@ -14,7 +14,7 @@ begin
   | "qrevflat (Cons2 xs xss) y = qrevflat xss (append (rev xs) y)"
   fun revflat :: "('a list) list => 'a list" where
   "revflat (Nil2) = Nil2"
-  | "revflat (Cons2 xs xss) = append (revflat xss) xs"
+  | "revflat (Cons2 xs xss) = append (revflat xss) (rev xs)"
   (*hipster append rev qrevflat revflat *)
 
 lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
@@ -33,9 +33,12 @@ hipster qrevflat revflat append rev
 lemma lemma_ad [thy_expl]: "append (qrevflat x3 y3) z3 = qrevflat x3 (append y3 z3)"
 by (hipster_induct_schemes qrevflat.simps revflat.simps append.simps)
 
-hipster qrevflat revflat append rev
+lemma lemma_ae [thy_expl]: "qrevflat x3 Nil2 = revflat x3"
+by (hipster_induct_schemes qrevflat.simps revflat.simps append.simps rev.simps)
 
   theorem x0 :
     "(revflat x) = (qrevflat x (Nil2))"
+    by (hipster_induct_schemes qrevflat.simps revflat.simps append.simps)
+
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

@@ -56,12 +56,14 @@ fun rprems_tac ctxt = Goal.norm_hhf_tac ctxt THEN' CSUBGOAL (fn (goal, i) =>
   ); *}
 
 lemma le_trans [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x y = True"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+(*
 apply(induct x y arbitrary: z rule: le.induct) (* or: x, z *)
 apply(simp_all)
 apply(metis le.simps Nat.exhaust thy_expl)
 apply(metis le.simps Nat.exhaust thy_expl)
 
-by (hipster_induct_schemes le.simps Nat.exhaust)
+by (hipster_induct_schemes le.simps Nat.exhaust)*)
 (*
 apply(induct x arbitrary: y rule: le.induct) (* or: x, z *)
 apply(simp_all)

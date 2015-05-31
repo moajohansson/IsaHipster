@@ -11,7 +11,7 @@ begin
   | "lt (Z) (S z) = True"
   | "lt (S x2) (S z) = lt x2 z"
   (*hipster plus lt *)
-(*hipster lt*)
+(*hipster lt*)(*
 lemma lemma_al [thy_expl]: "lt x2 x2 = False"
 by (hipster_induct_schemes lt.simps)
 
@@ -20,7 +20,7 @@ by (hipster_induct_schemes lt.simps)
 
 lemma lemma_abl [thy_expl]: "lt (S x2) x2 = False"
 by (hipster_induct_schemes lt.simps)
-
+*)
 lemma lemma_a [thy_expl]: "plus x2 Z = x2"
 by (hipster_induct_schemes plus.simps)
 

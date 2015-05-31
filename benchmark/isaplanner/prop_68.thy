@@ -63,7 +63,7 @@ by (hipster_induct_schemes le.simps len.simps Nat.exhaust)
 
   theorem x0 :
     "le (len (delete n xs)) (len xs)"
-    by (hipster_induct_schemes len.simps delete.simps le.simps)
+    by (hipster_induct_schemes)
 
 end
 

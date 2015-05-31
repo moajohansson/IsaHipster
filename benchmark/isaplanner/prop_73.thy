@@ -19,13 +19,13 @@ begin
 lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
 by (hipster_induct_schemes filter2.simps rev.simps)
 
-lemma lemma_aa [thy_expl]: "filter2 x13 (filter2 y13 z13) = filter2 y13 (filter2 x13 z13)"
+lemma lemma_aa []: "filter2 x13 (filter2 y13 z13) = filter2 y13 (filter2 x13 z13)"
 by (hipster_induct_schemes filter2.simps rev.simps)
 
 lemma lemma_ab [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
 by (hipster_induct_schemes filter2.simps rev.simps)
 
-lemma lemma_ac [thy_expl]: "filter2 x9 (filter2 x9 y9) = filter2 x9 y9"
+lemma lemma_ac []: "filter2 x9 (filter2 x9 y9) = filter2 x9 y9"
 by (hipster_induct_schemes filter2.simps rev.simps)
 
 lemma lemma_ad [thy_expl]: "append (filter2 x6 y6) (filter2 x6 z6) = filter2 x6 (append y6 z6)"
@@ -44,14 +44,15 @@ by simp
 lemma sst: "\<not> f x \<Longrightarrow> filter2 f (Cons2 x y) = (filter2 f y)"
 by simp
 
-lemma unknown [thy_expl]: "rev (filter2 x y) = filter2 x (rev y)"
-apply(induction y arbitrary: x rule: rev.induct)
+lemma unknown []: "rev (filter2 x y) = filter2 x (rev y)"
+apply(induction y)
 apply(simp_all)
-by (metis (hide_lams)filter2.simps lemma_ad lemma_a lemma_ab lemma_ac lemma_ae lemma_af)
+by (metis rev.simps append.simps filter2.simps thy_expl) (*lemma_ad lemma_a lemma_ab lemma_ac lemma_ae lemma_af)*)
 
-
+setup {* Hip_Tac_Ops.set_metis_to @{context} 2000 *}
   theorem x0 :
     "(rev (filter2 p xs)) = (filter2 p (rev xs))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (hipster_induct_schemes rev.simps append.simps filter2.simps)
+
 end
 

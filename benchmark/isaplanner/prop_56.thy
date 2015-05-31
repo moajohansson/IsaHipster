@@ -14,16 +14,16 @@ begin
   (*hipster plus drop *)
 
 (*hipster drop*)
-lemma lemma_a [thy_expl]: "drop x3 Nil2 = Nil2"
+lemma lemma_a []: "drop x3 Nil2 = Nil2"
 by (hipster_induct_schemes drop.simps)
 
 lemma lemma_aa [thy_expl]: "drop (S Z) (drop x3 y3) = drop (S x3) y3"
 by (hipster_induct_schemes drop.simps)
 
-lemma unknown [thy_expl]: "drop x (drop y z) = drop y (drop x z)"
+lemma unknown []: "drop x (drop y z) = drop y (drop x z)"
 oops
 
-lemma unknown [thy_expl]: "drop (S x) (drop y z) = drop (S y) (drop x z)"
+lemma unknown []: "drop (S x) (drop y z) = drop (S y) (drop x z)"
 oops
 
   theorem x0 :

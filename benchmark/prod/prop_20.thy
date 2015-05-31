@@ -26,6 +26,9 @@ by (hipster_induct_schemes length.simps even.simps append.simps)
 lemma unknown [thy_expl]: "length (append x y) = length (append y x)"
 oops
 
+lemma ax2[thy_expl]: "length (append y (Cons2 ya xs)) = S (length (append y xs))"
+by(hipster_induct_schemes)
+
   theorem x0 :
     "even (length (append x x))"
     by (hipster_induct_schemes length.simps even.simps append.simps list.exhaust Nat.exhaust)

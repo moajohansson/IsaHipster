@@ -34,20 +34,20 @@ by (hipster_induct_schemes equal2.simps)
 
 (*hipster_cond equal2*)
 
-lemma lemma_ac [thy_expl]: "equal2 y2 x2 \<Longrightarrow> x2 = y2"
+lemma lemma_ac []: "equal2 y2 x2 \<Longrightarrow> x2 = y2"
 by (hipster_induct_schemes equal2.simps)
 
 hipster le equal2
-lemma lemma_ad [thy_expl]: "le x2 x2 = True"
+lemma lemma_ad []: "le x2 x2 = True"
 by (hipster_induct_schemes le.simps equal2.simps)
 
-lemma lemma_ae [thy_expl]: "equal2 x2 Z = le x2 Z"
+lemma lemma_ae []: "equal2 x2 Z = le x2 Z"
 by (hipster_induct_schemes le.simps equal2.simps)
 
-lemma lemma_af [thy_expl]: "le x2 (S x2) = True"
+lemma lemma_af []: "le x2 (S x2) = True"
 by (hipster_induct_schemes le.simps equal2.simps)
 
-lemma lemma_ag [thy_expl]: "le (S x2) x2 = False"
+lemma lemma_ag []: "le (S x2) x2 = False"
 by (hipster_induct_schemes le.simps equal2.simps)
 
 (*hipster_cond le

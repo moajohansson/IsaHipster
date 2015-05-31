@@ -27,8 +27,11 @@ oops
 
 hipster even length append
 
+lemma ax2[thy_expl]: "length (append y (Cons2 ya xs)) = S (length (append y xs))"
+by(hipster_induct_schemes)
+
   theorem x0 :
     "(even (length (append x y))) = (even (length (append y x)))"
-    by (hipster_induct_schemes length.simps even.simps append.simps Nat.exhaust list.exhaust)
+    by (hipster_induct_schemes length.simps even.simps append.simps)
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

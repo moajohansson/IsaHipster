@@ -12,27 +12,25 @@ fun max2 :: "Nat => Nat => Nat" where
 | "max2 (S z) (S x2) = S (max2 z x2)"
 
 (*hipster max2*)
-
-lemma lemma_a [thy_expl]: "max2 x x = x"
+hipster max2
+lemma lemma_a [thy_expl]: "max2 x2 y2 = max2 y2 x2"
 by (hipster_induct_schemes max2.simps)
 
-lemma lemma_aa [thy_expl]: "max2 x Z = x"
+lemma lemma_aa [thy_expl]: "max2 x2 x2 = x2"
 by (hipster_induct_schemes max2.simps)
 
-lemma lemma_ab [thy_expl]: "max2 x (max2 x y) = max2 x y"
+lemma lemma_ab [thy_expl]: "max2 x2 Z = x2"
 by (hipster_induct_schemes max2.simps)
 
-lemma lemma_ac [thy_expl]: "max2 x (max2 y x) = max2 y x"
+lemma lemma_ac [thy_expl]: "max2 x1 (max2 x1 y1) = max2 x1 y1"
 by (hipster_induct_schemes max2.simps)
 
-lemma lemma_ad [thy_expl]: "max2 (max2 x y) x = max2 x y"
+lemma lemma_ad [thy_expl]: "max2 x2 (S x2) = S x2"
 by (hipster_induct_schemes max2.simps)
 
-lemma lemma_ae [thy_expl]: "max2 (S x) y = max2 y (S x)"
+lemma lemma_ae [thy_expl]: "max2 (max2 x1 y1) (S x1) = max2 y1 (S x1)"
 by (hipster_induct_schemes max2.simps)
 
-lemma lemma_af [thy_expl]: "max2 x y = max2 y x"
-by (hipster_induct_schemes max2.simps)
 
 end
 

@@ -62,10 +62,10 @@ by (hipster_induct_schemes take.simps)
 
 lemma unknown [thy_expl]: "take x (take y z) = take y (take x z)"
 oops
-
+setup{* Hip_Tac_Ops.set_metis_to @{context} 600 *}
   theorem x0 :
     "(drop n (take m xs)) = (take (minus m n) (drop n xs))"
-    by (hipster_induct_schemes take.simps drop.simps minus.simps Nat.exhaust list.exhaust)
+    by (hipster_induct_schemes take.simps drop.simps minus.simps Nat.exhaust)
 
 end
 

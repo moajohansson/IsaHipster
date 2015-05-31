@@ -81,15 +81,15 @@ fun simp_a ctxt facts i =
        (Method.insert_tac facts i) THEN
         (PARALLEL_GOALS o ALLGOALS o Simplifier.asm_full_simp_tac) ctxt
 
-fun simp_or_metis ctxt (facts, lemmas) = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
+fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (pretty_thm ctxt thm) in*)
   let
     val do_full = Hip_Tac_Ops.use_full_types ctxt
-    val simp_adds = filter (hd (Hip_Tac_Ops.simp_cond ctxt)) lemmas
-    val metis_adds = filter (hd (Hip_Tac_Ops.metis_cond ctxt)) (facts @ lemmas)
+    val simp_adds = filter (fn lem => hd (Hip_Tac_Ops.simp_cond ctxt) (thm,lem)) lemmas
+    val metis_adds = filter (fn lem => hd (Hip_Tac_Ops.metis_cond ctxt) (thm,lem)) (facts @ lemmas)
   in
-    ALLGOALS((simp_a ctxt simp_adds) (* FIXME: both facts and lemmas? *)     (*SOLVE_TIMEOUT 2000*) 
+    (ALLGOALS((simp_a ctxt simp_adds) (* FIXME: both facts and lemmas? *)     (*SOLVE_TIMEOUT 2000*) 
     THEN_ALL_NEW
-    ((REPEAT_ALL_NEW (metis_method ((NONE,NONE), lemmas) ctxt facts)))) (* vs: HEADGOAL in metis_methos and REPEAT here; ALLGOALS feels safer *)
+    ((REPEAT_ALL_NEW (metis_method ((NONE,NONE), lemmas) ctxt facts)))))thm (* vs: HEADGOAL in metis_methos and REPEAT here; ALLGOALS feels safer *)
   end
 *}
 

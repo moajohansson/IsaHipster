@@ -41,6 +41,69 @@ by (hipster_induct_schemes rev.simps append.simps list.exhaust)
 
 (*trivial
 hipster count*)
+(*hipster count append rev equal2*)
+lemma lemma_ac [thy_expl]: "rev (rev x1) = x1"
+by (hipster_induct_schemes count.simps append.simps rev.simps equal2.simps)
+
+lemma unknown [thy_expl]: "count x (append y z) = count x (append z y)"
+oops
+
+lemma unknown [thy_expl]: "count x (rev y) = count x y"
+oops
+
+lemma unknown [thy_expl]: "count (count x y) (append z xa) =
+count (count x y) (append xa z)"
+oops
+
+lemma unknown [thy_expl]: "count (count x y) (append z y) =
+count (count x y) (append y z)"
+oops
+
+lemma unknown [thy_expl]: "count (count x y) (rev z) = count (count x y) z"
+oops
+
+lemma unknown [thy_expl]: "count (count x y) (append y z) =
+count (count x y) (append z y)"
+oops
+
+lemma unknown [thy_expl]: "count (S x) (append y z) = count (S x) (append z y)"
+oops
+
+lemma unknown [thy_expl]: "count Z (append x y) = count Z (append y x)"
+oops
+
+lemma unknown [thy_expl]: "count (count x y) (rev y) = count (count x y) y"
+oops
+
+lemma unknown [thy_expl]: "count (S x) (rev y) = count (S x) y"
+oops
+
+lemma unknown [thy_expl]: "count Z (rev x) = count Z x"
+oops
+
+lemma unknown [thy_expl]: "count (count Z x) (append y z) =
+count (count Z x) (append z y)"
+oops
+
+lemma unknown [thy_expl]: "count (count Z x) (append y x) =
+count (count Z x) (append x y)"
+oops
+
+lemma unknown [thy_expl]: "count (count Z x) (rev y) = count (count Z x) y"
+oops
+
+lemma unknown [thy_expl]: "count (count Z x) (append x y) =
+count (count Z x) (append y x)"
+oops
+
+lemma unknown [thy_expl]: "count (S Z) (append x y) = count (S Z) (append y x)"
+oops
+
+lemma unknown [thy_expl]: "count (count Z x) (rev x) = count (count Z x) x"
+oops
+
+lemma unknown [thy_expl]: "count (S Z) (rev x) = count (S Z) x"
+oops
 
 (*hipster_cond equal2 count append*)
 lemma lemma_ac [thy_expl]: "equal2 y2 x2 \<Longrightarrow> x2 = y2"

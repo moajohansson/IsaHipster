@@ -32,9 +32,10 @@ oops
     apply(induction xs ys rule: append.induct)
     apply(simp_all)
     apply(metis thy_expl butlastConcat.simps butlast.simps append.simps list.exhaust)
-    apply (metis append.elims butlastConcat.elims prop_49.append.simps(2) prop_49.butlast.simps(3) prop_49.list.distinct(1))
+    
+    (*apply (metis append.elims butlastConcat.elims prop_49.append.simps(2) prop_49.butlast.simps(3) prop_49.list.distinct(1))
 
-    apply(metis  butlastConcat.simps butlast.simps append.simps list.exhaust)
+    apply(metis  butlastConcat.simps butlast.simps append.simps list.exhaust)*)
 
     (*apply(metis thy_expl butlastConcat.elims prop_49.append.simps(2) prop_49.butlast.simps(3) list.exhaust)*)
 

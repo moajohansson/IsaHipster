@@ -41,8 +41,7 @@ by (hipster_induct_schemes plus.simps)
 lemma lemma_an [thy_expl]: "plus (S x2) y2 = S (plus y2 x2)"
 by (hipster_induct_schemes plus.simps)
 
-lemma lemma_ao [thy_expl]: "plus (plus x3 y3) (plus x3 z3) =
-plus (plus x3 z3) (plus x3 y3)"
+lemma lemma_ao [thy_expl]: "plus (plus x3 y3) (plus x3 z3) = plus (plus x3 z3) (plus x3 y3)"
 by (hipster_induct_schemes plus.simps Nat.exhaust)
 
 lemma lemma_a [thy_expl]: "drop x3 Nil2 = Nil2"
@@ -65,17 +64,9 @@ by (hipster_induct_schemes take.simps)
 lemma lemma_ab [thy_expl]: "drop x2 (take x2 y2) = Nil2"
 by (hipster_induct_schemes drop.simps take.simps)
 
-lemma unknown [thy_expl]: "drop x (drop y z) = drop y (drop x z)"
-oops
-
-lemma unknown [thy_expl]: "take x (take y z) = take y (take x z)"
-oops
-
-lemma unknown [thy_expl]: "drop (S x) (drop y z) = drop (S y) (drop x z)"
-oops
 
   theorem x0 :
     "(take n (drop m xs)) = (drop m (take (plus n m) xs))"
-    by (hipster_induct_schemes drop.simps take.simps plus.simps Nat.exhaust list.exhaust) (*
+    by (hipster_induct_schemes drop.simps take.simps Nat.exhaust) (*
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})*)
 end

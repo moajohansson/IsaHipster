@@ -23,24 +23,26 @@ by (hipster_induct_schemes  append.simps)
 
 lemma lemma_aa [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
 by (hipster_induct_schemes append.simps)
-
-lemma lemma_ab [thy_expl]: "rotate x1 Nil2 = Nil2"
+(*
+lemma lemma_ab []: "rotate x1 Nil2 = Nil2"
 by (hipster_induct_schemes rotate.simps append.simps)
 
-lemma lemma_ac [thy_expl]: "rotate x2 (Cons2 y2 Nil2) = Cons2 y2 Nil2"
+lemma lemma_ac []: "rotate x2 (Cons2 y2 Nil2) = Cons2 y2 Nil2"
 by (hipster_induct_schemes rotate.simps append.simps)
 
-lemma lemma_ad [thy_expl]: "append (rotate x3 y3) (rotate x3 y3) = rotate x3 (append y3 y3)"
+lemma lemma_ad []: "append (rotate x3 y3) (rotate x3 y3) = rotate x3 (append y3 y3)"
 by (hipster_induct_schemes rotate.simps append.simps)
 
-lemma lemma_ae [thy_expl]: "rotate (S Z) (rotate x2 y2) = rotate (S x2) y2"
+lemma lemma_ae []: "rotate (S Z) (rotate x2 y2) = rotate (S x2) y2"
 by (hipster_induct_schemes rotate.simps append.simps)
 
 lemma unknown []: "rotate x (rotate y z) = rotate y (rotate x z)"
 oops
 
 lemma unknown' []: "rotate (S x) (rotate y z) = rotate (S y) (rotate x z)"
-oops
+oops*)
+
+(*hipster length append rotate*)
 
   theorem x0 :
     "(rotate (length x) (append x y)) = (append y x)"

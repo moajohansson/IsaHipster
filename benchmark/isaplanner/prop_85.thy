@@ -55,7 +55,6 @@ by (hipster_induct_schemes zip2.simps append.simps)
 lemma lemma_aj [thy_expl]: "rev (rev x3) = x3"
 by (hipster_induct_schemes len.simps rev.simps append.simps)
 
-
 lemma unknown []: "zip2 (append x y) (rev x) = zip2 x (rev x)"
 oops
 
@@ -78,7 +77,7 @@ oops
 lemma unknown []: "zip2 (prop_85.rev x) (prop_85.append x x) = zip2 (prop_85.rev x) x"
 oops
 
-hipster len append
+(*hipster len *)
 
 fun equal2 :: "Nat => Nat => bool" where
   "equal2 (Z) (Z) = True"
@@ -129,39 +128,32 @@ hipster_cond equal2 leneq appendb
 
 hipster_cond leneq equal2
 
-
 hipster leneq equal2 lenb
-
 
 hipster_cond leneq equal2 lenb
 
 hipster_cond leneq appendb len
 
-
-
 hipster equal2 leneq len appendb
-
 
 hipster_cond equal2 leneq len appendb
 
-
 hipster_cond leneq appendb revb equal2*)
 
-hipster append len
+(*hipster append len*)
 
 lemma xx[thy_expl]: "len (append xs (Cons2 y ys)) = S (len (prop_85.append xs ys))"
-sorry
-lemma lemma_applen [thy_expl]: "len (append x y) = len (append y x)"
 by (hipster_induct_schemes append.simps len.simps list.exhaust)
 
+lemma lemma_applen [thy_expl]: "len (append x y) = len (append y x)"
+by (hipster_induct_schemes append.simps len.simps list.exhaust)
+(*
 apply(induction x y rule: zip2.induct)
 apply(simp_all)
 apply(metis thy_expl append.simps len.simps list.exhaust)
 apply(metis thy_expl zip2.simps append.simps len.simps list.exhaust)
 apply(metis (full_types) thy_expl zip2.simps append.simps len.simps list.exhaust)
-
-by (hipster_induct_schemes append.simps len.simps list.exhaust)
-
+by (hipster_induct_schemes append.simps len.simps list.exhaust)*)
 
 lemma lemma_at [thy_expl]: "len (rev x3) = len x3"
 by (hipster_induct_schemes len.simps rev.simps append.simps)
@@ -173,12 +165,8 @@ zip (x++y) (rev x) == zip x (rev x) failed to be proved
 zip (rev x) (x++y) == zip (rev x) x failed to be proved
 
 zip x x++++zip y z == zip (x++y) (x++z) proved by induction on  x
-22.07 s	
 
 zip (rev x) (rev x) == prev (zip x x) proved by induction on  x
-25.19 s	
-prop_85 failed to be proved
-25.23 s	
 
 zip (x++y) (rev x) == zip x (rev x) failed to be proved
 zip (rev x) (x++y) == zip (rev x) x failed to be proved

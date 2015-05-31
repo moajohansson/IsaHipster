@@ -17,7 +17,7 @@ begin
   | "intersect (Cons2 z xs) y =
        (if elem z y then Cons2 z (intersect xs y) else intersect xs y)"
 
-hipster equal2 elem intersect
+(*hipster equal2 elem intersect*)
 
 lemma lemma_a [thy_expl]: "equal2 x2 y2 = equal2 y2 x2"
 by (hipster_induct_schemes equal2.simps)
@@ -33,7 +33,7 @@ by (hipster_induct_schemes equal2.simps)
 lemma lemma_ac [thy_expl]: "equal2 y2 x2 \<Longrightarrow> x2 = y2"
 by (hipster_induct_schemes equal2.simps)
 
-lemma lemma_ad [thy_expl]: "intersect (intersect x5 y5) y5 = intersect x5 y5"
+lemma lemma_ad []: "intersect (intersect x5 y5) y5 = intersect x5 y5"
 by (hipster_induct_schemes elem.simps intersect.simps equal2.simps)
 
 lemma lemma_ae [thy_expl]: "elem x1 z1 \<Longrightarrow> elem x1 (intersect y1 z1) = elem x1 y1"

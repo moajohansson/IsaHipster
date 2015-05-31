@@ -44,7 +44,7 @@ lemma lemma_ai [thy_expl]: "plus x2 (plus y2 z2) = plus y2 (plus z2 x2)"
 by (hipster_induct_schemes plus.simps)
 
 (*hipster even plus*)
-lemma lemma_aj [thy_expl]: "even (plus x1 x1) = True"
+lemma lemma_aj []: "even (plus x1 x1) = True"
 by (hipster_induct_schemes even.simps plus.simps)
 
   theorem x0 :

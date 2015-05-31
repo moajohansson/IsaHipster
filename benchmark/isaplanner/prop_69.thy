@@ -121,5 +121,5 @@ by (hipster_induct_schemes plus.simps)
 
   theorem x0 :
     "le n (plus m n)"
-    by (hipster_induct_schemes plus.simps le.simps)
+    by (hipster_induct_schemes le.simps)
 end

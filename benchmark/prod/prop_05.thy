@@ -31,9 +31,10 @@ by (hipster_induct_schemes rev.simps append.simps)
 (*
 lemma ax: "length (append (Cons2 ya xs) y) = S (length (append xs y))"
 by (metis length.simps(2) append.simps(2))
+*)
 
 lemma ax2[thy_expl]: "length (append y (Cons2 ya xs)) = S (length (append y xs))"
-by(hipster_induct_schemes)*)
+by(hipster_induct_schemes)
 
 hipster length rev append
 lemma unknown []: "length (append x y) = length (append y x)"

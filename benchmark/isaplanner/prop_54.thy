@@ -34,7 +34,7 @@ by (hipster_induct_schemes minus.simps)
 lemma lemma_afm [thy_expl]: "minus (minus x4 y4) x4 = Z"
 by (hipster_induct_schemes minus.simps)
 
-hipster plus
+(*hipster plus*)
 lemma lemma_a [thy_expl]: "plus x2 Z = x2"
 by (hipster_induct_schemes plus.simps)
 
