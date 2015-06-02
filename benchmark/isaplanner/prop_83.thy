@@ -40,7 +40,7 @@ by (hipster_induct_schemes prop_83.take.simps)
 lemma lemma_ak [thy_expl]: "prop_83.take (S x3) (prop_83.take x3 y3) = prop_83.take x3 y3"
 by (hipster_induct_schemes prop_83.take.simps)
 
-hipster append
+(*hipster append*)
 lemma lemma_ab [thy_expl]: "prop_83.append x2 Nil2 = x2"
 by (hipster_induct_schemes prop_83.append.simps)
 

@@ -118,7 +118,7 @@ fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (prett
   let
     val type_enc = if Hip_Tac_Ops.use_full_types ctxt then (SOME [ATP_Proof_Reconstruct.full_type_enc]) else NONE
     val simp_adds = filter (fn lem => hd (Hip_Tac_Ops.simp_cond ctxt) (thm,lem)) lemmas
-    val metis_adds = filter (fn lem => hd (Hip_Tac_Ops.metis_cond ctxt) (thm,lem)) (facts @ lemmas)
+    val metis_adds = filter (fn lem => hd (Hip_Tac_Ops.metis_cond ctxt) (thm,lem)) (lemmas)
   in
     ((simp_all ctxt simp_adds) (* FIXME: both facts and lemmas? *)     (*SOLVE_TIMEOUT 2000*) 
      THEN
