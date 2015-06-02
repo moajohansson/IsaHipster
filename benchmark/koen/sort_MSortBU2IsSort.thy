@@ -11,10 +11,9 @@ fun risers :: "int list => (int list) list" where
 | "risers (Cons2 y (Cons2 y2 xs)) =
      (if y <= y2 then
         case risers (Cons2 y2 xs) of
-          | Nil2 => risers (Cons2 y2 xs)
+            Nil2 => risers (Cons2 y2 xs)
           | Cons2 ys yss => Cons2 (Cons2 y ys) yss
-        end
-        else
+      else
         Cons2 (Cons2 y (Nil2)) (risers (Cons2 y2 xs)))"
 
 fun lmerge :: "int list => int list => int list" where

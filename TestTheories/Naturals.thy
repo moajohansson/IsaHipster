@@ -11,6 +11,7 @@ fun align_left msg xs ys =
 *}
 
 datatype Nat = Z | S Nat
+thm Nat.exhaust
 
 fun leq :: "Nat => Nat => bool" where
   "leq Z _ = True"

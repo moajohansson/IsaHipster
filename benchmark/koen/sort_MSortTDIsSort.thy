@@ -9,9 +9,8 @@ fun ztake :: "int => 'a list => 'a list" where
 "ztake x y =
    (if x = 0 then Nil2 else
       case y of
-        | Nil2 => y
-        | Cons2 z xs => Cons2 z (ztake (x - 1) xs)
-      end)"
+          Nil2 => y
+        | Cons2 z xs => Cons2 z (ztake (x - 1) xs))"
 
 fun zlength :: "'a list => int" where
 "zlength (Nil2) = 0"
@@ -21,9 +20,8 @@ fun zdrop :: "int => 'a list => 'a list" where
 "zdrop x y =
    (if x = 0 then y else
       case y of
-        | Nil2 => y
-        | Cons2 z xs => zdrop (x - 1) xs
-      end)"
+          Nil2 => y
+        | Cons2 z xs => zdrop (x - 1) xs)"
 
 fun lmerge :: "int list => int list => int list" where
 "lmerge (Nil2) y = y"
@@ -36,14 +34,12 @@ fun msorttd :: "int list => int list" where
 "msorttd (Nil2) = Nil2"
 | "msorttd (Cons2 y (Nil2)) = Cons2 y (Nil2)"
 | "msorttd (Cons2 y (Cons2 x2 x3)) =
-     lmerge
-       (msorttd
-          (ztake
-             (div (zlength (Cons2 y (Cons2 x2 x3))) 2) (Cons2 y (Cons2 x2 x3))))
-       (msorttd
-          (zdrop
-             (div (zlength (Cons2 y (Cons2 x2 x3))) 2)
-             (Cons2 y (Cons2 x2 x3))))"
+     lmerge (msorttd (ztake
+                      ((op div) (zlength (Cons2 y (Cons2 x2 x3))) 2)
+                      (Cons2 y (Cons2 x2 x3))))
+            (msorttd (zdrop
+                      ((op div) (zlength (Cons2 y (Cons2 x2 x3))) 2)
+                        (Cons2 y (Cons2 x2 x3))))"
 
 fun insert2 :: "int => int list => int list" where
 "insert2 x (Nil2) = Cons2 x (Nil2)"
