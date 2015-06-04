@@ -6,7 +6,7 @@ imports Main
 
 begin
 
-hipster last app rev
+(*hipster last app rev*)
 lemma lemma_a [thy_expl]: "app x2 NL.Nil = x2"
 by (hipster_induct_schemes last.simps app.simps rev.simps)
 
@@ -22,7 +22,7 @@ by (hipster_induct_schemes last.simps app.simps rev.simps)
 lemma unknown [thy_expl]: "last (app x x) = last x"
 oops
 
-hipster_cond notNil last app rev head
+(*hipster_cond notNil last app rev head*)
 lemma lemma_ad [thy_expl]: "head (app x1 x1) = head x1"
 by (hipster_induct_schemes notNil.simps last.simps app.simps rev.simps head.simps)
 

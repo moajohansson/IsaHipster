@@ -52,7 +52,8 @@ fun init :: "'a List \<Rightarrow> 'a List" where
   "init Nil          = Nil"
 | "init (Cons _ Nil) = Nil"
 | "init (Cons t ts)  = Cons t (init ts)"
-
+thm init.induct
+thm last.induct
 fun tail :: "'a List \<Rightarrow> 'a List" where
   "tail Nil         = Nil"
 | "tail (Cons _ ts) = ts"

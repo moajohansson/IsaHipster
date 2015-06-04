@@ -85,9 +85,11 @@ fun try_prove_priority_goal ctxt goal =
     end;
 
 fun proof_loop_w_prio ctxt facts fact_nms prio_goal_opt cand_lemmas_str =
-    let 
+    let
+      val _ = @{print} cand_lemmas_str
+
       val ctxt' = ThyExpl_Data.init_expl ctxt facts fact_nms prio_goal_opt
-                    (Library.split_lines (Library.trim_line cand_lemmas_str))     
+                    (Library.split_lines (Library.trim_line cand_lemmas_str))
       fun recf ctxt = 
           case (try_nxt_conj ctxt) of
             NONE => NONE (*ctxt *) (* No more lemmas to prove, not proved prio goal, fail. *)
@@ -256,6 +258,38 @@ fun explore_goal ctxt const_nms thm =
       val facts = maps (fn nm => Sledgehammer_Util.thms_of_name ctxt nm 
                                  handle _ => []) facts_nms 
       val res_ctxt = proof_loop_w_prio ctxt facts facts_nms (SOME thm) (hipspec_explore ctxt NONE const_nms)
+    in
+      case res_ctxt of
+        NONE =>
+        let val _ = Output.urgent_message ("Failed to find lemmas which will prove goal.")
+        in no_tac thm end
+      | SOME ctxt' => (* Success, provided the explored lemmas, the thm can be proved. *)
+        let
+          val tac_str = Tactic_Data.hard_tac_str ctxt'
+          val lemmas = Library.space_implode "\n\n"
+                       (map (mk_lemma_str ctxt' Thm.prop_of)
+                           (map (fn thm => (thm, tac_str)) (ThyExpl_Data.proved_of_ctxt ctxt')))
+          val str_of_thm = @{make_string} thm (*(Sledgehammer_Util.with_vanilla_print_mode Syntax.string_of_term ctxt')
+                             (Thm.concl_of thm)*)
+          val _ = Output.urgent_message
+                    ("Try first proving lemmas:\n\n" ^ lemmas ^ "\n\n" ^
+                     "then prove the open goal "^ str_of_thm ^ " " ^
+                     (Tactic_Data.routine_tac_str ctxt'))
+        in
+          Seq.single thm
+        end
+    end;
+
+fun explore_goal_cond ctxt const_nms thm =
+     let
+      (* val thy = Proof_Context.theory_of ctxt *)
+      (*val const_nms = Hipster_Utils.thy_consts_of (Context.theory_name (Thm.theory_of_thm thm)) thm *)
+          (* FIXME: No simps for constant symbols, e.g. datatype constructors.
+             FIXME: Won't pick up all the simps it needs, e.g. from functions defined in terms of *)
+      val facts_nms = map (fn c => c^".simps") const_nms
+      val facts = maps (fn nm => Sledgehammer_Util.thms_of_name ctxt nm 
+                                 handle _ => []) facts_nms 
+      val res_ctxt = proof_loop_w_prio ctxt facts facts_nms (SOME thm) (hipspec_explore ctxt (SOME (hd const_nms)) const_nms)
     in
       case res_ctxt of
         NONE =>

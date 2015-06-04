@@ -33,6 +33,28 @@ by (hipster_induct_schemes drop.simps)
 lemma lemma_daa [thy_expl]: "drop (S Z) (drop x3 y3) = drop (S x3) y3"
 by (hipster_induct_schemes drop.simps)
 
+lemma lemma_dab [thy_expl]: "drop x (drop y z) = drop y (drop x z)"
+by (hipster_induct_schemes drop.simps Nat.exhaust)
+
+lemma lemma_ah [thy_expl]: "drop (len x2) x2 = Nil2"
+by (hipster_induct_schemes len.simps append.simps rev.simps drop.simps take.simps minus.simps)
+
+lemma lemma_ta [thy_expl]: "take x2 (take x2 y2) = take x2 y2"
+by (hipster_induct_schemes take.simps)
+
+lemma lemma_taa [thy_expl]: "take x1 (take Z y1) = take Z y1"
+by (hipster_induct_schemes take.simps)
+
+lemma lemma_tab [thy_expl]: "take (S x2) (take x2 y2) = take x2 y2"
+by (hipster_induct_schemes take.simps)
+
+lemma lemma_tac []: "take x (take y z) = take y (take x z)"
+apply(induction y z arbitrary: x rule: take.induct)
+apply(simp_all)
+apply(metis take.simps thy_expl)
+apply(metis take.simps thy_expl)
+by (metis take.simps list.exhaust Nat.exhaust)
+
 lemma lemma_a [thy_expl]: "minus x2 x2 = Z"
 by (hipster_induct_schemes minus.simps)
 
@@ -80,11 +102,14 @@ by (hipster_induct_schemes append.simps take.simps)
 
 lemma lemma_ay [thy_expl]: "rev (rev x3) = x3"
 by (hipster_induct_schemes rev.simps append.simps take.simps drop.simps len.simps minus.simps)
-(*
+
+lemma ax2[thy_expl]: "len (append y (Cons2 ya xs)) = S (len (append y xs))"
+by(hipster_induct_schemes)
+
 lemma lemma_applen [thy_expl]: "len (append x y) = len (append y x)"
-apply(induction x)
+(*apply(induction x)
 apply(simp_all)
-apply(metis thy_expl append.simps len.simps)
+apply(metis thy_expl append.simps len.simps)*)
 by (hipster_induct_schemes)
 
 lemma lemma_revlen [thy_expl]: "len (rev x) = len x"
@@ -94,19 +119,52 @@ lemma lemma_takerev [thy_expl]: "take (len x) (rev x) = rev x"
 by (hipster_induct_schemes take.simps len.simps rev.simps append.simps)
 
 lemma lemma_droprev [thy_expl]: "drop (len x) (rev x) = Nil2"
-by (hipster_induct_schemes)*)
-hipster len append rev drop take
-lemma lemma_ag [thy_expl]: "prop_72.drop (len x2) x2 = Nil2"
-by (hipster_induct_schemes prop_72.len.simps prop_72.append.simps prop_72.rev.simps prop_72.drop.simps prop_72.take.simps)
+by (hipster_induct_schemes)
+(*hipster len append rev drop take minus*)
 
-lemma unknown [thy_expl]: "prop_72.drop x (prop_72.drop y z) = prop_72.drop y (prop_72.drop x z)"
+setup{* Hip_Tac_Ops.set_metis_to @{context} 800*}
+
+lemma unknown [thy_expl]: "minus (minus x y) z = minus (minus x z) y"
 oops
 
-lemma unknown [thy_expl]: "prop_72.drop (S x) (prop_72.drop y z) =
-prop_72.drop (S y) (prop_72.drop x z)"
+lemma unknown [thy_expl]: "minus x (minus x y) = minus y (minus y x)"
+oops
+
+lemma unknown [thy_expl]: "minus (minus x y) (minus z y) =
+minus (minus x z) (minus y z)"
+oops
+
+lemma unknown [thy_expl]: "minus (minus x y) (S z) =
+minus (minus x z) (S y)"
+oops
+
+lemma unknown [thy_expl]: "minus (minus x y) (minus x z) =
+minus (minus z y) (minus z x)"
+oops
+
+lemma unknown [thy_expl]: "drop (minus x y) (drop y z) =
+drop (minus y x) (drop x z)"
+oops
+
+lemma unknown [thy_expl]: "take (minus x y) (take x z) =
+take (minus x y) z"
+oops
+
+lemma unknown [thy_expl]: "drop (S x) (drop y z) =
+drop (S y) (drop x z)"
+oops
+
+lemma unknown [thy_expl]: "minus (S x) (minus x y) =
+minus (S y) (minus y x)"
+oops
+
+lemma unknown [thy_expl]: "drop (S x) (drop y z) =
+drop (S y) (drop x z)"
 oops
 
   theorem x0 :
     "(rev (drop i xs)) = (take (minus (len xs) i) (rev xs))"
+by (hipster_induct_schemes rev.simps append.simps take.simps drop.simps len.simps minus.simps Nat.exhaust list.exhaust)
+
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 end

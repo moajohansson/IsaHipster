@@ -9,6 +9,7 @@ begin
   | "max2 (S z) (Z) = S z"
   | "max2 (S z) (S x2) = S (max2 z x2)"
   (*hipster max2 *)
+thm max2.induct
 (*
 lemma lemma_a [thy_expl]: "max2 x x = x"
 by (hipster_induct_schemes max2.simps)

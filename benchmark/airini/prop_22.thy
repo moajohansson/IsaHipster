@@ -8,7 +8,7 @@ begin
 
 
 theorem initAsTake: "init ts = take (sub (len ts) (S Z)) ts"
-by (hipster_induct_schemes sub.simps Nat.exhaust)
+by (hipster_induct_schemes sub.simps take.simps init.simps Nat.exhaust)
 
 
 end

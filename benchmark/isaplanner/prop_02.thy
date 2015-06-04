@@ -19,6 +19,7 @@ begin
   fun append :: "'a list => 'a list => 'a list" where
   "append (Nil2) y = y"
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
+thm append.induct
   (*hipster plus equal2 count append *)
   theorem x0 :
     "(plus (count n xs) (count n ys)) = (count n (append xs ys))"

@@ -33,7 +33,8 @@ by (hipster_induct_schemes min2.simps)
   theorem x0 :
     "(min2 (min2 a b) c) = (min2 a (min2 b c))"
     apply(induction a b arbitrary: c rule: min2.induct)
-    apply(simp_all add: thy_expl)
-    by (metis min2.simps Nat.exhaust thy_expl)
+    apply(simp_all)
+    apply(metis min2.simps Nat.exhaust)
+    by (metis min2.simps Nat.exhaust)
     (*by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})*)
 end

@@ -125,14 +125,47 @@ oops
 lemma unknown [thy_expl]: "pzip (ntake x y) (ntake z y) = pzip (ntake z y) (ntake x y)"
 oops
 
+ML {* Induct.find_casesT @{context} @{typ "Nat"} *}
+thm Nat.cases
+thm Nat.exhaust
+thm Nat.inject
+thm Nat.distinct
 
   theorem x0 :
     "(ptake n (pzip xs ys)) = (pzip (ntake n xs) (ntake n ys))"
     apply(induction xs ys arbitrary: n rule: pzip.induct)
     apply(simp_all)
-    apply(metis thy_expl pzip.simps take.simps)
-    apply(metis thy_expl pzip.simps take.simps)
+    apply(metis ptake.simps pzip.simps ntake.simps thy_expl)
     apply(metis pzip.simps take.simps ntake.simps ptake.simps NPair.exhaust Nat.exhaust PList.exhaust Nlist.exhaust)
+    apply(case_tac n)
+    apply simp_all
+    done
+
+fun len :: "Nlist \<Rightarrow> Nat" where
+"len NNil = Z"
+| "len (NCons _ xs) = S (len xs)"
+  fun append :: "Nlist => Nlist => Nlist" where
+  "append (NNil) y = y"
+  | "append (NCons z xs) y = NCons z (append xs y)"
+  fun rev :: "Nlist => Nlist" where
+  "rev (NNil) = NNil"
+  | "rev (NCons y xs) = append (rev xs) (NCons y (NNil))"
+  fun pappend :: "PList => PList => PList" where
+  "pappend (PNil) y = y"
+  | "pappend (PCons z xs) y = PCons z (pappend xs y)"
+  fun prev :: "PList => PList" where
+  "prev (PNil) = PNil"
+  | "prev (PCons y xs) = pappend (prev xs) (PCons y (PNil))"
+
+  theorem x1 :
+    "((len xs) = (len ys)) ==>
+       ((pzip (rev xs) (rev ys)) = (prev (pzip xs ys)))"
+       apply(induction xs ys rule: pzip.induct)
+       apply simp
+       apply simp
+       apply simp+
+sledgehammer
+       apply(metis pzip.simps prev.simps pappend.simps append.simps rev.simps)
 
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 
