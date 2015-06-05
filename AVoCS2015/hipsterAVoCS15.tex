@@ -7,6 +7,31 @@
 % Required packages
 % =================
 % Your \usepackage commands go here.
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{amsmath}  % for equation*
+\usepackage{array}    % for tabular
+\usepackage{verbatim} % for comment
+\usepackage{wrapfig}
+\usepackage[final]{microtype}
+\usepackage{tabularx}
+
+\newcommand\forAll[1]{\forall \, #1 \, . \,}
+\newcommand\forAllII[2]{\forall \, #1 \, #2 \, . \,}
+
+\newcommand\propno[1]{(\emph{#1})}
+\newcommand\hs[1]{\texttt{#1}}
+
+\lstnewenvironment{code}[1][]
+  {\noindent
+   \vspace{-0.5\baselineskip}
+   \lstset{basicstyle=\ttfamily,
+           frame=single,
+           language=Haskell,
+           keywordstyle=\color{black},
+           #1}
+   \fontsize{8pt}{8pt}\selectfont}
+  {}
 
 % Volume frontmatter
 % ==================
@@ -14,12 +39,19 @@
 
 % Article frontmatter
 % ===================
-%\title{} % Title of the article
+\title{Conditional Lemma Discovery and Recursion Induction in Hipster} % Title of the article
 %\short{} % Short title of the article (optional)
 %\author{\autref{1}\sponsor{}} % Authors and references to addresses
+\author{Irene Lobo Valbuena and Moa Johansson}
 %\institute{\autlabel{1}} % Institutes with labels
-%\abstract{} % Abstract of the article
-%\keywords{} % Keywords for the article
+\institute{\email{lobo@student.chalmers.se},  \email{moa.johansson@chalmers.se} \\
+Departement of Computer Science and Engineering \\Chalmers University of Technology, Gothenburg, Sweden.}
+
+\abstract{Hipster is a theory exploration tool for the proof assistant Isabelle/HOL. It automatically discovers lemmas about given recursive functions and datatypes and proves them by induction. Previously, only equational properties could be discovered. Conditional lemmas, for example required when reasoning about sorting, has been beyond the scope of theory exploration. In this paper we describe an extension to Hipster to also support discovery and proof of conditional lemmas.
+
+We also present a new automated tactic, which uses \emph{recursion induction}. Recursion induction follows the recursive structure of a function definition, as opposed to structural induction, which follows that of the datatype. We find that the addition recursion induction increases the number of proofs completed automatically, both for conditional and equational statements. } % Abstract of the article
+
+\keywords{theory exploration, automated induction, interactive theorem proving} % Keywords for the article
 
 \begin{document}
 \maketitle
@@ -27,6 +59,24 @@
 % Main part of your article
 % =========================
 \section{Introduction}
+\input{introduction}
+
+%Background, explaining how Hipster works
+\section{Background: Theory Exploration in Hipster}
+\input{background}
+
+% Conditional lemmas, with a worked example
+\section{Conditional Lemmas}
+
+% Recursion induction
+\section{Automating Recursion Induction}
+
+% The experimental results
+\section{Evaluation}
+
+\section{Related Work}
+
+\section{Conclusion and Further Work}
 
 
 % Acknowledgements for colleagues, referees, ...
@@ -36,7 +86,7 @@
 
 % Bibliography with BibTeX
 % ========================
-%\bibliographystyle{eceasst}
-%\bibliography{}
+\bibliographystyle{eceasst}
+\bibliography{bibfile}
 
 \end{document}
