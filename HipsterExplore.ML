@@ -208,11 +208,16 @@ fun explore' cond_opt ctxt const_nms =
                        handle _ => (n^"_def", Sledgehammer_Util.thms_of_name ctxt (n^"_def"))
                        handle _ => (n,[])) const_nms
       val (fact_nms, facts) = Library.split_list (filter (not o null o snd) ctts)
+      (* dirty fix *)
+      val dats = (map (Hipster_Utils.type_names o Thm.prop_of) (List.concat facts))
+      val tts = map (fn n => (n^".exhaust", Sledgehammer_Util.thms_of_name ctxt (n^".exhaust"))
+                       handle _ => (n,[])) (distinct (op=) (List.concat dats))
+      val (dat_nms, dats) = Library.split_list (filter (not o null o snd) tts)
 
       val conjs = hipspec_explore ctxt cond_opt const_nms
       (*val _ = @{print} conjs*)
 
-      val res_ctxt = proof_loop ctxt (List.concat facts) fact_nms conjs
+      val res_ctxt = proof_loop ctxt (List.concat facts @ List.concat dats) (fact_nms @ dat_nms) conjs
       val tac_str = Tactic_Data.hard_tac_str res_ctxt
 
       val output = Library.space_implode "\n\n"

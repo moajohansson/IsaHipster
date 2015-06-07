@@ -239,5 +239,31 @@ ML {*
 
 *}
 
+ML{*
+
+val x = @{term "Nil"};
+val y = @{term "S Z"};
+val T = Term.type_of x;
+dest_Type T;
+val uu = dest_Type (Term.type_of y);
+@{print} (fst uu ^ ".exhaust");
+Sledgehammer_Util.thms_of_name @{context}(fst uu ^ ".exhaust");
+
+
+  fun reT uu = case uu of
+        Var (_,t)       => (*let val _ = @{print} "Var" in t end*) [t]
+      | (t$a)           => (*let val _ = @{print} "$" in reP t end*) reT t @ reT a
+      | (Abs (_, t, b)) => (*let val _ = @{print} "Abs" in t end*) t::(reT b)
+      | (Free (_, t))   => [t] (* TODO: Bound, Const *)
+      | Bound _         => []
+      | Const (_, t)    => [t];
+fun exx (args, T) = (fst o dest_Type) T :: map (fst o dest_Type) args;
+
+val ll = distinct (op=) (List.concat (map (exx o strip_type) (distinct (op =) (reT eg2))));
+fun ff tt =  not (String.isPrefix "Pure" tt orelse String.isPrefix "HOL" tt orelse String.isPrefix "prop" tt);
+filter ff ll;
+
+*}
+thm Nat.exhaust
 end
 

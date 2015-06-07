@@ -8,6 +8,8 @@ sig
   val frees_and_tfrees_of_thm : Thm.thm -> string list * string list
 
   val dangling_vars : Term.term -> (string * Term.typ) list * (string * Term.typ) list
+  val type_names : Term.term -> string list
+  val types_in_term : Term.term -> typ list
 end
 
 val yup = @{term "!! x. x=y"}
@@ -75,5 +77,24 @@ fun add_consts_of_thy (thynm, t) consts =
 fun thy_consts_of thynm thm = 
       add_consts_of_thy (thynm, Thm.concl_of thm) [];
 
+fun types_in_term t = case t of
+    Var (_,T)       => (*let val _ = @{print} "Var" in t end*) [T]
+  | (f$a)           => (*let val _ = @{print} "$" in reP t end*) types_in_term f @ types_in_term a
+  | (Abs (_, T, b)) => (*let val _ = @{print} "Abs" in t end*) T::(types_in_term b)
+  | (Free (_, T))   => [T] (* TODO: Bound, Const *)
+  | Bound _         => []
+  | Const (_, T)    => [T];
+
+fun type_names t =
+  let
+    fun names_in (args, T) = (fst o dest_Type) T :: map (fst o dest_Type) args
+    fun sieve tt = not (String.isPrefix "Pure" tt orelse String.isPrefix "HOL" tt orelse "prop"= tt)
+  in
+    filter sieve (distinct (op=) (List.concat (map (names_in o strip_type) (distinct (op =) (types_in_term t)))))
+  end;
+(*
+val ll = distinct (op=) (List.concat (map (exx o strip_type) (distinct (op =) (reT eg2))));
+fun ff tt =  not (String.isPrefix "Pure" tt orelse String.isPrefix "HOL" tt orelse String.isPrefix "prop" tt);
+filter ff ll;*)
 
 end
