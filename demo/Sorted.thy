@@ -116,6 +116,10 @@ by (hipster_induct_simp_metis Sorted.sorted2.simps Sorted.insert.simps Sorted.is
 lemma unknong [thy_expl]: "isort2 (isort2 x) = isort2 x"
 by (hipster_induct_simp_metis Sorted.sorted2.simps Sorted.insert.simps Sorted.isort2.simps)
 
+
+setup{* Hip_Tac_Ops.set_metis_to @{context} 1000 *}
+setup{* Hip_Tac_Ops.toggle_full_types @{context}  *}
+
 lemma unknoni []: "Sorted.sorted2 y \<Longrightarrow> Sorted.sorted2 (insert x y) = True"
 by (hipster_induct_schemes Sorted.sorted2.simps Sorted.insert.simps Sorted.isort2.simps)
 

@@ -50,4 +50,5 @@ by (hipster_induct_schemes plus.simps half.simps)
   theorem x0 :
     "(half (plus x x)) = x"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+
 end

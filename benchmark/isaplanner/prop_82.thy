@@ -82,11 +82,11 @@ by (hipster_induct_schemes ptake.simps ntake.simps pzip.simps)
 lemma unknown [thy_expl]: "ntake x (ntake y z) = ntake y (ntake x z)"
 oops
 
-setup{*Hip_Tac_Ops.set_metis_to @{context} 1000*}
+setup{*Hip_Tac_Ops.set_metis_to @{context} 10000*}
 setup{*Hip_Tac_Ops.set_metis_filter @{context} (K false)*}
 
 lemma lemma_ao [thy_expl]: "ptake x (pzip y z) = pzip y (ntake x z)"
-by (hipster_induct_schemes PList.exhaust Nat.exhaust Nlist.exhaust ntake.simps ptake.simps pzip.simps)
+by (hipster_induct_schemes thy_expl PList.exhaust Nat.exhaust Nlist.exhaust ntake.simps ptake.simps pzip.simps)
 (*
 apply(induction y z arbitrary: x  rule: pzip.induct)
 apply simp_all

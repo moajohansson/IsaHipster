@@ -32,7 +32,6 @@ by (hipster_induct_schemes le.simps)
 lemma lemma_ab [thy_expl]: "le (S x2) x2 = False"
 by (hipster_induct_schemes le.simps)
 
-
 lemma unknown [thy_expl]: "insort x (insort y z) = insort y (insort x z)"
 oops
 

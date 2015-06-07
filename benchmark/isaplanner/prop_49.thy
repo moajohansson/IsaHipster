@@ -15,24 +15,38 @@ begin
   "butlastConcat x (Nil2) = butlast x"
   | "butlastConcat x (Cons2 z x2) = append x (butlast (Cons2 z x2))"
   (*hipster butlast append butlastConcat *)
-(*hipster butlast append*)
+(*hipster butlast append*)(*
 lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
 by (hipster_induct_schemes butlast.simps append.simps)
 
-lemma lemma_ae [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
+lemma lemma_aa [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
 by (hipster_induct_schemes butlast.simps append.simps)
 
 lemma unknown [thy_expl]: "butlast (append x x) = append x (butlast x)"
 oops
 
+lemma lemma_ab [thy_expl]: "butlastConcat Nil2 x = butlast x"
+by (hipster_induct_schemes butlast.simps append.simps)
+
+lemma lemma_ac [thy_expl]: "append x (butlast x) = butlastConcat x x"
+by (hipster_induct_schemes butlast.simps append.simps)*)
+(*
+hipster butlast butlastConcat append
+*)
 (*hipster butlastConcat butlast append*)
+
+setup{* Hip_Tac_Ops.set_metis_to @{context} 16000 *}
+setup{* Hip_Tac_Ops.set_metis_filter @{context} (K false)*}
 
   theorem x0 :
     "(butlast (append xs ys)) = (butlastConcat xs ys)"
-    apply(induction xs ys rule: append.induct)
+    apply(hipster_induct_schemes butlastConcat.simps prop_49.append.simps append.simps list.exhaust)
+
+    apply(induction xs arbitrary:ys rule: butlast.induct)
     apply(simp_all)
-    apply(metis thy_expl butlastConcat.simps butlast.simps append.simps list.exhaust)
-    
+    apply(metis  butlastConcat.simps butlast.simps append.simps list.exhaust)
+    apply(metis  butlastConcat.simps butlast.simps append.simps list.exhaust)
+    by (metis butlastConcat.simps  append.simps prop_49.butlast.simps list.exhaust)
     (*apply (metis append.elims butlastConcat.elims prop_49.append.simps(2) prop_49.butlast.simps(3) prop_49.list.distinct(1))
 
     apply(metis  butlastConcat.simps butlast.simps append.simps list.exhaust)*)

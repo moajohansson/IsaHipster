@@ -60,9 +60,9 @@ lemma lemma_tak [thy_expl]: "take (S x3) (take x3 y3) = take x3 y3"
 by (hipster_induct_schemes take.simps)
 
 
-(*hipster drop take*)
+(*hipster drop take
 lemma lemma_ab [thy_expl]: "drop x2 (take x2 y2) = Nil2"
-by (hipster_induct_schemes drop.simps take.simps)
+by (hipster_induct_schemes drop.simps take.simps)*)
 
 
   theorem x0 :

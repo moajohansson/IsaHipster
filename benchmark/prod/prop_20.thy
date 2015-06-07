@@ -16,7 +16,17 @@ begin
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster length even append *)
 
-hipster length even append
+fun yum ::  "'a list => 'a list => 'a list" where
+  "yum Nil2 Nil2 = Nil2"
+| "yum (Cons2 x xs) Nil2 = yum xs Nil2"
+| "yum Nil2 (Cons2 y ys) = yum Nil2 ys"
+| "yum (Cons2 x xs) (Cons2 y ys) = yum xs ys"
+
+thm yum.induct
+lemma xx: "even x = even y"
+apply(induction x)
+apply(induction y)
+(*hipster length even append*)
 lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
 by (hipster_induct_schemes length.simps even.simps append.simps)
 

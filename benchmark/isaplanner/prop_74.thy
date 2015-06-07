@@ -161,10 +161,10 @@ lemma unknown []: "minus (S x) (minus x y) = minus (S y) (minus y x)"
 oops
 
 lemma lemma_takerev [thy_expl]: "take (len x) (rev x) = rev x"
-by (hipster_induct_schemes)
+by (hipster_induct_schemes take.simps rev.simps len.simps)
 
 lemma lemma_droprev [thy_expl]: "drop (len x) (rev x) = Nil2"
-by (hipster_induct_schemes)
+by (hipster_induct_schemes drop.simps len.simps rev.simps)
 
 
   theorem x0 :

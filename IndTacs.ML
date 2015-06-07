@@ -243,7 +243,8 @@ fun induct_on_var_tac ctxt rule var i goalthm =
       val nw_thms' = (Induction.induction_tac ctxt false [insts] [(*non_ithings*)otherfrees] [] rule [] i goalthm)
             handle ERROR _ => Seq.empty (* let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end *)
       in
-        Seq.map snd nw_thms'
+        (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty *)Seq.map snd nw_thms'
+
       end;
 
 
@@ -253,11 +254,16 @@ fun induct_on_var_tac ctxt rule var i goalthm =
 
 (* Apply induction on var and try to prove all cases by simp *)
 fun induct_and_simp lemmas ctxt rule var i = 
-     DEPTH_SOLVE ((induct_on_var_tac ctxt rule var i) THEN (prove_by_simp ctxt lemmas));
+     DEPTH_SOLVE (
+          (Seq.DETERM
+            (HEADGOAL ((induct_on_var_tac ctxt rule var )))) THEN (prove_by_simp ctxt lemmas));
 
 (* Induction on var, then try to prove resulting subgoals by simp or metis *)
 fun induct_simp_or_metis (facts, lemmas) ctxt rule var i = 
-    DEPTH_SOLVE ((induct_on_var_tac ctxt rule var i) THEN (simp_or_metis ctxt (facts,lemmas)));
+    DEPTH_SOLVE (
+
+          (Seq.DETERM
+            (HEADGOAL ((induct_on_var_tac ctxt rule var)))) (*induct_on_var_tac ctxt rule var i*) THEN (simp_or_metis ctxt (facts,lemmas)));
 
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)

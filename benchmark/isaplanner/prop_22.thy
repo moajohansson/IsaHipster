@@ -32,8 +32,8 @@ by (hipster_induct_schemes max2.simps)
 lemma lemma_af []: "max2 x y = max2 y x"
 by (hipster_induct_schemes max2.simps)
 *)
-lemma lemma_a [thy_expl]: "max2 x2 y2 = max2 y2 x2"
-by (hipster_induct_schemes max2.simps)
+lemma lemma_a []: "max2 x2 y2 = max2 y2 x2"
+by (hipster_induct_schemes max2.simps Nat.exhaust)
 
 lemma lemma_aa [thy_expl]: "max2 x2 x2 = x2"
 by (hipster_induct_schemes max2.simps)
@@ -66,7 +66,8 @@ apply (simp_all add:lemma_aa lemma_a lemma_ab lemma_ac lemma_ad dd triv_a)
 lemma aa: "max2 (max2 a b) c = max2 a (max2 b c) \<Longrightarrow> max2 (max2 a b) (S c) = max2 a (max2 b (S c))"
 apply hipster_induct_schemes*)
 
-
+setup{* Hip_Tac_Ops.set_metis_to @{context} 15000*}
+setup{* Hip_Tac_Ops.set_metis_filter @{context} (K false)*}
 
   theorem x0 :
     "(max2 (max2 a b) c) = (max2 a (max2 b c))"
@@ -74,7 +75,7 @@ apply hipster_induct_schemes*)
 
     apply(induction a b arbitrary: c rule: max2.induct)
     apply(simp_all)
-    by (metis max2.simps Nat.exhaust)
+    by (metis  max2.simps Nat.exhaust)
 
     (*
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})*)

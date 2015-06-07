@@ -43,8 +43,11 @@ by simp
 
 lemma sst: "\<not> f x \<Longrightarrow> filter2 f (Cons2 x y) = (filter2 f y)"
 by simp
+setup {* Hip_Tac_Ops.set_metis_to @{context} 2000 *}
 
 lemma unknown []: "rev (filter2 x y) = filter2 x (rev y)"
+    by (hipster_induct_schemes rev.simps append.simps filter2.simps)
+
 apply(induction y)
 apply(simp_all)
 by (metis rev.simps append.simps filter2.simps thy_expl) (*lemma_ad lemma_a lemma_ab lemma_ac lemma_ae lemma_af)*)

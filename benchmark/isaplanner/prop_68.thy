@@ -41,14 +41,8 @@ by (hipster_induct_schemes le.simps len.simps)
 lemma lemma_ae [thy_expl]: "le (S x2) x2 = False"
 by (hipster_induct_schemes le.simps len.simps)
 
-(*hipster delete len*)
-lemma lemma_af [thy_expl]: "delete x10 (delete y10 z10) = delete y10 (delete x10 z10)"
-by (hipster_induct_schemes delete.simps len.simps)
+hipster_cond le
 
-lemma lemma_ag [thy_expl]: "delete x6 (delete x6 y6) = delete x6 y6"
-by (hipster_induct_schemes delete.simps len.simps)
-
-(*hipster_cond le len*)
 lemma lemma_ah [thy_expl]: "le x2 y2 \<Longrightarrow> le x2 (S y2) = True"
 by (hipster_induct_schemes le.simps len.simps)
 
@@ -59,7 +53,15 @@ lemma lemma_aj [thy_expl]: "le y x \<and> le x y \<Longrightarrow> x = y"
 by (hipster_induct_schemes le.simps len.simps Nat.exhaust)
 
 lemma lemma_ak [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x y = True"
-by (hipster_induct_schemes le.simps len.simps Nat.exhaust)
+by (hipster_induct_schemes le.simps  Nat.exhaust)
+
+(*hipster delete len*)
+lemma lemma_af [thy_expl]: "delete x10 (delete y10 z10) = delete y10 (delete x10 z10)"
+by (hipster_induct_schemes delete.simps len.simps)
+
+lemma lemma_ag [thy_expl]: "delete x6 (delete x6 y6) = delete x6 y6"
+by (hipster_induct_schemes delete.simps len.simps)
+
 
   theorem x0 :
     "le (len (delete n xs)) (len xs)"

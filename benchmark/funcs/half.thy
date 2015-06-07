@@ -10,5 +10,7 @@ fun half :: "Nat => Nat" where
 | "half (S (Z)) = Z"
 | "half (S (S z)) = S (half z)"
 
+hipster half
+
 end
 

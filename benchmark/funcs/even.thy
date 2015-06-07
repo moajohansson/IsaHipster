@@ -10,5 +10,7 @@ fun even :: "Nat => bool" where
 | "even (S (Z)) = False"
 | "even (S (S z)) = even z"
 
+hipster even
+
 end
 

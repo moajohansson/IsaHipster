@@ -76,7 +76,7 @@ setup {* Hip_Tac_Ops.set_metis_to @{context} 700 *}
 lemma lemma_al [thy_expl]: "sorted x \<Longrightarrow> isort x = x"
 by (hipster_induct_schemes sorted.simps isort.simps insert2.simps le.simps)
 
-setup {* Hip_Tac_Ops.set_metis_to @{context} 900 *}
+setup {* Hip_Tac_Ops.set_metis_to @{context} 1000 *}
 
 lemma lemma_am [thy_expl]: "sorted y \<Longrightarrow> sorted (insert2 x y) = True"
 by (hipster_induct_schemes sorted.simps isort.simps insert2.simps)
@@ -86,9 +86,9 @@ by (hipster_induct_schemes sorted.simps isort.simps insert2.simps)
 
 lemma lemma_ao [thy_expl]: "sorted y \<Longrightarrow> isort (insert2 x y) = insert2 x y"
 by (hipster_induct_schemes sorted.simps isort.simps insert2.simps)
-
+(*
 lemma lemma_ap [thy_expl]: "sorted (insert2 x y) = sorted y"
-by (hipster_induct_schemes sorted.simps isort.simps insert2.simps le.simps Nat.exhaust)
+by (hipster_induct_schemes sorted.simps isort.simps insert2.simps le.simps Nat.exhaust)*)
 
 
   theorem x0 :

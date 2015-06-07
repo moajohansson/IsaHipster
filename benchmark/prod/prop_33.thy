@@ -20,6 +20,46 @@ begin
   (*hipster plus one mult qfac fac *)
 
 (*hipster plus*)
+hipster plus one
+lemma lemma_a [thy_expl]: "plus x2 Z = x2"
+by (hipster_induct_schemes plus.simps one_def)
+
+lemma lemma_aa [thy_expl]: "plus (plus x1 y1) z1 = plus x1 (plus y1 z1)"
+by (hipster_induct_schemes plus.simps one_def)
+
+lemma lemma_ab [thy_expl]: "plus x1 (S y1) = S (plus x1 y1)"
+by (hipster_induct_schemes plus.simps one_def)
+
+lemma lemma_ac [thy_expl]: "plus x6 (plus y6 x6) = plus y6 (plus x6 x6)"
+by (hipster_induct_schemes plus.simps one_def)
+
+lemma lemma_ad [thy_expl]: "plus x7 (plus y7 y7) = plus y7 (plus y7 x7)"
+by (hipster_induct_schemes plus.simps one_def)
+
+lemma lemma_ae [thy_expl]: "plus x7 (S y7) = S (plus y7 x7)"
+by (hipster_induct_schemes plus.simps one_def)
+
+lemma lemma_af [thy_expl]: "plus (S x7) y7 = S (plus y7 x7)"
+by (hipster_induct_schemes plus.simps one_def)
+
+lemma lemma_ag [thy_expl]: "plus (plus x7 y7) (plus x7 z7) =
+plus (plus x7 z7) (plus x7 y7)"
+by (hipster_induct_schemes plus.simps one_def)
+
+lemma lemma_ah [thy_expl]: "plus (plus x7 y7) (plus z7 x7) =
+plus (plus z7 x7) (plus x7 y7)"
+by (hipster_induct_schemes plus.simps one_def)
+
+lemma lemma_ai [thy_expl]: "plus (plus x6 x6) (plus y6 z6) =
+plus (plus x6 y6) (plus x6 z6)"
+by (hipster_induct_schemes plus.simps one_def)
+
+lemma lemma_aj [thy_expl]: "plus x7 y7 = plus y7 x7"
+by (hipster_induct_schemes plus.simps one_def)
+
+hipster mult plus one
+
+(*
 lemma lemma_a [thy_expl]: "plus x2 Z = x2"
 by (hipster_induct_schemes plus.simps)
 
@@ -118,12 +158,11 @@ lemma lemma_bc [thy_expl]: "mult x2 y2 = mult y2 x2"
 by (hipster_induct_schemes mult.simps plus.simps)
 
 lemma lemma_bd [thy_expl]: "mult x2 (mult y2 z2) = mult y2 (mult x2 z2)"
-
 by (hipster_induct_schemes mult.simps plus.simps Nat.exhaust)
 
 lemma lemma_be [thy_expl]: "plus (mult x1 y1) (mult x1 z1) = mult x1 (plus y1 z1)"
 by (hipster_induct_schemes mult.simps plus.simps)
-
+*)
 
   theorem x0 :
     "(fac x) = (qfac x one)"
