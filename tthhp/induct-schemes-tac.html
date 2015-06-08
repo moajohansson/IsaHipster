@@ -326,7 +326,7 @@ fun even :: "Nat => bool" where
 
 Structural induction
 
-$$ \frac {P\; Z \;\;\;\; (P \;t \Longrightarrow P\; (S \;t))}{\forall x \; P \; x}
+$$ \frac {P\; Z \;\;\;\; \forall t\;(P \;t \Longrightarrow P\; (S \;t))}{\forall x \; P \; x}
 $$
 
 ---
@@ -613,12 +613,17 @@ template: gains
 .center[![](comp.png)]
 
 - Haskell programs: Zeno, HipSpec
+
 - SMT solver based: CVC4, Pirate
+
 - Rippling: IsaPlanner
 
 - Bottom-up lemma generation: HipSpec
+
 - Top-down lemma generation: CVC4, Pirate
+
 - Conditionals: Pirate
+
 - Certified proofs: IsaPlanner
 
 
