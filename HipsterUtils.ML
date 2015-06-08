@@ -87,7 +87,9 @@ fun types_in_term t = case t of
 
 fun type_names t =
   let
-    fun names_in (args, T) = (fst o dest_Type) T :: map (fst o dest_Type) args
+    fun  ddd T = [(fst o dest_Type) T]
+                  handle _ => []
+    fun names_in (args, T) = ddd T @ (List.concat (map ddd args)) (*(fst o dest_Type) T @ map (fst o dest_Type) args*)
     fun sieve tt = not (String.isPrefix "Pure" tt orelse String.isPrefix "HOL" tt orelse "prop"= tt)
   in
     filter sieve (distinct (op=) (List.concat (map (names_in o strip_type) (distinct (op =) (types_in_term t)))))

@@ -237,9 +237,9 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                                           SOME (NONE : Binding.binding option,(Free v,false)))
                          inductfrees;
          (* Throw away Isar related stuff and only take the Thm.thm seq *)
-      val _ = Pretty.writeln (Pretty.block ( [Pretty.str "induct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
+      (*val _ = Pretty.writeln (Pretty.block ( [Pretty.str "induct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
         | SOME (_, (Free (v,_),false)) => v) insts)), Pretty.str "; otherfrees: ", Pretty.str (Library.space_implode ", "
-          (map (fn (v,_) => v) otherfrees)) ]));
+          (map (fn (v,_) => v) otherfrees)) ]));*)
       val nw_thms' = (Induction.induction_tac ctxt false [insts] [(*non_ithings*)otherfrees] [] rule [] i goalthm)
             handle ERROR _ => Seq.empty (* let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end *)
       in
@@ -271,11 +271,11 @@ fun try_induct_on ctxt rule strat vars i =
     case vars
        of [] => (*strat ctxt NONE (* for now, no: rule - don't think it should ever work *) NONE i
                 ORELSE*) no_tac
-        | (v :: vs) =>  let val _ = Pretty.writeln (Pretty.str (" - vars: "^ @{make_string} v)) in
+        | (v :: vs) =>  (*let val _ = Pretty.writeln (Pretty.str (" - vars: "^ @{make_string} v)) in*)
           (*(induct_simp_or_metis ctxt facts rule v i)*)
           strat ctxt rule (SOME v) i (*THEN simp_all ctxt []*)
           ORELSE
-          (try_induct_on ctxt rule strat vs i) end;
+          (try_induct_on ctxt rule strat vs i)
 
 (* Find the variables we can induct on *)
 fun try_inductable_vars ctxt strat i thm = 
@@ -320,13 +320,13 @@ fun try_inductable_vars ctxt strat i thm =
 fun try_induction_with ctxt scheme_rules strat vars i =
     (* let val vars = map fst (fst (inductable_things_in_sg i thm)) *)
     let val struct_tac =
-          let val _ = Pretty.writeln (Pretty.str "Rule: none")
-          in try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i end
+          (*let val _ = Pretty.writeln (Pretty.str "Rule: none")
+          in*) try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i
         fun rec_ind_tac rules =
               case rules of
                 []            => no_tac
               | ((n,r) :: rs) =>
-                  let val _ = Pretty.writeln (Pretty.str ("Rule: "^n))
+                  let (*val _ = Pretty.writeln (Pretty.str ("Rule: "^n))*)
                       val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
                       val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
               (*val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)*)

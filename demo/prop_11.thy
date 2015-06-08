@@ -12,28 +12,24 @@ begin
     "rev (Nil2) = Nil2"
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
 
-declare [[thy_interesting = true]]
-
-(*hipster append rev*)
-lemma lemma_a [thy_expl]: "prop_11.append x2 Nil2 = x2"
-by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
-
-lemma lemma_aa [thy_expl]: "prop_11.append (prop_11.append x2 y2) z2 =
-prop_11.append x2 (prop_11.append y2 z2)"
-by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
-
-lemma lemma_ab [thy_expl]: "prop_11.append (prop_11.rev x5) (prop_11.rev y5) =
-prop_11.rev (prop_11.append y5 x5)"
-by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
-
-lemma lemma_ac [thy_expl]: "prop_11.rev (prop_11.rev x5) = x5"
-by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
-
+hipster append rev
 
 
   theorem revAppend :
     "(rev (append (rev x) (rev y))) = (append y x)"
-    by (hipster_induct_schemes rev.simps append.simps)
+    oops
+
+
+
+
+
+
+(*    by (hipster_induct_schemes rev.simps append.simps)*)
+
+
+
+
+
 
 ML_val {*
   (*proof body with digest*)

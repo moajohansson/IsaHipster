@@ -1,43 +1,43 @@
-theory prop_14
+theory sortd
 imports Main
-        "../../IsaHipster"
+        "../IsaHipster"
 begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
   fun le :: "Nat => Nat => bool" where
-  "le (Z) y = True"
-  | "le (S z) (Z) = False"
+    "le Z y = True"
+  | "le (S z) Z = False"
   | "le (S z) (S x2) = le z x2"
   fun sorted :: "Nat list => bool" where
-  "sorted (Nil2) = True"
+  "sorted Nil2 = True"
   | "sorted (Cons2 y (Nil2)) = True"
   | "sorted (Cons2 y (Cons2 y2 xs)) =
        (if le y y2 then sorted (Cons2 y2 xs) else False)"
   fun insert2 :: "Nat => Nat list => Nat list" where
-  "insert2 x (Nil2) = Cons2 x (Nil2)"
+  "insert2 x Nil2 = Cons2 x (Nil2)"
   | "insert2 x (Cons2 z xs) =
        (if le x z then Cons2 x (Cons2 z xs) else Cons2 z (insert2 x xs))"
   fun isort :: "Nat list => Nat list" where
-  "isort (Nil2) = Nil2"
+  "isort Nil2 = Nil2"
   | "isort (Cons2 y xs) = insert2 y (isort xs)"
-  (*hipster le sorted insert2 isort *)
+
 
 hipster le
 lemma lemma_a [thy_expl]: "le x2 x2 = True"
-by (hipster_induct_schemes le.simps)
+by (hipster_induct_schemes le.simps Nat.exhaust)
 
 lemma lemma_aa [thy_expl]: "le x2 (S x2) = True"
-by (hipster_induct_schemes le.simps)
+by (hipster_induct_schemes le.simps Nat.exhaust)
 
 lemma lemma_ab [thy_expl]: "le (S x2) x2 = False"
-by (hipster_induct_schemes le.simps)
+by (hipster_induct_schemes le.simps Nat.exhaust)
 
 (*hipster_cond le*)
 lemma lemma_ac [thy_expl]: "le x2 y2 \<Longrightarrow> le x2 (S y2) = True"
-by (hipster_induct_schemes le.simps)
+by (hipster_induct_schemes le.simps Nat.exhaust)
 
 lemma lemma_ad [thy_expl]: "le y2 x2 \<Longrightarrow> le (S x2) y2 = False"
-by (hipster_induct_schemes le.simps)
+by (hipster_induct_schemes le.simps Nat.exhaust)
 
 lemma lemma_ae [thy_expl]: "le y x \<and> le x y \<Longrightarrow> x = y"
 by (hipster_induct_schemes le.simps Nat.exhaust)
@@ -94,4 +94,5 @@ by (hipster_induct_schemes sorted.simps isort.simps insert2.simps le.simps Nat.e
   theorem x0 :
     "sorted (isort x)"
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+
 end
