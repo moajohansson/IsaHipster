@@ -13,11 +13,24 @@ begin
   | "rev (Cons2 y xs) = append (rev xs) (Cons2 y (Nil2))"
 
 hipster append rev
+lemma lemma_a [thy_expl]: "prop_11.append x2 Nil2 = x2"
+by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps prop_11.list.exhaust)
+
+lemma lemma_aa [thy_expl]: "prop_11.append (prop_11.append x1 y1) z1 =
+prop_11.append x1 (prop_11.append y1 z1)"
+by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps prop_11.list.exhaust)
+
+lemma lemma_ab [thy_expl]: "prop_11.append (prop_11.rev x4) (prop_11.rev y4) =
+prop_11.rev (prop_11.append y4 x4)"
+by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps prop_11.list.exhaust)
+
+lemma lemma_ac [thy_expl]: "prop_11.rev (prop_11.rev x3) = x3"
+by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps prop_11.list.exhaust)
 
 
   theorem revAppend :
     "(rev (append (rev x) (rev y))) = (append y x)"
-    oops
+    by (hipster_induct_schemes append.simps rev.simps)
 
 
 

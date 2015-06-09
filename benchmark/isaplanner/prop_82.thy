@@ -79,14 +79,11 @@ by (hipster_induct_schemes ptake.simps ntake.simps pzip.simps)
 lemma lemma_an [thy_expl]: "ptake (S x2) (ptake x2 y2) = ptake x2 y2"
 by (hipster_induct_schemes ptake.simps ntake.simps pzip.simps)
 
-lemma unknown [thy_expl]: "ntake x (ntake y z) = ntake y (ntake x z)"
-oops
-
 setup{*Hip_Tac_Ops.set_metis_to @{context} 10000*}
 setup{*Hip_Tac_Ops.set_metis_filter @{context} (K false)*}
 
 lemma lemma_ao [thy_expl]: "ptake x (pzip y z) = pzip y (ntake x z)"
-by (hipster_induct_schemes thy_expl PList.exhaust Nat.exhaust Nlist.exhaust ntake.simps ptake.simps pzip.simps)
+by (hipster_induct_schemes PList.exhaust Nat.exhaust Nlist.exhaust ntake.simps ptake.simps pzip.simps)
 (*
 apply(induction y z arbitrary: x  rule: pzip.induct)
 apply simp_all
@@ -106,40 +103,69 @@ done*)
 
 *)
 
+setup{*Hip_Tac_Ops.set_metis_to @{context} 5000*}
+
+lemma lemma_ap [thy_expl]: "ntake x (ntake y z) = ntake y (ntake x z)"
+by (hipster_induct_schemes PList.exhaust Nat.exhaust Nlist.exhaust ntake.simps ptake.simps pzip.simps)
+
+lemma lemma_aq [thy_expl]: "ptake x (ptake y z) = ptake y (ptake x z)"
+by (hipster_induct_schemes PList.exhaust Nat.exhaust Nlist.exhaust ntake.simps ptake.simps pzip.simps)
+
+(* not found... for some reason *)
+(*lemma lemma_ar [thy_expl]: "ptake x (pzip y z) = pzip (ntake x y) z"
+by (hipster_induct_schemes PList.exhaust Nat.exhaust Nlist.exhaust ntake.simps ptake.simps pzip.simps)
+
+
 setup{*Hip_Tac_Ops.set_metis_filter @{context} (K true)*}
 
-
-lemma unknown [thy_expl]: "ptake x (ptake y z) = ptake y (ptake x z)"
-oops
-
-lemma unknown [thy_expl]: "pzip (ntake x y) z = pzip y (ntake x z)"
-oops
+lemma lemma_as [thy_expl]: "pzip (ntake x y) z = pzip y (ntake x z)"
+by(metis thy_expl)*)
 
 lemma unknown [thy_expl]: "pzip (ntake x y) (ntake z xa) = pzip (ntake z y) (ntake x xa)"
 oops
 
 lemma unknown [thy_expl]: "pzip (ntake x y) (ntake x z) = pzip y (ntake x z)"
+oops(*by(metis thy_expl)*)
 
+lemma unknown [thy_expl]: "pzip (ntake x y) (ntake z y) = pzip (ntake z y) (ntake x y)"
+oops
+(*
+ML {* Induct.find_casesT @{context} @{typ "Nat"} *}
+thm Nat.cases
+thm Nat.exhaust
+thm Nat.inject
+thm Nat.distinct*)
+
+(*hipster ptake pzip ntake*)
+lemma lemma_ar [thy_expl]: "pzip (ntake x28 y28) z28 = pzip y28 (ntake x28 z28)"
+by (hipster_induct_schemes ptake.simps pzip.simps ntake.simps PList.exhaust Nat.exhaust NPair.exhaust Nlist.exhaust)
+
+lemma unknown [thy_expl]: "pzip (ntake x y) (ntake z xa) = pzip (ntake z y) (ntake x xa)"
+oops
+
+lemma unknown [thy_expl]: "pzip (ntake x y) (ntake x z) = pzip y (ntake x z)"
 oops
 
 lemma unknown [thy_expl]: "pzip (ntake x y) (ntake z y) = pzip (ntake z y) (ntake x y)"
 oops
 
-ML {* Induct.find_casesT @{context} @{typ "Nat"} *}
-thm Nat.cases
-thm Nat.exhaust
-thm Nat.inject
-thm Nat.distinct
+setup{*Hip_Tac_Ops.set_metis_filter @{context} (K true)*}
+setup{*Hip_Tac_Ops.set_metis_to @{context} 400*}
 
   theorem x0 :
     "(ptake n (pzip xs ys)) = (pzip (ntake n xs) (ntake n ys))"
-    apply(induction xs ys arbitrary: n rule: pzip.induct)
+    by (hipster_induct_schemes ptake.simps pzip.simps ntake.simps PList.exhaust Nat.exhaust NPair.exhaust Nlist.exhaust)
+
+    (*apply(induction xs ys arbitrary: n rule: pzip.induct)
     apply(simp_all)
     apply(metis ptake.simps pzip.simps ntake.simps thy_expl)
     apply(metis pzip.simps take.simps ntake.simps ptake.simps NPair.exhaust Nat.exhaust PList.exhaust Nlist.exhaust)
+    sledgehammer
+    apply(metis thy_expl pzip.simps take.simps ntake.simps ptake.simps NPair.exhaust Nat.exhaust PList.exhaust Nlist.exhaust)
+
     apply(case_tac n)
     apply simp_all
-    done
+    done*)
 
 fun len :: "Nlist \<Rightarrow> Nat" where
 "len NNil = Z"
@@ -165,7 +191,7 @@ fun len :: "Nlist \<Rightarrow> Nat" where
        apply simp
        apply simp+
 sledgehammer
-       apply(metis pzip.simps prev.simps pappend.simps append.simps rev.simps)
+       (*apply(metis pzip.simps prev.simps pappend.simps append.simps rev.simps)*)
 
     by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
 

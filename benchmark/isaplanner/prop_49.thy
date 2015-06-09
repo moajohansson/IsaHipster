@@ -35,78 +35,12 @@ hipster butlast butlastConcat append
 *)
 (*hipster butlastConcat butlast append*)
 
-setup{* Hip_Tac_Ops.set_metis_to @{context} 16000 *}
+setup{* Hip_Tac_Ops.set_metis_to @{context} 3000 *}
 setup{* Hip_Tac_Ops.set_metis_filter @{context} (K false)*}
 
   theorem x0 :
     "(butlast (append xs ys)) = (butlastConcat xs ys)"
-    apply(hipster_induct_schemes butlastConcat.simps prop_49.append.simps append.simps list.exhaust)
+    by (hipster_induct_schemes butlastConcat.simps butlast.simps append.simps list.exhaust)
 
-    apply(induction xs arbitrary:ys rule: butlast.induct)
-    apply(simp_all)
-    apply(metis  butlastConcat.simps butlast.simps append.simps list.exhaust)
-    apply(metis  butlastConcat.simps butlast.simps append.simps list.exhaust)
-    by (metis butlastConcat.simps  append.simps prop_49.butlast.simps list.exhaust)
-    (*apply (metis append.elims butlastConcat.elims prop_49.append.simps(2) prop_49.butlast.simps(3) prop_49.list.distinct(1))
-
-    apply(metis  butlastConcat.simps butlast.simps append.simps list.exhaust)*)
-
-    (*apply(metis thy_expl butlastConcat.elims prop_49.append.simps(2) prop_49.butlast.simps(3) list.exhaust)*)
-
-
-    (*apply(metis  append.simps butlast.simps butlastConcat.simps)*)
-
-    (*apply(hipster_induct_schemes append.simps butlastConcat.simps butlast.simps list.exhaust thy_expl)*)
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
-hipspec --isabelle-mode --extra-trans append --extra-trans butlast --extra-trans butlastConcat  ~/Field/thesis/IsaHipster/GenCode/prop_49_hipspec.hs - H ~/Field/thesis/IsaHipster/GenCode/hs ~/Field/thesis/IsaHipster/GenCode/prop_49_hipspec.hs 
-Trivial proof: butlastConcat Nil2 Nil2 = Nil2 
-Rule: butlast.induct 
- - vars: ["x"] 
-Rule: butlastConcat.induct 
- - vars: ["x"] 
-Rule: none 
- - vars: ["x"] 
-induct_on: x; otherfrees:  
-Proved: butlastConcat Nil2 x = butlast x; Saving to ThyExpl_Data: butlastConcat Nil2 ?x3 = butlast ?x3 
-Rule: butlastConcat.induct 
- - vars: ["x"] 
-Rule: butlast.induct 
- - vars: ["x"] 
-Rule: append.induct 
- - vars: ["x"] 
-Rule: none 
- - vars: ["x"] 
-induct_on: x; otherfrees:  
-Proved: append x (butlast x) = butlastConcat x x; Saving to ThyExpl_Data: append ?x2 (butlast ?x2) = butlastConcat ?x2 ?x2
-Rule: butlastConcat.induct 
- - vars: ["x"] 
-Rule: append.induct 
- - vars: ["x"] 
-Rule: none 
- - vars: ["x"] 
-induct_on: x; otherfrees:  
-induct_on: x; otherfrees:  
-induct_on: x; otherfrees:  
-Failed proving: butlastConcat x (append x x) = append x (butlastConcat x x) 
-Rule: butlastConcat.induct 
- - vars: ["x"] 
-Rule: append.induct 
- - vars: ["x"] 
-Rule: butlast.induct 
- - vars: ["x"] 
-Rule: none 
- - vars: ["x"] 
-induct_on: x; otherfrees:  
-induct_on: x; otherfrees:  
-induct_on: x; otherfrees:  
-induct_on: x; otherfrees:  
-Failed proving: butlast (append x x) = butlastConcat x x 
-Rule: butlast.induct 
- - vars: ["x"] 
-Rule: butlastConcat.induct 
- - vars: ["x"] 
-Rule: none 
- - vars: ["x"] 
-induct_on: x; otherfrees:  
-induct_on: x; otherfrees: 
+ 
 end
