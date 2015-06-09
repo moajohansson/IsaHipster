@@ -127,9 +127,10 @@ fun proof_loop ctxt facts fact_nms cand_lemmas_str =
 
 (* TODO: Implement properly. This is for mapping back to Isabelle constants those things that the
  code generator renamnes in Haskell. Otherwise, Isabelle will not understand the resulting lemmas. *)
-val haskell_consts = [("List.rev","reverse"),("List.append","++"), (*("HOL.conj", " '&&' "),*)
+val haskell_consts = [("List.rev","reverse"),("List.append","++"), ("HOL.conj", " '&&' "),
                       ("Groups.plus_class.plus", "plus_nat"), ("Groups.zero_class.zero", "Zero_nat"),
-                      ("Groups.one_class.one", "one_nat")]
+                      ("Groups.one_class.one", "one_nat"),("<="," less_eq_nat "),
+                      ("<", " less_nat ")]
 
 fun map_to_haskell isa_nm = 
     case (Library.find_first (fn (nm,_) => nm=isa_nm) haskell_consts)
@@ -140,15 +141,18 @@ fun map_to_haskell isa_nm =
          are in the def of any of the given const-nms *)  
 fun hipspec_plain consts file =
     let 
-      val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts
-    in
+      (*val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts*)
+      val add_funs = List.foldl (fn (nm,s) => "--extra="^(Long_Name.base_name nm)^ " "^s) " " consts
+
+      in
       "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --tests=600"
     end;
 
 (* FIXME: make cond-count a proper parameter controlled by user. *)
 fun hipspec_cond cond_name consts file = 
     let 
-      val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts
+      val add_funs = List.foldl (fn (nm,s) => "--extra="^(Long_Name.base_name nm)^ " "^s) " " consts
+      (*val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts *)
     in
       "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^ (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
     end;
