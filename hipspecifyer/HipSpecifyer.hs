@@ -80,7 +80,7 @@ add_decls funs dec =
     DataDecl loc dataOrNew context name tyVarBnds qualConDecls decls ->
       [DataDecl loc dataOrNew context name tyVarBnds qualConDecls (new_ders++decls),
        generic "Arbitrary" "arbitrary" "genericArbitrary",
-       generic "CoArbitrary" "coarbitrary" "genericCoarbitrary",
+       generic "CoArbitrary" "coarbitrary" "HipSpecifyer.Prelude.genericCoarbitrary",
        generic "Observe" "observe" "genericObserve"]
         where 
           generic cls fun impl =
