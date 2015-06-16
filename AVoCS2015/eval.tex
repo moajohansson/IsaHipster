@@ -1,13 +1,176 @@
 \label{sec:evaluation}
 
+In this section we present an evaluation of Hispter's scope of proving capability, an analysis which had not been performed for Hipster to the same extent priorly.
+
+Keeping in mind evaluation of automated tools for interactive theorem proving necessarily has to consider some degree of interaction, two forms of evaluation have been carried out:
+
+\begin{itemize}
+\item case studies on algebraic data types and operations on them; in particular focusing on inductive theories for natural numbers and lists, of which we present a case study for insertion sort's correctness
+
+\item evaluation on a subset of TIP \cite{tip-benchmarks}, a set of benchmarks and challenge problems for inductive theorem provers.
+\end{itemize}
+
 \subsection{Interactive case study: insertion sort}
+
+We here showcase Hipster's handling of conditional lemmas via the proof of correctness for the theorem \isaCode{sorted (isort ts)}.
+%
+For it, we assume the less-or-equal operator \isaCode{le} for naturals (and no prior, additional lemmas), the already defined \isaCode{sorted} and the function definitions:
+
+\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
+fun insert :: "Nat $\Rightarrow$ Nat List $\Rightarrow$ Nat List" where
+  "insert r Nil           = Cons r Nil"
+| "insert r (Cons t ts) = (if (le r t) then Cons r (Cons t ts)	
+                                              else Cons t (insert r ts))"
+
+fun isort :: "Nat List $\Rightarrow$ Nat List" where
+  "isort Nil           = Nil"
+| "isort (Cons t ts) = insert t (isort ts)"
+\end{lstlisting}
+
+Running exploration from the simpler components is the first step, considering both equational and conditional lemmas, since we have two predicates involved in the definiens of functions in the final theorem.
+%
+Starting with conditional exploration for \isaCode{le} and also for its negation, $10$ lemmas are yielded and proven, $6$ of which are conditionals (we present the vital lemmas towards the final proof) and all require recursion induction:
+
+\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
+hipster_cond le
+(...)
+lemma lemma_ac [thy_expl]: "le x y $\Longrightarrow$ le x (S y) = True"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+
+lemma lemma_ad [thy_expl]: "le y x $\Longrightarrow$ le (S x) y = False"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+(...)
+lemma lemma_ai [thy_expl]: "($\lnot$ le x y) $\Longrightarrow$ le x Z = False"
+by (hipster_induct_schemes le.simps Nat.exhaust)
+(...)
+\end{lstlisting}
+
+A new exploration considering the functions about sorting itself and taking \isaCode{sorted} as a side-condition for which to discover lemmas, Hipster discovers and proves both the conditional auxiliary lemma required and the goal theorem.
+
+\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
+hispter_cond sorted isort insert
+(...)
+lemma isortInvariant [thy_expl]: "sorted ys $\Longrightarrow$ sorted (insert x ys) = True"
+by (hipster_induct_schemes sorted.simps isort.simps insert.simps)
+(...)
+theorem isortSorts [thy_expl]: "sorted (isort x) = True"
+by (hipster_induct_schemes sorted.simps isort.simps insert.simps)
+\end{lstlisting}
+
+During this last exploration, other interesting lemmas are discovered, all of which can be now proven automatically by using the sub-lemma about \isaCode{insert}'s invariant \isaCode{isortInvariant}:
+
+\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
+lemma isortFixes [thy_expl]: "sorted x $\Longrightarrow$ isort x = x"
+by (hipster_induct_schemes sorted.simps isort.simps insert.simps)
+
+lemma insertComm [thy_expl]: "insert x (insert y z) = insert y (insert x z)"
+by (hipster_induct_schemes insert.simps)
+\end{lstlisting}
+
+Invoking the recursion induction tactic \isaCode{hipster\_induct\_schemes} once proves all of the statements above, simplifying the interaction with the proof assistant; recursion induction therefore proves to be successful in automating proofs.
+%
+Particularly, the crucial lemma \isaCode{isortInvariant} is proven applying \isaCode{sorted}'s associated induction scheme, highlighting once again the need for support of conditional lemmas in automated inductive proving and the possibilities recursion induction brings.
+
+% XXX: include? IF we mention new options
+% Lastly, the benefit of an interactive environment is being able to parameterise the proving methods with adequate options as one works along. This supervised automation can be of great utility to a user during a formal theory development.
+
 
 \subsection{Benchmarks: TIP}
 
+From TIP, we evaluate Hipster over two subsets of problems employed in previous works on inductive theorem proving: Johansson, Dixon and Bundy's work on case-analysis for rippling \cite{IsaPcase} (we denote it \emph{case-analysis}), and prior work by Ireland and Bundy on employing proof failure to guide lemma discovery and patch inductive proofs \cite{productiveuse} (we denote it \emph{prod-failure}).
+
 \subsubsection{Method}
+
+To evaluate performance on TIP, each problem is analysed individually, in isolation from others.
+%
+Theory explorations were only run for those whenever the problem was not provable by the recursion induction tactic yet, i.e.: was missing helping lemmas.
+%
+These were first run on the individual functions appearing in the problem definition, jointly with their auxiliary functions, followed by explorations on groups of said functions if required, leaving conditional exploration as the last exploration to be run before defining the problem as non-provable by Hipster.
+
+As already specified, conditional lemma discovery is limited to explore a single predicate to define the premise at a time. For the present evaluation this has sufficed.
+
+Additionally, to test Hipster's capacity when working on strictly newly defined theories, no assumptions nor properties from theories in Isabelle/HOL were considered during proof search.
+%
+As an example, natural numbers are not Isabelle/HOL's, but redefined.
+%
+Hence, predefined notions of orderings and other properties do not play a part in proofs obscuring the results of Hipster's actual work.
+%
+In this way, we only consider as the base starting point a set of definitional statements, aligning with the purpose of proving based on structure and construction of programs.
 
 \subsubsection{Results}
 
+The following table summarises statistics on the two sets of the benchmarks run.
+%
+Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational and a conditional theorem respectively.
+
+\begin{tabularx}{\textwidth}{l | X X | X X}
+  & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
+  &  EQ & COND & EQ & COND \\
+  \hline
+  Total & 71 & 15 & 38 & 12 \\
+  \hline
+  Fully automated & 67 & 14 & 29 & 12 \\
+  Partially automated & 2 & 0 & 6 & 0 \\
+  \hline
+  Prior exploration & 32 & 4 & 34 & 4 \\
+  Conditional exploration & 6 & 2 & 2 & 3 \\
+  \hline
+  Recursion induction & 29 & 6 & 1 & 1 \\
+  Recursion induction on sub-lemmas & 16 & 1 & 5 & 0 \\
+  \hline
+  Filter theorems for FO prover & 3 & 0 & 0 & 0 \\
+\end{tabularx}
+
+\paragraph{Automation}
+%
+Full automation refers to solving a problem entirely only with lemmas discovered by Hipster's theory exploration and Hipster's automated recursion induction tactic. The rate of fully automated success is observed to be high, with an overall 90\%
+  provability on the benchmark set. For the conditionals in the test set this rate is higher, 96\%
+ .
+
+\paragraph{Partially automated}
+
+A number of theorems failed in a first instance due to the inability to automate the proof for a particular lemma, common to all of them:
+
+
+This proof failure was due to there being missing a small lemma which was not discovered and yet would have led to complete their proof. Specifically, this lemma was:
+
+
+For efficiency reasons, lemmas are only constructed with terms up to a certain depth, 3
+ , during theory exploration in the underlying HipSpec/QuickSpec whilst the required lemma has term depth 4
+ , reason for which it is not obtained. QuickSpec would generate such a conjecture were it set to work with depth 4
+ . This auxiliary lemma can be proven by Hipster's tactic and once it is added to the affected problem theories, the remaining proofs are all automated by Hipster.
+
+Examples of these partially automated theorems are:
+
+
+If we were to include the function for addition on natural numbers, however, enough lemmas would have been automatically discovered to prove \texttt{len (append x y) = len (appen y x)} without needing any other intervention than including addition in the theory exploration for this small set of theorems.
+
+\paragraph{Theory exploration}
+
+Over half of the problems originating from the first set did not require any exploration, whereas most of the problems from the second one required exploring at least a function for auxiliary lemmas. But overall, just over half of the cases required theory exploration, highlighting the benefit of employing it. Not surprisingly, equational lemmas were much more likely to need exploration than conditional ones. Equations are unrestricted and more general, hence potentially requiring more steps in order to proof their different case branches. On the other hand, for these benchmarks, conditionals provided constraints that narrow down cases.
+
+Conditional exploration was necessary for a small subset of problems, namely for those involving functions defined in terms of some predicate.
+
+\paragraph{Recursion induction}
+
+Whereas recursion induction might not have been necessary in as many cases as theory exploration (for the main theorem or any auxiliary lemmas), the number of theorems requiring recursion induction is notable. Structural induction was attempted by the tactic during testing, hence all those theorems solved via recursion induction (around a third of the benchmarks) would have not been solved otherwise, at least not with the degree of exploration carried out.
+
+The results seem to indicate that recursion induction can save on exploration time, since it provides appropriate induction patterns that avoid the need for sub-lemmas about specific constructor combinations.
+
+
 \subsubsection{Comparison}
+
+\begin{tabularx}{\textwidth}{l | X X X | X X | X | X | X | X X X}
+  & \multicolumn{3}{|c|}{Hipster}
+  	& \multicolumn{2}{c|}{HipSpec}
+  	& \multicolumn{1}{c|}{Zeno}
+  	& \multicolumn{1}{c|}{IsaPlanner}
+  	& \multicolumn{1}{c|}{CVC4}
+  	& \multicolumn{3}{c}{Pirate} \\
+  \hline
+  Case-analysis & 80 & (82) & [83] & 80 & & 82 & 47 & 80 & 85 & & [86] \\
+  Prod-failure & 41 & (47) & & 44 & (47) & 21 & - & 40 & & (47) & \\
+\end{tabularx}
+
 
 \subsection{Discussion}   % Observed behaviour
