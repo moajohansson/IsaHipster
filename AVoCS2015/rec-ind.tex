@@ -21,7 +21,7 @@ fun last :: "'a List $\Rightarrow$ 'a" where
 
 \noindent From these definitions' structures one can derive two new induction principles.
 %
-In the case of \texttt{\fontfamily{lmvtt}\selectfont sorted}, cases are broken down more detailed ones whilst \texttt{\fontfamily{lmvtt}\selectfont last} is partially defined, meaning the induction scheme it gives rise to is to be completed with its missing case for empty lists, as the corresponding induction scheme depicts:
+In the case of \texttt{\fontfamily{lmvtt}\selectfont sorted}, cases are broken down into more detailed ones whilst \texttt{\fontfamily{lmvtt}\selectfont last} is partially defined, meaning the induction scheme it gives rise to is to be completed with its missing case for empty lists, as the corresponding induction scheme depicts:
 
 \inferrule [SortedInd]
   {P(Nil) \\ \forall u\; P(Cons \; u \; Nil) \\ \forall t, \; r, \; ts\; ((le \;\; t \; r \; \Longrightarrow\; P(Cons \; r \; ts)) \; \Longrightarrow\;P(Cons \; t \; (Cons \; r \; ts)))}
