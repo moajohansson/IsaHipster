@@ -2,6 +2,116 @@
 
 \subsection{Recursion induction}
 
+When defining a recursive function over an inductive datatype one might traverse arguments following a different pattern to the strictly structural one.
+%
+This pattern could be more specific, or even less so, than the structural one.
+
+For instance, take the functions on lists \texttt{\fontfamily{lmvtt}\selectfont sorted} and \texttt{\fontfamily{lmvtt}\selectfont last}:
+
+\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
+fun sorted :: "Nat List $\Rightarrow$ Bool" where
+  "sorted Nil = True"
+| "sorted (Cons _ Nil) = True"
+| "sorted (Cons r (Cons t ts)) = (le r t & sorted (Cons t ts))"
+
+fun last :: "'a List $\Rightarrow$ 'a" where
+  "last (Cons t Nil) = t"
+| "last (Cons _ ts) = last ts"
+\end{lstlisting}
+
+\noindent From these definitions' structures one can derive two new induction principles.
+%
+In the case of \texttt{\fontfamily{lmvtt}\selectfont sorted}, cases are broken down more detailed ones whilst \texttt{\fontfamily{lmvtt}\selectfont last} is partially defined, meaning the induction scheme it gives rise to is to be completed with its missing case for empty lists, as the corresponding induction scheme depicts:
+
+\inferrule [SortedInd]
+  {P(Nil) \\ \forall u\; P(Cons \; u \; Nil) \\ \forall t, \; r, \; ts\; ((le \;\; t \; r \; \Longrightarrow\; P(Cons \; r \; ts)) \; \Longrightarrow\;P(Cons \; t \; (Cons \; r \; ts)))}
+  {\forall x \; P (x)}
+
+\inferrule [LastInd]
+  {P(Cons \; u \; Nil) \\ \forall r, \; t, \; ts\; (P(Cons \; r \; ts) \; \Longrightarrow\;P(Cons \; t \; (Cons \; r \; ts))) \\ P(Nil)}
+  {\forall x \; P (x)}
+
+Induction determined by these schemata is called \emph{recursion induction} or \emph{computation induction}.
+%
+They can isolate sub-units not represented in a datatypes structure as being atomic, such as lists with at least two elements in the scheme for \texttt{\fontfamily{lmvtt}\selectfont sorted}.
+%
+Recursion induction hence provides an immediate and more specific structure for reasoning about other recursion patterns where a simple structural induction would fail to set appropriate base cases for the inductive step to succeed.
+
+Particularly, within Isabelle/HOL these schemata are automatically derived as theorems from recursive functions termination order \cite{krauss-term}.
+ 
+ 
 \subsection{Recursion induction for conditionals}
 
+Conditional lemmas are required in breaking down reasoning into small units of focus.
+%
+Different scenarios and constructs require or give cause for constrained propositions:
+
+\begin{itemize}
+\item branching on conditions determining cases during a proof attempt
+\item proving algorithm correctness, where changes of consecutive steps are to be taken into account
+\item programming invariants
+\begin{itemize}
+\item in datatypes, where sometimes these cannot be encoded in the constructors and instead depend of the arrangement of data values conforming an instance and invariant preservation by from functions manipulating the datatype
+\item in functions and algorithms, where auxiliary functions might assume certain conditions on their input to be able to guarantee conditions over the output result.
+\end{itemize}
+\end{itemize}
+
+By employing recursion induction, a proof can be driven and shaped by the structure of its components (types or functions).
+%
+This allows to account for the imposition a side-condition may have on variables appearing in an explicit, direct way, whether it is via its own recursion induction scheme or its evaluation on cases isolated by another function's (appearing in the lemma) recursion induction.
+
+%% Example from presentation on difference
+
+Let us take for instance the already introduced conditional lemma required in proving insertion sort's correctness \texttt{\fontfamily{lmvtt}\selectfont sorted xs $\Longrightarrow$ sorted (insert x xs)}.
+%
+Applying structural induction would produce the subgoals:
+
+\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
+1. sorted [] $\Longrightarrow$ sorted (insert x [])
+2. $\wedge$ a y. (sorted y $\Longrightarrow$ sorted (insert x y)) $\Longrightarrow$ sorted (a # y) $\Longrightarrow$ sorted (insert x (a # y))
+\end{lstlisting}
+
+\noindent Whilst \texttt{\fontfamily{lmvtt}\selectfont sorted}'s recursion induction would yield:
+
+\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
+1. sorted [] $\Longrightarrow$ sorted (insert x [])
+2. $\wedge$ u. sorted [u] $\Longrightarrow$ sorted2 (insert x [u])
+3. $\wedge$ r t ts. (sorted (t # ts) $\Longrightarrow$ sorted (insert x (t # ts))) $\Longrightarrow$ sorted (r # t # ts) $\Longrightarrow$
+                sorted (insert x (r # t # ts))
+\end{lstlisting}
+
+%% TODO: complete
+
 \subsection{A tactic (not only) for conditionals}
+
+\subsubsection*{Simultaneous induction}
+
+The final tactic for Hipster explores the proofs one could attain by recursion inductions derived from either elements in a side-condition or in the conclusion of the lemma to be proven.
+%
+As a side-result, this increases the scope of Hipster's original approach for equational lemmas too.
+
+A notable gain, affecting both conditional and equational lemmas, is that of having the capability of performing simultaneous induction.
+%
+Such is the case for the list function \texttt{\fontfamily{lmvtt}\selectfont zip}'s recursion induction scheme, which corresponds to parallel induction on lists:
+
+\inferrule [ZipInd]
+  {\forall ts\; P(Nil,\; ts) \\ \forall z,\; rs\;\; P (Cons \; z \; rs, Nil)  \\ \forall z,\; y,\; rs,\; ts\;\; (P(rs,\;ts) \Longrightarrow\; P (Cons\; z\; rs,\; Cons\;y\; ts))}
+  {\forall xs, \; ys \;\; P (xs,\; ys)}
+
+\noindent This scheme, along with some initial theory exploration, allows theorems like the following to be provable:
+
+\begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
+zip (xs @ ys) zs = (zip xs (take (len xs) zs)) @ (zip ys (drop (len xs) zs))
+\end{lstlisting}
+
+\noindent Or even the alternative similar conditional lemma to be immediately provable:
+
+\begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
+len a = len b $\Longrightarrow$ (zip a b) @ (zip c d) = zip (a @ c) (b @ d)
+\end{lstlisting}
+
+
+\subsubsection*{Flexibilising Hipster}
+
+% Include or not?
+
