@@ -237,9 +237,9 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                                           SOME (NONE : Binding.binding option,(Free v,false)))
                          inductfrees;
          (* Throw away Isar related stuff and only take the Thm.thm seq *)
-      (*val _ = Pretty.writeln (Pretty.block ( [Pretty.str "induct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
+      val _ = Pretty.writeln (Pretty.block ( [Pretty.str "induct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
         | SOME (_, (Free (v,_),false)) => v) insts)), Pretty.str "; otherfrees: ", Pretty.str (Library.space_implode ", "
-          (map (fn (v,_) => v) otherfrees)) ]));*)
+          (map (fn (v,_) => v) otherfrees)) ]));
       val nw_thms' = (Induction.induction_tac ctxt false [insts] [(*non_ithings*)otherfrees] [] rule [] i goalthm)
             handle ERROR _ => Seq.empty (* let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end *)
       in
@@ -326,7 +326,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
               case rules of
                 []            => no_tac
               | ((n,r) :: rs) =>
-                  let (*val _ = Pretty.writeln (Pretty.str ("Rule: "^n))*)
+                  let val _ = Pretty.writeln (Pretty.str ("Rule: "^n))
                       val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
                       val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
               (*val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)*)

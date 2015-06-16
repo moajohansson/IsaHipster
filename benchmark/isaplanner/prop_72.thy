@@ -103,6 +103,22 @@ by (hipster_induct_schemes append.simps take.simps)
 lemma lemma_ay [thy_expl]: "rev (rev x3) = x3"
 by (hipster_induct_schemes rev.simps append.simps take.simps drop.simps len.simps minus.simps)
 
+(*
+4: xs++[] == xs
+5: []++xs == xs
+6: (x:xs)++ys == x:(xs++ys)
+7: (xs++ys)++zs == xs++(ys++zs)
+
+== Equations about several functions ==
+8: (length (xs++ys)) == (length (ys++xs))
+9: (length (x:(xs++ys))) == (length (x:(ys++xs)))
+10: (length (xs++(ys++zs))) == (length (xs++(zs++ys)))
+11: (length ((x:xs)++(y:ys))) == (length ((x:xs)++(z:ys)))
+12: (length ((x:xs)++(ys++zs))) == (length ((x:ys)++(xs++zs)))
+13: (length ((x:xs)++(ys++zs))) == (length ((y:xs)++(ys++zs)))
+14: (length ((xs++ys)++(zs++ys))) == (length ((xs++zs)++(ys++ys)))*)
+
+
 lemma ax2[thy_expl]: "len (append y (Cons2 ya xs)) = S (len (append y xs))"
 by(hipster_induct_schemes)
 
@@ -119,7 +135,7 @@ lemma lemma_takerev [thy_expl]: "take (len x) (rev x) = rev x"
 by (hipster_induct_schemes take.simps len.simps rev.simps append.simps)
 
 lemma lemma_droprev [thy_expl]: "drop (len x) (rev x) = Nil2"
-by (hipster_induct_schemes)
+by (hipster_induct_schemes drop.simps len.simps rev.simps)
 (*hipster len append rev drop take minus*)
 
 setup{* Hip_Tac_Ops.set_metis_to @{context} 800*}
