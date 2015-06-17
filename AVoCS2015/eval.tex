@@ -135,7 +135,7 @@ count x (x @ y) = count x (y @ x)
 \end{lstlisting}
 
 % The failure is associated to smaller lemmas not being discovered, possibly because discovery of lemmas limits constructed terms to a certain depth.
-\noindent These examples seem to indicate that recursion induction may not suffice when an operation nested within another has commuting arguments at each side of an equality.
+\noindent These examples seem to indicate that recursion induction may not suffice when a non-commutative operation nested within another has commuting arguments at each side of an equality.
 %
 At least not in the absence of smaller related lemmas corresponding to subgoals.
 %
@@ -145,25 +145,40 @@ Nonetheless, proofs for the problems associated to these lemmas can be partially
 %
 When extracted, the open subgoals are provable by Hipster.
 %
-Alternatively, for both cases, one can observe that the outermost 
+Alternatively, for both cases, one can observe that the outermost function applied, \isaCode{len} and \isaCode{count} respectively, acts as a relator function between two datatypes.
+%
+Furthermore, these will in fact act as relator functions between list concatenation \isaCode{@} and addition for natural numbers \isaCode{plus}.
+%
+Adding interactively \isaCode{plus} to the exploration succeeds at discovering necessary lemmas for automating these two pending proofs without further intervention.
 
-
-%If we were to include the function for addition on natural numbers, however, enough lemmas would have been automatically discovered to prove \texttt{len (append x y) = len (appen y x)} without needing any other intervention than including addition in the theory exploration for this small set of theorems.
+% TODO: successive inductions!
 
 \paragraph{Theory exploration}
 
-Over half of the problems originating from the first set did not require any exploration, whereas most of the problems from the second one required exploring at least a function for auxiliary lemmas. But overall, just over half of the cases required theory exploration, highlighting the benefit of employing it. Not surprisingly, equational lemmas were much more likely to need exploration than conditional ones. Equations are unrestricted and more general, hence potentially requiring more steps in order to proof their different case branches. On the other hand, for these benchmarks, conditionals provided constraints that narrow down cases.
+Just over half of the problems required prior lemma discovery, indicating the benefit of theory exploration.
+%
+Not surprisingly, equational lemmas were much more likely than conditionals to need exploration.
+%
+Equations are unrestricted and more general, hence potentially requiring more steps to asses their different case branches.
+%
+On the other hand, for these benchmarks, conditionals provided constraints that narrow down cases.
 
-Conditional exploration was necessary for a small subset of problems, namely for those involving functions defined in terms of some predicate.
+A smaller subset of problems were provable with the aid of conditional exploration, namely those involving functions defined in terms of some predicate.
 
 \paragraph{Recursion induction}
 
-Whereas recursion induction might not have been necessary in as many cases as theory exploration (for the main theorem or any auxiliary lemmas), the number of theorems requiring recursion induction is notable. Structural induction was attempted by the tactic during testing, hence all those theorems solved via recursion induction (around a third of the benchmarks) would have not been solved otherwise, at least not with the degree of exploration carried out.
-
-The results seem to indicate that recursion induction can save on exploration time, since it provides appropriate induction patterns that avoid the need for sub-lemmas about specific constructor combinations.
+Whereas recursion induction was not necessary as often as theory exploration (whether for the main theorem or auxiliary lemmas), its impact is still notable.
+%
+Structural induction was always attempted before by the tactic, meaning theorems solved via recursion induction (around a third of the benchmarks) would have not been solved otherwise, at least not with the degree of exploration carried out.
+ 
+The results suggest recursion induction can save on exploration time.
+%
+It provides appropriate induction patterns that avoid the need for sub-lemmas about specific constructor combinations.
 
 
 \subsubsection{Comparison}
+
+% Briefly describe others tested against
 
 \begin{tabularx}{\textwidth}{l | X X X | X X | X | X | X | X X X}
   & \multicolumn{3}{|c|}{Hipster}
@@ -176,6 +191,12 @@ The results seem to indicate that recursion induction can save on exploration ti
   Case-analysis & 80 & (82) & [83] & 80 & & 82 & 47 & 80 & 85 & & [86] \\
   Prod-failure & 41 & (47) & & 44 & (47) & 21 & - & 40 & & (47) & \\
 \end{tabularx}
+
+% Specify meaning of the numbers
+
+% Draw conclusions and compare the different approaches; mainly with HipSpec and Pirate (as an example from which we can draw a difference with using generalisation)
+
+% Emphasise interaction aspect
 
 
 % \subsection{Discussion}   % Observed behaviour
