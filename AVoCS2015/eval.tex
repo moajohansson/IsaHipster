@@ -110,40 +110,45 @@ Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational an
   Total & 71 & 15 & 38 & 12 \\
   \hline
   Fully automated & 67 & 14 & 29 & 12 \\
-  Partially automated & 2 & 0 & 6 & 0 \\
+  Partially automated & 4 & 0 & 6 & 0 \\
   \hline
-  Prior exploration & 32 & 4 & 34 & 4 \\
+  Prior exploration & 33 & 4 & 34 & 4 \\
   Conditional exploration & 6 & 2 & 2 & 3 \\
   \hline
   Recursion induction & 29 & 6 & 1 & 1 \\
   Recursion induction on sub-lemmas & 16 & 1 & 5 & 0 \\
   \hline
-  Filter theorems for FO prover & 3 & 0 & 0 & 0 \\
+  Filter theorems for FO prover & 3 & 0 & 0 & 0 \\ % XXX: remove this since we don't mention these options?
 \end{tabularx}
 
 \paragraph{Automation}
 %
-Full automation refers to solving a problem entirely only with lemmas discovered by Hipster's theory exploration and Hipster's automated recursion induction tactic. The rate of fully automated success is observed to be high, with an overall 90\%
-  provability on the benchmark set. For the conditionals in the test set this rate is higher, 96\%
- .
+Overall, the rate of fully automated provability on the benchmark set is 90\%, considering fully automation the solving of a problem only with discovered lemmas and Hipster's automated recursion induction.
+%
+For conditional lemmas in the test set this rate is higher, 96\%.
 
-\paragraph{Partially automated}
+A number of theorems required one of the following two similar lemmas, not automatically proven in a first instance:
 
-A number of theorems failed in a first instance due to the inability to automate the proof for a particular lemma, common to all of them:
+\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
+len (x @ y) = len (y @ x)
+count x (x @ y) = count x (y @ x)
+\end{lstlisting}
+
+% The failure is associated to smaller lemmas not being discovered, possibly because discovery of lemmas limits constructed terms to a certain depth.
+\noindent These examples seem to indicate that recursion induction may not suffice when an operation nested within another has commuting arguments at each side of an equality.
+%
+At least not in the absence of smaller related lemmas corresponding to subgoals.
+%
+This seems reasonable: the structure of the terms at each side of the equality will differ upon induction.
+
+Nonetheless, proofs for the problems associated to these lemmas can be partially automated.
+%
+When extracted, the open subgoals are provable by Hipster.
+%
+Alternatively, for both cases, one can observe that the outermost 
 
 
-This proof failure was due to there being missing a small lemma which was not discovered and yet would have led to complete their proof. Specifically, this lemma was:
-
-
-For efficiency reasons, lemmas are only constructed with terms up to a certain depth, 3
- , during theory exploration in the underlying HipSpec/QuickSpec whilst the required lemma has term depth 4
- , reason for which it is not obtained. QuickSpec would generate such a conjecture were it set to work with depth 4
- . This auxiliary lemma can be proven by Hipster's tactic and once it is added to the affected problem theories, the remaining proofs are all automated by Hipster.
-
-Examples of these partially automated theorems are:
-
-
-If we were to include the function for addition on natural numbers, however, enough lemmas would have been automatically discovered to prove \texttt{len (append x y) = len (appen y x)} without needing any other intervention than including addition in the theory exploration for this small set of theorems.
+%If we were to include the function for addition on natural numbers, however, enough lemmas would have been automatically discovered to prove \texttt{len (append x y) = len (appen y x)} without needing any other intervention than including addition in the theory exploration for this small set of theorems.
 
 \paragraph{Theory exploration}
 
@@ -173,4 +178,4 @@ The results seem to indicate that recursion induction can save on exploration ti
 \end{tabularx}
 
 
-\subsection{Discussion}   % Observed behaviour
+% \subsection{Discussion}   % Observed behaviour
