@@ -14,33 +14,33 @@ Keeping in mind evaluation of automated tools for interactive theorem proving ne
 
 We here showcase Hipster's handling of conditional lemmas via the proof of correctness for the theorem \isaCode{sorted (isort ts)}.
 %
-For it, we assume the less-or-equal operator \isaCode{le} for naturals (and no prior, additional lemmas), the already defined \isaCode{sorted} and the function definitions:
+For it, we assume the less-or-equal operator \isaCode{$\le$} for naturals (and no prior, additional lemmas), the already defined \isaCode{sorted} and the function definitions:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 fun insert :: "Nat $\Rightarrow$ Nat List $\Rightarrow$ Nat List" where
-  "insert r Nil           = Cons r Nil"
-| "insert r (Cons t ts) = (if (le r t) then Cons r (Cons t ts)	
-                                              else Cons t (insert r ts))"
+  "insert r []          = r # []"
+| "insert r (t # ts) = (if (r $\le$ t) then r # (t # ts)	
+                                           else t # (insert r ts))"
 
 fun isort :: "Nat List $\Rightarrow$ Nat List" where
-  "isort Nil           = Nil"
-| "isort (Cons t ts) = insert t (isort ts)"
+  "isort []          = []"
+| "isort (t # ts) = insert t (isort ts)"
 \end{lstlisting}
 
 Running exploration from the simpler components is the first step, considering both equational and conditional lemmas, since we have two predicates involved in the definiens of functions in the final theorem.
 %
-Starting with conditional exploration for \isaCode{le} and also for its negation, $10$ lemmas are yielded and proven, $6$ of which are conditionals (we present the vital lemmas towards the final proof) and all require recursion induction:
+Starting with conditional exploration for \isaCode{$\le$} and also for its negation, $10$ lemmas are yielded and proven, $6$ of which are conditionals (we present the vital lemmas towards the final proof) and all require recursion induction:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 hipster_cond le
 (...)
-lemma lemma_ac [thy_expl]: "le x y $\Longrightarrow$ le x (S y) = True"
+lemma lemma_ac [thy_expl]: "x $\le$ y $\Longrightarrow$ x $\le$ (S y) = True"
 by (hipster_induct_schemes le.simps Nat.exhaust)
 
-lemma lemma_ad [thy_expl]: "le y x $\Longrightarrow$ le (S x) y = False"
+lemma lemma_ad [thy_expl]: "y $\le$ x $\Longrightarrow$ (S x) $\le$ y = False"
 by (hipster_induct_schemes le.simps Nat.exhaust)
 (...)
-lemma lemma_ai [thy_expl]: "($\lnot$ le x y) $\Longrightarrow$ le x Z = False"
+lemma lemma_ai [thy_expl]: "($\lnot$ (x $\le$ y)) $\Longrightarrow$ x $\le$ Z = False"
 by (hipster_induct_schemes le.simps Nat.exhaust)
 (...)
 \end{lstlisting}
