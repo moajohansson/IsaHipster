@@ -37,11 +37,11 @@ We start with the first phase, where QuickSpec investigates non-conditional conj
  & Term & Ground Instance & Value \\
  \hline
 1 \quad &\texttt{sort xs} & \texttt{sort [3,1]} & \texttt{[1,3]} \\
-2 \quad&\texttt{sort(sort xs)} &\texttt{sort(sort [1,3])} & \texttt{[1,3]}\\  %% TODO: check this: shouldn't it be sort(sort [3,1])?
+2 \quad&\texttt{sort(sort xs)} &\texttt{sort(sort [3,1])} & \texttt{[1,3]}\\  
 3 \quad &\texttt{xs} &\texttt{[3,1]} & \texttt{[3,1]} \\
 \end{tabularx}
 
-\noindent Terms 1 and 2 evaluate to the same value and remain in the same equivalence class, while term 3 gets put in a different one. After this, no subsequent tests further split these equivalence classes, and we can read off the equation: \texttt{sort(sort xs) = xs}.  %% TODO: Isn't it sort(sort xs) = sort xs??
+\noindent Terms 1 and 2 evaluate to the same value and remain in the same equivalence class, while term 3 gets put in a different one. After this, no subsequent tests further split these equivalence classes, and we can read off the equation: \texttt{sort(sort xs) = sort xs}.  
 
 In the second phase, QuickSpec performs a new exploration, this time requiring the predicate \texttt{sorted xs} to hold for all test values. Suppose we test with the sorted list: \texttt{xs}$ \rightarrow$ \texttt{[1,2]} (other non-sorted values for \texttt{xs} would be discarded).       
 
