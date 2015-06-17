@@ -17,7 +17,7 @@ begin
        (Cons2 D (Nil2))"
   | "lin (Ex) = Cons2 X (Nil2)"
   | "lin (EY) = Cons2 Y (Nil2)"
-  hipster append lin
+  (*hipster append lin*)
   theorem x0 :
     "!! (u :: E) (v :: E) . ((lin u) = (lin v)) ==> (u = v)"
     oops

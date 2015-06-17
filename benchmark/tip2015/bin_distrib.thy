@@ -101,7 +101,7 @@ lemma lemma_al [thy_expl]: "plus (plus x2 y2) (plus z2 y2) = plus (plus x2 z2) (
 by (hipster_induct_schemes s.simps plus.simps)
 
 
-hipster s plus times
+(*hipster s plus times*)
 
 
 theorem x0 :

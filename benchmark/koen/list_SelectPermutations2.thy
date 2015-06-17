@@ -1,4 +1,4 @@
-theory list_SelectPermutations'
+theory list_SelectPermutations2
 imports Main
         "../../IsaHipster"
 begin

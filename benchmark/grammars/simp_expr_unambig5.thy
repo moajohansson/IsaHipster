@@ -16,7 +16,7 @@ begin
   "lin (Plus a b) =
      append (append (linTerm a) (Cons2 Pl (Nil2))) (lin b)"
   | "lin (Term t) = linTerm t"
-  hipster linTerm append lin
+  (*hipster linTerm append lin*)
   theorem x0 :
     "!! (u :: E) (v :: E) . ((lin u) = (lin v)) ==> (u = v)"
     oops

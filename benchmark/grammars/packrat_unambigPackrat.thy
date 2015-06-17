@@ -22,7 +22,7 @@ begin
   fun linS :: "S => Tok list" where
   "linS (A a) = linA a"
   | "linS (B b) = linB b"
-  hipster append linA linB linS
+  (*hipster append linA linB linS*)
   theorem x0 :
     "!! (u :: S) (v :: S) . ((linS u) = (linS v)) ==> (u = v)"
     oops
