@@ -1,15 +1,55 @@
 \label{sec:intro}
 
-Theory exploration is a technique for automatically discovering new interesting lemmas in a formal mathematical theory development. These lemmas are intended to help constructing a richer background theory about the concepts at hand (e.g. functions and datatypes) which can be useful both to enhance the power of automation as well as being of use in interactive proofs \cite{mathsaid,isacosy,isascheme}. Theory exploration has proved particularly useful for automation of inductive proofs \cite{hipspecCADE}. This work builds on Hipster \cite{hipster}, an interactive theory exploration system for the proof assistant Isabelle/HOL \cite{isabelle}. It can be used in two modes, either \emph{exploratory mode} to generate a set of basic lemmas about given datatypes and functions, or in \emph{proof mode}, where it assists the user by searching for missing lemmas needed to prove the current subgoal. To generate conjectures, Hipster uses as a backend the HipSpec system, a theory explorer for Haskell programs \cite{hipspecCADE}. Proofs are then performed by specialised tactics in Isabelle/HOL. Hipster has been shown capable of discovering and proving standard lemmas about recursive functions, thus speeding up theory development in Isabelle. However, lemma discovery by theory exploration has previously been restricted to equational properties. In this paper we take the first steps towards lifting this restriction and exploring also conditional conjectures. Conditional lemmas are necessary if we for example want to prove properties about sorting algorithms. As an example, consider the proof of correctness for insertion sort:
+Theory exploration is a technique for automatically discovering new interesting lemmas in a formal mathematical theory development.
+%
+These lemmas are intended to help constructing a richer background theory about the concepts at hand (e.g. functions and datatypes) which can be useful both to enhance the power of automation as well as being of use in interactive proofs \cite{mathsaid,isacosy,isascheme}.
+%
+Theory exploration has proved particularly useful for automation of inductive proofs \cite{hipspecCADE}. This work builds on Hipster \cite{hipster}, an interactive theory exploration system for the proof assistant Isabelle/HOL \cite{isabelle}.
+%
+It can be used in two modes, either \emph{exploratory mode} to generate a set of basic lemmas about given datatypes and functions, or in \emph{proof mode}, where it assists the user by searching for missing lemmas needed to prove the current subgoal.
+%
+To generate conjectures, Hipster uses as a backend the HipSpec system, a theory explorer for Haskell programs \cite{hipspecCADE}.
+%
+Proofs are then performed by specialised tactics in Isabelle/HOL. Hipster has been shown capable of discovering and proving standard lemmas about recursive functions, thus speeding up theory development in Isabelle.
+%
+However, lemma discovery by theory exploration has previously been restricted to equational properties.
+%
+In this paper we take the first steps towards lifting this restriction and exploring also conditional conjectures.
+%
+Conditional lemmas are necessary if we for example want to prove properties about sorting algorithms.
+%
+As an example, consider the proof of correctness for insertion sort:
+%
+%\begin{small}
 \begin{center}
-\texttt{theorem isortSorts: "sorted(isort xs)"}
+\isaCode{theorem isortSorts: "sorted (isort xs)"}
 \end{center}
+%\end{small}
+%
 To prove this theorem by induction will in the step-case require a lemma telling us that if a list is sorted, it remains so after an additional element is inserted:
+%
 \begin{center}		
-\texttt{lemma "sorted xs ==> sorted(insert x xs)"}
+\isaCode{lemma "sorted xs $\Longrightarrow$ sorted (insert x xs)"}
 \end{center}
-Discovering this kind of conditional lemmas introduces a big challenge for theory exploration. First of all, the search space greatly increases: what statements should be picked as potentially interesting side-conditions to explore? Secondly, as our theory exploration system relies on generation of random test-cases, we also need to ensure that we perform enough tests where the condition evaluates to true, otherwise the whole conjecture is trivially true. As Hipster is designed as an interactive system, we avoid the first problem by asking the user to specify under which condition theory exploration should occur. In the example above, this would require the user to tell Hipster that the predicate \texttt{sorted} is an interesting pre-condition, in addition to which function symbols should be explored in the bodies of lemmas. The rest of the process is however automatic. We describe it in more detail in \S \ref{} 
+%
+Discovering this kind of conditional lemmas introduces a big challenge for theory exploration.
+%
+First of all, the search space greatly increases: what statements should be picked as potentially interesting side-conditions to explore?
+%
+Secondly, as our theory exploration system relies on generation of random test-cases, we also need to ensure that we perform enough tests where the condition evaluates to true, otherwise the whole conjecture is trivially true.
+%
+As Hipster is designed as an interactive system, we avoid the first problem by asking the user to specify under which condition theory exploration should occur.
+%
+In the example above, this would require the user to tell Hipster that the predicate \isaCode{sorted} is an interesting pre-condition, in addition to which function symbols should be explored in the bodies of lemmas.
+%
+The rest of the process is however automatic. We describe it in more detail in \S \ref{} 
 
-The second contribution of this paper is a new automated tactic for \emph{recursion induction}. Previously, Hipster only supported structural induction over the datatypes, but has now been extended with a new tactic that uses recursion induction, following the termination order of function definitions instead of the datatype. This has shown to be useful for many proofs that previously failed, but can also provide shorter proofs in some cases. The new recursion induction tactic is described in \S \ref{sec:rec-ind}. It is used by Hipster during automated theory exploration, but can equally well be applied as a powerful regular tactic by a human user working in Isabelle.
-
-  
+The second contribution of this paper is a new automated tactic for \emph{recursion induction}.
+%
+Previously, Hipster only supported structural induction over the datatypes, but has now been extended with a new tactic that uses recursion induction, following the termination order of function definitions instead of the datatype.
+%
+This has shown to be useful for many proofs that previously failed, but can also provide shorter proofs in some cases.
+%
+The new recursion induction tactic is described in \S \ref{sec:rec-ind}.
+%
+It is used by Hipster during automated theory exploration, but can equally well be applied as a powerful regular tactic by a human user working in Isabelle.
