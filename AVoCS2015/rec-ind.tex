@@ -42,48 +42,6 @@ Particularly, within Isabelle/HOL these schemata are automatically derived as th
  
 \subsection{Recursion induction for conditionals}
 
-Conditional lemmas are required in breaking down reasoning into small units of focus.
-%
-Different scenarios and constructs require or give cause for constrained propositions:
-
-\begin{itemize}
-\item branching on conditions determining cases during a proof attempt
-\item proving algorithm correctness, where changes of consecutive steps are to be taken into account
-\item programming invariants
-\begin{itemize}
-\item in datatypes, where sometimes these cannot be encoded in the constructors and instead depend of the arrangement of data values conforming an instance and invariant preservation by from functions manipulating the datatype
-\item in functions and algorithms, where auxiliary functions might assume certain conditions on their input to be able to guarantee conditions over the output result.
-\end{itemize}
-\end{itemize}
-
-By employing recursion induction, a proof can be driven and shaped by the structure of its components (types or functions).
-%
-This allows to account for the imposition a side-condition may have on variables appearing in an explicit, direct way, whether it is via its own recursion induction scheme or its evaluation on cases isolated by another function's (appearing in the lemma) recursion induction.
-
-%% Example from presentation on difference
-
-Let us take for instance the already introduced conditional lemma required in proving insertion sort's correctness \isaCode{sorted xs $\Longrightarrow$ sorted (insert x xs)}.
-%
-Applying structural induction would produce the subgoals:
-
-\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
-1. sorted [] $\Longrightarrow$ sorted (insert x [])
-2. $\wedge$ a y. (sorted y $\Longrightarrow$ sorted (insert x y)) $\Longrightarrow$ sorted (a # y) $\Longrightarrow$ sorted (insert x (a # y))
-\end{lstlisting}
-
-\noindent Whilst \isaCode{sorted}'s recursion induction would yield:
-
-\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
-1. sorted [] $\Longrightarrow$ sorted (insert x [])
-2. $\wedge$ u. sorted [u] $\Longrightarrow$ sorted (insert x [u])
-3. $\wedge$ r t ts. (sorted (t # ts) $\Longrightarrow$ sorted (insert x (t # ts))) $\Longrightarrow$ sorted (r # t # ts) $\Longrightarrow$
-                sorted (insert x (r # t # ts))
-\end{lstlisting}
-
-The latter set of subgoals leads to an immediate proof of the main lemma thanks to its definition of steps being parallel to that of the actual predicate.
-%
-In contrast, the former, even though intuitively looks immediate to prove, is not sufficiently generalised to be so nor does it specify any intermediate result on inserting an element on a concrete non-empty list (in our case, the singleton list) which would enable to prove the subgoal for any arbitrary list.
-
 
 \subsection{A tactic (not only) for conditionals}
 
