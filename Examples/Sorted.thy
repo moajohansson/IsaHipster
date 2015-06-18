@@ -27,11 +27,18 @@ where
   "sorted [] = True"
 | "sorted [x] = True"
 | "sorted (x # y # xs) = ((leq x y) \<and> (sorted (y#xs)))"
+thm sorted.induct
+
+fun last :: "'a list \<Rightarrow> 'a" where
+  "last ([t]) = t"
+| "last (_ # ts) = last ts"
+thm last.induct
 
 fun ins :: " Nat => Nat list => Nat list"
 where
  "ins x [] = [x]"
 |"ins x (y#ys) = (if (leq x y) then (x#y#ys) else (y#(ins x ys)))"
+thm ins.induct
 
 hipster sorted ins
 lemma lemma_ac [thy_expl]: "leq x2 x2 = True"

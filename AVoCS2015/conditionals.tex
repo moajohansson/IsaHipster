@@ -1,86 +1,83 @@
 \label{sec:conditionals}
 
-\subsection{Need for conditionals}
+\subsection{A Need for Conditionals}
 
 Conditional lemmas are required in breaking down reasoning into small units of focus.
 %
-Different scenarios and constructs require or give cause for constrained propositions:
+Different scenarios and constructs require or give rise to constrained propositions:
 
-\begin{itemize}
+\begin{itemize}\itemsep0mm
 \item branching on conditions determining cases during a proof attempt
 \item proving algorithm correctness, where changes of consecutive steps are to be taken into account
 \item programming invariants
-\begin{itemize}
+\begin{itemize}\itemsep1mm
 \item in datatypes, where sometimes these cannot be encoded in the constructors and instead depend of the arrangement of data values conforming an instance and invariant preservation by from functions manipulating the datatype
 \item in functions and algorithms, where auxiliary functions might assume certain conditions on their input to be able to guarantee conditions over the output result.
 \end{itemize}
 \end{itemize}
 
-By employing recursion induction, a proof can be driven and shaped by the structure of its components (types or functions).
+By employing recursion induction, a proof can be driven and shaped by the structure of its components (types or functions), further explained in \S \ref{sec:rec-ind}.
 %
 This allows to account for the imposition a side-condition may have on variables appearing in an explicit, direct way, whether it is via its own recursion induction scheme or its evaluation on cases isolated by another function's (appearing in the lemma) recursion induction.
 
-%% Example from presentation on difference
 
-Let us take for instance the already introduced conditional lemma required in proving insertion sort's correctness \isaCode{sorted xs $\Longrightarrow$ sorted (insert x xs)}.
-%
-Applying structural induction would produce the subgoals:
-
-\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
-1. sorted [] $\Longrightarrow$ sorted (insert x [])
-2. $\wedge$ a y. (sorted y $\Longrightarrow$ sorted (insert x y)) $\Longrightarrow$ sorted (a # y) $\Longrightarrow$ sorted (insert x (a # y))
-\end{lstlisting}
-
-\noindent Whilst \isaCode{sorted}'s recursion induction would yield:
-
-\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
-1. sorted [] $\Longrightarrow$ sorted (insert x [])
-2. $\wedge$ u. sorted [u] $\Longrightarrow$ sorted (insert x [u])
-3. $\wedge$ r t ts. (sorted (t # ts) $\Longrightarrow$ sorted (insert x (t # ts))) $\Longrightarrow$ sorted (r # t # ts) $\Longrightarrow$
-                sorted (insert x (r # t # ts))
-\end{lstlisting}
-
-The latter set of subgoals leads to an immediate proof of the main lemma thanks to its definition of steps being parallel to that of the actual predicate.
-%
-In contrast, the former, even though intuitively looks immediate to prove, is not sufficiently generalised to be so nor does it specify any intermediate result on inserting an element on a concrete non-empty list (in our case, the singleton list) which would enable to prove the subgoal for any arbitrary list.
-
-
-\subsection{Interactive case study: insertion sort}
+\subsection{Interactive Case Study: Insertion Sort}
 
 We here showcase Hipster's handling of conditional lemmas via the proof of correctness for the theorem \isaCode{sorted (isort ts)}.
 %
-For it, we assume the less-or-equal operator \isaCode{$\le$} for naturals (and no prior, additional lemmas), the already defined \isaCode{sorted} and the function definitions:
+For it, we assume the less-or-equal operator \isaCode{$\le$} for naturals (and no prior, additional lemmas), and the function definitions:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
+fun sorted :: "Nat List $\Rightarrow$ Bool" where
+  "sorted [] = True"
+| "sorted ([_]) = True"
+| "sorted (r # (t # ts)) = (r $\le$ t & sorted (t # ts))"
+
 fun insert :: "Nat $\Rightarrow$ Nat List $\Rightarrow$ Nat List" where
-  "insert r []          = r # []"
+  "insert r [] = r # []"
 | "insert r (t # ts) = (if (r $\le$ t) then r # (t # ts)	
                                            else t # (insert r ts))"
 
 fun isort :: "Nat List $\Rightarrow$ Nat List" where
-  "isort []          = []"
+  "isort [] = []"
 | "isort (t # ts) = insert t (isort ts)"
 \end{lstlisting}
 
 Running exploration from the simpler components is the first step, considering both equational and conditional lemmas, since we have two predicates involved in the definiens of functions in the final theorem.
 %
-Starting with conditional exploration for \isaCode{$\le$} and also for its negation, $10$ lemmas are yielded and proven, $6$ of which are conditionals (we present the vital lemmas towards the final proof) and all require recursion induction:
+The following command invokes conditional exploration for \isaCode{$\le$}:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
-hipster_cond le
-(...)
+hipster_cond $\le$
+\end{lstlisting}
+
+\noindent which, along with conditional exploration for its negation, results in $10$ discovered and proven lemmas, $6$ of which are conditionals (we present the vital lemmas towards the final proof) and all require recursion induction:
+
+\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 lemma lemma_ac [thy_expl]: "x $\le$ y $\Longrightarrow$ x $\le$ (S y) = True"
-by (hipster_induct_schemes le.simps Nat.exhaust)
+by (hipster_induct_schemes $\le$.simps Nat.exhaust)
 
 lemma lemma_ad [thy_expl]: "y $\le$ x $\Longrightarrow$ (S x) $\le$ y = False"
-by (hipster_induct_schemes le.simps Nat.exhaust)
+by (hipster_induct_schemes $\le$.simps Nat.exhaust)
 (...)
 lemma lemma_ai [thy_expl]: "($\lnot$ (x $\le$ y)) $\Longrightarrow$ x $\le$ Z = False"
-by (hipster_induct_schemes le.simps Nat.exhaust)
+by (hipster_induct_schemes $\le$.simps Nat.exhaust)
 (...)
 \end{lstlisting}
 
-A new exploration considering the functions about sorting itself and taking \isaCode{sorted} as a side-condition for which to discover lemmas, Hipster discovers and proves both the conditional auxiliary lemma required and the goal theorem.
+\noindent Hipster automatically generates this output.
+%
+For each case, the \isaCode{lemma} command makes the statement to be proven and is followed by a tactic application via the \isaCode{by} command.
+%
+Hipster's new tactic is \isaCode{hipster\_induct\_schemes}.
+%
+It employs recursion induction where necessary.
+%
+To enable the completion of the proof, exploration provides it with the automatically generated Isabelle rules for simplification of function definitions, such as \isaCode{$\le$.simps}, and datatype case distinction rules, such as \isaCode{Nat.exhaust}.
+
+With a new exploration considering the functions about sorting itself and (potentially) taking \isaCode{sorted} as a side-condition for which to discover lemmas, Hipster discovers and proves both the conditional auxiliary lemma required and the goal theorem.
+%
+Note that the exploration command takes as its first argument the predicate with which to construct side-conditions:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 hispter_cond sorted isort insert
@@ -102,9 +99,9 @@ lemma insertComm [thy_expl]: "insert x (insert y z) = insert y (insert x z)"
 by (hipster_induct_schemes insert.simps)
 \end{lstlisting}
 
-Invoking the recursion induction tactic \isaCode{hipster\_induct\_schemes} once proves all of the statements above, simplifying the interaction with the proof assistant; recursion induction therefore proves to be successful in automating proofs.
+Invoking the recursion induction tactic \isaCode{hipster\_induct\_schemes} once proves all of the statements above, simplifying the interaction with the proof assistant.
 %
-Particularly, the crucial lemma \isaCode{isortInvariant} is proven applying \isaCode{sorted}'s associated induction scheme, highlighting once again the need for support of conditional lemmas in automated inductive proving and the possibilities recursion induction brings.
+Particularly, the crucial lemma \isaCode{isortInvariant} is proven applying \isaCode{sorted}'s associated induction scheme, highlighting once again the need for support of conditional lemmas in automated inductive proving and the possibilities recursion induction brings towards proof automation.
 
 % XXX: include? IF we mention new options
 % Lastly, the benefit of an interactive environment is being able to parameterise the proving methods with adequate options as one works along. This supervised automation can be of great utility to a user during a formal theory development.
