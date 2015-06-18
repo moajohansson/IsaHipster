@@ -59,45 +59,51 @@ Particularly, within Isabelle/HOL these schemata are automatically derived as th
 
 %% Example from presentation on difference
 
-Let us take for instance the already introduced conditional lemma required in proving insertion sort's correctness \isaCode{sorted xs $\Longrightarrow$ sorted (insert x xs)}.
-
-
-Applying structural induction would produce the subgoals:
+To exemplify the potential difference between recursion and structural induction, let us take the already introduced conditional lemma \isaCode{sorted xs $\Longrightarrow$ sorted (insert x xs)}.
+%
+Applying structural induction on the list \isaCode{xs} would produce the subgoals:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 1. sorted [] $\Longrightarrow$ sorted (insert x [])
-2. $\wedge$ a y. (sorted y $\Longrightarrow$ sorted (insert x y)) $\Longrightarrow$ sorted (a # y) $\Longrightarrow$ sorted (insert x (a # y))
+2. $\wedge$ a y. (sorted y $\Longrightarrow$ sorted (insert x y)) $\Longrightarrow$ sorted (a # y) $\Longrightarrow$
+            sorted (insert x (a # y))
 \end{lstlisting}
 
-\noindent Whilst \isaCode{sorted}'s recursion induction would yield:
+\noindent Whilst \isaCode{sorted}'s recursion induction scheme would yield:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 1. sorted [] $\Longrightarrow$ sorted (insert x [])
 2. $\wedge$ u. sorted [u] $\Longrightarrow$ sorted (insert x [u])
 3. $\wedge$ r t ts. (sorted (t # ts) $\Longrightarrow$ sorted (insert x (t # ts))) $\Longrightarrow$ sorted (r # t # ts) $\Longrightarrow$
-                sorted (insert x (r # t # ts))
+               sorted (insert x (r # t # ts))
 \end{lstlisting}
 
-The latter set of subgoals leads to an immediate proof of the main lemma thanks to its definition of steps being parallel to that of the actual predicate.
+The latter set of subgoals leads to an immediate proof of the main lemma thanks to its steps mirroring the actual predicate definition, hence having a correspondence with its simplification rules.
 %
-In contrast, the former, even though intuitively looks immediate to prove, is not sufficiently generalised to be so nor does it specify any intermediate result on inserting an element on a concrete non-empty list (in our case, the singleton list) which would enable to prove the subgoal for any arbitrary list.
+In contrast, the former, even though intuitively looks immediate to prove, is not sufficiently generalised nor does it specify any intermediate result on inserting an element on a concrete non-empty list (in our case, the singleton list) which would enable to prove the second subgoal for any arbitrary list. Structural induction is in some way a weaker scheme and additional case-splits or lemmas would be required to close the proof employing it in our example.
 
 
 \subsection{A tactic (not only) for conditionals}
 
 \subsubsection*{Simultaneous induction}
 
-The final tactic for Hipster explores the proofs one could attain by recursion inductions derived from either elements in a side-condition or in the conclusion of the lemma to be proven.
+The final tactic for Hipster explores the proofs one could attain by recursion inductions derived from functions occurring in the conjecture.
 %
 As a side-result, this increases the scope of Hipster's original approach for equational lemmas too.
 
-A notable gain, affecting both conditional and equational lemmas, is that of having the capability of performing simultaneous induction.
+A notable gain, affecting both conditional and equational lemmas, is that of having the capability of performing simultaneous induction, whereas previously only structural inductions on a single variable were performed by Hipster.
+%
+Simultaneous induction schemata are those inducting over more than one variable at a time, whether those variables are of the same type or not.
 %
 Such is the case for the list function \isaCode{zip}'s recursion induction scheme, which corresponds to parallel induction on lists:
+
+\vspace{2 mm}
 
 \inferrule [ZipInd]
   {\forall ts\;\; P\;([],\; ts) \\ \forall z,\; rs\;\; P\;(z\;\#\; rs, [])  \\ \forall z,\; y,\; rs,\; ts\;\; (P\;(rs,\;ts) \Longrightarrow\; P\;(z\; \# \; rs,\; y\;\#\; ts))}
   {\forall xs, \; ys \;\; P\;(xs,\; ys)}
+
+\vspace{2 mm}
 
 \noindent This scheme, along with some initial theory exploration, allows theorems like the following to be provable:
 
