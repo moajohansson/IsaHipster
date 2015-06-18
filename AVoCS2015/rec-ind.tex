@@ -111,12 +111,19 @@ Such is the case for the list function \isaCode{zip}'s recursion induction schem
 zip (xs @ ys) zs = (zip xs (take (len xs) zs)) @ (zip ys (drop (len xs) zs))
 \end{lstlisting}
 
-\noindent 
-\noindent Or even the alternative similar conditional lemma to be immediately provable:
+\noindent Or even the alternative related conditional lemma to be immediately provable:
 
 \begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
 len a = len b $\Longrightarrow$ (zip a b) @ (zip c d) = zip (a @ c) (b @ d)
 \end{lstlisting}
+
+Neither of these lemmas was provable before, even having done exploration for all the occurring functions in them.
+%
+Hipster's prior structural induction approach could not capture in a scheme the relation between two variables.
+%
+In these two cases, \isaCode{zip} traverses its arguments taking steps on both at the same time, a pattern we can only capture with some form of simultaneous induction.
+%
+Instead of synthesising a series of possible simultaneous induction schemes, recursion induction gives us an immediate choice which is also closer to the problem at hand.
 
 
 \subsubsection*{Flexibilising Hipster}
