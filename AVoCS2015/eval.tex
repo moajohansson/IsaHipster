@@ -60,15 +60,16 @@ Overall, the rate of fully automated provability on the benchmark set is 90\%, c
 %
 For conditional lemmas in the test set this rate is higher, 96\%.
 
-A number of theorems (problems $52$, $53$, $72$, $74$ from \emph{case-analysis}; and $2$, $4$, $5$, $20$, $22$, $23$ from \emph{prod-failure}) required one of the following two similar lemmas, not automatically proven in a first instance:
+A number of theorems (problems $52$, $53$, $72$, $74$ from \emph{case-analysis}; and $2$, $4$, $5$, $20$, $22$, $23$ from \emph{prod-failure}) required one of the following two similar lemmas, not automatically proven in a first instance (neither by structural nor recursion induction):
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 len (x @ y) = len (y @ x)
-count x (x @ y) = count x (y @ x)
+count z (x @ y) = count z (y @ x)
 \end{lstlisting}
 
-% The failure is associated to smaller lemmas not being discovered, possibly because discovery of lemmas limits constructed terms to a certain depth.
-\noindent These examples seem to indicate that recursion induction may not suffice when a non-commutative operation nested within another has commuting arguments at each side of an equality.
+\noindent The failure is associated to less general auxiliary lemmas not being discovered. % Discovery possibly because discovery of lemmas limits constructed terms to a certain depth.
+
+These examples seem to indicate that recursion induction may not suffice when a non-commutative operation nested within another has commuting arguments at each side of an equality.
 %
 At least not in the absence of smaller related lemmas corresponding to subgoals.
 %
@@ -82,7 +83,18 @@ Alternatively, for both cases, one can observe that the outermost function appli
 %
 Furthermore, these will in fact act as relator functions between list concatenation \isaCode{@} and addition for natural numbers \isaCode{plus}.
 %
-Adding interactively \isaCode{plus} to the exploration succeeds at discovering necessary lemmas for automating these two pending proofs without further intervention.
+Since \isaCode{plus} does not occur in the problems to be proven, it is not added to the exploration directly.
+%
+Adding adding \isaCode{plus} interactively, Hipster discovers and proves automatically the lemmas:
+
+\begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
+len (x @ y) = plus (len x) (len y)
+count z (x @ y) = plus (count z x) (count z y)
+\end{lstlisting}
+
+\noindent Along with the commutative law for \isaCode{plus}, also discovered and proven automatically, these enable the automation of the two pending proofs without further intervention.
+%
+And so, the corresponding TIP problems are solved as well.
 
 % TODO: successive inductions!
 
