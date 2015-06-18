@@ -98,23 +98,26 @@ And so, the corresponding TIP problems are solved as well.
 
 % TODO: successive inductions!
 
+
 \paragraph{Theory exploration}
 
 Just over half of the problems required prior lemma discovery, indicating the benefit of theory exploration.
 %
-Not surprisingly, equational lemmas were much more likely than conditionals to need exploration.
+Equational lemmas were much more likely than conditionals to need exploration.
 %
-Equations are unrestricted and more general, hence potentially requiring more steps to asses their different case branches.
+Equations are unrestricted and can be more general, potentially requiring more steps to assess different case branches.
 %
-On the other hand, for these benchmarks, conditionals provided constraints that narrow down cases.
+However, the number of conditional problems in these benchmarks is low, and one cannot draw conclusions as to whether exploration becomes less necessary, or not, when a statement to be proven is constrained by a side-condition.% On the other hand, for these benchmarks, conditionals provided constraints that narrow down cases.
 
 A smaller subset of problems were provable with the aid of conditional exploration, namely those involving functions defined in terms of some predicate.
 
 \paragraph{Recursion induction}
 
 Whereas recursion induction was not necessary as often as theory exploration (whether for the main theorem or auxiliary lemmas), its impact is still notable.
+
+Overall, there seems to be a trade-off between using weaker induction schemes (structural induction) and reducing the number and complexity of needed auxiliary lemmas.
 %
-Structural induction was always attempted before by the tactic, meaning theorems solved via recursion induction (around a third of the benchmarks) would have not been solved otherwise, at least not with the degree of exploration carried out.
+Structural induction was always attempted first by the tactic, meaning theorems solved via recursion induction (around a third of the benchmarks) would have not been solved otherwise, at least not with the degree of exploration carried out.
  
 The results suggest recursion induction can save on exploration time.
 %
@@ -124,6 +127,18 @@ It provides appropriate induction patterns that avoid the need for sub-lemmas ab
 \subsection{Comparison}
 
 % Briefly describe others tested against
+
+Other inductive provers have also been evaluated on the test suites we have presented results for, serving as a good point of comparison.
+%
+The following table collects the number of problems solved by some of these in comparison with Hipster.
+%
+Plain figures correspond to fully automated solutions to problems and those in parenthesis $(x)$ indicate number of successful proofs after some adaptation of settings.
+%
+In total, \emph{case-analysis} has $85$ problems whilst \emph{prod-failure} has $50$.
+%
+Additionally, a last theorem was not evaluated in all of the associated works, as brought up in \cite{SPASSInduction}. Results including such a lemma are given with square brackets $[x]$.
+
+\vspace{2 mm}
 
 \begin{tabularx}{\textwidth}{l | X X X | X X | X | X | X | X X X}
   & \multicolumn{3}{|c|}{Hipster}
@@ -137,11 +152,20 @@ It provides appropriate induction patterns that avoid the need for sub-lemmas ab
   Prod-failure & 41 & (47) & & 44 & (47) & 21 & - & 40 & & (47) & \\
 \end{tabularx}
 
-% Specify meaning of the numbers
+\vspace{2 mm}
 
-% Draw conclusions and compare the different approaches; mainly with HipSpec and Pirate (as an example from which we can draw a difference with using generalisation)
+The already mentioned HipSpec uses theory exploration, structural induction and external first-order provers to prove properties about functional programs \cite{hipspecCADE}.
+%
+Zeno is a tool for proving equational inductive properties of Haskell programs \cite{zeno}.
+%
+Both CVC4 and Pirate are based on SMT solving, with a top-down approach in conjecture generation \cite{cvc4, SPASSInduction}.
+%
+IsaPlanner is a proof planning tool for Isabelle based on rippling.
 
-% Emphasise interaction aspect
+In comparison to other (automated) inductive provers, the new Hipster is the only one (to the best of our knowledge) to employ recursion induction.
+%
+Its performance is on par 
+
+%TODO TODO TODO: factorial, etc.
 
 
-% \subsection{Discussion}   % Observed behaviour
