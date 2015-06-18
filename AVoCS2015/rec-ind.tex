@@ -105,12 +105,13 @@ Such is the case for the list function \isaCode{zip}'s recursion induction schem
 
 \vspace{2 mm}
 
-\noindent This scheme, along with some initial theory exploration, allows theorems like the following to be provable:
+\noindent This scheme, along with some initial theory exploration, allows theorems like the following to be provable automatically:
 
 \begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
 zip (xs @ ys) zs = (zip xs (take (len xs) zs)) @ (zip ys (drop (len xs) zs))
 \end{lstlisting}
 
+\noindent 
 \noindent Or even the alternative similar conditional lemma to be immediately provable:
 
 \begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
