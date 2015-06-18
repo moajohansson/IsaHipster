@@ -55,7 +55,7 @@ by (hipster_induct_simp_metis zip2.simps)
 lemma lemma_acz [thy_expl]: "zip2 Nil2 x1 = zip2 y1 Nil2"
 by (hipster_induct_simp_metis zip2.simps)
 
-hipster zip2 append take len drop
+(*hipster zip2 append take len drop*)
 lemma lemma_ad [thy_expl]: "zip2 x1 (testind.append x1 y1) = zip2 x1 x1"
 by (hipster_induct_simp_metis testind.zip2.simps testind.append.simps testind.take.simps testind.len.simps testind.drop.simps testind.list.exhaust testind.Pair2.exhaust testind.Nat.exhaust)
 
@@ -172,12 +172,21 @@ oops
 lemma unknown [thy_expl]: "testind.take (len x) (testind.take y x) = testind.take y x"
 oops
 
+theorem t: "len a = len b \<Longrightarrow> append (zip2 a b) (zip2 c d) = zip2 (append a c) (append b d)"
+       apply(induction d arbitrary: a b c)
+       apply simp_all
+       sledgehammer
+       by (hipster_induct_simp_metis zip2.simps len.simps take.simps drop.simps append.simps Nat.exhaust list.exhaust)
+
+
   theorem x0 :
     "(zip2 (append xs ys) zs) =
        (append (zip2 xs (take (len xs) zs)) (zip2 ys (drop (len xs) zs)))"
-       apply(induction xs arbitrary: zs ys)
+       apply(induction zs arbitrary: ys xs)
        apply simp_all
-       sledgehammer
+
+apply (metis lemma_a lemma_acz lemma_ai testind.append.simps(1) zip2.simps(1))
+sledgehammer
        by (hipster_induct_simp_metis zip2.simps len.simps take.simps drop.simps append.simps Nat.exhaust list.exhaust)
 
 end
