@@ -7,7 +7,7 @@ Keeping in mind evaluation of automated tools for interactive theorem proving ne
 \begin{itemize}
 \item case studies on algebraic data types and operations on them; in particular focusing on inductive theories for natural numbers and lists
 
-\item evaluation on problems from  TIP (Tons of Inductive Problems) \cite{tip-benchmarks}, a set of benchmarks and challenge problems for inductive theorem provers.
+\item evaluation on problems from TIP (Tons of Inductive Problems) \cite{tip-benchmarks}, a set of benchmarks and challenge problems for inductive theorem provers.
 \end{itemize}
 
 From TIP, we evaluate Hipster over two sets of problems employed in previous works on inductive theorem proving: Johansson, Dixon and Bundy's work on case-analysis for rippling \cite{IsaPcase} (we denote it \emph{case-analysis}), and prior work by Ireland and Bundy on employing proof failure to guide lemma discovery and patch inductive proofs \cite{productiveuse} (we denote it \emph{prod-failure}).
@@ -171,8 +171,15 @@ In comparison to other (automated) inductive provers, the new Hipster is the onl
 %
 As results show, its performance is on par to other state of the art tools'.
 %
-To be noted is that the failing problems for Hipster in the benchmark set \emph{prod-failure} (problems $33$-$35$) differ from those that 
+To be noted is that the failing problems for Hipster in the benchmark set \emph{prod-failure} (problems $33$-$35$) differ from those HipSpec and Pirate fail at (with the exception of $33$ in Pirate's case).
+%
+These three problems involve definitions for multiplication, factorial and exponentiation operations for Peano numerals with accumulator arguments.
+%
+Particularly, HipSpec employed adjusted settings in these three cases due to memory usage during testing in QuickSpec to be able to discover appropriate helping lemmas.
+%
+Hipster has not been evaluated with adjusted settings at the HipSpec/QuickSpec level and hence the exploration phase was not feasible to perform for them.
+%
+With similar settings to HipSpec's, there is a probability problems $33$-$35$ would be solvable in Hipster too.
 
-%TODO TODO TODO: factorial, etc.
 
 
