@@ -183,6 +183,73 @@ fun len :: "Nlist \<Rightarrow> Nat" where
   "prev (PNil) = PNil"
   | "prev (PCons y xs) = pappend (prev xs) (PCons y (PNil))"
 
+hipster append rev len
+lemma lemma_as [thy_expl]: "prop_82.append (prop_82.append x1 y1) z1 =
+prop_82.append x1 (prop_82.append y1 z1)"
+by (hipster_induct_schemes prop_82.append.simps prop_82.rev.simps prop_82.len.simps prop_82.Nlist.exhaust prop_82.Nat.exhaust)
+
+lemma unknown [thy_expl]: "len (prop_82.append x y) = len (prop_82.append y x)"
+oops
+
+lemma miss[thy_expl]: "append x NNil = x"
+by (hipster_induct_schemes prop_82.append.simps prop_82.rev.simps prop_82.len.simps prop_82.Nlist.exhaust prop_82.Nat.exhaust)
+
+lemma withM_a [thy_expl]: "prop_82.append (prop_82.rev x) (prop_82.rev y) =
+prop_82.rev (prop_82.append y x)"
+by (hipster_induct_schemes prop_82.append.simps prop_82.rev.simps prop_82.len.simps prop_82.Nlist.exhaust prop_82.Nat.exhaust)
+
+lemma withM_aa [thy_expl]: "prop_82.rev (prop_82.rev x) = x"
+by (hipster_induct_schemes prop_82.append.simps prop_82.rev.simps   )
+
+lemma unknown [thy_expl]: "len (prop_82.rev x) = len x"
+oops
+
+hipster prev pappend
+lemma lemma_at [thy_expl]: "pappend (pappend x1 y1) z1 = pappend x1 (pappend y1 z1)"
+by (hipster_induct_schemes prop_82.prev.simps prop_82.pappend.simps prop_82.PList.exhaust prop_82.NPair.exhaust)
+
+lemma miss_b[thy_expl]: "pappend x PNil = x"
+by (hipster_induct_schemes prop_82.prev.simps prop_82.pappend.simps prop_82.PList.exhaust prop_82.NPair.exhaust)
+
+lemma withM_ab [thy_expl]: "pappend (prev x) (prev y) = prev (pappend y x)"
+by (hipster_induct_schemes prop_82.prev.simps prop_82.pappend.simps prop_82.PList.exhaust prop_82.NPair.exhaust)
+
+lemma withM_ac [thy_expl]: "prev (prev x) = x"
+by (hipster_induct_schemes prop_82.prev.simps prop_82.pappend.simps prop_82.PList.exhaust prop_82.NPair.exhaust)
+
+hipster pzip pappend prev rev append len
+lemma lemma_au [thy_expl]: "pzip x1 (prop_82.append x1 y1) = pzip x1 x1"
+by (hipster_induct_schemes prop_82.pzip.simps prop_82.pappend.simps prop_82.prev.simps prop_82.rev.simps prop_82.append.simps prop_82.len.simps prop_82.PList.exhaust prop_82.Nlist.exhaust prop_82.Nat.exhaust prop_82.NPair.exhaust)
+
+lemma lemma_av [thy_expl]: "pzip (prop_82.append x32 y32) x32 = pzip x32 x32"
+by (hipster_induct_schemes prop_82.pzip.simps prop_82.pappend.simps prop_82.prev.simps prop_82.rev.simps prop_82.append.simps prop_82.len.simps prop_82.PList.exhaust prop_82.Nlist.exhaust prop_82.Nat.exhaust prop_82.NPair.exhaust)
+
+lemma lemma_aw [thy_expl]: "pappend (pzip x1 x1) (pzip y1 z1) =
+pzip (prop_82.append x1 y1) (prop_82.append x1 z1)"
+by (hipster_induct_schemes prop_82.pzip.simps prop_82.pappend.simps prop_82.prev.simps prop_82.rev.simps prop_82.append.simps prop_82.len.simps prop_82.PList.exhaust prop_82.Nlist.exhaust prop_82.Nat.exhaust prop_82.NPair.exhaust)
+
+lemma unknown [thy_expl]: "len (prop_82.append x y) = len (prop_82.append y x)"
+oops
+
+lemma unknown [thy_expl]: "len (prop_82.rev x) = len x"
+oops
+
+lemma unknown [thy_expl]: "pzip (prop_82.append x y) (prop_82.rev x) = pzip x (prop_82.rev x)"
+oops
+
+lemma unknown [thy_expl]: "pzip (prop_82.rev x) (prop_82.append x y) = pzip (prop_82.rev x) x"
+oops
+
+lemma unknown [thy_expl]: "pzip (prop_82.append x x) (prop_82.rev x) = pzip x (prop_82.rev x)"
+oops
+
+lemma unknown [thy_expl]: "pzip (prop_82.rev x) (prop_82.append x x) = pzip (prop_82.rev x) x"
+oops
+
+lemma unknown [thy_expl]: "pzip (prop_82.rev x) (prop_82.rev x) = prev (pzip x x)"
+oops
+
+
   theorem x1 :
     "((len xs) = (len ys)) ==>
        ((pzip (rev xs) (rev ys)) = (prev (pzip xs ys)))"
