@@ -2,7 +2,7 @@
 
 A recursion induction scheme is specific for and associated to a function's definition.
 %
-Its use entails a stronger induction scheme which corresponds closer to a given definition and hence the cases considered in its simplification rules.
+This stronger induction scheme corresponds closer to the originating definition and, hence, the cases considered in its simplification rules.
 %
 We further explain recursion induction in this section and the benefit in considering these schemata.
 
@@ -25,15 +25,22 @@ fun last :: "'a List $\Rightarrow$ 'a" where
 | "last (_ # ts) = last ts"
 \end{lstlisting}
 
-\noindent From these definitions' structures one can derive two new induction principles.
+\noindent From these definitions' structures one can derive a new induction principle.
 %
 Structural induction on lists considers the base-case \isaCode{[]} (the empty list) and step-case \isaCode{t \# ts} (a list with an element inserted at the front).
 %
 In the case of \isaCode{sorted}, cases are broken down into more detailed ones by including an additional base-case \isaCode{[t]} (the singleton list) and restricting the step-case to lists with at least two elements \isaCode{r \# t \# ts}.
 %
-Meanwhile \isaCode{last} is not defined for the case \isaCode{[]} and hence partially defined, meaning the induction scheme it gives rise to is to be completed with such a case, as the corresponding induction scheme depicts:
+Meanwhile \isaCode{last} is not defined for the case \isaCode{[]} and hence partially defined, meaning the induction scheme it gives rise to is to be completed with such a case.
+%
+This, in fact, results in the same recursion induction scheme derived from \isaCode{sorted}:
 
-% TODO: update
+% TODO: update?
+% For longer version: insert recursion induction scheme and how it becomes even more specific
+%\inferrule [InsertInd]
+%  {\forall r\;\; P\;(r,\; []) \\ \forall r, \; t, \; ts\;\; ((\not (r \le t) \Longrightarrow P\;(r, \; ts)) \; \Longrightarrow\;P\;(r, \; (t\;\#\; ts))) }
+%  {\forall x,\; ys \;\; P\;(x,\; ys)}
+
 \vspace{2 mm}
 
 \inferrule [SortedInd]
@@ -53,7 +60,7 @@ They can isolate sub-units not represented in a datatype's structure as being at
 %
 Recursion induction hence provides an immediate and more specific structure for reasoning about other recursion patterns where a simple structural induction would fail to set appropriate base cases for the inductive step to succeed.
 
-Particularly, within Isabelle/HOL these schemata are automatically derived as theorems from recursive functions' termination order \cite{krauss-term}.
+Particularly, within Isabelle/HOL these schemata are automatically derived as theorems from recursive functions' termination order \cite{krauss-term}. % From the PROOF! of those
 
 \subsubsection*{Recursion induction in a proof}
 
@@ -85,6 +92,8 @@ In contrast, the former, even though intuitively looks immediate to prove, is no
 
 \subsection{A tactic (not only) for conditionals}
 
+Recursion induction is a way of dealing with more complicated recursive structures, many may occur in conditional statements but the advantage in considering recursion induction is broader.
+
 \subsubsection*{Simultaneous induction}
 
 The final tactic for Hipster explores the proofs one could attain by recursion inductions derived from functions occurring in the conjecture.
@@ -96,6 +105,13 @@ A notable gain, affecting both conditional and equational lemmas, is that of hav
 Simultaneous induction schemata are those inducting over more than one variable at a time, whether those variables are of the same type or not.
 %
 Such is the case for the list function \isaCode{zip}'s recursion induction scheme, which corresponds to parallel induction on lists:
+
+\begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
+fun zip :: "'a list $\Rightarrow$ 'b list $\Rightarrow$ ('a $\times$ 'b) list" where
+  "zip [] y = []"
+| "zip (x # xs) [] = []"
+| "zip (x # xs) (y # ys) = (x, y) # (zip xs ys)"
+\end{lstlisting}
 
 \vspace{2 mm}
 
@@ -123,10 +139,11 @@ Hipster's prior structural induction approach could not capture in a scheme the 
 %
 In these two cases, \isaCode{zip} traverses its arguments taking steps on both at the same time, a pattern we can only capture with some form of simultaneous induction.
 %
-Instead of synthesising a series of possible simultaneous induction schemes, recursion induction gives us an immediate choice which is also closer to the problem at hand.
+Instead of synthesising a series of possible simultaneous induction schemata, recursion induction gives us an immediate choice which is also closer to the problem at hand.
 
 
-\subsubsection*{Flexibilising Hipster}
+% Unnecessary here. Maybe expand in longer?
+% \subsubsection*{Flexibilising Hipster}
 
 % Include or not?
 
