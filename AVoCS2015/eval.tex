@@ -36,7 +36,9 @@ The following table summarises statistics on the two sets of the benchmarks run.
 %
 Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational and a conditional theorem respectively.
 
-\begin{tabularx}{\textwidth}{l | X X | X X}
+\vspace{2 mm}
+
+\noindent \begin{tabularx}{\textwidth}{l | X X | X X}
   & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
   &  EQ & COND & EQ & COND \\
   \hline
@@ -53,6 +55,9 @@ Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational an
   \hline
   Filter theorems for FO prover & 3 & 0 & 0 & 0 \\ % XXX: remove this since we don't mention these options?
 \end{tabularx}
+
+\vspace{2 mm}
+
 
 \paragraph{Automation}
 %
@@ -140,7 +145,7 @@ Additionally, a last theorem was not evaluated in all of the associated works, a
 
 \vspace{2 mm}
 
-\begin{tabularx}{\textwidth}{l | X X X | X X | X | X | X | X X X}
+\noindent \begin{tabularx}{\textwidth}{l | X X X | X X | X | X | X | X X X}
   & \multicolumn{3}{|c|}{Hipster}
   	& \multicolumn{2}{c|}{HipSpec}
   	& \multicolumn{1}{c|}{Zeno}
@@ -154,17 +159,19 @@ Additionally, a last theorem was not evaluated in all of the associated works, a
 
 \vspace{2 mm}
 
-The already mentioned HipSpec uses theory exploration, structural induction and external first-order provers to prove properties about functional programs \cite{hipspecCADE}.
+\noindent The already mentioned HipSpec uses theory exploration, structural induction and external first-order provers to prove properties about functional programs \cite{hipspecCADE}.
 %
 Zeno is a tool for proving equational inductive properties of Haskell programs \cite{zeno}.
 %
-Both CVC4 and Pirate are based on SMT solving, with a top-down approach in conjecture generation \cite{cvc4, SPASSInduction}.
+Both CVC4's and Pirate's approaches to inductive proving are built on SMT solving, with a top-down approach in conjecture generation \cite{cvc4, SPASSInduction}.
 %
-IsaPlanner is a proof planning tool for Isabelle based on rippling.
+IsaPlanner is a proof planning tool for Isabelle based on rippling \cite{isaplanner2, IsaPcase}.
 
 In comparison to other (automated) inductive provers, the new Hipster is the only one (to the best of our knowledge) to employ recursion induction.
 %
-Its performance is on par 
+As results show, its performance is on par to other state of the art tools'.
+%
+To be noted is that the failing problems for Hipster in the benchmark set \emph{prod-failure} (problems $33$-$35$) differ from those that 
 
 %TODO TODO TODO: factorial, etc.
 
