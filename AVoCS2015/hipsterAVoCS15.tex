@@ -48,11 +48,25 @@
 \author{Irene Lobo Valbuena and Moa Johansson}
 %\institute{\autlabel{1}} % Institutes with labels
 \institute{\email{lobo@student.chalmers.se},  \email{moa.johansson@chalmers.se} \\
-Departement of Computer Science and Engineering \\Chalmers University of Technology, Gothenburg, Sweden.}
+Department of Computer Science and Engineering \\Chalmers University of Technology, Gothenburg, Sweden.}
 
-\abstract{Hipster is a theory exploration tool for the proof assistant Isabelle/HOL. It automatically discovers lemmas about given recursive functions and datatypes and proves them by induction. Previously, only equational properties could be discovered. Conditional lemmas, for example required when reasoning about sorting, has been beyond the scope of theory exploration. In this paper we describe an extension to Hipster to also support discovery and proof of conditional lemmas.
+\abstract{
+Hipster is a theory exploration tool for the proof assistant Isabelle/HOL.
+%
+It automatically discovers lemmas about given recursive functions and datatypes and proves them by induction.
+%
+Previously, only equational properties could be discovered.
+%
+Conditional lemmas, for example required when reasoning about sorting, has been beyond the scope of theory exploration.
+%
+In this paper we describe an extension to Hipster to also support discovery and proof of conditional lemmas.
 
-We also present a new automated tactic, which uses \emph{recursion induction}. Recursion induction follows the recursive structure of a function definition through its termination order, as opposed to structural induction, which follows that of the datatype. We find that the addition of recursion induction increases the number of proofs completed automatically, both for conditional and equational statements. } % Abstract of the article
+We also present a new automated tactic, which uses \emph{recursion induction}.
+%
+Recursion induction follows the recursive structure of a function definition through its termination order, as opposed to structural induction, which follows that of the datatype.
+%
+We find that the addition of recursion induction increases the number of proofs completed automatically, both for conditional and equational statements.
+} % Abstract of the article
 
 \keywords{theory exploration, automated induction, interactive theorem proving} % Keywords for the article
 
