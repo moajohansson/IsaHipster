@@ -167,7 +167,7 @@ fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
       val conjs = lemma_strs
                     |> map (Syntax.read_prop ctxt)
                     (*|> sort term_var_ord*)
-                    |> map (Goal.init o (Thm.cterm_of thy))
+                    |> map (Goal.init o (Thm.cterm_of ctxt))
                     |> filter (is_present ctxt);
     in
       ExplData.put

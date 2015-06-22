@@ -86,7 +86,7 @@ fun timed_metis_tac ctxt full facts i thm =
         ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm
  end;
 
-val has_tvar = exists_type (exists_subtype (fn TVar _ => true | _ => false)) o prop_of
+val has_tvar = exists_type (exists_subtype (fn TVar _ => true | _ => false)) o Thm.prop_of
 
 fun metis_method ((override_type_encs, lam_trans), ths) ctxt facts =
   let val (schem_facts, nonschem_facts) = List.partition has_tvar facts
@@ -173,7 +173,7 @@ fun mk_induct_insts ithings indnames =
 fun inductable_things_in_term thry t =
     let
       fun lookup thy s =
-          case (Datatype.get_info thy s) of
+          case (Old_Datatype_Data.get_info thy s) of
              NONE => NONE
            | SOME di => SOME (#induct di);
       fun datatype_chk (Type(tn,_)) =
@@ -194,7 +194,7 @@ fun inductable_things_in_term thry t =
 fun inductable_things_in_sg i thm = (*let val _ = @{print} i in*)
     inductable_things_in_term
       (Thm.theory_of_thm thm)
-      (Library.nth (prems_of thm) (i - 1)) (*end*) (* XXX: check how this might affect us *)
+      (Library.nth (Thm.prems_of thm) (i - 1)) (*end*) (* XXX: check how this might affect us *)
 
 fun infer_term x ctxt =
      let val (T, ctxt') = Proof_Context.inferred_param x ctxt

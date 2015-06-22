@@ -11,7 +11,7 @@ struct
 
 (* FIXME: Default to Isabelle Contrib or something more sensible *)
 (* Set these to your path to the Hipster directory *)
-	val basepath = "~/Field/thesis/IsaHipster/";
+	val basepath = "~/Field/IsaHipster/";
 val filepath = basepath^"GenCode/";
 
 end
