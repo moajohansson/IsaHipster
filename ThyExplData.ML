@@ -2,6 +2,16 @@
 (* Data to be stored during theory exploration *)
 (*-----------------------------------------------------------------------------------------*)
 
+(*structure ThyExpl_Opts =
+struct
+
+datatype T = Data of
+    { val cond_count : int,
+      val ind_count : int,
+    }
+end;*)
+
+
 structure ThyExpl_Data =
 struct
 
@@ -128,13 +138,36 @@ fun is_present ctxt thm =
       null (snd (Find_Theorems.find_theorems ctxt (SOME (sym RS thm)) (SOME 1) false crits))
     end
 
- 
-(* Assmume get list of strings from HipSpec, which can be directly parsed as Isabelle terms*)
-fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs = 
+(* from the CookBook *)
+fun goal_prop str ctxt =
+    let
+      val prop = Syntax.read_prop ctxt str
+    in
+      Proof.theorem NONE (K I) [[(prop, [])]] ctxt
+    end
+
+(* Assmume get list of strings from HipSpec, which can be directly parsed as Isabelle terms *)
+fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
     let
       val thy = Proof_Context.theory_of ctxt
+      (*val _ = @{print} lemma_strs*)
+
+      (*val _ = @{print} prio_goal_opt
+      val _ = @{print} conjs
+      val culprit = filter (fn s => String.isSubstring "[]" s) (map (@{make_string}) conjs)
+      val _ = @{print}culprit*)
+      fun total_vs t = let val (frs,als) = Hipster_Utils.dangling_vars t in length frs + length als end
+      fun term_var_ord (t1, t2) =
+        let val freedom1 = total_vs t1
+            val freedom2 = total_vs t2
+        in
+          bool_ord (freedom2 < freedom1, freedom1 < freedom2)
+        end
+      
       val conjs = lemma_strs
-                    |> map (Goal.init o (Thm.cterm_of thy) o (Syntax.read_prop ctxt))
+                    |> map (Syntax.read_prop ctxt)
+                    (*|> sort term_var_ord*)
+                    |> map (Goal.init o (Thm.cterm_of ctxt))
                     |> filter (is_present ctxt);
     in
       ExplData.put

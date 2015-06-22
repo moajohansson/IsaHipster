@@ -9,9 +9,15 @@ ML{*
 structure Hipster_Setup =
 struct
 
+<<<<<<< HEAD
 
 (* Set the basepath to Hipster's home directory *)
 val basepath = "$HIPSTER_HOME";
+=======
+(* FIXME: Default to Isabelle Contrib or something more sensible *)
+(* Set these to your path to the Hipster directory *)
+	val basepath = "~/Field/IsaHipster/";
+>>>>>>> b6ad6673d5b5e1ca2a77f72a85a6c1df79e627c4
 val filepath = basepath^"GenCode/";
 
 end
@@ -31,8 +37,13 @@ val thy_interesting = Attrib.setup_config_bool @{binding thy_interesting} (K tru
 setup {* Hipster_Rules.setup;*}
 
 ML_file "HipsterUtils.ML"
+ML_file "SchemeInstances.ML"
 ML_file "ThyExplData.ML"
 ML_file "HipsterTacs.ML"
+
+ML_file "HipTacOps.ML"
+ML_file "IndTacs.ML"
+
 ML_file "TacticData.ML"
 ML_file "HipsterExplore.ML"
 ML_file "HipsterIsar.ML"
@@ -41,14 +52,22 @@ ML_file "HipsterIsar.ML"
 method_setup hipster_induct_simp = {*
   Scan.lift (Scan.succeed 
     (fn ctxt => SIMPLE_METHOD 
-      (Hipster_Tacs.induct_simp_tac ctxt)))
+      (Ind_Tacs.induct_simp_tac ctxt)))
    *}
 
 method_setup hipster_induct_simp_metis = {*
   Attrib.thms >> (fn thms => fn ctxt =>
     SIMPLE_METHOD 
-      (Hipster_Tacs.induct_simp_metis ctxt thms))
+      (Ind_Tacs.induct_simp_metis ctxt thms))
  *}
+
+
+method_setup hipster_induct_schemes = {*
+  Attrib.thms >> (fn thms => fn ctxt =>
+    SIMPLE_METHOD 
+      (Ind_Tacs.induct_with_schemes ctxt thms))
+ *}
+
 (*
 ML{*
 Method.setup;
@@ -61,7 +80,7 @@ method_setup hipster_goal = {*
 *}
 *)
 (* 
-(* Default value for tactics is induct_simp_metis. 
+(* Default value for tactics is induct_simp_metis.
    Use setup command to change to other hard/routine tactics.
 *)
 setup{* 

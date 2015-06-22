@@ -197,7 +197,7 @@ obs1 x f = blind1 x f
            `mappend` observer (f undefined)
 
 -- | A binary function.
-obs2 :: (Typeable a, Typeable b,
+obs2 :: (Typeable a, Typeable b, {-Observe a, Observe b,-}
          Typeable c, Observe c) =>
         String -> (a -> b -> c) -> Sig
 obs2 x f = blind2 x f
