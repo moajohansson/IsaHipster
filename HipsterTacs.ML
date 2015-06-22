@@ -32,10 +32,7 @@ structure Hipster_Tacs  : HIPSTER_TACS  =
 struct
 
 type hardtac = Proof.context -> thm list option -> string option -> int -> tactic
-<<<<<<< HEAD
-=======
 (* XXX: string option seems better than checking for nulls string, right? *)
->>>>>>> b6ad6673d5b5e1ca2a77f72a85a6c1df79e627c4
 
 fun SOLVE_TIMEOUT mseconds tac t = 
     let
@@ -196,14 +193,6 @@ fun infer_term x ctxt =
 (* var is the variable we want to do induction on *)
 fun induct_on_var_tac ctxt rule var i goalthm = 
     let
-<<<<<<< HEAD
-      val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
-      val vs = case var of NONE => [] | SOME v => [v]
-      val (otherfrees, inductfrees) = mk_induct_insts ithings vs
-      val insts = [map (fn NONE => NONE | SOME v => 
-                                          SOME (NONE : Binding.binding option,(Free v,false)))
-                         inductfrees]
-=======
         (*Dummy context for the sake of Isar*)
       (*val ctxt = Proof_Context.init_global (Thm.theory_of_thm goalthm);*)
       val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
@@ -218,7 +207,6 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                                            -- changed : testing : matters not in our case since we are wrapping them with 'Free' *)
                                           SOME (NONE : Binding.binding option,(Free v,false)))
                          inductfrees;
->>>>>>> b6ad6673d5b5e1ca2a77f72a85a6c1df79e627c4
          (* Throw away Isar related stuff and only take the Thm.thm seq *)
       val _ = Pretty.writeln (Pretty.block ( [Pretty.str "induct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
         | SOME (_, (Free (v,_),false)) => v) insts)), Pretty.str "; otherfrees: ", Pretty.str (Library.space_implode ", "
@@ -253,10 +241,7 @@ fun induct_and_simp lemmas ctxt rule var i =
 (* Induction on var, then try to prove resulting subgoals by simp or metis *)
 fun induct_simp_or_metis (facts, lemmas) ctxt rule var i = 
     (induct_on_var_tac ctxt rule var i) THEN (simp_or_metis ctxt (facts,lemmas));
-<<<<<<< HEAD
-=======
 
->>>>>>> b6ad6673d5b5e1ca2a77f72a85a6c1df79e627c4
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
 fun try_induct_on ctxt rule strat vars i =
@@ -265,15 +250,9 @@ fun try_induct_on ctxt rule strat vars i =
                 ORELSE*) no_tac
         | (v :: vs) =>  let val _ = Pretty.writeln (Pretty.str (" - var: "^v)) in
           (*(induct_simp_or_metis ctxt facts rule v i)*)
-<<<<<<< HEAD
-          strat ctxt rule (SOME v) i
-          ORELSE 
-          (try_induct_on ctxt rule strat vs i);
-=======
           strat ctxt rule (SOME v) i (*THEN simp_all ctxt []*)
           ORELSE
           (try_induct_on ctxt rule strat vs i) end;
->>>>>>> b6ad6673d5b5e1ca2a77f72a85a6c1df79e627c4
 
 (* Find the variables we can induct on *)
 fun try_inductable_vars ctxt strat i thm = 

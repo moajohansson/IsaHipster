@@ -9,15 +9,10 @@ ML{*
 structure Hipster_Setup =
 struct
 
-<<<<<<< HEAD
 
-(* Set the basepath to Hipster's home directory *)
-val basepath = "$HIPSTER_HOME";
-=======
 (* FIXME: Default to Isabelle Contrib or something more sensible *)
 (* Set these to your path to the Hipster directory *)
-	val basepath = "~/Field/IsaHipster/";
->>>>>>> b6ad6673d5b5e1ca2a77f72a85a6c1df79e627c4
+val basepath = "~/Field/IsaHipster/";
 val filepath = basepath^"GenCode/";
 
 end
