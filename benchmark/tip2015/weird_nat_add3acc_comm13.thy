@@ -1,6 +1,6 @@
 theory weird_nat_add3acc_comm13
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Nat = Z | S "Nat"

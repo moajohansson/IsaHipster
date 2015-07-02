@@ -1,7 +1,7 @@
 theory plus
 imports Main
         "../data/Natu"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 fun plus :: "Nat => Nat => Nat" where

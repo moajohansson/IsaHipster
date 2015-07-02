@@ -3,7 +3,7 @@ imports Main
         benchNat
         benchList
         benchTree
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

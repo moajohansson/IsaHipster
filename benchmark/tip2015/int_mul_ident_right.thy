@@ -1,6 +1,6 @@
 theory int_mul_ident_right
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Sign = Pos | Neg

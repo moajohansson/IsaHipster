@@ -2,7 +2,7 @@ theory fac
 imports Main
         "../data/Nat"
         "../funcs/mult"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 fun fac :: "Nat => Nat" where

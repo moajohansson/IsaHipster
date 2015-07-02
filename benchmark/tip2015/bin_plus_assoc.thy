@@ -1,6 +1,6 @@
 theory bin_plus_assoc
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Bin = One | ZeroAnd "Bin" | OneAnd "Bin"

@@ -2,7 +2,7 @@ theory exp
 imports Main
         "../data/Natu"
         "../funcs/mult"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 fun exp :: "Nat => Nat => Nat" where

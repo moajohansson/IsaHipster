@@ -1,6 +1,6 @@
 theory prop_58
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype ('a, 'b) Pair2 = Pair "'a" "'b"

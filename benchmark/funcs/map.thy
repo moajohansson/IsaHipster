@@ -1,7 +1,7 @@
 theory map
 imports Main
         "../data/list"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

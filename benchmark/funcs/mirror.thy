@@ -1,7 +1,7 @@
 theory mirror
 imports Main
         "../data/Tree"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

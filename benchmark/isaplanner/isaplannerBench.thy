@@ -1,6 +1,6 @@
 theory isaplannerBench
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
   datatype 'a list = nil | cons "'a" "'a list"

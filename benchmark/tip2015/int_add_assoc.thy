@@ -1,6 +1,6 @@
 theory int_add_assoc
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Nat = Zero | Succ "Nat"

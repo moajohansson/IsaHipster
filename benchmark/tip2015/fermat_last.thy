@@ -1,6 +1,6 @@
 theory fermat_last
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Nat = Z | S "Nat"

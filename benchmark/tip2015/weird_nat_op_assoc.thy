@@ -1,6 +1,6 @@
 theory weird_nat_op_assoc
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Nat = Z | S "Nat"

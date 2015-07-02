@@ -1,7 +1,7 @@
 theory benchList
 imports Main
         benchNat
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype 'a list = nil | cons "'a" "'a list"

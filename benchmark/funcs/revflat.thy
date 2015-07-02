@@ -2,7 +2,7 @@ theory revflat
 imports Main
         "../data/list"
         "../funcs/append"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

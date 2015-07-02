@@ -1,6 +1,6 @@
 theory nat_pow_le_factorial
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Nat = Z | S "Nat"

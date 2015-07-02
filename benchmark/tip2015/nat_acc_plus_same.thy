@@ -1,6 +1,6 @@
 theory nat_acc_plus_same
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Nat = Z | S "Nat"

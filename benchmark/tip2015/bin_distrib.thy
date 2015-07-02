@@ -1,6 +1,6 @@
 theory bin_distrib
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Bin = One | ZeroAnd "Bin" | OneAnd "Bin"

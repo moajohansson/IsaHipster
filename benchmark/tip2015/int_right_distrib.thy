@@ -1,6 +1,6 @@
 theory int_right_distrib
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Sign = Pos | Neg

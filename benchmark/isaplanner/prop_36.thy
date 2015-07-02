@@ -1,6 +1,6 @@
 theory prop_36
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   fun takeWhile :: "('a => bool) => 'a list => 'a list" where

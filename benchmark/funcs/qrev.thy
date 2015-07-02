@@ -1,7 +1,7 @@
 theory qrev
 imports Main
         "../data/list"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

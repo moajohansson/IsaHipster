@@ -1,7 +1,7 @@
 theory append
 imports Main
         "../data/list"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

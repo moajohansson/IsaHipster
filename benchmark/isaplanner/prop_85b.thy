@@ -1,6 +1,6 @@
 theory prop_85b
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
 datatype NPair = Pairn Nat Nat

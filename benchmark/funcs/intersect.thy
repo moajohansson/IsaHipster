@@ -3,7 +3,7 @@ imports Main
         "../data/Natu"
         "../data/list"
         "../funcs/elem"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

@@ -2,7 +2,7 @@ theory qexp
 imports Main
         "../data/Nat"
         "../funcs/mult"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 fun qexp :: "Nat => Nat => Nat => Nat" where

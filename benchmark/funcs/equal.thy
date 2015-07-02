@@ -1,7 +1,7 @@
 theory equal
 imports Main
         "../data/Natu"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 fun equal2 :: "Nat => Nat => bool" where

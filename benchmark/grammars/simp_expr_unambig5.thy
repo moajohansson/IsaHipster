@@ -1,6 +1,6 @@
 theory simp_expr_unambig5
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Tok = C | D | X | Y | Pl

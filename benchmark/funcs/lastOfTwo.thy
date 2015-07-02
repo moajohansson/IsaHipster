@@ -4,7 +4,7 @@ imports Main
         "../data/list"
         "../funcs/last"
         "../funcs/append"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

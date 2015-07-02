@@ -2,7 +2,7 @@ theory drop
 imports Main
         "../data/Natu"
         "../data/list"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

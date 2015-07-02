@@ -1,6 +1,6 @@
 theory rotate_snoc_self
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype 'a list = Nil2 | Cons2 "'a" "'a list"

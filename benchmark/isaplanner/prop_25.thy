@@ -1,6 +1,6 @@
 theory prop_25
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
   datatype Nat = Z | S "Nat"
   fun max2 :: "Nat => Nat => Nat" where

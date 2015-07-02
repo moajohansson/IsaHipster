@@ -1,6 +1,6 @@
 theory mccarthy91_M1
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 function m :: "int => int" where

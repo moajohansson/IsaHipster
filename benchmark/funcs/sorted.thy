@@ -2,7 +2,7 @@ theory sorted
 imports Main
         "../data/list"
         "../funcs/le"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

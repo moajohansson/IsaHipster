@@ -1,7 +1,7 @@
 theory min
 imports Main
         "../data/Natu"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

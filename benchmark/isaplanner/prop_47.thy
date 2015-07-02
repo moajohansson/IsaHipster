@@ -1,6 +1,6 @@
 theory prop_47
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
   datatype 'a Tree = Leaf | Node "'a Tree" "'a" "'a Tree"
   datatype Nat = Z | S "Nat"

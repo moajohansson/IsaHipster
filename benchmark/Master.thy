@@ -1,6 +1,6 @@
 theory Master
 imports Main
-        "../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

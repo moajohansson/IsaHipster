@@ -1,6 +1,6 @@
 theory prop_73
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   fun filter2 :: "('a => bool) => 'a list => 'a list" where

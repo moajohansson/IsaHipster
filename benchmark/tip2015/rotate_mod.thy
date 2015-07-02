@@ -1,6 +1,6 @@
 theory rotate_mod
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Nat = S "Nat" | Z

@@ -1,6 +1,6 @@
 theory sort_BubSortIsSort
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype 'a list = Nil2 | Cons2 "'a" "'a list"

@@ -3,7 +3,7 @@ imports Main
         "../data/Tree"
         "../data/Natu"
         "../funcs/max"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

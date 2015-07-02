@@ -3,7 +3,7 @@ imports Main
         "../data/list"
         "../funcs/append"
         "../funcs/butlast"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

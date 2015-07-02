@@ -1,6 +1,6 @@
 theory packrat_unambigPackrat
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Tok = X | Y | Z

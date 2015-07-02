@@ -1,6 +1,6 @@
 theory prop_28
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   fun append :: "'a list => 'a list => 'a list" where

@@ -2,7 +2,7 @@ theory len
 imports Main
         "../data/list"
         "../data/Natu"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

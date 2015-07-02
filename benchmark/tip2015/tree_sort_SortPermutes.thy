@@ -1,6 +1,6 @@
 theory tree_sort_SortPermutes
 imports Main
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype 'a list = Nil2 | Cons2 "'a" "'a list"

@@ -2,7 +2,7 @@ theory mult2
 imports Main
         "../data/Natu"
         "../funcs/plus"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 fun mult2 :: "Nat => Nat => Nat => Nat" where

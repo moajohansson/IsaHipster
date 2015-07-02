@@ -2,7 +2,7 @@ theory zip
 imports Main
         "../data/list"
         "../data/Pair2"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

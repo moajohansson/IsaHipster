@@ -1,7 +1,7 @@
 theory benchTree
 imports Main
         benchNat
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype 'a Tree = Leaf | Node "'a Tree" "'a" "'a Tree"

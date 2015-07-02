@@ -2,7 +2,7 @@ theory prop_18
 imports Main
         "../../TestTheories/Listi"
         "../../TestTheories/Naturals"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

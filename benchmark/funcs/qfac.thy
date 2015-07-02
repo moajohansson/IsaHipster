@@ -2,7 +2,7 @@ theory qfac
 imports Main
         "../data/Nat"
         "../funcs/mult"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 fun qfac :: "Nat => Nat => Nat" where

@@ -2,7 +2,7 @@ theory unequal
 imports Main
         "../data/Natu"
         "../funcs/equal"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 
