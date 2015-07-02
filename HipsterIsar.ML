@@ -7,9 +7,9 @@ fun call_hipster consts =
   (fn ctxt => 
       let 
         fun get_const_name ctxt c = 
-            c |> Proof_Context.read_const {proper=true, strict = false} ctxt (*false dummyT *)
-              |> dest_Const
-              |> fst          
+              c |> Proof_Context.read_const {proper=true, strict = false} ctxt (*false dummyT *)
+                |> dest_Const
+                |> fst
       in   
         consts 
           |> map (get_const_name ctxt)
@@ -29,9 +29,9 @@ fun call_hipster consts =
   (fn ctxt => 
       let 
         fun get_const_name ctxt c = 
-            c |> Proof_Context.read_const {proper = true, strict = false} ctxt  (*false dummyT *)
-              |> dest_Const
-              |> fst 
+              c |> Proof_Context.read_const {proper = true, strict = false} ctxt  (*false dummyT *)
+                |> dest_Const
+                |> fst 
         val const_nms = map (get_const_name ctxt) consts
                  
       in   

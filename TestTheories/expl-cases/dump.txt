@@ -1,0 +1,1108 @@
+hipspec --isabelle-mode --extra-trans mul --extra-trans add  ~/Field/Thesis/IsaHipster/GenCode/Naturals_hipspec.hs - H ~/Field/Thesis/IsaHipster/GenCode/Naturals.hs ~/Field/Thesis/IsaHipster/GenCode/Naturals_hipspec.hs 
+mul x y = mul y x \<Longrightarrow> (mul x y = mul y x) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul x y = mul y x 
+add x y = add y x \<Longrightarrow> (add x y = add y x) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: add x y = add y x 
+mul x Z = Z \<Longrightarrow> (mul x Z = Z) 
+Rule: Naturals.mul.induct 
+ - var: x 
+Rule: none 
+ - var: x 
+induct_on: x; otherfrees:  
+Proved: mul x Z = Z; Saving to ThyExpl_Data: mul ?x2 Z = Z 
+add x Z = x \<Longrightarrow> (add x Z = x) 
+Rule: Naturals.add.induct 
+ - var: x 
+Rule: none 
+ - var: x 
+induct_on: x; otherfrees:  
+Proved: add x Z = x; Saving to ThyExpl_Data: add ?x2 Z = ?x2 
+mul x (mul y z) = mul y (mul x z) \<Longrightarrow> (mul x (mul y z) = mul y (mul x z)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul x (mul y z) = mul y (mul x z) 
+mul x (mul y z) = mul y (mul z x) \<Longrightarrow> (mul x (mul y z) = mul y (mul z x)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul x (mul y z) = mul y (mul z x) 
+add x (add y z) = add y (add x z) \<Longrightarrow> (add x (add y z) = add y (add x z)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: add x (add y z) = add y (add x z) 
+add x (add y z) = add y (add z x) \<Longrightarrow> (add x (add y z) = add y (add z x)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: add x (add y z) = add y (add z x) 
+mul (mul x y) z = mul x (mul y z) \<Longrightarrow> (mul (mul x y) z = mul x (mul y z)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) z = mul x (mul y z) 
+mul (mul x y) z = mul x (mul z y) \<Longrightarrow> (mul (mul x y) z = mul x (mul z y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) z = mul x (mul z y) 
+mul (mul x y) z = mul z (mul x y) \<Longrightarrow> (mul (mul x y) z = mul z (mul x y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) z = mul z (mul x y) 
+mul (add x y) z = mul z (add x y) \<Longrightarrow> (mul (add x y) z = mul z (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (add x y) z = mul z (add x y) 
+add (mul x y) z = add z (mul x y) \<Longrightarrow> (add (mul x y) z = add z (mul x y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: add (mul x y) z = add z (mul x y) 
+add (add x y) z = add x (add y z) \<Longrightarrow> (add (add x y) z = add x (add y z)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+Proved: add (add x y) z = add x (add y z); Saving to ThyExpl_Data: add (add ?x2 ?y2) ?z2 = add ?x2 (add ?y2 ?z2) 
+add (add x y) z = add x (add z y) \<Longrightarrow> (add (add x y) z = add x (add z y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: add (add x y) z = add x (add z y) 
+add (add x y) z = add z (add x y) \<Longrightarrow> (add (add x y) z = add z (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: add (add x y) z = add z (add x y) 
+mul x (mul y x) = mul y (mul x x) \<Longrightarrow> (mul x (mul y x) = mul y (mul x x)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul x (mul y x) = mul y (mul x x) 
+mul x (mul y y) = mul y (mul y x) \<Longrightarrow> (mul x (mul y y) = mul y (mul y x)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul x (mul y y) = mul y (mul y x) 
+mul x (add y y) = mul y (add x x) \<Longrightarrow> (mul x (add y y) = mul y (add x x)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul x (add y y) = mul y (add x x) 
+add x (mul x y) = mul x (S y) \<Longrightarrow> (add x (mul x y) = mul x (S y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: add x (mul x y) = mul x (S y) 
+add x (S y) = S (add x y) \<Longrightarrow> (add x (S y) = S (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Proved: add x (S y) = S (add x y); Saving to ThyExpl_Data: add ?x2 (S ?y2) = S (add ?x2 ?y2) 
+add x (mul y x) = mul x (S y) \<Longrightarrow> (add x (mul y x) = mul x (S y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: add x (mul y x) = mul x (S y) 
+add x (add y x) = add y (add x x) \<Longrightarrow> (add x (add y x) = add y (add x x)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Proved: add x (add y x) = add y (add x x); Saving to ThyExpl_Data: add ?x2 (add ?y2 ?x2) = add ?y2 (add ?x2 ?x2) 
+add x (add y y) = add y (add y x) \<Longrightarrow> (add x (add y y) = add y (add y x)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Proved: add x (add y y) = add y (add y x); Saving to ThyExpl_Data: add ?x2 (add ?y2 ?y2) = add ?y2 (add ?y2 ?x2) 
+add x (S y) = S (add y x) \<Longrightarrow> (add x (S y) = S (add y x)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Proved: add x (S y) = S (add y x); Saving to ThyExpl_Data: add ?x2 (S ?y2) = S (add ?y2 ?x2) 
+mul (mul x y) x = mul x (mul x y) \<Longrightarrow> (mul (mul x y) x = mul x (mul x y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul (mul x y) x = mul x (mul x y) 
+mul (mul x y) y = mul x (mul y y) \<Longrightarrow> (mul (mul x y) y = mul x (mul y y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul (mul x y) y = mul x (mul y y) 
+mul (add x y) x = mul x (add x y) \<Longrightarrow> (mul (add x y) x = mul x (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul (add x y) x = mul x (add x y) 
+mul (add x y) y = mul y (add x y) \<Longrightarrow> (mul (add x y) y = mul y (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul (add x y) y = mul y (add x y) 
+add (mul x y) x = mul x (S y) \<Longrightarrow> (add (mul x y) x = mul x (S y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Proved: add (mul x y) x = mul x (S y); Saving to ThyExpl_Data: add (mul ?x2 ?y2) ?x2 = mul ?x2 (S ?y2) 
+add (mul x y) y = mul y (S x) \<Longrightarrow> (add (mul x y) y = mul y (S x)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: add (mul x y) y = mul y (S x) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ab", "lemma_ac", "lemma_af", "lemma_ag", "Naturals.eqSym" 
+Trivial proof: add (add x y) x = add x (add x y) 
+Trivial proof: add (add x y) y = add x (add y y) 
+mul (mul x x) y = mul x (mul x y) \<Longrightarrow> (mul (mul x x) y = mul x (mul x y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul (mul x x) y = mul x (mul x y) 
+mul (mul x x) y = mul y (mul x x) \<Longrightarrow> (mul (mul x x) y = mul y (mul x x)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul (mul x x) y = mul y (mul x x) 
+mul (add x x) y = mul x (add y y) \<Longrightarrow> (mul (add x x) y = mul x (add y y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Proved: mul (add x x) y = mul x (add y y); Saving to ThyExpl_Data: mul (add ?x2 ?x2) ?y2 = mul ?x2 (add ?y2 ?y2) 
+mul (add x x) y = mul y (add x x) \<Longrightarrow> (mul (add x x) y = mul y (add x x)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.mul.simps_1", "lemma_a", "lemma_aa", "lemma_ac", "Naturals.eqSym" 
+Proved: mul (add x x) y = mul y (add x x); Saving to ThyExpl_Data: mul (add ?x3 ?x3) ?y3 = mul ?y3 (add ?x3 ?x3) 
+mul (S x) y = mul y (S x) \<Longrightarrow> (mul (S x) y = mul y (S x)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+induct_on: x; otherfrees: y 
+induct_on: y; otherfrees: x 
+Failed proving: mul (S x) y = mul y (S x) 
+add (mul x x) y = add y (mul x x) \<Longrightarrow> (add (mul x x) y = add y (mul x x)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Proved: add (mul x x) y = add y (mul x x); Saving to ThyExpl_Data: add (mul ?x2 ?x2) ?y2 = add ?y2 (mul ?x2 ?x2) 
+Trivial proof: add (add x x) y = add x (add x y) 
+Trivial proof: add (add x x) y = add y (add x x) 
+add (S x) y = S (add y x) \<Longrightarrow> (add (S x) y = S (add y x)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Proved: add (S x) y = S (add y x); Saving to ThyExpl_Data: add (S ?x2) ?y2 = S (add ?y2 ?x2) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "lemma_a", "lemma_aa", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ah", "lemma_ai", "lemma_ak", "Naturals.eqSym" 
+Trivial proof: add x (mul x x) = mul x (S x) 
+Trivial proof: add x (S x) = S (add x x) 
+mul (mul x x) x = mul x (mul x x) \<Longrightarrow> (mul (mul x x) x = mul x (mul x x)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+Rule: none 
+ - var: x 
+induct_on: x; otherfrees:  
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "lemma_a", "lemma_aa", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ah", "lemma_ai", "lemma_ak", "Naturals.eqSym" 
+Proved: mul (mul x x) x = mul x (mul x x); Saving to ThyExpl_Data: mul (mul ?x3 ?x3) ?x3 = mul ?x3 (mul ?x3 ?x3) 
+Trivial proof: mul (add x x) x = mul x (add x x) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "lemma_a", "lemma_aa", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ah", "lemma_ai", "lemma_ak", "lemma_al", "Naturals.eqSym" 
+Trivial proof: mul (S x) x = mul x (S x) 
+Trivial proof: add (mul x x) x = mul x (S x) 
+Trivial proof: add (add x x) x = add x (add x x) 
+mul (mul x y) (mul x z) = mul (mul x z) (mul x y) \<Longrightarrow> (mul (mul x y) (mul x z) = mul (mul x z) (mul x y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) (mul x z) = mul (mul x z) (mul x y) 
+mul (mul x y) (mul z y) = mul (mul x z) (mul y y) \<Longrightarrow> (mul (mul x y) (mul z y) = mul (mul x z) (mul y y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) (mul z y) = mul (mul x z) (mul y y) 
+mul (mul x y) (mul z z) = mul (mul x z) (mul z y) \<Longrightarrow> (mul (mul x y) (mul z z) = mul (mul x z) (mul z y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) (mul z z) = mul (mul x z) (mul z y) 
+mul (mul x y) (add z z) = mul (mul x z) (add y y) \<Longrightarrow> (mul (mul x y) (add z z) = mul (mul x z) (add y y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) (add z z) = mul (mul x z) (add y y) 
+mul (mul x y) (mul z x) = mul (mul z x) (mul x y) \<Longrightarrow> (mul (mul x y) (mul z x) = mul (mul z x) (mul x y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) (mul z x) = mul (mul z x) (mul x y) 
+mul (mul x y) (mul z y) = mul (mul z x) (mul y y) \<Longrightarrow> (mul (mul x y) (mul z y) = mul (mul z x) (mul y y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) (mul z y) = mul (mul z x) (mul y y) 
+mul (mul x y) (mul z z) = mul (mul z x) (mul z y) \<Longrightarrow> (mul (mul x y) (mul z z) = mul (mul z x) (mul z y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) (mul z z) = mul (mul z x) (mul z y) 
+mul (mul x y) (add z z) = mul (mul z x) (add y y) \<Longrightarrow> (mul (mul x y) (add z z) = mul (mul z x) (add y y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x y) (add z z) = mul (mul z x) (add y y) 
+mul (add x y) (mul x z) = mul (mul x z) (add x y) \<Longrightarrow> (mul (add x y) (mul x z) = mul (mul x z) (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (add x y) (mul x z) = mul (mul x z) (add x y) 
+mul (add x y) (mul y z) = mul (mul y z) (add x y) \<Longrightarrow> (mul (add x y) (mul y z) = mul (mul y z) (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (add x y) (mul y z) = mul (mul y z) (add x y) 
+mul (add x y) (mul z y) = mul (mul z y) (add x y) \<Longrightarrow> (mul (add x y) (mul z y) = mul (mul z y) (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (add x y) (mul z y) = mul (mul z y) (add x y) 
+mul (add x y) (add x z) = mul (add x z) (add x y) \<Longrightarrow> (mul (add x y) (add x z) = mul (add x z) (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (add x y) (add x z) = mul (add x z) (add x y) 
+mul (add x y) (mul z x) = mul (mul z x) (add x y) \<Longrightarrow> (mul (add x y) (mul z x) = mul (mul z x) (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (add x y) (mul z x) = mul (mul z x) (add x y) 
+mul (add x y) (add z x) = mul (add z x) (add x y) \<Longrightarrow> (mul (add x y) (add z x) = mul (add z x) (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (add x y) (add z x) = mul (add z x) (add x y) 
+mul (add x y) (add z y) = mul (add z y) (add x y) \<Longrightarrow> (mul (add x y) (add z y) = mul (add z y) (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (add x y) (add z y) = mul (add z y) (add x y) 
+add (mul x y) (mul x z) = mul x (add y z) \<Longrightarrow> (add (mul x y) (mul x z) = mul x (add y z)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ad", "lemma_ae", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "Naturals.eqSym" 
+induct_on: y; otherfrees: x, z 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "Naturals.eqSym" 
+Proved: add (mul x y) (mul x z) =
+        mul x (add y z); Saving to ThyExpl_Data: add (mul ?x3 ?y3) (mul ?x3 ?z3) = mul ?x3 (add ?y3 ?z3) 
+add (mul x y) (mul y z) = mul y (add x z) \<Longrightarrow> (add (mul x y) (mul y z) = mul y (add x z)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "Naturals.eqSym" 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "Naturals.eqSym" 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ad", "lemma_ae", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "Naturals.eqSym" 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ad", "lemma_ae", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "Naturals.eqSym" 
+Metis: Unused theorems: "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_al", "Naturals.eqSym" 
+Proved: add (mul x y) (mul y z) =
+        mul y (add x z); Saving to ThyExpl_Data: add (mul ?x3 ?y3) (mul ?y3 ?z3) = mul ?y3 (add ?x3 ?z3) 
+add (mul x y) (mul x z) = mul x (add z y) \<Longrightarrow> (add (mul x y) (mul x z) = mul x (add z y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ab", "lemma_ad", "lemma_ae", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "lemma_an", "Naturals.eqSym" 
+Proved: add (mul x y) (mul x z) =
+        mul x (add z y); Saving to ThyExpl_Data: add (mul ?x3 ?y3) (mul ?x3 ?z3) = mul ?x3 (add ?z3 ?y3) 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "Naturals.eqSym" 
+Trivial proof: add (mul x y) (mul z y) = mul y (add x z) 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "Naturals.eqSym" 
+Trivial proof: add (mul x y) (mul z x) = mul x (add z y) 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "Naturals.eqSym" 
+Trivial proof: add (mul x y) (mul z y) = mul y (add z x) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "Naturals.eqSym" 
+Trivial proof: add (add x y) (mul x z) = add (mul x z) (add x y) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "Naturals.eqSym" 
+Trivial proof: add (add x y) (mul y z) = add (mul y z) (add x y) 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "Naturals.eqSym" 
+Trivial proof: add (add x y) (mul z y) = add (mul z y) (add x y) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "Naturals.eqSym" 
+Trivial proof: add (add x y) (add x z) = add (add x z) (add x y) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "Naturals.eqSym" 
+Trivial proof: add (add x y) (add z y) = add (add x z) (add y y) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ac", "lemma_ad", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "lemma_an", "lemma_ao", "Naturals.eqSym" 
+Trivial proof: add (add x y) (add z z) = add (add x z) (add z y) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "Naturals.eqSym" 
+Trivial proof: add (add x y) (S z) = add (add x z) (S y) 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "Naturals.eqSym" 
+Trivial proof: add (add x y) (mul z x) = add (mul z x) (add x y) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "Naturals.eqSym" 
+Trivial proof: add (add x y) (add z x) = add (add z x) (add x y) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "Naturals.eqSym" 
+Trivial proof: add (add x y) (add z y) = add (add z x) (add y y) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "Naturals.eqSym" 
+Trivial proof: add (add x y) (add z z) = add (add z x) (add z y) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "Naturals.eqSym" 
+Trivial proof: add (add x y) (S z) = add (add z x) (S y) 
+mul (mul x x) (mul y z) = mul (mul x y) (mul x z) \<Longrightarrow> (mul (mul x x) (mul y z) = mul (mul x y) (mul x z)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x x) (mul y z) = mul (mul x y) (mul x z) 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "Naturals.eqSym" 
+Trivial proof: mul (mul x x) (add y z) = mul (add y z) (mul x x) 
+mul (mul x x) (mul y z) = mul (mul y x) (mul x z) \<Longrightarrow> (mul (mul x x) (mul y z) = mul (mul y x) (mul x z)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (mul x x) (mul y z) = mul (mul y x) (mul x z) 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "Naturals.eqSym" 
+Trivial proof: mul (mul x x) (mul y z) = mul (mul y z) (mul x x) 
+mul (add x x) (mul y z) = mul (mul x y) (add z z) \<Longrightarrow> (mul (add x x) (mul y z) = mul (mul x y) (add z z)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (add x x) (mul y z) = mul (mul x y) (add z z) 
+mul (add x x) (add y z) = mul (add y z) (add x x) \<Longrightarrow> (mul (add x x) (add y z) = mul (add y z) (add x x)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "Naturals.eqSym" 
+Proved: mul (add x x) (add y z) =
+        mul (add y z) (add x x); Saving to ThyExpl_Data: mul (add ?x3 ?x3) (add ?y3 ?z3) = mul (add ?y3 ?z3) (add ?x3 ?x3) 
+mul (add x x) (mul y z) = mul (mul y x) (add z z) \<Longrightarrow> (mul (add x x) (mul y z) = mul (mul y x) (add z z)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+induct_on: x; otherfrees: y, z 
+induct_on: y; otherfrees: x, z 
+induct_on: z; otherfrees: x, y 
+Failed proving: mul (add x x) (mul y z) = mul (mul y x) (add z z) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "lemma_an", "lemma_ap", "Naturals.eqSym" 
+Trivial proof: mul (add x x) (mul y z) = mul (mul y z) (add x x) 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_am", "lemma_ap", "Naturals.eqSym" 
+Trivial proof: mul (S x) (mul y z) = mul (mul y z) (S x) 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_ap", "Naturals.eqSym" 
+Trivial proof: mul (S x) (add y z) = mul (add y z) (S x) 
+Trivial proof: add (mul x x) (mul y z) = add (mul y z) (mul x x) 
+Trivial proof: add (mul x x) (add y z) = add (add y z) (mul x x) 
+Trivial proof: add (add x x) (mul y z) = add (mul y z) (add x x) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "lemma_ap", "Naturals.eqSym" 
+Trivial proof: add (add x x) (add y z) = add (add x y) (add x z) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "lemma_ap", "Naturals.eqSym" 
+Trivial proof: add (add x x) (add y z) = add (add y x) (add x z) 
+Trivial proof: add (add x x) (add y z) = add (add y z) (add x x) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "lemma_ap", "Naturals.eqSym" 
+Trivial proof: add (S x) (mul y z) = add (mul y z) (S x) 
+Trivial proof: add (S x) (add y z) = add (add x y) (S z) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "lemma_ap", "Naturals.eqSym" 
+Trivial proof: add (S x) (add y z) = add (add y x) (S z) 
+add (S x) (add y z) = add (add y z) (S x) \<Longrightarrow> (add (S x) (add y z) = add (add y z) (S x)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+ - var: z 
+Rule: none 
+ - var: x 
+ - var: y 
+ - var: z 
+induct_on: x; otherfrees: y, z 
+Proved: add (S x) (add y z) = add (add y z) (S x); Saving to ThyExpl_Data: add (S ?x2) (add ?y2 ?z2) = add (add ?y2 ?z2) (S ?x2) 
+Trivial proof: mul (mul x y) Z = Z 
+Trivial proof: mul (add x y) Z = Z 
+mul (add x y) (mul x y) = mul (mul x y) (add x y) \<Longrightarrow> (mul (add x y) (mul x y) = mul (mul x y) (add x y)) 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "lemma_a", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "lemma_ap", "lemma_aq", "Naturals.eqSym" 
+Proved: mul (add x y) (mul x y) =
+        mul (mul x y) (add x y); Saving to ThyExpl_Data: mul (add ?x3 ?y3) (mul ?x3 ?y3) = mul (mul ?x3 ?y3) (add ?x3 ?y3) 
+Trivial proof: add (mul x y) Z = mul x y 
+Trivial proof: add (mul x y) (mul x y) = mul x (add y y) 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "Naturals.mul.simps_2", "lemma_a", "lemma_aa", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_an", "lemma_ap", "lemma_aq", "lemma_ar", "Naturals.eqSym" 
+Trivial proof: add (mul x y) (mul x x) = mul x (add x y) 
+Trivial proof: add (mul x y) (mul y y) = mul y (add x y) 
+Trivial proof: add (add x y) Z = add x y 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_ap", "lemma_aq", "lemma_ar", "Naturals.eqSym" 
+Trivial proof: add (add x y) (mul x y) = add (mul x y) (add x y) 
+Metis: Unused theorems: "Naturals.add.simps_2", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ag", "lemma_ah", "lemma_ai", "lemma_aj", "lemma_ak", "lemma_al", "lemma_ap", "lemma_aq", "lemma_ar", "Naturals.eqSym" 
+Trivial proof: mul (mul x x) (mul x y) = mul (mul x y) (mul x x) 
+mul (mul x x) (add x y) = mul (add x y) (mul x x) \<Longrightarrow> (mul (mul x x) (add x y) = mul (add x y) (mul x x)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: Naturals.add.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y 
+Metis: Unused theorems: "Naturals.add.simps_1", "Naturals.add.simps_2", "Naturals.mul.simps_1", "lemma_a", "lemma_aa", "lemma_ab", "lemma_ac", "lemma_ad", "lemma_ae", "lemma_af", "lemma_ah", "lemma_ai", "lemma_ak", "lemma_al", "lemma_am", "lemma_an", "lemma_ao", "lemma_ap", "lemma_aq", "lemma_ar", "Naturals.eqSym" 
+Proved: mul (mul x x) (add x y) =
+        mul (add x y) (mul x x); Saving to ThyExpl_Data: mul (mul ?x3 ?x3) (add ?x3 ?y3) = mul (add ?x3 ?y3) (mul ?x3 ?x3) 
+mul (mul x x) (mul y y) = mul (mul x y) (mul x y) \<Longrightarrow> (mul (mul x x) (mul y y) = mul (mul x y) (mul x y)) 
+Rule: Naturals.mul.induct 
+ - var: x 
+ - var: y 
+Rule: none 
+ - var: x 
+ - var: y 
+induct_on: x; otherfrees: y

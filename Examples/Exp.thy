@@ -1,5 +1,5 @@
 theory Exp
-imports "../IsaHipster"
+imports "$HIPSTER_HOME/IsaHipster"
 
 begin
 

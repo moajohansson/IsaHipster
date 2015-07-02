@@ -1,0 +1,11 @@
+induct_on: a * b; otherfrees: c, d 
+exception THM 0 raised (line 801 of "drule.ML"):
+  Ill-typed instantiation:
+  Type
+  'b\<Colon>type List
+  of variable ?a0.0\<Colon>'b\<Colon>type List
+  cannot be unified with type
+  'a\<Colon>type List
+  of term a\<Colon>'a\<Colon>type List
+  (\<And>ts\<Colon>?'a\<Colon>type List. (?P\<Colon>?'a\<Colon>type List \<Rightarrow> ?'a\<Colon>type List \<Rightarrow> bool) Listing.List.Nil ts) \<Longrightarrow>
+  (\<And>(r\<Colon>?'a\<Colon>type) (rs\<Colon>?'a\<Colon>type List) ts\<Colon>?'a\<Colon>type List. ?P rs ts \<Longrightarrow> ?P (Listing.List.Cons r rs) ts) \<Longrightarrow> ?P (?a0.0\<Colon>?'a\<Colon>type List) (?a1.0\<Colon>?'a\<Colon>type List)

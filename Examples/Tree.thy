@@ -1,5 +1,5 @@
 theory Tree
-imports "../IsaHipster"
+imports "$HIPSTER_HOME/IsaHipster"
 
 begin
 
@@ -49,17 +49,24 @@ where
 
 ML{*Hipster_Explore.explore  @{context} ["Tree.flat_tree", "Tree.mirror", "Tree.tmap", "Tree.leftmost", "Tree.rigthmost","List.rev", "List.map", "List.hd", "List.append"]; *}
 lemma lemma_ac [thy_expl]: "flat_tree (tmap x2 y2) = map x2 (flat_tree y2)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.flat_tree.simps Tree.mirror.simps Tree.tmap.simps Tree.leftmost.simps Tree.rigthmost.simps List.rev.simps List.map.simps List.hd.simps List.append.simps thy_expl} *})
+by hipster_induct_simp_metis
+(*by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.flat_tree.simps Tree.mirror.simps Tree.tmap.simps Tree.leftmost.simps Tree.rigthmost.simps List.rev.simps List.map.simps List.hd.simps List.append.simps thy_expl} *})
+*)
 
 lemma lemma_ad [thy_expl]: "map x2 (rev xs2) = rev (map x2 xs2)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.flat_tree.simps Tree.mirror.simps Tree.tmap.simps Tree.leftmost.simps Tree.rigthmost.simps List.rev.simps List.map.simps List.hd.simps List.append.simps thy_expl} *})
+by hipster_induct_simp_metis
+(*by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.flat_tree.simps Tree.mirror.simps Tree.tmap.simps Tree.leftmost.simps Tree.rigthmost.simps List.rev.simps List.map.simps List.hd.simps List.append.simps thy_expl} *})
+*)
 
 lemma lemma_ae [thy_expl]: "flat_tree (mirror x2) = rev (flat_tree x2)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.flat_tree.simps Tree.mirror.simps Tree.tmap.simps Tree.leftmost.simps Tree.rigthmost.simps List.rev.simps List.map.simps List.hd.simps List.append.simps thy_expl} *})
+by hipster_induct_simp_metis
+(*by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.flat_tree.simps Tree.mirror.simps Tree.tmap.simps Tree.leftmost.simps Tree.rigthmost.simps List.rev.simps List.map.simps List.hd.simps List.append.simps thy_expl} *})
+*)
 
 lemma lemma_af [thy_expl]: "hd (xs2 @ xs2) = hd xs2"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.flat_tree.simps Tree.mirror.simps Tree.tmap.simps Tree.leftmost.simps Tree.rigthmost.simps List.rev.simps List.map.simps List.hd.simps List.append.simps thy_expl} *})
-
+by hipster_induct_simp_metis
+(*by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.flat_tree.simps Tree.mirror.simps Tree.tmap.simps Tree.leftmost.simps Tree.rigthmost.simps List.rev.simps List.map.simps List.hd.simps List.append.simps thy_expl} *})
+*)
 lemma unknown [thy_expl]: "hd (flat_tree x) = leftmost x"
 oops
 

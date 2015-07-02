@@ -1,0 +1,7 @@
+theory dropTake
+imports Main
+        "../IsaHipster"
+begin
+
+end
+

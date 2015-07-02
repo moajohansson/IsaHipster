@@ -1,5 +1,5 @@
 theory SimpleCake
-imports "../IsaHipster"
+imports "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Slice = Cream | Marzipan
