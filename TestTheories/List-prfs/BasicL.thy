@@ -1,7 +1,7 @@
 theory BasicL
 imports Main
         "../Listing"
-        "../../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
         "../Naturals"
 
 begin

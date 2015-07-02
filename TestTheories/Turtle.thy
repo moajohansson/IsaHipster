@@ -1,6 +1,6 @@
 theory Turtle
 imports Main
-        "../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

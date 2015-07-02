@@ -1,6 +1,6 @@
 theory BinTree
 imports Main
-        "../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

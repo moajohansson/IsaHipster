@@ -1,5 +1,5 @@
 theory Sorted
-imports "../IsaHipster"
+imports "$HIPSTER_HOME/IsaHipster"
 
 begin
 datatype Nat = 

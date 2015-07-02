@@ -1,5 +1,5 @@
 theory TreeDemo
-imports "../IsaHipster"
+imports "$HIPSTER_HOME/IsaHipster"
 
 begin
 

@@ -1,6 +1,6 @@
 theory Naturals
 imports Main
-        "../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 ML {*

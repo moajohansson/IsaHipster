@@ -1,6 +1,6 @@
 theory BExp
 imports Main
-        "../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 (*uses "../HipSpec.ML"*)
 
 begin

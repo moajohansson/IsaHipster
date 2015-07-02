@@ -1,6 +1,6 @@
 theory NatsBug
 imports Main
-        "../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype Nat = Z | S Nat

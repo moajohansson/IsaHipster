@@ -1,6 +1,6 @@
 theory Sorti
 imports Main
-        "../IsaHipster"
+        "$HIPSTER_HOME/IsaHipster"
 
 begin
 

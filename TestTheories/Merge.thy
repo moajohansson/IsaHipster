@@ -1,5 +1,5 @@
 theory Merge
-imports Main "../IsaHipster"
+imports Main "$HIPSTER_HOME/IsaHipster"
 begin
 
 definition leqnat :: "nat \<Rightarrow> nat \<Rightarrow> bool" where
