@@ -12,8 +12,13 @@ struct
 
 (* FIXME: Default to Isabelle Contrib or something more sensible *)
 (* Set these to your path to the Hipster directory *)
-val basepath = "$HIPSTER_HOME/";
-val filepath = basepath^"GenCode/";
+val basepath =
+  case getenv "HIPSTER_HOME" of
+    "" => let val _ = Output.warning ("Hipster: Environment variable $HIPSTER_HOME not set."^
+                         "\n  Using current directory.")
+          in "./" end
+  | hip_home => hip_home^"/"
+val filepath = basepath^"GenCode/"
 
 end
 
