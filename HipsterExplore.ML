@@ -142,7 +142,7 @@ fun map_to_haskell isa_nm =
 fun hipspec_plain consts file =
     let 
       (*val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts*)
-      val add_funs = List.foldl (fn (nm,s) => "--extra="^(Long_Name.base_name nm)^ " "^s) " " consts
+      val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts
 
       in
       "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --tests=600"
@@ -152,7 +152,7 @@ fun hipspec_plain consts file =
 fun hipspec_cond cond_name consts file = 
     let
       (*val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts *)
-      val add_funs = List.foldl (fn (nm,s) => "--extra="^(Long_Name.base_name nm)^ " "^s) " " consts
+      val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts
     in
       "hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^ (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
     end;
