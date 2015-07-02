@@ -382,7 +382,7 @@ fun final_tactic_str ctxt =
 end
 
 
-structure Simp_T : THY_EXPL_TACS =
+structure Simp_T : EXPL_TACS =
 struct
 
 fun routine_tac ctxt =
