@@ -6,27 +6,27 @@ begin
 
  
 ML{*
+
 structure Hipster_Setup =
 struct
 
 (* FIXME: Default to Isabelle Contrib or something more sensible *)
 (* Set these to your path to the Hipster directory *)
-	val basepath = "~/Field/thesis/IsaHipster/";
+val basepath = "$HIPSTER_HOME/";
 val filepath = basepath^"GenCode/";
 
 end
-*}
 
-ML {*
 structure Hipster_Rules = Named_Thms
-(val name = @{binding "thy_expl"} 
- val description = "Theorems discovered by theory exploration")
-*}
-ML{*
+  ( val name = @{binding "thy_expl"} 
+    val description = "Theorems discovered by theory exploration" )
+
 (* A flag which tells Hipster that it should disregard equations
    which *only* feature functions defined in another theory, i.e. a library. *)
 val thy_interesting = Attrib.setup_config_bool @{binding thy_interesting} (K true)
+
 *}
+
 
 setup {* Hipster_Rules.setup;*}
 
@@ -65,14 +65,11 @@ method_setup hipster_induct_schemes = {*
 (*
 ML{*
 Method.setup;
-
 *}
-
 
 method_setup hipster_goal = {*
-  
-*}
-*)
+*}*)
+
 (* 
 (* Default value for tactics is induct_simp_metis.
    Use setup command to change to other hard/routine tactics.
@@ -81,8 +78,8 @@ setup{*
 Tactic_Data.set_induct_simp_metis;
 *}
 
-
 *)
 
 
 end
+

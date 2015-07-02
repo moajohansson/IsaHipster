@@ -94,7 +94,7 @@ by (hipster_induct_schemes prop_11.append.simps prop_11.rev.simps)
 *)
   theorem x0 :
     "(rev (append (rev x) (rev y))) = (append y x)"
-    by hipster_induct_schemes
+    by (hipster_induct_schemes rev.simps append.simps)
     
 
 
