@@ -1,7 +1,8 @@
 (*  Author:     Moa Johansson, Chalmers University of Technology
     Author:     Irene Lobo Valbuena, Chalmers University of Technology
 
-Hipster induction tactics.
+Hipster induction tactics and predifined routine-hard reasoning pairs
+parameterising theory exploration.
 *)
 
 (* Various tactics for Hipster. Induction, simplification and metis. *)
@@ -22,8 +23,7 @@ sig
   val induct_simp_or_metis : thm list * thm list -> hardtac
 
   val try_inductable_vars : Proof.context -> hardtac -> int -> tactic
-  (*val induct_for_me : Proof.context -> string list list -> string -> int -> tactic
-*)
+  
   (* Context -> tactic, to be pasted into proof script. *)
   val induct_simp_tac : Proof.context -> tactic
 
@@ -33,7 +33,6 @@ sig
   (* Context -> list of induct rules (schemes) -> tactic *)
   val induct_with_schemes : Proof.context -> thm list -> tactic
   val try_induct_schemes : Proof.context -> hardtac -> int -> tactic
-  (*val try_induction_with : Proof.context -> thm list list -> hardtac -> vars -> int -> tactic*)
 
 end
 
@@ -49,7 +48,7 @@ fun SOLVE_TIMEOUT mseconds tac t =
                      | ERROR _ => NONE
   in
     case res of
-      NONE => Seq.empty (*let val _ = Pretty.writeln (Pretty.str "Timeout :(") in Seq.empty end*)
+      NONE => Seq.empty  (* Output.tracing ("Timeout :(") *)
     | SOME t' => Seq.single t'
   end;
 
@@ -64,7 +63,6 @@ fun SOLVE_TIMEOUT mseconds tac t =
 fun simp_all ctxt lemmas thm = 
     let
        (*val _ = Pretty.writeln (Pretty.block [Pretty.str "simp_all: ", pretty_thm ctxt thm])*)
-       (*val _ = @{print} thm  OR @{make_string} *)
        (*val ss = map @{print} lemmas*)
        val ctxt' = Library.foldl (fn (ctxt,thm) => Simplifier.add_simp thm ctxt)
                                  (ctxt, lemmas)
@@ -181,30 +179,27 @@ fun inductable_things_in_sg i thm = (*let val _ = @{print} i in*)
 (* var is the variable we want to do induction on *)
 fun induct_on_var_tac ctxt rule var i goalthm = 
   let val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
-      (*val _ = @{print} non_ithings
-      val _ = Pretty.writeln (Pretty.str "I-things")
-      val _ = @{print} ithings*)
 
       val (otherfrees, inductfrees) = (case var of
                                         NONE => mk_induct_insts ithings []
                                       | SOME v => mk_induct_insts ithings v (*[v]*))
       (*val (tss, ctxt') = (fold_map o fold_map) infer_term [case var of NONE => [] | SOME v=> [v]] ctxt
       val instss = map (map (fn inst => SOME (NONE, (inst, false)))) tss;*)
-      (*val _ = @{print} inductfrees;
-      val _ = @{print} rule;*)
       val insts = map (fn NONE => NONE
                         | SOME v => SOME (NONE : Binding.binding option,(Free v,false)))
                           (* Each variable paired with false: matters not in our case since we are wrapping them with 'Free' *)
-                  inductfrees;
+                  inductfrees
         
         (* Throw away Isar related stuff and only take the Thm.thm seq *)
-      val _ = Pretty.writeln (Pretty.block ( [Pretty.str "induct_on: ", Pretty.str (Library.space_implode " * " (map (fn NONE => "; "
-        | SOME (_, (Free (v,_),false)) => v) insts)), Pretty.str "; otherfrees: ", Pretty.str (Library.space_implode ", "
-          (map (fn (v,_) => v) otherfrees)) ]));
-      val nw_thms' = (Induction.induction_tac ctxt false [insts] [(*non_ithings*)otherfrees] [] rule [] i goalthm)
-            handle ERROR _ => Seq.empty (* let val _ = Pretty.writeln (Pretty.str (" >> ERROR : " ^ t)) in Seq.empty end *)
+      val _ = Output.tracing ("induct_on: "^ (Library.space_implode " * "
+                (map (fn NONE => "; "
+                       | SOME (_, (Free (v,_),false)) => v) insts))^
+                "; otherfrees: "^ (Library.space_implode ", " (map fst otherfrees)))
+      val nw_thms = Induction.induction_tac ctxt false
+                      [insts] [(*non_ithings*)otherfrees] [] rule [] i goalthm
+                    handle ERROR _ => Seq.empty
   in
-        (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty *)Seq.map snd nw_thms'
+    (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty*) Seq.map snd nw_thms
   end;
 
 
@@ -245,16 +240,17 @@ fun try_inductable_vars ctxt strat i thm =
       | (Abs (_, t, _)) => t
       | (Free (_, t)) => t; (* TODO: Bound, Const *)
 
+
+(* Proof.context -> thm list list -> hardtac -> vars -> int -> tactic *)
 fun try_induction_with ctxt scheme_rules strat vars i =
   (* let val vars = map fst (fst (inductable_things_in_sg i thm)) *)
-  let val struct_tac =
-          (*let val _ = Pretty.writeln (Pretty.str "Rule: none")
-          in*) try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i
+  let val struct_tac = try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i
+          (* Output.tracing "Rule: none" *)
       fun rec_ind_tac rules =
         case rules of
           []            => no_tac
         | ((n,r) :: rs) =>
-            let val _ = Pretty.writeln (Pretty.str ("Rule: "^n))
+            let val _ = Output.tracing ("Rule: "^n)
                 val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
                 val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
               (*val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)*)
@@ -264,7 +260,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
             in
               try_induct_on ctxt r strat (map (map fst) instt) i
               ORELSE
-              (rec_ind_tac rs) (*ctxt rs strat vars i*)
+              rec_ind_tac rs (*ctxt rs strat vars i*)
             end
   in
     struct_tac ORELSE rec_ind_tac scheme_rules
@@ -273,7 +269,6 @@ fun try_induction_with ctxt scheme_rules strat vars i =
 
 fun try_induct_schemes ctxt strat i thm =
   let val vars = fst (inductable_things_in_sg i thm) (* map fst ... *)
-      (*val lemmas = ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt*)
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
@@ -319,7 +314,8 @@ fun induct_simp_tac ctxt thm =
   in ALLGOALS(try_inductable_vars ctxt' (induct_and_simp lemmas)) thm
   end;
 
-end;
+end
+
 
 (*-----------------------------------------------------------------------------------------*)
 (* Structures for pre-defined combinations of routine/hard reasoning in Hipster            *)

@@ -1,7 +1,7 @@
 (*  Author:     Moa Johansson, Chalmers University of Technology
     Author:     Irene Lobo Valbuena, Chalmers University of Technology
 
-Hipster theory exploration with HipSpec/QuickSpec
+Hipster theory exploration discovered properties data.
 *)
 
 (*-----------------------------------------------------------------------------------------*)

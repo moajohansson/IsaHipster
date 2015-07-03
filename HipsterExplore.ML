@@ -17,68 +17,57 @@ struct
 (*-----------------------------------------------------------------------------------------*)
 fun try_nxt_conj ctxt =
   case (ThyExpl_Data.open_conjs_of_ctxt ctxt) of
-    (*retry open_conjs if we have some new proved since last time.*)
-    [] => if (ThyExpl_Data.progress_of_ctxt ctxt) 
-            then SOME (ctxt 
-                         |> ThyExpl_Data.set_open_conjs_ctxt (ThyExpl_Data.failed_of_ctxt ctxt)
-                         |> ThyExpl_Data.set_failed_ctxt []
-                         |> ThyExpl_Data.set_progress_ctxt false)                
-            else NONE
+    [] => (*retry open_conjs if we have some new proved since last time.*)
+      if (ThyExpl_Data.progress_of_ctxt ctxt) 
+        then SOME (ctxt 
+                    |> ThyExpl_Data.set_open_conjs_ctxt (ThyExpl_Data.failed_of_ctxt ctxt)
+                    |> ThyExpl_Data.set_failed_ctxt []
+                    |> ThyExpl_Data.set_progress_ctxt false)                
+        else NONE
 
   | (c::cs) => (* try proving next open conj *)
       let 
-        val r = SINGLE (Tactic_Data.routine_tac ctxt) c
         val lemma_str = (Syntax.string_of_term ctxt (Thm.concl_of c))
       in
-        case r of (* Discard this, it is trivial *)
+        case (SINGLE (Tactic_Data.routine_tac ctxt) c) of (* Discard this, it is trivial *)
           SOME _ => (* TODO: Include proving loop tracing as an option *)
-            let val _ = (Pretty.writeln o Pretty.str) ("Trivial proof: "^lemma_str)
+            let val _ = Output.tracing ("Trivial proof: "^lemma_str)
             in SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
             end
-        | NONE =>
-            let
-              (* (Proof_Context.init_global (Thm.theory_of_thm c) *)
-              val res = SINGLE (Tactic_Data.hard_tac ctxt) c
-            in
-              (* Only care about first proof found *)
-              case res of
-                SOME proved_thm =>
-                  let
-                    val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt
-                    (* Thm used by simp need to be lifted so it use meta-variables *)
-                    val final_thm = proved_thm
-                                     |> (Drule.generalize (Hipster_Utils.frees_and_tfrees_of_thm proved_thm))
-                                     |> Goal.finish ctxt'
-                                     |> Thm.put_name_hint new_nm
-                    val _ = Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message
-                              ("Proved: " ^ lemma_str)
-                  in
-                    SOME (ctxt'
-                            |> ThyExpl_Data.set_open_conjs_ctxt cs
-                            |> ThyExpl_Data.add_proved_ctxt final_thm
-                            |> ThyExpl_Data.set_progress_ctxt true)
-                  end
-              (* NONE indicates that the tactic failed to prove c *)
-              | NONE =>
-                  let val _ = (Pretty.writeln o Pretty.str) ("Failed proving: "^lemma_str)
-                  in
-                    SOME (ctxt
-                            |> ThyExpl_Data.set_open_conjs_ctxt cs
-                            |> ThyExpl_Data.add_failed_ctxt c)
-                  end
-            end
+        | NONE => (* Only care about first proof found *)
+            case (SINGLE (Tactic_Data.hard_tac ctxt) c) of
+              SOME proved_thm =>
+                let
+                  val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt
+                  (* Thm used by simp need to be lifted so it use meta-variables *)
+                  val final_thm = proved_thm
+                                    |> (Drule.generalize (Hipster_Utils.frees_and_tfrees_of_thm proved_thm))
+                                    |> Goal.finish ctxt'
+                                    |> Thm.put_name_hint new_nm
+                  val _ = Sledgehammer_Util.with_vanilla_print_mode Output.urgent_message
+                            ("Proved: " ^ lemma_str)
+                in
+                  SOME (ctxt'
+                          |> ThyExpl_Data.set_open_conjs_ctxt cs
+                          |> ThyExpl_Data.add_proved_ctxt final_thm
+                          |> ThyExpl_Data.set_progress_ctxt true)
+                end
+            (* NONE indicates that the tactic failed to prove c *)
+            | NONE =>
+                let val _ = Output.tracing ("Failed proving: "^lemma_str)
+                in SOME (ctxt
+                          |> ThyExpl_Data.set_open_conjs_ctxt cs
+                          |> ThyExpl_Data.add_failed_ctxt c)
+                end
       end
 
 fun try_prove_priority_goal ctxt goal =
-  let val res = SINGLE (Tactic_Data.routine_tac ctxt) goal
-  in 
-    case res of
-      SOME _ => 
-        let val _ = Output.urgent_message "Proved prio goal";
-        in SOME (ThyExpl_Data.set_priority_goal_ctxt NONE ctxt)
-        end
-    | NONE => NONE
-  end
+  case (SINGLE (Tactic_Data.routine_tac ctxt) goal) of
+    SOME _ => 
+      let val _ = Output.urgent_message "Proved prio goal";
+      in SOME (ThyExpl_Data.set_priority_goal_ctxt NONE ctxt)
+      end
+  | NONE => NONE
 
 fun proof_loop_w_prio ctxt facts fact_nms prio_goal_opt cand_lemmas_str =
   let
@@ -157,9 +146,9 @@ fun hipspec_explore ctxt cond_opt const_nms =
                                      | SOME c => hipspec_cond c const_nms' outfile
     val path_opt = SOME (Path.explode Hipster_Setup.filepath);    
           (* As of Isabelle2014, the below function takes a mystery boolean. Guessing false... *)
-    val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
-    val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile;
-    val _ = Pretty.writeln (Pretty.str (hipspec_cmd ^ " - " ^ args ));
+    val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])]
+    val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile
+    val _ = Output.tracing (hipspec_cmd ^ " - " ^ args )
     val _ = Isabelle_System.bash ("HipSpecifyer " ^ args)
       (*("ghc -e 'let xs = " ^ args ^ " in System.Environment.withArgs xs HipSpecifyer.main'");*)
   in 
@@ -251,7 +240,8 @@ fun explore_goal ctxt const_nms thm =
   let val facts_nms = map (fn c => c^".simps") const_nms
       val facts = maps (fn nm => Sledgehammer_Util.thms_of_name ctxt nm 
                                  handle _ => []) facts_nms 
-      val res_ctxt = proof_loop_w_prio ctxt facts facts_nms (SOME thm) (hipspec_explore ctxt NONE const_nms)
+      val res_ctxt = proof_loop_w_prio ctxt facts facts_nms (SOME thm)
+                      (hipspec_explore ctxt NONE const_nms)
   in
     case res_ctxt of
       NONE =>
