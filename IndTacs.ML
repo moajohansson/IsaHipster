@@ -1,3 +1,9 @@
+(*  Author:     Moa Johansson, Chalmers University of Technology
+    Author:     Irene Lobo Valbuena, Chalmers University of Technology
+
+Hipster induction tactics.
+*)
+
 (* Various tactics for Hipster. Induction, simplification and metis. *)
 
 (* TODO: checkout Type.could_unify

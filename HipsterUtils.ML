@@ -1,3 +1,9 @@
+(*  Author:     Moa Johansson, Chalmers University of Technology
+    Author:     Irene Lobo Valbuena, Chalmers University of Technology
+
+Hipster utility functions for extracting term information.
+*)
+
 (* Various utility functions for Hipster *)
 
 signature HIPSTER_UTILS =
@@ -57,7 +63,7 @@ fun thy_consts_of thynm thm = add_consts_of_thy (thynm, Thm.concl_of thm) []
 
 
 (*------------------------------------------------------------------------------------*)
-(* Variable *)
+(* Variable and type extraction utilities *)
 (*------------------------------------------------------------------------------------*)
 
 (* Gives all sinks in a term; separates them into (free variables, universally quantified)
