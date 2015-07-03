@@ -1,8 +1,8 @@
-(*  Author:     Moa Johansson, Chalmers University of Technology
-    Author:     Irene Lobo Valbuena, Chalmers University of Technology
+(*  Author:     Irene Lobo Valbuena, Chalmers University of Technology
 
-Hipster theory exploration with HipSpec/QuickSpec
+Instantiations with variables for type signatures.
 *)
+
 
 signature SCHEME_INSTANCES =
 sig
@@ -20,8 +20,8 @@ structure Scheme_Instances : SCHEME_INSTANCES =
 struct
 
 type var_typ = string * Term.typ
-type instance = var_typ list
-type instance_bins = instance list list
+type instance = var_typ list    (* a variable instantiation for some given type signature*)
+type instance_bins = instance list list   (* collections of instances by size *)
 
 fun var_typ_ord ((x,t1),(y,t2)) =
   case fast_string_ord (x,y) of
@@ -35,8 +35,7 @@ val merge_n_instances = fold (Ord_List.insert (dict_ord var_typ_ord))
 fun index_bins v (bin1s::bin0s::binss) =
       let val new1s = map (fn is0 => is0 @ [v] (*v::is0*)) bin0s
           val all1s = merge_n_instances new1s bin1s
-      in all1s :: index_bins v (bin0s::binss)
-      end
+      in all1s :: index_bins v (bin0s::binss) end
   | index_bins _ [[[]]] = [[[]]]
   | index_bins _ _      = []
 
@@ -45,7 +44,7 @@ fun zipWith f xs ys = ListPair.foldr (fn (a, b, cs) => f(a, b)::cs) [] (xs, ys)
 fun foldl1 _ nil     = raise Empty (* TODO: really raise error ? *)
   | foldl1 f (x::xs) = fold f xs x
 
-(* merges instance bins of the same length *)
+(* Merges instance bins of the same length *)
 fun merge_bins xss yss = zipWith (fn (xs,ys) => merge_n_instances ys xs) xss yss
 
 fun fix_nth_arg (t::ts) xs bins =
@@ -56,6 +55,8 @@ fun fix_nth_arg (t::ts) xs bins =
       in if null all_bins then fix_nth_arg ts xs bins else foldl1 merge_bins all_bins end
   | fix_nth_arg [] _ bins = bins
 
+(* Compute possible instances with given variables xs for a type signature ts (expressed as a list)
+   Returns result as a list of bins according to instance size, with the most specific at the head *)
 fun instances_for_with ts xs = fix_nth_arg ts xs empty_instance
 
 (* true  => keep more specific instances in front
