@@ -172,13 +172,13 @@ fun mk_induct_insts ithings indnames =
    (can have induction applied) *)
 fun inductable_things_in_term thry t =
     let
-      fun lookup thy s =
+      fun lookup thy s = let val _ = @{print} s in
           case (Old_Datatype_Data.get_info thy s) of  (* XXX: compatibility layer can be found in HOL/Tools/BNF/bnf_lfp_compat.ML + with Old_Datatype_Data being the backwards-compatible module *)
              NONE => NONE
-           | SOME di => SOME (#induct di);
+           | SOME di => let val _ = @{print} di in SOME (#induct di) end end;
       fun datatype_chk (Type(tn,_)) =
             Basics.is_some (lookup thry tn)
-        | datatype_chk _ = false;
+        | datatype_chk _ = let val _ = @{print}"not a type!!" in false end;
       (*val _ = @{print} (Term.fastype_of t,  (Term.strip_all_body t))
       val tfs = Hipster_Utils.typ_tfrees_of (Term.fastype_of t)
       val _ = @{print} (length tfs)*)
@@ -261,7 +261,6 @@ fun induct_and_simp lemmas ctxt rule var i =
 (* Induction on var, then try to prove resulting subgoals by simp or metis *)
 fun induct_simp_or_metis (facts, lemmas) ctxt rule var i = 
     DEPTH_SOLVE (
-
           (Seq.DETERM
             (HEADGOAL ((induct_on_var_tac ctxt rule var)))) (*induct_on_var_tac ctxt rule var i*) THEN (simp_or_metis ctxt (facts,lemmas)));
 
@@ -281,6 +280,8 @@ fun try_induct_on ctxt rule strat vars i =
 fun try_inductable_vars ctxt strat i thm = 
     let
       val vars = map (fn (v,_) => [v]) (*fst*) (fst (inductable_things_in_sg i thm))
+      val _ = @{print} "argu"
+      val _ = @{print} vars
     in
       (try_induct_on ctxt NONE strat vars i) thm
     end;
@@ -343,6 +344,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
 fun try_induct_schemes ctxt strat i thm =
     let
       val vars = fst (inductable_things_in_sg i thm) (* map fst ... *)
+      val _ = @{print} vars
       (*val lemmas = ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt*)
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm

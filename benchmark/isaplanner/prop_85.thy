@@ -4,6 +4,8 @@ imports Main
 begin
   datatype 'a list = Nil2 | Cons2 "'a" "'a list"
   datatype Nat = Z | S "Nat"
+datatype_compat list
+datatype_compat Nat
   fun zip2 :: "'a list => 'b list => ('a * 'b) list" where
   "zip2 (Nil2) y = Nil2"
   | "zip2 (Cons2 z x2) (Nil2) = Nil2"
