@@ -4,7 +4,7 @@ This section provides a description of how Hipster works and how its subsystem Q
 \subsection{Theory Exploration in Hipster}
 Figure \ref{fig:hipster} gives an overview of the Hipster system.
 %
-Starting from an Isabelle theory file, defining a set of datatypes and functions, the user calls Hipster on a list of functions about which she is interested in finding lemmas.
+Starting from an Isabelle theory file that defines a set of datatypes and functions, the user calls Hipster on a list of functions about which she is interested in finding lemmas.
 %
 The workings of Hipster can be divided up into three stages:
 \begin{enumerate}
@@ -109,7 +109,7 @@ Suppose QuickSpec generates the random value \isaCode{xs} $\rightarrow$ \isaCode
 
 \vspace{2 mm}
 
-\noindent Terms 1 and 2 evaluate to the same value and remain in the same equivalence class, while term 3 gets put in a different one.
+\noindent As not all terms evaluate to the same value, they should no longer be in the same equivalence class. We thus split the terms into two new equivalence classes: terms 1 and 2 evaluate to the same value and remain together, while term 3 is separate.
 %
 After this, no subsequent tests further split these equivalence classes, and we can read off the equation: \isaCode{isort(isort xs) = isort xs}.  
 %
