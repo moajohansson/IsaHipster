@@ -13,7 +13,7 @@ Different scenarios and constructs require or give rise to constrained propositi
 \item proving algorithm correctness, where changes of consecutive steps are to be taken into account
 \item programming invariants
 \begin{itemize}\itemsep1mm
-\item in datatypes, where sometimes these cannot be encoded in the constructors and instead depend of the arrangement of data values conforming an instance and invariant preservation by from functions manipulating the datatype
+\item in datatypes, where sometimes these cannot be encoded in the constructors and instead depend on the arrangement of data values conforming an instance and invariant preservation by functions manipulating the datatype
 \item in functions and algorithms, where auxiliary functions might assume certain conditions on their input to be able to guarantee conditions over the output result.
 \end{itemize}
 \end{itemize}
@@ -32,7 +32,7 @@ For it, we assume the less-or-equal operator \isaCode{$\le$} for naturals (and n
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 fun sorted :: "Nat List $\Rightarrow$ Bool" where
   "sorted [] = True"
-| "sorted ([_]) = True"
+| "sorted (_ # []) = True"
 | "sorted (r # (t # ts)) = (r $\le$ t & sorted (t # ts))"
 
 fun insert :: "Nat $\Rightarrow$ Nat List $\Rightarrow$ Nat List" where

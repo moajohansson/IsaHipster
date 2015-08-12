@@ -1,6 +1,6 @@
 \label{sec:evaluation}
 
-In this section we present an evaluation of Hispter's automated tactics, an analysis which had not been performed for Hipster to the same extent priorly.
+In this section we present an evaluation of Hipster's automated tactics, an analysis which had not been performed for Hipster to the same extent priorly.
 
 Keeping in mind evaluation of automated tools for interactive theorem proving necessarily has to consider some degree of interaction, two forms of evaluation have been carried out\footnote{Source code for Hipster, examples presented and benchmarks are available online: \url{https://github.com/moajohansson/IsaHipster}}:
 
@@ -64,7 +64,7 @@ Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational an
 
 \paragraph{Automation}
 %
-Overall, the rate of fully automated provability on the benchmark set is 90\%, considering fully automation the solving of a problem only with discovered lemmas and Hipster's automated recursion induction.
+Overall, the rate of fully automated provability on the benchmark set is 90\%, considering fully automating the solving of a problem only with discovered lemmas and Hipster's automated recursion induction.
 %
 For conditional lemmas in the test set this rate is higher, 96\%.
 
@@ -77,7 +77,7 @@ count z (x @ y) = count z (y @ x)
 
 \noindent The failure is associated to less general auxiliary lemmas not being discovered. % Discovery possibly because discovery of lemmas limits constructed terms to a certain depth.
 
-These examples seem to indicate that recursion induction may not suffice when a non-commutative operation nested within another has commuting arguments at each side of an equality.
+These examples seem to indicate that recursion induction may not suffice when a non-commutative operation nested within another has commuting arguments on both sides of an equality.
 %
 At least not in the absence of smaller related lemmas corresponding to subgoals.
 %
@@ -140,7 +140,7 @@ Other inductive provers have also been evaluated on the test suites we have pres
 %
 The following table collects the number of problems solved by some of these in comparison with Hipster.
 %
-Plain figures correspond to fully automated solutions to problems and those in parenthesis $(x)$ indicate number of successful proofs after some adaptation of settings.
+Plain figures correspond to fully automated solutions to problems and those in parentheses $(x)$ indicate number of successful proofs after some adaptation of settings.
 %
 In total, \emph{case-analysis} has $85$ problems whilst \emph{prod-failure} has $50$.
 %
