@@ -39,11 +39,9 @@ Hipster is parametrised by two tactics, which can be set by the user: one for \e
 %
 Conjectures solved by routine reasoning are deemed trivial and discarded, while those requiring more difficult reasoning are displayed to the user and included in the Isabelle theory so they can be used in subsequent proofs if necessary.
 %
-In the context of this paper, routine reasoning is first-order equational reasoning and simplification, while difficult reasoning involves some kind of induction.
+In the context of this paper, routine reasoning is first-order equational reasoning and simplification, while difficult reasoning involves some kind of induction. If a conjectur is not immediately provable, Hipster will place it at the end of the list of open conjectures and will try it again if it has found some additional lemmas.
 %
-Occasionally, Hipster might discover some conjecture which it cannot prove automatically.
-%
-Such an open conjecture would also be displayed to the user, who can then choose to perform an interactive proof.
+Occasionally, Hipster might discover some conjecture which it does not manage to prove automatically, because not even its tactic difficult reasoning is strong enough. Such an open conjecture would also be displayed to the user, who can then choose to perform an interactive proof in Isabelle, perhaps employing other tactics or lemmas than those currently available to Hipster.
 
 
 \subsection{Conjecture Generation in QuickSpec}

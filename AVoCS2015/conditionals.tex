@@ -62,17 +62,17 @@ For instance, take the functions on lists \isaCode{sorted} and \isaCode{last}:
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 fun sorted :: "Nat List $\Rightarrow$ Bool" where
   "sorted [] = True"
-| "sorted ([_]) = True"
-| "sorted (r # (t # ts)) = (r $\le$ t & sorted (t # ts))"
+| "sorted ([x]) = True"
+| "sorted (x1 # (x2 # xs)) = (x1 $\le$ x2 & sorted (x2 # xs))"
 
 fun last :: "'a List $\Rightarrow$ 'a" where
-  "last ([t]) = t"
-| "last (_ # ts) = last ts"
+  "last ([x]) = x"
+| "last (x # xs) = last xs"
 \end{lstlisting}
 
 \noindent From these definitions' structures one can derive a new induction principle.
-Structural induction on lists considers the base-case \isaCode{[]} (the empty list) and step-case \isaCode{t \# ts} (a list with an element inserted at the front).
-In the case of \isaCode{sorted}, cases are broken down into more detailed ones by including an additional base-case \isaCode{[t]} (the singleton list) and restricting the step-case to lists with at least two elements \isaCode{r \# t \# ts}.
+Structural induction on lists considers the base-case \isaCode{[]} (the empty list) and step-case \isaCode{x \# xs} (a list with an element inserted at the front).
+In the case of \isaCode{sorted}, cases are broken down into more detailed ones by including an additional base-case \isaCode{[x]} (the singleton list) and restricting the step-case to lists with at least two elements \isaCode{x1 \# x2 \# xs}.
 Meanwhile \isaCode{last} is not defined for the case \isaCode{[]} and hence partially defined, meaning the induction scheme it gives rise to is to be completed with such a case.
 This, in fact, results in the same recursion induction scheme derived from \isaCode{sorted}:
 
@@ -121,7 +121,7 @@ Applying structural induction on the list \isaCode{xs} would produce the subgoal
 
 The latter set of subgoals leads to an immediate proof of the main lemma thanks to its steps mirroring the actual predicate definition, hence having a correspondence with its simplification rules.
 %
-In contrast, the former, even though intuitively looks immediate to prove, is not sufficiently generalised nor does it specify any intermediate result on inserting an element on a concrete non-empty list (in our case, the singleton list) which would enable to prove the second subgoal for any arbitrary list. Structural induction is in some way a weaker scheme and additional case-splits or lemmas would be required to close the proof employing it in our example.
+In contrast, the former, even though it intuitively looks immediate to prove, is not sufficiently generalised nor does it specify any intermediate result on inserting an element on a concrete non-empty list (in our case, the singleton list) which would enable to prove the second subgoal for any arbitrary list. Structural induction is in some way a weaker scheme and additional case-splits or lemmas would be required to close the proof employing it in our example.
 
 \paragraph*{Example 4: Simultaneous Induction.}
 The new tactic for Hipster explores the proofs one could attain by recursion inductions derived from functions occurring in the conjecture.
