@@ -36,8 +36,8 @@ Discovering this kind of conditional lemmas introduces a big challenge for theor
 %
 First of all, the search space greatly increases: what statements should be picked as potentially interesting side-conditions to explore?
 %
-Secondly, as our theory exploration system relies on generation of random test-cases, we also need to ensure that we perform enough tests where the condition evaluates to true, otherwise the whole conjecture is trivially true.
-%
+Secondly, as our theory exploration system relies on generation of random test-cases, we also need to ensure that we perform tests where the condition evaluates to true, otherwise we may miss conditional equations as the theory exploration system might place the relevant terms in different equivalence classes (see Example 2 on p. \pageref{example2}).
+
 As Hipster is designed as an interactive system, we avoid the first problem by asking the user to specify under which condition theory exploration should occur.
 %
 In the example above, this would require the user to tell Hipster that the predicate \isaCode{sorted} is an interesting pre-condition, in addition to which function symbols should be explored in the bodies of lemmas.
@@ -46,7 +46,7 @@ The rest of the process is however automatic.
 %
 We describe it in more detail in \S \ref{sec:conditionals} 
 
-The second contribution of this paper is a new automated tactic for \emph{recursion induction}.
+The second contribution of this paper is a new automated tactic for \emph{recursion induction} (see e.g. \S3.5.4 of \cite{isabelle}).
 %
 Previously, Hipster only supported structural induction over the datatypes, but has now been extended with a new tactic that uses recursion induction, following the termination order of function definitions instead of the datatype.
 %
