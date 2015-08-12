@@ -79,11 +79,11 @@ This, in fact, results in the same recursion induction scheme derived from \isaC
 \vspace{2 mm}
 
 \inferrule [SortedInd]
-  {P\;([]) \\ \forall u\;\; P\;(u \;\#\; []) \\ \forall r, \; t, \; ts\;\; (P\;(r \;\#\; ts) \; \Longrightarrow\;P\;(t\;\#\; (r\;\#\; ts)))}
+  {P\;([]) \\ \forall u\;\; P\;([u]) \\ \forall r, \; t, \; ts\;\; (P\;(r \;\#\; ts) \; \Longrightarrow\;P\;(t\;\#\; (r\;\#\; ts)))}
   {\forall x \;\; P\;(x)}
 
 \inferrule [LastInd]
-  {\forall u\;\; P\;(u \;\#\; []) \\ \forall r, \; t, \; ts\;\; (P\;(r\;\#\; ts) \; \Longrightarrow\;P\;(t \;\#\; (r\;\#\; ts))) \\ P\;([])}
+  {\forall u\;\; P\;([u]) \\ \forall r, \; t, \; ts\;\; (P\;(r\;\#\; ts) \; \Longrightarrow\;P\;(t \;\#\; (r\;\#\; ts))) \\ P\;([])}
   {\forall x \;\; P\;(x)}
 
 \vspace{2 mm}
@@ -92,9 +92,9 @@ Induction determined by these schemata is called \emph{recursion induction} or \
 %
 They can isolate sub-units not represented in a datatype's structure as being atomic, such as lists with at least two elements in the scheme for \isaCode{sorted}.
 %
-Recursion induction hence provides an immediate and more specific structure for reasoning about other recursion patterns where a simple structural induction would fail to set appropriate base cases for the inductive step to succeed.
+Recursion induction hence provides an immediate and more specific structure for reasoning about other recursion patterns where a simple structural induction might fail to set appropriate base and step-cases for the induction to succeed.
 
-Within Isabelle/HOL these schemata are automatically derived as theorems from recursive functions' termination order \cite{krauss-term}. 
+Within Isabelle/HOL these schemata are automatically derived and proved as theorems from recursive functions' termination order, and hence guaranteed to be sound \cite{krauss-term}. 
 
 \paragraph*{Example 3: Recursion Induction in a Proof.}
 
@@ -158,7 +158,7 @@ zip (xs @ ys) zs = (zip xs (take (len xs) zs)) @ (zip ys (drop (len xs) zs))
 \noindent Or even the alternative related conditional lemma to be immediately provable:
 
 \begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
-len a = len b $\Longrightarrow$ (zip a b) @ (zip c d) = zip (a @ c) (b @ d)
+len xs = len ys $\Longrightarrow$ (zip xs ys) @ (zip zs ws) = zip (xs @ zs) (ys @ ws)
 \end{lstlisting}
 
 Neither of these lemmas was provable before, even having done exploration for all the occurring functions in them.
@@ -169,6 +169,8 @@ In these two cases, \isaCode{zip} traverses its arguments taking steps on both a
 %
 Instead of synthesising a series of possible simultaneous induction schemata, recursion induction gives us an immediate choice which is also closer to the problem at hand.
 
+\subsubsection*{A New Induction Tactic for Hipster}
+I just realised that we're missing this section. Here, we should explain how your new tactic is implemented (i.e. the tactic hipster-induct-schemes used below in the case study). I.e. how it searches for a proof. Does it first try structural induction, and if that that didn't work, proceed to structural induction. Explain how it chooses which functions induction scheme to try if there are several.  
 
 \subsection{Interactive Case Study: Insertion Sort}
 
@@ -179,17 +181,17 @@ For it, we assume the less-or-equal operator \isaCode{$\le$} for naturals (and n
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 fun sorted :: "Nat List $\Rightarrow$ Bool" where
   "sorted [] = True"
-| "sorted ([_]) = True"
-| "sorted (r # (t # ts)) = (r $\le$ t & sorted (t # ts))"
+| "sorted ([x]) = True"
+| "sorted (x1 # (x2 # xs)) = (x1 $\le$ x2 & sorted (x2 # xs))"
 
 fun insert :: "Nat $\Rightarrow$ Nat List $\Rightarrow$ Nat List" where
-  "insert r [] = r # []"
-| "insert r (t # ts) = (if (r $\le$ t) then r # (t # ts)	
-                                           else t # (insert r ts))"
+  "insert x [] = [x]"
+| "insert x1 (x2 # xs) = (if (x1 $\le$ x2) then x1 # (x2 # xs)	
+                                           else x2 # (insert x1 xs))"
 
 fun isort :: "Nat List $\Rightarrow$ Nat List" where
   "isort [] = []"
-| "isort (t # ts) = insert t (isort ts)"
+| "isort (x # xs) = insert x (isort xs)"
 \end{lstlisting}
 
 Running exploration from the simpler components is the first step, considering both equational and conditional lemmas, since we have two predicates involved in the definiens of functions in the final theorem.

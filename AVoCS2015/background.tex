@@ -102,12 +102,13 @@ Suppose QuickSpec generates the random value \isaCode{xs} $\rightarrow$ \isaCode
  \hline
 1 \quad &\isaCode{isort xs} & \isaCode{isort [3,1]} & \isaCode{[1,3]} \\
 2 \quad&\isaCode{isort (isort xs)} &\isaCode{isort (isort [3,1])} & \isaCode{[1,3]}\\  
+\hdashline
 3 \quad &\isaCode{xs} &\isaCode{[3,1]} & \isaCode{[3,1]} \\
 \end{tabularx}
 
 \vspace{2 mm}
 
-\noindent As not all terms evaluate to the same value, they should no longer be in the same equivalence class. We thus split the terms into two new equivalence classes: terms 1 and 2 evaluate to the same value and remain together, while term 3 is separate.
+\noindent As not all terms evaluate to the same value, they should no longer be in the same equivalence class. We thus split the terms into two new equivalence classes: terms 1 and 2 evaluate to the same value and remain together, while term 3 is separated.
 %
 After this, no subsequent tests further split these equivalence classes, and we can read off the equation: \isaCode{isort(isort xs) = isort xs}.  
 %
