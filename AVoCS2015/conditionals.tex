@@ -123,16 +123,36 @@ The latter set of subgoals leads to an immediate proof of the main lemma thanks 
 %
 In contrast, the former, even though it intuitively looks immediate to prove, is not sufficiently generalised nor does it specify any intermediate result on inserting an element on a concrete non-empty list (in our case, the singleton list) which would enable to prove the second subgoal for any arbitrary list. Structural induction is in some way a weaker scheme and additional case-splits or lemmas would be required to close the proof employing it in our example.
 
-\paragraph*{Example 4: Simultaneous Induction.}
-The new tactic for Hipster explores the proofs one could attain by recursion inductions derived from functions occurring in the conjecture.
-%
-As a side-result, this increases the scope of Hipster's original approach for equational lemmas too.
+\subsubsection*{A New Induction Tactic for Hipster}
+%I just realised that we're missing this section. Here, we should explain how your new tactic is implemented (i.e. the tactic hipster-induct-schemes used below in the case study). I.e. how it searches for a proof. Does it first try structural induction, and if that that didn't work, proceed to structural induction. Explain how it chooses which functions induction scheme to try if there are several.  
+We have implemented a new automated tactic for induction in Isabelle, called \\ \isaCode{hipster\_induct\_schemes}. This tactic searches not only for proofs by structural induction, but may also employ recursion induction when appropriate. It is designed for Hipster to use as its "difficult reasoning" component, but human users may of course also employ this tactic in interactive proofs. 
+%This is my understanding of what the tactic does. Irene, might need revising!
+% I.e. which are the configuration options for the tactic?
+The tactic first tries structural induction using the induction scheme associated with the datatype(s) of variables in the problem. If this fails, the tactic then tries recursion induction, using the induction schemes associated with the functions occurring in the problem. [MENTION heuristics here! Are there any for which functions induction scheme to try first? Timeouts?].  For each attempted induction, the tactic will apply Isabelle's simplifier followed by (if necessary) first-order reasoning using Isabelle's built in first-order prover Metis. An overview of the algorithm is shown in Figure \ref{fig:tactic}. The user can configure the tactic to specify what facts should be passed to the simplifier and to Metis. The default is the simplification rules from the relevant function definitions plus the datatype case distinction rules which are automatically derived by Isabelle. We typically often also want to include lemmas discovered by previous theory exploration. However, if we pass too many facts to Metis, it becomes slower. As further work, we plan to experiment with using Sledgehammer instead \cite{sledgehammer}, which calls powerful external first-order provers and reports back exactly which facts were needed in the proof. Metis can then reconstruct the proof quickly inside Isabelle's trusted kernel.
 
-A notable gain, affecting both conditional and equational lemmas, is that of having the capability of performing simultaneous induction, whereas previously only structural inductions on a single variable were performed by Hipster.
+\begin{figure}
+\begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
+TRY
+  Structural induction schemes(s)
+     THEN simplification + F.O. reasoning
+OTHERWISE_TRY
+  Recursion induction sceheme(s)
+     THEN simplification + F.O. reasoning
+\end{lstlisting}		
+\caption{Overview of Hipsters new tactic.}	
+\label{fig:tactic}
+\end{figure}
+
+\paragraph*{Example 4: Simultaneous Induction.}
+%The new tactic for Hipster explores the proofs one could attain by recursion inductions derived from functions occurring in the conjecture.
+%
+%As a side-result, this increases the scope of Hipster's original approach for equational lemmas too.
+
+A notable gain of the new tactic with recursion induction is that of having the capability of performing simultaneous induction, whereas previously only structural inductions on a single variable were performed by Hipster.
 %
 Simultaneous induction schemata are those inducting over more than one variable at a time, whether those variables are of the same type or not.
 %
-Such is the case for the list function \isaCode{zip}'s recursion induction scheme, which corresponds to parallel induction on lists:
+Such is the case for the list function \isaCode{zip}'s recursion induction scheme, which corresponds to parallel induction on two lists:
 
 \begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
 fun zip :: "'a list $\Rightarrow$ 'b list $\Rightarrow$ ('a $\times$ 'b) list" where
@@ -161,7 +181,7 @@ zip (xs @ ys) zs = (zip xs (take (len xs) zs)) @ (zip ys (drop (len xs) zs))
 len xs = len ys $\Longrightarrow$ (zip xs ys) @ (zip zs ws) = zip (xs @ zs) (ys @ ws)
 \end{lstlisting}
 
-Neither of these lemmas was provable before, even having done exploration for all the occurring functions in them.
+Neither of these lemmas were provable before, even having done exploration for all the occurring functions in them.
 %
 Hipster's prior structural induction approach could not capture in a scheme the relation between two variables.
 %
@@ -169,8 +189,6 @@ In these two cases, \isaCode{zip} traverses its arguments taking steps on both a
 %
 Instead of synthesising a series of possible simultaneous induction schemata, recursion induction gives us an immediate choice which is also closer to the problem at hand.
 
-\subsubsection*{A New Induction Tactic for Hipster}
-I just realised that we're missing this section. Here, we should explain how your new tactic is implemented (i.e. the tactic hipster-induct-schemes used below in the case study). I.e. how it searches for a proof. Does it first try structural induction, and if that that didn't work, proceed to structural induction. Explain how it chooses which functions induction scheme to try if there are several.  
 
 \subsection{Interactive Case Study: Insertion Sort}
 
@@ -218,11 +236,7 @@ by (hipster_induct_schemes $\le$.simps Nat.exhaust)
 
 \noindent Hipster automatically generates this output.
 %
-For each case, the \isaCode{lemma} command makes the statement to be proven and is followed by a tactic application via the \isaCode{by} command.
-%
-Hipster's new tactic is \isaCode{hipster\_induct\_schemes}.
-%
-It employs recursion induction where necessary.
+For each case, the \isaCode{lemma} command makes the statement to be proven and is followed by a tactic application via the \isaCode{by} command, here using Hipster's new tactic \isaCode{hipster\_induct\_schemes}, which employs recursion induction where necessary.
 %
 To enable the completion of the proof, exploration provides it with the automatically generated Isabelle rules for simplification of function definitions, such as \isaCode{$\le$.simps}, and datatype case distinction rules, such as \isaCode{Nat.exhaust}.
 
