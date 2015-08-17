@@ -21,9 +21,13 @@ To evaluate performance on TIP, each problem is analysed individually, in isolat
 %
 Theory explorations were only run for those whenever the problem was not provable by the recursion induction tactic directly, i.e. when the problem was missing helping lemmas.
 %
-Explorations were first performed on the individual functions appearing in the problem definition, jointly with their auxiliary functions. These were followed by explorations on groups of said functions if required, leaving conditional exploration as the last exploration to be run before defining the problem as non-provable by Hipster.
+Explorations were first performed on the individual functions appearing in the problem definition, jointly with their auxiliary functions.
+%
+These were followed by explorations on groups of said functions if required, leaving conditional exploration as the last exploration to be run before defining the problem as non-provable by Hipster.
 
-As already specified, conditional lemma discovery is limited to explore a single predicate at a time to define side-conditions. For the present evaluation this has sufficed.
+As already specified, conditional lemma discovery is limited to explore a single predicate at a time to define side-conditions.
+%
+For the present evaluation this has sufficed.
 
 Additionally, to test Hipster's capacity when working on strictly newly defined theories, no assumptions nor properties from theories in Isabelle/HOL were considered during proof search.
 %
