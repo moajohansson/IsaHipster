@@ -189,11 +189,10 @@ An overview of the algorithm is shown in Figure \ref{fig:tactic}.
 
 The user can configure the tactic to specify how to select facts to be passed to the simplifier and to Metis.
 %
-The default is the simplification rules from the relevant function definitions plus the datatype case distinction rules which are automatically derived by Isabelle.
+The default is the simplification rules from the relevant function definitions, the datatype case distinction rules which are automatically derived by Isabelle, and the lemmas discovered by theory exploration so far.
 %
-We typically often also want to include lemmas discovered by previous theory exploration.
 %
-However, if we pass too many facts to Metis, it becomes slower.
+However, if we pass too many facts to Metis, it becomes slower. Therefore, the user can configure Hipster to include fewer of the discovered lemmas if needed. Hipster also impose a timeout on simplification and first-order reasoning, which can be set by the user. The default timeout is 1 second for each proof attempt.
 %
 As further work, we plan to experiment with using Sledgehammer instead \cite{sledgehammer}, which calls powerful external first-order provers and reports back exactly which facts were needed in the proof.
 %
