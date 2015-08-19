@@ -10,7 +10,7 @@ Keeping in mind evaluation of automated tools for interactive theorem proving ne
 \item evaluation on problems from TIP (Tons of Inductive Problems) \cite{tip-benchmarks}, a set of benchmarks and challenge problems for inductive theorem provers.
 \end{itemize}
 
-From TIP, we evaluate Hipster over two sets of problems employed in previous works on inductive theorem proving: Johansson, Dixon and Bundy's work on case-analysis for rippling \cite{IsaPcase} (we denote it \emph{case-analysis}), and prior work by Ireland and Bundy on employing proof failure to guide lemma discovery and patch inductive proofs \cite{productiveuse} (we denote it \emph{prod-failure}).
+From TIP, we evaluate Hipster over two sets of problems employed in previous works on inductive theorem proving: Johansson, Dixon and Bundy's work on case-analysis for rippling \cite{IsaPcase} (we denote it \emph{case-analysis} \footnote{Case-analysis problems: \url{https://github.com/tip-org/benchmarks/tree/master/benchmarks/isaplanner}}), and prior work by Ireland and Bundy on employing proof failure to guide lemma discovery and patch inductive proofs \cite{productiveuse} (we denote it \emph{prod-failure} \footnote{Prod-failure problems: \url{https://github.com/tip-org/benchmarks/tree/master/benchmarks/prod}}).
 %
 We now present these results and compare them with other tools' reported results.
 
@@ -19,7 +19,7 @@ We now present these results and compare them with other tools' reported results
 
 To evaluate performance on TIP, each problem is analysed individually, in isolation from others, to assess how far Hipster can go from bare definitions.
 %
-Theory explorations were only run for those whenever the problem was not provable by the recursion induction tactic directly, i.e. when the problem was missing helping lemmas.
+Theory explorations were only run whenever the problem was not provable by the recursion induction tactic directly, i.e. when the problem was missing helping lemmas.
 %
 Explorations were first performed on the individual functions appearing in the problem definition, jointly with their auxiliary functions.
 %
@@ -37,9 +37,10 @@ Hence, predefined notions of orderings and other properties do not play a part i
 %
 In this way, we only consider as the base starting point a set of definitional statements, aligning with the purpose of proving based on structure and construction of programs.
 
+
 \subsection{Results}
 
-The following table summarises statistics on the two sets of the benchmarks run.
+The following set of tables summarise statistics on the two sets of the benchmarks run, with respect to the number of problems solved.
 %
 Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational and a conditional theorem respectively.
 
@@ -50,17 +51,7 @@ Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational an
   &  EQ & COND & EQ & COND \\
   \hline
   Total number of benchmarks & 71 & 15 & 38 & 12 \\
-  \hline
-  Fully automated & 67 & 14 & 29 & 12 \\
-  Partially automated & 4 & 0 & 6 & 0 \\
-  \hline
-  Prior exploration & 33 & 4 & 34 & 4 \\
-  Conditional exploration & 6 & 2 & 2 & 3 \\
-  \hline
-  Recursion induction & 29 & 6 & 1 & 1 \\
-  Recursion induction on sub-lemmas & 16 & 1 & 5 & 0 \\
-  \hline
-  Filter theorems for FO prover & 3 & 0 & 0 & 0 \\ % XXX: remove this since we don't mention these options?
+  Number of problems solved & 71 & 14 & 35 & 12 \\
 \end{tabularx}
 
 \vspace{2 mm}
@@ -68,9 +59,21 @@ Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational an
 
 \paragraph{Automation}
 %
-Overall, the rate of fully automated provability on the benchmark set is 90\%, considering fully automating the solving of a problem only with discovered lemmas and Hipster's automated recursion induction.
+Overall, the rate of fully automated provability on the benchmark set is 90\% ($(67+29+14+12)/(71+38+15+12)$), where full automation is understood as solving a problem only with discovered lemmas and Hipster's automated recursion induction.
 %
-For conditional lemmas in the test set this rate is higher, 96\%.
+In particular, for conditional lemmas in the test set this rate is higher, 96\%.
+
+\vspace{2 mm}
+
+\noindent \begin{tabularx}{\textwidth}{l | X X | X X}
+  & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
+  &  EQ & COND & EQ & COND \\
+  \hline
+  Fully automated & 67 & 14 & 29 & 12 \\
+  Partially automated & 4 & 0 & 6 & 0 \\
+\end{tabularx}
+
+\vspace{2 mm}
 
 A number of theorems (problems $52$, $53$, $72$, $74$ from \emph{case-analysis}; and $2$, $4$, $5$, $20$, $22$, $23$ from \emph{prod-failure}) required one of the following two similar lemmas, not automatically proven in a first instance (neither by structural nor recursion induction):
 
@@ -114,7 +117,20 @@ And so, the corresponding TIP problems are solved as well.
 \paragraph{Theory exploration}
 
 Just over half of the problems required prior lemma discovery, indicating the benefit of theory exploration.
-%
+
+\vspace{2 mm}
+
+\noindent \begin{tabularx}{\textwidth}{l | X X | X X}
+  & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
+  &  EQ & COND & EQ & COND \\
+  \hline
+  No lemmas & & & \\
+  Equational lemmas & 33 & 4 & 34 & 4 \\
+  Conditional lemmas & 6 & 2 & 2 & 3 \\
+\end{tabularx}
+
+\vspace{2 mm}
+
 Equational lemmas were much more likely than conditionals to need exploration.
 %
 Equations are unrestricted and can be more general, potentially requiring more steps to assess different case branches.
@@ -126,6 +142,21 @@ A smaller subset of problems were provable with the aid of conditional explorati
 \paragraph{Recursion induction}
 
 Whereas recursion induction was not necessary as often as theory exploration (whether for the main theorem or auxiliary lemmas), its impact is still notable.
+%
+Some problems would not be provable employing only Hipster's prior structural induction approach.
+
+\vspace{2 mm}
+
+\noindent \begin{tabularx}{\textwidth}{l | X X | X X}
+  & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
+  &  EQ & COND & EQ & COND \\
+  \hline
+  Structural induction & & & \\
+  Recursion induction & 29 & 6 & 1 & 1 \\
+  Recursion induction on sub-lemmas & 16 & 1 & 5 & 0 \\
+\end{tabularx}
+
+\vspace{2 mm}
 
 Overall, there seems to be a trade-off between using weaker induction schemes (structural induction) and reducing the number and complexity of needed auxiliary lemmas.
 %
@@ -178,6 +209,8 @@ In comparison to other (automated) inductive provers, the new Hipster is the onl
 %
 As results show, its performance is on par to other state of the art tools'.
 %
+Additionally, unlike these tools, Hipster produces formal, certified proofs.
+
 To be noted is that the failing problems for Hipster in the benchmark set \emph{prod-failure} (problems $33$-$35$) differ from those HipSpec and Pirate fail at (with the exception of $33$ in Pirate's case).
 %
 These three problems involve definitions for multiplication, factorial and exponentiation operations for Peano numerals with accumulator arguments.
@@ -186,7 +219,6 @@ Particularly, HipSpec employed adjusted settings in these three cases due to mem
 %
 Hipster has not been evaluated with adjusted settings at the HipSpec/QuickSpec level and hence the exploration phase was not feasible to perform for them.
 %
-With similar settings to HipSpec's, there is a probability problems $33$-$35$ would be solvable in Hipster too.
+With similar settings to HipSpec's, problems $33$-$35$ are likely to be solvable in Hipster too.
 
-
-
+% problem 85?
