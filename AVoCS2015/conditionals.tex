@@ -83,7 +83,7 @@ It will however produce the additional conjecture \isaCode{sorted xs $\Longright
 
 A recursion induction scheme is derived from a function's recursive definition.
 %
-Unlike structural induction, the recursion induction scheme corresponds to the originating definition and hence, the cases considered in its simplification rules.
+Unlike structural induction, the recursion induction scheme corresponds to the originating definition, and hence, the cases considered in its simplification rules.
 
 When defining a recursive function over an inductive datatype one might traverse arguments following a different pattern to the strictly structural one (the one arising from a datatype's definition).
 %
@@ -94,11 +94,11 @@ For instance, take the functions on lists \isaCode{sorted} and \isaCode{last}:
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 fun sorted :: "Nat List $\Rightarrow$ Bool" where
   "sorted [] = True"
-| "sorted ([x]) = True"
+| "sorted (x # []) = True"
 | "sorted (x1 # (x2 # xs)) = (x1 $\le$ x2 & sorted (x2 # xs))"
 
 fun last :: "'a List $\Rightarrow$ 'a" where
-  "last ([x]) = x"
+  "last (x # []) = x"
 | "last (x # xs) = last xs"
 \end{lstlisting}
 
@@ -106,7 +106,7 @@ fun last :: "'a List $\Rightarrow$ 'a" where
 %
 Structural induction on lists considers the base-case \isaCode{[]} (the empty list) and step-case \isaCode{x \# xs} (a list with an element inserted at the front).
 %
-In the case of \isaCode{sorted}, cases are broken down into more detailed ones by including an additional base-case \isaCode{[x]} (the singleton list) and restricting the step-case to lists with at least two elements \isaCode{x1 \# x2 \# xs}.
+In the case of \isaCode{sorted}, cases are broken down into more detailed ones by including an additional base-case \isaCode{x \# []} (the singleton list, a special case of the structural \isaCode{x \# xs}) and restricting the step-case to lists with at least two elements \isaCode{x1 \# x2 \# xs}.
 %
 Meanwhile \isaCode{last} is not defined for the case \isaCode{[]} and hence partially defined, meaning the induction scheme it gives rise to is to be completed with such a case.
 %
@@ -167,7 +167,7 @@ Structural induction is in some way a weaker scheme and additional case-splits o
 
 %I just realised that we're missing this section. Here, we should explain how your new tactic is implemented (i.e. the tactic hipster-induct-schemes used below in the case study). I.e. how it searches for a proof. Does it first try structural induction, and if that that didn't work, proceed to structural induction. Explain how it chooses which functions induction scheme to try if there are several.
 
-We have implemented a new automated tactic for induction in Isabelle, called \isaCode{hipster\_induct\_schemes}.
+We have implemented a new automated tactic, called \isaCode{hipster\_induct\_schemes}, for induction in Isabelle.
 %
 This tactic searches not only for proofs by structural induction, but may also employ recursion induction when appropriate.
 %
@@ -178,13 +178,16 @@ It is designed for Hipster to use as its "difficult reasoning" component, but hu
 The tactic first tries structural induction using the induction scheme associated with the datatype(s) of variables in the problem.
 %
 If this fails, the tactic then tries recursion induction, using the induction schemes associated with the functions occurring in the problem.
-% TODO: TODO: [MENTION heuristics here! Are there any for which functions induction scheme to try first? Timeouts?].
 %
+When instantiating recursion induction schemes with variables of the problem, more complete instantiations are considered first.
+%
+This leaves less specific partial instantiations to be tried later.
+% TODO: TODO: [MENTION heuristics here! Are there any for which functions induction scheme to try first? Timeouts?].
 For each attempted induction, the tactic will apply Isabelle's simplifier followed by (if necessary) first-order reasoning using Isabelle's built in first-order prover Metis.
 %
 An overview of the algorithm is shown in Figure \ref{fig:tactic}.
-%
-The user can configure the tactic to specify what facts should be passed to the simplifier and to Metis.
+
+The user can configure the tactic to specify how to select facts to be passed to the simplifier and to Metis.
 %
 The default is the simplification rules from the relevant function definitions plus the datatype case distinction rules which are automatically derived by Isabelle.
 %
@@ -236,19 +239,19 @@ fun zip :: "'a list $\Rightarrow$ 'b list $\Rightarrow$ ('a $\times$ 'b) list" w
 
 \vspace{2 mm}
 
-\noindent This scheme, along with some initial theory exploration, allows theorems like the following to be provable automatically:
+\noindent This scheme, along with some initial theory exploration, allows theorems like the following to be proven automatically:
 
 \begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
 zip (xs @ ys) zs = (zip xs (take (len xs) zs)) @ (zip ys (drop (len xs) zs))
 \end{lstlisting}
 
-\noindent Or even the alternative related conditional lemma to be immediately provable:
+\noindent Or even the alternative related conditional lemma to be proven without prior exploration:
 
 \begin{lstlisting}[   mathescape,   columns=fullflexible,   basicstyle=\fontfamily{lmvtt}\selectfont, ]
 len xs = len ys $\Longrightarrow$ (zip xs ys) @ (zip zs ws) = zip (xs @ zs) (ys @ ws)
 \end{lstlisting}
 
-Neither of these lemmas were provable before, even having done exploration for all the occurring functions in them.
+\noindent Neither of these lemmas were provable before, even having done exploration for all the occurring functions in them.
 %
 Hipster's prior structural induction approach could not capture in a scheme the relation between two variables.
 %
@@ -303,7 +306,7 @@ by (hipster_induct_schemes $\le$.simps Nat.exhaust)
 
 \noindent Hipster automatically generates this output.
 %
-For each case, the \isaCode{lemma} command makes the statement to be proven and is followed by a tactic application via the \isaCode{by} command, here using Hipster's new tactic \isaCode{hipster\_induct\_schemes}, which employs recursion induction where necessary.
+For each case, the \isaCode{lemma} command makes the statement to be proven and is followed by a tactic application via the \isaCode{by} command, here using Hipster's recursion induction tactic \isaCode{hipster\_induct\_schemes}, which employs recursion induction where necessary.
 %
 To enable the completion of the proof, exploration provides it with the automatically generated Isabelle rules for simplification of function definitions, such as \isaCode{$\le$.simps}, and datatype case distinction rules, such as \isaCode{Nat.exhaust}.
 
@@ -333,7 +336,7 @@ by (hipster_induct_schemes insert.simps)
 
 Invoking the recursion induction tactic \isaCode{hipster\_induct\_schemes} once proves all of the statements above, simplifying the interaction with the proof assistant.
 %
-Particularly, the crucial lemma \isaCode{isortInvariant} is proven applying \isaCode{sorted}'s associated induction scheme, highlighting once again the need for support of conditional lemmas in automated inductive proving and the possibilities recursion induction brings towards proof automation.
+Particularly, the crucial lemma \isaCode{isortInvariant} is proven applying \isaCode{sorted}'s associated recursion induction scheme, highlighting once again the need for support of conditional lemmas in automated inductive proving and the possibilities recursion induction brings towards proof automation.
 
 % XXX: include? IF we mention new options
 % Lastly, the benefit of an interactive environment is being able to parameterise the proving methods with adequate options as one works along. This supervised automation can be of great utility to a user during a formal theory development.
