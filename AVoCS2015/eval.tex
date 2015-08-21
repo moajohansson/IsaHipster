@@ -40,7 +40,7 @@ In this way, we only consider as the base starting point a set of definitional s
 
 \subsection{Results}
 
-The following set of tables summarises statistics on the two sets of the benchmarks run, with respect to the number of problems solved.
+The following set of tables summarises statistics on the two sets of the benchmarks, with respect to the number of problems solved.
 %
 Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational and a conditional theorem respectively.
 
@@ -66,7 +66,7 @@ Full automation is understood as solving a problem only with discovered lemmas a
 Partially automated problems are those for which additional related functions of a datatype's theory were provided to exploration for completion.
 % TODO: repeat
 
-Overall, the rate of fully automated provability on the benchmark set is 90\% ; considering partially automated problems as well, the rate is 97\%.
+Overall, the rate of fully automated provability on the benchmark set is 90\% ; considering partially automated problems as well, the overall rate is 97\%.
 %
 % In particular, for conditional lemmas in the test set this rate is higher, 96\%.
 
@@ -127,7 +127,7 @@ This seems reasonable: the structure of the terms at each side of the equality w
 
 \paragraph{Theory exploration}
 
-Just over half of the problems required prior lemma discovery, indicating the benefit of theory exploration. In Table \ref{tab:explore} we show the number of solved problems which required prior theory exploration and specify how many required further conditional lemmas.
+Just over half of the problems required prior lemma discovery, showcasing the benefit of theory exploration. In Table \ref{tab:explore} we show the number of solved problems which required prior theory exploration and specify how many required further conditional lemmas.
 
 \begin{table}
 \begin{tabularx}{\textwidth}{l | X X | X X}
@@ -135,8 +135,8 @@ Just over half of the problems required prior lemma discovery, indicating the be
   &  EQ & COND & EQ & COND \\
   \hline
   No additional lemmas & 38 & 10 & 1 & 8 \\
-  Equational lemmas & 33 & 3 & 34 & 4 \\
-  Conditional lemmas & 6 & 1 & 2 & 3 \\
+  Only equational lemmas & 27 & 2 & 32 & 1 \\
+  Equational and conditional lemmas & 6 & 1 & 2 & 3 \\
 \end{tabularx}
 \caption{Number of problems requiring discovery of auxiliary lemmas.}
 \label{tab:explore}
@@ -156,7 +156,7 @@ Whereas recursion induction was not necessary as often as theory exploration (wh
 %
 Some problems would not be provable employing only Hipster's prior structural induction approach.
 %
-In Table \ref{tab:rec-ind}, problems solved by structural induction are those for which both the main theorem and any required auxiliary lemma only needed structural induction in their respective solutions.%proofs?
+In Table \ref{tab:rec-ind}, problems solved by structural induction are those for which both the main theorem and any required auxiliary lemma only needed structural induction. Those solved by recursion induction required it for the main theorem's proof or any of its helping lemmas. %proofs?
 %
 %It is notable to observe... compare both test benches? Is prod-failure simpler?
 
@@ -167,7 +167,6 @@ In Table \ref{tab:rec-ind}, problems solved by structural induction are those fo
   \hline
   Structural induction & 38 & 7 & 30 & 11 \\
   Recursion induction & 33 & 6 & 5 & 1 \\
-  Recursion induction on sub-lemmas & 16 & 1 & 5 & 0 \\
 \end{tabularx}
 \caption{Number of problems solved with both kinds of induction.}
 \label{tab:rec-ind}
@@ -186,11 +185,11 @@ It provides appropriate induction patterns that avoid the need for sub-lemmas ab
 
 % Briefly describe others tested against
 
-Other inductive provers have also been evaluated on the test suites we have presented results for, serving as a good point of comparison.
+Other inductive provers have also been evaluated on these test suites, serving as a good point of comparison.
 %
-The following table collects the number of problems solved by some of these in comparison with Hipster; note that we compare on problems for which other provers have available data.
+The following table collects the number of problems solved by some of them in comparison with Hipster; note that we compare on problems for which other provers have available data.
 %
-Plain figures correspond to fully automated solutions to problems and those in parentheses $(x)$ indicate number of successful proofs after some adaptation of settings.
+Plain figures correspond to fully automated solutions and those in parentheses $(x)$ indicate number of successful proofs after some adaptation of settings.
 %
 In total, \emph{case-analysis} has $85$ problems whilst \emph{prod-failure} has $50$.
 %
@@ -222,7 +221,7 @@ IsaPlanner is a proof planning tool for Isabelle based on rippling \cite{isaplan
 
 In comparison to other (automated) inductive provers, the new Hipster is the only one (to the best of our knowledge) to employ recursion induction.
 %
-As results show, its performance is on par to other state of the art tools'.
+As results show, its performance is on par to other state-of-the-art tools'.
 %
 Additionally, unlike these tools, Hipster produces formal, certified proofs.
 
