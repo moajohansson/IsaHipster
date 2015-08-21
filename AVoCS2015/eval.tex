@@ -19,7 +19,7 @@ We now present these results and compare them with other tools' reported results
 
 To evaluate performance on TIP, each problem is analysed individually, in isolation from others, to assess how far Hipster can go from bare definitions.
 %
-Theory explorations were only run whenever the problem was not provable by the recursion induction tactic directly, i.e. when the problem was missing helping lemmas.
+Theory explorations were only run whenever the problem was not provable by the induction tactic directly, i.e. when the problem was missing helping lemmas.
 %
 Explorations were first performed on the individual functions appearing in the problem definition, jointly with their auxiliary functions.
 %
@@ -230,15 +230,14 @@ To be noted is that the failing problems for Hipster in the benchmark set \emph{
 These three problems involve definitions for multiplication, factorial and exponentiation operations for Peano numerals with accumulator arguments.
 %
 %Particularly, HipSpec employed adjusted settings in these three cases due to memory usage during testing in QuickSpec to be able to discover appropriate helping lemmas.
-Particularly, HipSpec employed adjusted settings for lemma discovery in these three cases.% to be able to discover appropriate helping lemmas.
+Particularly, HipSpec employed adjusted settings for lemma discovery in these three cases: the generators for random values of datatypes are manually defined.
+% to be able to discover appropriate helping lemmas.
 %
 %HipSpec's evaluation is adjusted with manually defined generators for these problems.
-The generators for random values of datatypes it employs are manually defined.
 %
-Testing
-As already pointed out in \S \ref{sub:gencond}, Hipster derives generators for random values of datatypes automatically, which means the simplicity of these could lead to inefficiencies in them.
+As already pointed out in \S \ref{sub:gencond}, Hipster derives generators automatically, which means the simplicity of these could lead to inefficiencies when it comes to generating values of larger sizes.
 %
-Hipster has not been evaluated with adjusted settings at the HipSpec/QuickSpec level and hence the exploration phase was not feasible to perform for them.
+Hipster has not been evaluated with adjusted settings at the HipSpec/QuickSpec level and hence the exploration phase was not feasible to perform for these problems due to memory usage during testing in QuickSpec.
 %
 With similar settings to HipSpec's, problems $33$-$35$ are likely to be solvable in Hipster too.
 

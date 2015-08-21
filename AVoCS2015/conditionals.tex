@@ -117,11 +117,11 @@ This, in fact, results in the same recursion induction scheme derived from \isaC
 \vspace{2 mm}
 
 \inferrule [SortedInd]
-  {P\;([]) \\ \forall u\;\; P\;([u]) \\ \forall r, \; t, \; ts\;\; (P\;(r \;\#\; ts) \; \Longrightarrow\;P\;(t\;\#\; (r\;\#\; ts)))}
+  {P\;([]) \\ \forall x\;\; P\;([x]) \\ \forall x, \; y, \; xs\;\; (P\;(x \;\#\; xs) \; \Longrightarrow\;P\;(y\;\#\; (x\;\#\; xs)))}
   {\forall x \;\; P\;(x)}
 
 \inferrule [LastInd]
-  {\forall u\;\; P\;([u]) \\ \forall r, \; t, \; ts\;\; (P\;(r\;\#\; ts) \; \Longrightarrow\;P\;(t \;\#\; (r\;\#\; ts))) \\ P\;([])}
+  {\forall x\;\; P\;([x]) \\ \forall x, \; y, \; xs\;\; (P\;(x\;\#\; xs) \; \Longrightarrow\;P\;(y \;\#\; (x\;\#\; xs))) \\ P\;([])}
   {\forall x \;\; P\;(x)}
 
 \vspace{2 mm}
@@ -235,7 +235,7 @@ fun zip :: "'a list $\Rightarrow$ 'b list $\Rightarrow$ ('a $\times$ 'b) list" w
 \vspace{2 mm}
 
 \inferrule [ZipInd]
-  {\forall ts\;\; P\;([],\; ts) \\ \forall z,\; rs\;\; P\;(z\;\#\; rs, [])  \\ \forall z,\; y,\; rs,\; ts\;\; (P\;(rs,\;ts) \Longrightarrow\; P\;(z\; \# \; rs,\; y\;\#\; ts))}
+  {\forall ys\;\; P\;([],\; ys) \\ \forall x,\; xs\;\; P\;(x\;\#\; xs, [])  \\ \forall x,\; y,\; xs,\; ys\;\; (P\;(xs,\;ys) \Longrightarrow\; P\;(x\; \# \; xs,\; y\;\#\; ys))}
   {\forall xs, \; ys \;\; P\;(xs,\; ys)}
 
 \vspace{2 mm}
