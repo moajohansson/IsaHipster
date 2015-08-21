@@ -63,13 +63,12 @@ Table \ref{tab:auto} shows the number of problems with automated solutions out o
 %
 Full automation is understood as solving a problem only with discovered lemmas about the function symbols involved in the target theorem and Hipster's automated recursion induction.
 %
-Problems which were partially automated are those for which additional related functions of a datatype's theory were provided to exploration.
+Partially automated problems are those for which additional related functions of a datatype's theory were provided to exploration for completion.
 % TODO: repeat
 
-Overall, the rate of fully automated provability on the benchmark set is 90\% ($(67+29+14+12)/(71+38+15+12)$).
+Overall, the rate of fully automated provability on the benchmark set is 90\% ($(67+29+13+12)/(71+38+14+12)$); considering partially automated problems as well, the rate is 97\%.
 %
-In particular, for conditional lemmas in the test set this rate is higher, 96\%.
-
+% In particular, for conditional lemmas in the test set this rate is higher, 96\%.
 
 \begin{table}
 \begin{tabularx}{\textwidth}{l | X X | X X}
@@ -83,27 +82,22 @@ In particular, for conditional lemmas in the test set this rate is higher, 96\%.
 \label{tab:auto}
 \end{table}
 
-
-A number of theorems (problems $52$, $53$, $72$, $74$ from \emph{case-analysis}; and $2$, $4$, $5$, $20$, $22$, $23$ from \emph{prod-failure}) required one of the following two similar lemmas, not automatically proven in a first instance (neither by structural nor recursion induction):
+A number of theorems (problems $52$, $53$, $72$, $74$ from \emph{case-analysis}; and $2$, $4$, $5$, $20$, $22$, $23$ from \emph{prod-failure}) required one of the following two similar lemmas:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 len (x @ y) = len (y @ x)
 count z (x @ y) = count z (y @ x)
 \end{lstlisting}
 
-\noindent The failure is associated to less general auxiliary lemmas not being discovered. % Discovery possibly because discovery of lemmas limits constructed terms to a certain depth.
+\noindent These two lemmas are not automatically proven in a first instance (neither by structural nor recursion induction).
+%
+Each of them in turn needs an auxiliary lemma which is not discovered.
+%less general  aux lemmas
+% possibly because discovery of lemmas limits constructed terms to a certain depth.
 
-These examples seem to indicate that recursion induction may not suffice when a non-commutative operation nested within another has commuting arguments on both sides of an equality.
+Nonetheless, their proof can be partially automated.
 %
-At least not in the absence of smaller related lemmas corresponding to subgoals.
-%
-This seems reasonable: the structure of the terms at each side of the equality will differ upon induction.
-
-Nonetheless, proofs for the problems associated to these lemmas can be partially automated.
-%
-When extracted, the open subgoals are provable by Hipster.
-%
-Alternatively, for both cases, one can observe that the outermost function applied, \isaCode{len} and \isaCode{count} respectively, acts as a relator function between two datatypes.
+In both cases, one can observe that the outermost function applied, \isaCode{len} and \isaCode{count} respectively, acts as a relator function between two datatypes.
 %
 Furthermore, these will in fact act as relator functions between list concatenation \isaCode{@} and addition for natural numbers \isaCode{plus}.
 %
@@ -116,10 +110,18 @@ len (x @ y) = plus (len x) (len y)
 count z (x @ y) = plus (count z x) (count z y)
 \end{lstlisting}
 
-\noindent Along with the commutative law for \isaCode{plus}, also discovered and proven automatically, these enable the automation of the two pending proofs without further intervention.
+\noindent Along with the commutative law for \isaCode{plus}, also discovered and proven automatically, they enable the automation of the two pending proofs without further intervention.
 %
 And so, the corresponding TIP problems are solved as well.
 
+These two cases seem to indicate that recursion induction may not suffice when a non-commutative operation nested within another has commuting arguments on both sides of an equality.
+%
+At least not in the absence of smaller related lemmas corresponding to subgoals.
+%
+This seems reasonable: the structure of the terms at each side of the equality will differ upon induction.
+
+%When extracted, the open subgoals are provable by Hipster.
+%
 % TODO: successive inductions!
 
 
