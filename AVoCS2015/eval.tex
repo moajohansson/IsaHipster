@@ -44,36 +44,45 @@ The following set of tables summarise statistics on the two sets of the benchmar
 %
 Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational and a conditional theorem respectively.
 
-\vspace{2 mm}
-
-\noindent \begin{tabularx}{\textwidth}{l | X X | X X}
+\noindent \begin{table}[htbp]
+\begin{tabularx}{\textwidth}{l | X X | X X}
   & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
   &  EQ & COND & EQ & COND \\
   \hline
-  Total number of benchmarks & 71 & 15 & 38 & 12 \\
-  Number of problems solved & 71 & 14 & 35 & 12 \\
+  Total number of benchmarks & 71 & 14 & 38 & 12 \\
+  Number of problems solved & 71 & 13 & 35 & 12 \\
 \end{tabularx}
-
-\vspace{2 mm}
+\caption{Total number of problems solved.}
+\label{tab:total}
+\end{table}
 
 
 \paragraph{Automation}
 %
-Overall, the rate of fully automated provability on the benchmark set is 90\% ($(67+29+14+12)/(71+38+15+12)$), where full automation is understood as solving a problem only with discovered lemmas and Hipster's automated recursion induction.
+Table \ref{tab:auto} shows the number of problems with automate solutions out of those which were solved.
+%
+Full automation is understood as solving a problem only with discovered lemmas about the function symbols involved in the target theorem and Hipster's automated recursion induction.
+%
+Problems which were partially automated are those for which related function definitions of a datatype's theory were provided to exploration in addition.
+% TODO: repeat
+
+Overall, the rate of fully automated provability on the benchmark set is 90\% ($(67+29+14+12)/(71+38+15+12)$).
 %
 In particular, for conditional lemmas in the test set this rate is higher, 96\%.
 
-\vspace{2 mm}
 
-\noindent \begin{tabularx}{\textwidth}{l | X X | X X}
+\begin{table}
+\begin{tabularx}{\textwidth}{l | X X | X X}
   & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
   &  EQ & COND & EQ & COND \\
   \hline
-  Fully automated & 67 & 14 & 29 & 12 \\
+  Fully automated & 67 & 13 & 29 & 12 \\
   Partially automated & 4 & 0 & 6 & 0 \\
 \end{tabularx}
+\caption{Automation of problems solved}
+\label{tab:auto}
+\end{table}
 
-\vspace{2 mm}
 
 A number of theorems (problems $52$, $53$, $72$, $74$ from \emph{case-analysis}; and $2$, $4$, $5$, $20$, $22$, $23$ from \emph{prod-failure}) required one of the following two similar lemmas, not automatically proven in a first instance (neither by structural nor recursion induction):
 
@@ -118,18 +127,18 @@ And so, the corresponding TIP problems are solved as well.
 
 Just over half of the problems required prior lemma discovery, indicating the benefit of theory exploration.
 
-\vspace{2 mm}
-
-\noindent \begin{tabularx}{\textwidth}{l | X X | X X}
+\begin{table}
+\begin{tabularx}{\textwidth}{l | X X | X X}
   & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
   &  EQ & COND & EQ & COND \\
   \hline
-  No lemmas & & & \\
-  Equational lemmas & 33 & 4 & 34 & 4 \\
-  Conditional lemmas & 6 & 2 & 2 & 3 \\
+  No lemmas & 38 & 10 & 1 & 8 \\
+  Equational lemmas & 33 & 3 & 34 & 4 \\
+  Conditional lemmas & 6 & 1 & 2 & 3 \\
 \end{tabularx}
-
-\vspace{2 mm}
+\caption{Exploration necessary for automation}
+\label{tab:explore}
+\end{table}
 
 Equational lemmas were much more likely than conditionals to need exploration.
 %
@@ -145,9 +154,8 @@ Whereas recursion induction was not necessary as often as theory exploration (wh
 %
 Some problems would not be provable employing only Hipster's prior structural induction approach.
 
-\vspace{2 mm}
-
-\noindent \begin{tabularx}{\textwidth}{l | X X | X X}
+\noindent \begin{table}[h]
+\begin{tabularx}{\textwidth}{l | X X | X X}
   & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
   &  EQ & COND & EQ & COND \\
   \hline
@@ -155,8 +163,9 @@ Some problems would not be provable employing only Hipster's prior structural in
   Recursion induction & 29 & 6 & 1 & 1 \\
   Recursion induction on sub-lemmas & 16 & 1 & 5 & 0 \\
 \end{tabularx}
-
-\vspace{2 mm}
+\caption{Kinds of induction required}
+\label{tab:rec-ind}
+\end{table}
 
 Overall, there seems to be a trade-off between using weaker induction schemes (structural induction) and reducing the number and complexity of needed auxiliary lemmas.
 %
@@ -181,27 +190,28 @@ In total, \emph{case-analysis} has $85$ problems whilst \emph{prod-failure} has 
 %
 Additionally, a last theorem was not evaluated in all of the associated works, as brought up in \cite{SPASSInduction}. Results including such a lemma are given with square brackets $[x]$.
 
-\vspace{2 mm}
+\vspace{1
+ mm}
 
-\noindent \begin{tabularx}{\textwidth}{l | X X X | X X | X | X | X | X X X}
-  & \multicolumn{3}{|c|}{Hipster}
+\noindent \begin{tabularx}{\textwidth}{l | X X | X X | X | X | X | X X}
+  & \multicolumn{2}{|c|}{Hipster}
   	& \multicolumn{2}{c|}{HipSpec}
   	& \multicolumn{1}{c|}{Zeno}
   	& \multicolumn{1}{c|}{IsaPlanner}
   	& \multicolumn{1}{c|}{CVC4}
-  	& \multicolumn{3}{c}{Pirate} \\
+  	& \multicolumn{2}{c}{Pirate} \\
   \hline
-  Case-analysis & 80 & (84) & [85] & 80 & & 82 & 47 & 80 & 85 & & [86] \\
-  Prod-failure & 41 & (47) & & 44 & (47) & 21 & - & 40 & & (47) & \\
+  Case-analysis & 80 & (84) & 80 & & 82 & 47 & 80 & 85 & \\
+  Prod-failure & 41 & (47) & 44 & (47) & 21 & - & 40 & & (47) \\
 \end{tabularx}
 
-\vspace{2 mm}
+\vspace{1 mm}
 
 \noindent The already mentioned HipSpec uses theory exploration, structural induction and external first-order provers to prove properties about functional programs \cite{hipspecCADE}.
 %
 Zeno is a tool for proving equational inductive properties of Haskell programs \cite{zeno}.
 %
-Both CVC4's and Pirate's approaches to inductive proving are built on SMT solving, with a top-down approach in conjecture generation \cite{cvc4, SPASSInduction}.
+CVC4's approach to inductive proving is built on SMT solving whilst Pirate is built on first-order prover SPASS, both with a top-down approach in conjecture generation \cite{cvc4, SPASSInduction}.
 %
 IsaPlanner is a proof planning tool for Isabelle based on rippling \cite{isaplanner2, IsaPcase}.
 
