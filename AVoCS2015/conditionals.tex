@@ -1,6 +1,6 @@
 \label{sec:conditionals}
 
-We now demonstrate how to employ Hipster interactively for theory exploration of conditional lemmas in the development of a theory, with the aim of proving insertion sort's correctness.
+We now demonstrate how to employ Hipster interactively for theory exploration of conditional lemmas in the development of a theory.%, with the aim of proving insertion sort's correctness.
 %
 We first explain how conditional conjectures are generated in QuickSpec.
 %
@@ -35,9 +35,9 @@ In Example 1, we showed how QuickSpec generated equational conjectures about the
 %
 We are furthermore interested in the case with the condition that the predicate \isaCode{sorted} holds (for one variable).
 %
-QuickSpec now first performs one pass looking for plain equations, as in Example 1, then a second where it considers the condition \isaCode{sorted xs}.
+In this case, QuickSpec first performs one pass looking for plain equations, as in Example 1, then a second where it considers the condition \isaCode{sorted xs}.
 %
-In the second phase, QuickSpec performs a new exploration, this time requiring the predicate \isaCode{sorted xs} to hold for all test values.
+In this second phase, QuickSpec performs a new exploration, this time requiring the predicate \isaCode{sorted xs} to hold for all test values.
 %
 Suppose we test with the sorted list: \isaCode{xs $\rightarrow$ [1,2]} (other non-sorted values for \isaCode{xs} would be discarded).       
 
@@ -57,7 +57,7 @@ Suppose we test with the sorted list: \isaCode{xs $\rightarrow$ [1,2]} (other no
 %
 QuickSpec realises that there is no point producing the conjecture \isaCode{sorted xs $\Longrightarrow$ isort (isort xs) = xs}, as this is subsumed by the non-conditional equation discovered in the first phase.
 %
-It will however produce the additional conjecture \isaCode{sorted xs $\Longrightarrow$ isort xs = xs}, which clearly only holds if the list is already sorted.
+It will however produce the additional conjecture \\ \isaCode{sorted xs $\Longrightarrow$ isort xs = xs}, which clearly only holds if the list is already sorted.
 
 
 %\subsection{A Need for Conditionals}
@@ -96,11 +96,11 @@ For instance, take the functions on lists \isaCode{sorted} and \isaCode{last}:
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 fun sorted :: "Nat List $\Rightarrow$ Bool" where
   "sorted [] = True"
-| "sorted (x # []) = True"
+| "sorted ([x]) = True"
 | "sorted (x1 # (x2 # xs)) = (x1 $\le$ x2 & sorted (x2 # xs))"
 
 fun last :: "'a List $\Rightarrow$ 'a" where
-  "last (x # []) = x"
+  "last ([x]) = x"
 | "last (x # xs) = last xs"
 \end{lstlisting}
 
@@ -108,7 +108,7 @@ fun last :: "'a List $\Rightarrow$ 'a" where
 %
 Structural induction on lists considers the base-case \isaCode{[]} (the empty list) and step-case \isaCode{x \# xs} (a list with an element inserted at the front).
 %
-In the case of \isaCode{sorted}, cases are broken down into more detailed ones by including an additional base-case \isaCode{x \# []} (the singleton list, a special case of the structural \isaCode{x \# xs}) and restricting the step-case to lists with at least two elements \isaCode{x1 \# x2 \# xs}.
+In the case of \isaCode{sorted}, cases are broken down into more detailed ones by including an additional base-case \isaCode{[x]} (the singleton list) and restricting the step-case to lists with at least two elements \isaCode{x1 \# x2 \# xs}.
 %
 Meanwhile \isaCode{last} is not defined for the case \isaCode{[]} and hence partially defined, meaning the induction scheme it gives rise to is to be completed with such a case.
 %
@@ -139,23 +139,23 @@ Within Isabelle/HOL these schemata are automatically derived and proved as theor
 
 %% Example from presentation on difference
 
-To exemplify the potential difference between recursion and structural induction, let us take the already introduced conditional lemma \isaCode{sorted xs $\Longrightarrow$ sorted (insert x xs)}.
+To exemplify the potential difference between recursion and structural induction, let us take the already introduced conditional lemma \\ \isaCode{sorted xs $\Longrightarrow$ sorted (insert x xs)}.
 %
 Applying structural induction on the list \isaCode{xs} would produce the subgoals:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 1. sorted [] $\Longrightarrow$ sorted (insert x [])
-2. $\wedge$ a y. (sorted y $\Longrightarrow$ sorted (insert x y)) $\Longrightarrow$ sorted (a # y) $\Longrightarrow$
-            sorted (insert x (a # y))
+2. $\wedge$ y ys. (sorted ys $\Longrightarrow$ sorted (insert x ys)) $\Longrightarrow$ sorted (y # ys) $\Longrightarrow$
+            sorted (insert x (y # ys))
 \end{lstlisting}
 
 \noindent Whilst \isaCode{sorted}'s recursion induction scheme would yield:
 
 \begin{lstlisting}[ mathescape, columns=fullflexible,keepspaces, basicstyle=\fontfamily{lmvtt}\selectfont, ]
 1. sorted [] $\Longrightarrow$ sorted (insert x [])
-2. $\wedge$ u. sorted [u] $\Longrightarrow$ sorted (insert x [u])
-3. $\wedge$ r t ts. (sorted (t # ts) $\Longrightarrow$ sorted (insert x (t # ts))) $\Longrightarrow$ sorted (r # t # ts) $\Longrightarrow$
-               sorted (insert x (r # t # ts))
+2. $\wedge$ y. sorted [y] $\Longrightarrow$ sorted (insert x [y])
+3. $\wedge$ y1 y2 ys. (sorted (y2 # ys) $\Longrightarrow$ sorted (insert x (y2 # ys))) $\Longrightarrow$ 
+               sorted (y1 # y2 # ys) $\Longrightarrow$ sorted (insert x (y1 # y2 # ys))
 \end{lstlisting}
 
 \noindent The latter set of subgoals leads to an immediate proof of the main lemma thanks to its steps mirroring the actual predicate definition, hence having a correspondence with its simplification rules.
@@ -187,7 +187,7 @@ This leaves less specific partial instantiations to be tried later.
 % TODO: TODO: [MENTION heuristics here! Are there any for which functions induction scheme to try first? Timeouts?].
 For each attempted induction, the tactic will apply Isabelle's simplifier followed by (if necessary) first-order reasoning using Isabelle's built in first-order prover Metis.
 %
-An overview of the algorithm is shown in Figure \ref{fig:tactic}.
+Figure \ref{fig:tactic} shows an overview of the tactic.
 
 The user can configure the tactic to specify how to select facts to be passed to the simplifier and to Metis.
 %
@@ -258,7 +258,7 @@ Hipster's prior structural induction approach could not capture in a scheme the 
 %
 In these two cases, \isaCode{zip} traverses its arguments taking steps on both at the same time, a pattern we can only capture with some form of simultaneous induction.
 %
-Instead of synthesising a series of possible simultaneous induction schemata, recursion induction gives us an immediate choice which is also closer to the problem at hand.
+Instead of synthesising a series of possible simultaneous structural induction schemata, recursion induction gives us an immediate choice which is also closer to the problem at hand.
 
 
 \subsection{Interactive Case Study: Insertion Sort}
