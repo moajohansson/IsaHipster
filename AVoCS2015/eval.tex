@@ -45,12 +45,12 @@ The following set of tables summarises statistics on the two sets of the benchma
 Columns \emph{EQ} and \emph{COND} do so for problems defined by an equational and a conditional theorem respectively.
 
 \noindent \begin{table}[htbp]
-\begin{tabularx}{\textwidth}{l | X X | X X}
-  & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
+\begin{tabularx}{\textwidth}{l | X X | X X ? X}
+  & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c?}{Prod-failure} & \textbf{Total} \\
   &  EQ & COND & EQ & COND \\
   \hline
-  Total number of benchmarks & 71 & 14 & 38 & 12 \\
-  Number of problems solved & 71 & 13 & 35 & 12 \\
+  Total number of benchmarks & 71 & 14 & 38 & 12 & \textbf{135} \\
+  Number of problems solved & 71 & 13 & 35 & 12 & \textbf{131} \\
 \end{tabularx}
 \caption{Total number of problems solved.}
 \label{tab:total}
@@ -66,17 +66,17 @@ Full automation is understood as solving a problem only with discovered lemmas a
 Partially automated problems are those for which additional related functions of a datatype's theory were provided to exploration for completion.
 % TODO: repeat
 
-Overall, the rate of fully automated provability on the benchmark set is 90\% ($(67+29+13+12)/(71+38+14+12)$); considering partially automated problems as well, the rate is 97\%.
+Overall, the rate of fully automated provability on the benchmark set is 90\% ; considering partially automated problems as well, the rate is 97\%.
 %
 % In particular, for conditional lemmas in the test set this rate is higher, 96\%.
 
 \begin{table}
-\begin{tabularx}{\textwidth}{l | X X | X X}
-  & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c}{Prod-failure} \\
+\begin{tabularx}{\textwidth}{l | X X | X X ? X}
+  & \multicolumn{2}{c|}{Case-analysis} & \multicolumn{2}{c?}{Prod-failure} & \textbf{Total} \\
   &  EQ & COND & EQ & COND \\
   \hline
-  Fully automated & 67 & 13 & 29 & 12 \\
-  Partially automated & 4 & 0 & 6 & 0 \\
+  Fully automated & 67 & 13 & 29 & 12 & \textbf{121} \\
+  Partially automated & 4 & 0 & 6 & 0 & \textbf{10} \\
 \end{tabularx}
 \caption{Automation of problems solved.}
 \label{tab:auto}
@@ -142,11 +142,11 @@ Just over half of the problems required prior lemma discovery, indicating the be
 \label{tab:explore}
 \end{table}
 
-Equational lemmas were much more likely than conditionals to need exploration.
+% Equational lemmas were much more likely than conditionals to need exploration.
 %
-Equations are unrestricted and can be more general, potentially requiring more steps to assess different case branches.
+% Equations are unrestricted and can be more general, potentially requiring more steps to assess different case branches.
 %
-However, the number of conditional problems in these benchmarks is low, and one cannot draw conclusions as to whether exploration becomes less necessary, or not, when a statement to be proven is constrained by a side-condition.% On the other hand, for these benchmarks, conditionals provided constraints that narrow down cases.
+% However, the number of conditional problems in these benchmarks is low, and one cannot draw conclusions as to whether exploration becomes less necessary, or not, when a statement to be proven is constrained by a side-condition.% On the other hand, for these benchmarks, conditionals provided constraints that narrow down cases.
 
 A smaller subset of problems were provable with the aid of conditional exploration, namely those involving functions defined in terms of some predicate.
 
