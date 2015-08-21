@@ -263,7 +263,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
               rec_ind_tac rs (*ctxt rs strat vars i*)
             end
   in
-    struct_tac ORELSE rec_ind_tac scheme_rules
+    struct_tac ORELSE ( let val _ = @{print} "no struct!" in rec_ind_tac scheme_rules end )
   end;
 
 

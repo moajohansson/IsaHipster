@@ -24,7 +24,7 @@ begin
   "append (Nil2) y = y"
   | "append (Cons2 z xs) y = Cons2 z (append xs y)"
   (*hipster zip take len drop append *)
-hipster take len drop
+(*hipster take len drop*)
   theorem x0 :
     "(zip xs (append ys zs)) =
        (append (zip (take (len ys) xs) ys) (zip (drop (len ys) xs) zs))"

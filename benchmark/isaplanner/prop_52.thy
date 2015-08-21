@@ -105,7 +105,7 @@ oops
 lemma unknown [thy_expl]: "count (S Z) (rev x) = count (S Z) x"
 oops
 
-hipster_cond equal2 count append rev
+(*hipster_cond equal2 count append rev*)
 lemma lemma_ad [thy_expl]: "equal2 y2 x2 \<Longrightarrow> x2 = y2"
 by (hipster_induct_schemes equal2.simps count.simps append.simps)
 

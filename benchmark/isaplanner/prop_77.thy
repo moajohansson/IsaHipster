@@ -47,7 +47,7 @@ by (hipster_induct_schemes le.simps Nat.exhaust)
 lemma lemma_af [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x y = True"
 by (hipster_induct_schemes le.simps Nat.exhaust)
 
-hipster insort le
+(*hipster insort le*)
 lemma lemma_ag [thy_expl]: "insort Z (insort x2 y2) =
 insort x2 (insort Z y2)"
 by (hipster_induct_schemes insort.simps le.simps)
