@@ -67,10 +67,10 @@ by (hipster_induct_schemes sorted.simps isort.simps insert.simps le.simps)
 
 hipster_cond notle
 hipster notle le
-lemma lemma_ai [thy_expl]: "notle (S x2) y2 = le y2 x2"
+lemma lemma_adi [thy_expl]: "\<not> le (S x2) y2 = le y2 x2"
 by (hipster_induct_schemes sortd.notle.simps sortd.Nat.exhaust)
 
-lemma lemma_aj [thy_expl]: "notle x2 y2 \<Longrightarrow> notle x2 Z = True"
+lemma lemma_adj [thy_expl]: "\<not> le x2 y2 \<Longrightarrow> \<not> le x2 Z = True"
 by (hipster_induct_schemes sortd.notle.simps sortd.Nat.exhaust)
 
 lemma lemma_ [thy_expl]: "le (S x11) y11 = (\<not> le y11 x11)"
