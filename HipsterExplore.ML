@@ -183,7 +183,8 @@ fun prep_conjs ctxt conjs =
 (* Outputs snippets of proof script with the discovered lemmas that can be pasted into the theory file. *)
 fun explore' cond_opt ctxt const_nms =
   let
-    (* XXX: more principled way of obtaining simps? *)
+    (* XXX: more principled way of obtaining simps? 
+    FIXME: Use try instead of handle.*)
     val ctts = map (fn n => (n^".simps", Sledgehammer_Util.thms_of_name ctxt (n^".simps"))
                       handle _ => (n^".psimps", Sledgehammer_Util.thms_of_name ctxt (n^".psimps"))
                       handle _ => (n^"_def", Sledgehammer_Util.thms_of_name ctxt (n^"_def"))
