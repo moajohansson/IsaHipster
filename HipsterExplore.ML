@@ -71,7 +71,7 @@ fun try_prove_priority_goal ctxt goal =
 
 fun proof_loop_w_prio ctxt facts fact_nms prio_goal_opt cand_lemmas_str =
   let
-    val _ = @{print} cand_lemmas_str
+    (*val _ = @{print} cand_lemmas_str*)
 
     val ctxt' = ThyExpl_Data.init_expl ctxt facts fact_nms prio_goal_opt
                   (Library.split_lines (Library.trim_line cand_lemmas_str))
@@ -148,7 +148,7 @@ fun hipspec_explore ctxt cond_opt const_nms =
           (* As of Isabelle2014, the below function takes a mystery boolean. Guessing false... *)
     val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])]
     val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile
-    val _ = Output.tracing (hipspec_cmd ^ " - " ^ args )
+    (*val _ = Output.tracing (hipspec_cmd ^ " - " ^ args )*)
     val _ = Isabelle_System.bash ("HipSpecifyer " ^ args)
       (*("ghc -e 'let xs = " ^ args ^ " in System.Environment.withArgs xs HipSpecifyer.main'");*)
   in 

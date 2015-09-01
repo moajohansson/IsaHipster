@@ -20,8 +20,6 @@ hipster append rev
 
   theorem revAppend :
     "(rev (append (rev x) (rev y))) = (append y x)"
-
-
     by (hipster_induct_schemes append.simps rev.simps)
 
 

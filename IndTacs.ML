@@ -191,10 +191,11 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                   inductfrees
         
         (* Throw away Isar related stuff and only take the Thm.thm seq *)
+      (* For now remove informative tracing info until we improve it
       val _ = Output.tracing ("induct_on: "^ (Library.space_implode " * "
                 (map (fn NONE => "; "
                        | SOME (_, (Free (v,_),false)) => v) insts))^
-                "; otherfrees: "^ (Library.space_implode ", " (map fst otherfrees)))
+                "; otherfrees: "^ (Library.space_implode ", " (map fst otherfrees))) *)
       val nw_thms = Induction.induction_tac ctxt false
                       [insts] [(*non_ithings*)otherfrees] [] rule [] i goalthm
                     handle ERROR _ => Seq.empty
@@ -250,7 +251,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
         case rules of
           []            => no_tac
         | ((n,r) :: rs) =>
-            let val _ = Output.tracing ("Rule: "^n)
+            let (*val _ = Output.tracing ("Rule: "^n)*)
                 val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
                 val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
               (*val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)*)
@@ -263,7 +264,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
               rec_ind_tac rs (*ctxt rs strat vars i*)
             end
   in
-    struct_tac ORELSE ( let val _ = @{print} "no struct!" in rec_ind_tac scheme_rules end )
+    struct_tac ORELSE rec_ind_tac scheme_rules (* let val _ = @{print} "no struct!" in rec_ind_tac scheme_rules end *)
   end;
 
 
