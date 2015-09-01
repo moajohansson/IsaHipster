@@ -79,7 +79,7 @@ by (hipster_induct_schemes sorted.simps isort.simps insert2.simps le.simps)
 setup {* Hip_Tac_Ops.set_metis_to @{context} 1000 *}
 
 lemma lemma_am [thy_expl]: "sorted y \<Longrightarrow> sorted (insert2 x y) = True"
-by (hipster_induct_schemes sorted.simps isort.simps insert2.simps)
+by (hipster_induct_schemes sorted.simps isort.simps insert2.simps nole)
 
 lemma lemma_an [thy_expl]: "sorted (isort x) = True"
 by (hipster_induct_schemes sorted.simps isort.simps insert2.simps)

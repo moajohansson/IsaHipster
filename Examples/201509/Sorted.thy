@@ -88,20 +88,30 @@ fun nole:: "Nat \<Rightarrow> Nat \<Rightarrow> bool" where
 (* And we finally explore conditional properties for it *)
 (*hipster_cond nole*)
 lemma lemma_ai [thy_expl]: "nole (S x2) y2 = le y2 x2"
-by (hipster_induct_schemes nole.simps Nat.exhaust)
+by (hipster_induct_schemes  Nat.exhaust)
 
 lemma lemma_aj [thy_expl]: "nole x2 y2 \<Longrightarrow> nole x2 Z = True"
-by (hipster_induct_schemes nole.simps Nat.exhaust)
+by (hipster_induct_schemes  Nat.exhaust)
 
 
 (* If we now revisit one of the lemmas discovered about _sorted_ and _insort_, we will be able
     to prove after prior modification of the options: using full_types in metis and increasing
     the timeout for proof search (namely that for metis) *)
 setup{* Hip_Tac_Ops.toggle_full_types @{context} ;*}
-setup{* Hip_Tac_Ops.set_metis_to @{context} 1000;*}
+setup{* Hip_Tac_Ops.set_metis_to @{context} 5000;*}
+hipster_cond sorted insort le nole
+lemma lemma_ak [thy_expl]: "Sorted.insort x30 (Sorted.insort y30 z30) =
+Sorted.insort y30 (Sorted.insort x30 z30)"
+by (hipster_induct_schemes Sorted.sorted.simps Sorted.insort.simps Sorted.le.simps Sorted.list.exhaust Sorted.Nat.exhaust)
 
-lemma lemma_ak [thy_expl]: "sorted y \<Longrightarrow> sorted (insort x y) = True"
-by (hipster_induct_schemes sorted.simps nole.simps insort.simps le.simps)
+lemma lemma_al [thy_expl]: "Sorted.sorted y31 \<Longrightarrow>
+Sorted.sorted (Sorted.insort x31 y31) = True"
+by (hipster_induct_schemes Sorted.sorted.simps Sorted.insort.simps Sorted.le.simps Sorted.list.exhaust Sorted.Nat.exhaust)
+
+lemma unknown [thy_expl]: "Sorted.sorted (Sorted.insort x y) = Sorted.sorted y"
+oops
+lemma lemmaak []: "sorted y \<Longrightarrow> sorted (insort x y) = True"
+by (hipster_induct_schemes sorted.simps nole.simps insort.simps le.simps Nat.exhaust list.exhaust)
 
 (* We can finally immediately prove our target theorem! *)
   theorem x0 :
