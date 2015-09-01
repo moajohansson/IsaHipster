@@ -28,7 +28,7 @@ begin
   | "isort (Cons y xs) = insert y (isort xs)"
 
 
-hipster le
+(*hipster le*)
 lemma lemma_a [thy_expl]: "le x2 x2 = True"
 by (hipster_induct_schemes le.simps Nat.exhaust)
 
@@ -42,7 +42,7 @@ by (hipster_induct_schemes le.simps Nat.exhaust)
   fun notle :: "Nat => Nat => bool" where
     "notle x y = (\<not> le x y)"
 
-hipster_cond notle le
+(*hipster_cond notle le*)
 lemma lemma_ac [thy_expl]: "\<not> le (S x12) y12 = le y12 x12"
 by (hipster_induct_schemes notle.simps le.simps Nat.exhaust)
 
@@ -76,7 +76,7 @@ by (hipster_induct_schemes notle.simps le.simps Nat.exhaust)
 lemma lemma_al [thy_expl]: "\<not> le z11 y11 \<and> \<not> le x11 z11 \<Longrightarrow> le x11 y11 = False"
 by (hipster_induct_schemes notle.simps le.simps Nat.exhaust)
 
-hipster_cond le
+(*hipster_cond le*)
 lemma lemma_am [thy_expl]: "le x2 y2 \<Longrightarrow> le x2 (S y2) = True"
 by (hipster_induct_schemes le.simps Nat.exhaust)
 
@@ -107,7 +107,7 @@ lemma le_trans [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x y = True
 by (hipster_induct_schemes le.simps Nat.exhaust)
 
 
-hipster_cond sorted isort insert le
+(*hipster_cond sorted isort insert le*)
 lemma lemma_ao [thy_expl]: "insert Z (insert x22 y22) =
 insert x22 (insert Z y22)"
 by (hipster_induct_schemes sorted.simps isort.simps insert.simps le.simps list.exhaust Nat.exhaust)
@@ -129,7 +129,7 @@ oops
 
 lemma lemma_at [thy_expl]: "isort (isort x) = isort x"
 by (hipster_induct_schemes sorted.simps isort.simps insert.simps le.simps list.exhaust Nat.exhaust)
-
+(*
 lemma unknown []: "sorted (isort x) = True"
 oops
 
@@ -170,6 +170,7 @@ lemma nole []: "\<not> le r s \<Longrightarrow> le s r"
 by (hipster_induct_schemes le.simps Nat.exhaust)
 *)
 (*hipster_cond sorted isort insert le*)
+(*
 lemma lemma_ai [thy_expl]: "insert x32 (insert y32 z32) = insert y32 (insert x32 z32)"
 by (hipster_induct_schemes sorted.simps isort.simps insert.simps le.simps)
 
@@ -178,19 +179,19 @@ by (hipster_induct_schemes sorted.simps isort.simps insert.simps le.simps)
 
 lemma lemma_ak [thy_expl]: "isort (isort x19) = isort x19"
 by (hipster_induct_schemes sorted.simps isort.simps insert.simps le.simps)
-
+*)
 setup {* Hip_Tac_Ops.set_full_types @{context} true *}
 setup {* Hip_Tac_Ops.set_metis_to @{context} 700 *}
 
-lemma lemma_al [thy_expl]: "sorted x \<Longrightarrow> isort x = x"
+lemma lemma_au [thy_expl]: "sorted x \<Longrightarrow> isort x = x"
 by (hipster_induct_schemes sorted.simps isort.simps insert.simps le.simps)
 
-setup {* Hip_Tac_Ops.set_metis_to @{context} 1000 *}
+setup {* Hip_Tac_Ops.set_metis_to @{context} 1500 *}
 
-lemma lemma_am [thy_expl]: "sorted y \<Longrightarrow> sorted (insert x y) = True"
-by (hipster_induct_schemes sorted.simps isort.simps insert.simps)
+lemma lemma_av []: "sorted y \<Longrightarrow> sorted (insert x y) = True"
+by (hipster_induct_schemes sorted.simps isort.simps insert.simps Nat.exhaust)
 
-lemma lemma_an [thy_expl]: "sorted (isort x) = True"
+lemma lemma_av []: "sorted (isort x) = True"
 by (hipster_induct_schemes sorted.simps isort.simps insert.simps)
 
 lemma lemma_ao [thy_expl]: "sorted y \<Longrightarrow> isort (insert x y) = insert x y"
