@@ -1,107 +1,53 @@
 theory Dev
-imports HOL_IsaP
-uses "../ProofTools.ML"
+imports "$HIPSTER_HOME/IsaHipster"
 
 begin
-(* uses "../HipSpec.ML"
-*)
+
+setup Tactic_Data.set_induct_simp
 
 datatype 'a Tree = 
   Leaf 'a 
   | Node "'a Tree""'a Tree"
 
+ML{*
 
-definition unit :: "'a => 'a Tree"
-where
-  "unit x =  Leaf x"
+Sledgehammer.run_sledgehammer;
+Toplevel.proof_of;
 
-fun append :: "'a Tree => 'a Tree => 'a Tree"
-where
-  "append t1 t2 = Node t1 t2"
-
+fun my_sledgehammer state minimiser = 
+  let 
+  (* val state = Toplevel.proof_of @{Isar.state} *)
+  val thy =  Proof.theory_of state 
+  in    
+  Sledgehammer.run_sledgehammer 
+    (Sledgehammer_Commands.default_params thy [])
+    Sledgehammer_Prover.Try
+    NONE
+    1
+    Sledgehammer_Fact.no_fact_override
+    minimiser
+    state
+  end; 
+*}
 fun mirror :: "'a Tree => 'a Tree"
 where
   "mirror (Leaf x) = Leaf x"
 | "mirror (Node l r) = Node (mirror r) (mirror l)"
 
-fun map :: "('a => 'b) => 'a Tree => 'b Tree"
+fun tmap :: "('a => 'b) => 'a Tree => 'b Tree"
 where
-  "map f (Leaf x) = Leaf (f x)"
-| "map f (Node l r) = Node (map f l) (map f r)" 
+  "tmap f (Leaf x) = Leaf (f x)"
+| "tmap f (Node l r) = Node (tmap f l) (tmap f r)" 
 
-fun toList :: "'a Tree \<Rightarrow> 'a list"
-where
-  "toList (Leaf a) = [a]"
-  | "toList (Node l r) = (toList l) @ (toList r)"
-
-
-
-
-ML{*
-val c = ProofTools.mk_conjs @{context} ["[x] = toList(Leaf x)", "mirror(mirror x) = x"];
-val x  = ProofTools.hipspec_loop c;
-*}
-
-ML{*
-val thy = @{theory};
-val ctxt = @{context};
-val trm = @{term "mirror(mirror x) = x"};
-
-val conj = (Goal.init o (Thm.cterm_of thy) o (Syntax.read_prop ctxt)) "mirror(mirror x) = x";
+(* First call to Hipster: Explore tmap and mirror *)
+(* hipster tmap mirror *)
+lemma lemma_a [thy_expl]: "mirror (tmap x2 y2) = tmap x2 (mirror y2)"
+apply (induct y2)
+apply @{tactic }
+done
 
 
+lemma lemma_aa [thy_expl]: "mirror (mirror x2) = x2"
+by hipster_induct_simp
 
-val conj2 = (Goal.init o (Thm.cterm_of thy) o (Syntax.read_prop ctxt)) "x @ y = y @ x";
-
-val vars = map fst (fst (ProofTools.inductable_things_in_sg 1 conj2));
-
-val [t] = Seq.list_of(ProofTools.induct_tac NONE ["x"] conj);
-val [t2] = Seq.list_of(ProofTools.prove @{simpset} t);
-Goal.finish @{context} t2;
-(*
-val s1 = Seq.list_of((InductDTac.induct_tac NONE vars conj2));
-
-val s1 = Seq.list_of(Seq.maps (ProofTools.prove @{simpset}) (InductDTac.induct_tac NONE vars conj));
-
-val t1 = (Induct_Tacs.induct_tac ctxt [[SOME "x :: 'a Tree"]] 1 conj);
-val [t2] = Seq.list_of(Seq.maps (ProofTools.prove @{simpset}) t1);
-Goal.finish @{context} t2;
-*)
-*}
-
-
-ML{*
-val (ProofTools.ConjQ x) = the x;
-val [thm] = (#proved x);
-Goal.finish @{context} thm;
-*}
-ML{*
-val filepath = "~/TheoremProvers/IsaHip/";
-val hipspecifyer_cmd = filepath^"HipSpecifyer";
-val modulenm = "Tree";
-val consts = ["Tree.mirror","Tree.map"];
-*}
-
-
-ML{*
-(*
-val (x, l) = Code_Target.produce_code @{theory} consts "Haskell" NONE "Tree" [] 
-*)
-HipSpec.call_hipspec @{theory} consts;
-
-*}
-
-
-ML{*
-val app = Code_Thingol.lookup_const naming "List.append";
-*}
-
-
-
-
-lemma "map_mirror": "tmap a (mirror a1) = mirror (tmap a a1)"
-by (induct a1, simp_all)
-
-lemma "mirror_mirror": "mirror (mirror a) = a"
-by (induct a, simp_all)
- 
+end
