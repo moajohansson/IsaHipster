@@ -202,7 +202,7 @@
   \colorbox{easstblue}{\parbox{414pt}{\color{white}\sf
     \vspace{6pt}
     \hspace{6pt}\eceditor\\
-    \hspace*{6pt}Managing Editors: Tiziana Margaria, Julia Padberg, Gabriele Taentzer\\
+    %\hspace*{6pt}Managing Editors: Tiziana Margaria, Julia Padberg, Gabriele Taentzer\\
     \hspace*{6pt}ECEASST Home Page: \href{http://www.easst.org/eceasst/}{\textcolor{yellow}{http://www.easst.org/eceasst/}}
     \hfill ISSN 1863-2122\hspace{6pt}
     \vspace{6pt}}}}
