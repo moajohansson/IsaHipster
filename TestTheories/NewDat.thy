@@ -23,7 +23,6 @@ datatype_compat Nat*)
   (*hipster zip2 len append rev *)
   (*hipster rev*)
 lemma lemma_a [thy_expl]: "append x2 Nil2 = x2"
-apply(induction x2 rule: append.induct)
 by (hipster_induct_schemes rev.simps)
 
 lemma lemma_aa [thy_expl]: "append (append x2 y2) z2 = append x2 (append y2 z2)"
