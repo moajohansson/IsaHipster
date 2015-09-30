@@ -6,13 +6,20 @@ Figure \ref{fig:hipster} gives an overview of the Hipster system.
 %
 Starting from an Isabelle theory file that defines a set of datatypes and functions, the user calls Hipster on a list of functions about which she is interested in finding lemmas.
 %
-The workings of Hipster can be divided up into three stages:
-\begin{enumerate}
-\item Generation of Haskell code. 
-\item Theory exploration in Haskell.
-\item Proof in Isabelle.
-\end{enumerate}
+The workings of Hipster can be divided up into three stages: 
 
+\textbf{1)} Generation of Haskell code.
+
+\textbf{2)} Theory exploration in Haskell. 
+
+\textbf{3)} Proof in Isabelle.
+
+%\begin{enumerate}
+%\item Generation of Haskell code. 
+%\item Theory exploration in Haskell.
+%\item Proof in Isabelle.
+%\end{enumerate}
+%
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[scale=0.4]{hipster}
@@ -21,7 +28,7 @@ The workings of Hipster can be divided up into three stages:
 \end{center}
 \end{figure}
 
-Hipster uses Isabelle's code generator \cite{codegen2}, to translate the theory to a Haskell program.
+\noindent Hipster uses Isabelle's code generator \cite{codegen2}, to translate the theory to a Haskell program.
 %
 Hipster then employs the theory exploration system HipSpec as a backend for generating conjectures.
 %
