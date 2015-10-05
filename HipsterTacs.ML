@@ -49,7 +49,7 @@ fun SOLVE_TIMEOUT mseconds tac t =
 (*-----------------------------------------------------------------------------------------*)
 (* Simp tactics *) 
 (*-----------------------------------------------------------------------------------------*)
-fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);
+fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (Thm.prop_of thm);
 
 
 (* Apply simp to all subgoals *)
@@ -148,7 +148,7 @@ fun mk_induct_insts ithings indnames =
 fun inductable_things_in_term thry t =
     let
       fun lookup thy s =
-          case (Datatype.get_info thy s) of
+          case (Old_Datatype_Data.get_info thy s) of
              NONE => NONE
            | SOME di => SOME (#induct di);
       fun datatype_chk (Type(tn,_)) =
@@ -169,7 +169,7 @@ fun inductable_things_in_term thry t =
 fun inductable_things_in_sg i th = 
     inductable_things_in_term
       (Thm.theory_of_thm th)
-      (Library.nth (prems_of th) (i - 1)); (* XXX: check how this might affect us *)
+      (Library.nth (Thm.prems_of th) (i - 1)); (* XXX: check how this might affect us *)
 
 fun infer_term x ctxt =
      let val (T, ctxt') = Proof_Context.inferred_param x ctxt

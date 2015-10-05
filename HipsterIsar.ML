@@ -21,7 +21,7 @@ fun call_hipster consts =
           |> fst
       end);
 in
-Outer_Syntax.local_theory @{command_spec "hipster"} 
+Outer_Syntax.local_theory @{command_keyword "hipster"} 
       "Theory Exploration with Hipster"
       (Scan.repeat1 Parse.const >> call_hipster)
 end;
@@ -42,7 +42,7 @@ fun call_hipster consts =
         fst (Hipster_Explore.explore_cond (SOME (hd const_nms)) ctxt const_nms)
       end);
 in
-Outer_Syntax.local_theory @{command_spec "hipster_cond"} 
+Outer_Syntax.local_theory @{command_keyword "hipster_cond"} 
       "Theory Exploration for conditional lemmas with Hipster"
       (Scan.repeat1 Parse.const >> call_hipster)
 end;

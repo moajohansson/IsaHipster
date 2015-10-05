@@ -89,7 +89,7 @@ fun timed_metis_tac ctxt full facts i thm =
         ATP_Proof_Reconstruct.default_metis_lam_trans ctxt facts i)) thm
  end;
 
-val has_tvar = exists_type (exists_subtype (fn TVar _ => true | _ => false)) o prop_of
+val has_tvar = exists_type (exists_subtype (fn TVar _ => true | _ => false)) o Thm.prop_of
 
 fun metis_method ((override_type_encs, lam_trans), ths) ctxt facts =
   let val (schem_facts, nonschem_facts) = List.partition has_tvar facts
@@ -147,13 +147,13 @@ fun mk_induct_insts ithings indnames =
 
 (* the free variables of a term that are of a datatype 
    (can have induction applied) *)
-fun inductable_things_in_term thry t =
-  let fun lookup thy s =
-        case (Datatype.get_info thy s) of
+fun inductable_things_in_term ctxt t =
+  let fun lookup s =
+        case (BNF_FP_Def_Sugar.fp_sugar_of ctxt s) of
           NONE => NONE
-        | SOME di => SOME (#induct di);
+        | SOME di => SOME (di |> #fp_co_induct_sugar |> #co_inducts |> hd);
       
-      fun datatype_chk (Type(tn,_)) = Basics.is_some (lookup thry tn)
+      fun datatype_chk (Type(tn,_)) = Basics.is_some (lookup tn)
         | datatype_chk _ = false;
       (*val _ = @{print} (Term.fastype_of t,  (Term.strip_all_body t))
       val tfs = Hipster_Utils.typ_tfrees_of (Term.fastype_of t)
@@ -166,8 +166,8 @@ fun inductable_things_in_term thry t =
                    ((Hipster_Utils.frees_of t) @ (Term.strip_all_vars t))
   end;
 
-fun inductable_things_in_sg i thm = (*let val _ = @{print} i in*)
-  inductable_things_in_term (Thm.theory_of_thm thm) (Library.nth (prems_of thm) (i - 1)) (*end*) (* XXX: check how this might affect us *)
+fun inductable_things_in_sg ctxt i thm =
+  inductable_things_in_term ctxt (Library.nth (Thm.prems_of thm) (i - 1))  (* XXX: check how this might affect us *)
 
 
 (* Term: has_abs, dest_abs??
@@ -178,8 +178,7 @@ fun inductable_things_in_sg i thm = (*let val _ = @{print} i in*)
 (* Rule can be NONE if we just want plain structural induction. *)
 (* var is the variable we want to do induction on *)
 fun induct_on_var_tac ctxt rule var i goalthm = 
-  let val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
-
+  let val (ithings, non_ithings) = inductable_things_in_sg ctxt i goalthm;
       val (otherfrees, inductfrees) = (case var of
                                         NONE => mk_induct_insts ithings []
                                       | SOME v => mk_induct_insts ithings v (*[v]*))
@@ -230,7 +229,7 @@ fun try_induct_on ctxt rule strat vars i =
 
 (* Find the variables we can induct on *)
 fun try_inductable_vars ctxt strat i thm = 
-  let val vars = map (fn (v,_) => [v]) (*fst*) (fst (inductable_things_in_sg i thm))
+  let val vars = map (fn (v,_) => [v]) (*fst*) (fst (inductable_things_in_sg ctxt i thm))
   in (try_induct_on ctxt NONE strat vars i) thm
   end
 
@@ -269,7 +268,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
 
 
 fun try_induct_schemes ctxt strat i thm =
-  let val vars = fst (inductable_things_in_sg i thm) (* map fst ... *)
+  let val vars = fst (inductable_things_in_sg ctxt i thm) (* map fst ... *)
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
