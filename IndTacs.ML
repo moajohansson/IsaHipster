@@ -168,21 +168,18 @@ fun mk_induct_insts ithings indnames =
             (*val _ = Pretty.writeln (Pretty.block (map (pretty_thm ctxt) indds)) ;*)
            in*)
 
+
 (* the free variables of a term that are of a datatype 
    (can have induction applied) *)
-fun inductable_things_in_term thry t =
-    let
-      fun lookup thy s = let val _ = @{print} s in
-          case (Old_Datatype_Data.get_info thy s) of  (* XXX: compatibility layer can be found in HOL/Tools/BNF/bnf_lfp_compat.ML + with Old_Datatype_Data being the backwards-compatible module *)
-             NONE => NONE
-           | SOME di => let val _ = @{print} di in SOME (#induct di) end end;
+fun inductable_things_in_term ctxt t =
+    let 
+      fun lookup s =
+        case (BNF_FP_Def_Sugar.fp_sugar_of ctxt s) of
+          NONE => NONE
+        | SOME di => SOME (di |> #fp_co_induct_sugar |> #co_inducts |> hd);
       fun datatype_chk (Type(tn,_)) =
-            Basics.is_some (lookup thry tn)
+            Basics.is_some (lookup tn)
         | datatype_chk _ = let val _ = @{print}"not a type!!" in false end;
-      (*val _ = @{print} (Term.fastype_of t,  (Term.strip_all_body t))
-      val tfs = Hipster_Utils.typ_tfrees_of (Term.fastype_of t)
-      val _ = @{print} (length tfs)*)
-      (*val _ = @{print} (Hipster_Utils.frees_of t)*)
     in
       (* Return frees and forall quantified vars (if any) *)
       (* Split into those we can do structural induction over, and the rest *)
@@ -191,16 +188,15 @@ fun inductable_things_in_term thry t =
                        (Term.strip_all_vars t))
     end;
 
-fun inductable_things_in_sg i thm = (*let val _ = @{print} i in*)
+fun inductable_things_in_sg ctxt i thm =
     inductable_things_in_term
-      (Thm.theory_of_thm thm)
-      (Library.nth (Thm.prems_of thm) (i - 1)) (*end*) (* XXX: check how this might affect us *)
+      ctxt
+      (Library.nth (Thm.prems_of thm) (i - 1)) (* XXX: check how this might affect us *)
 
 fun infer_term x ctxt =
      let val (T, ctxt') = Proof_Context.inferred_param x ctxt
-         (*val _ = @{print} (x, T)*)
      in (Free (x, T), ctxt') end;
-(*fun bis x = Attrib.thms x ;*)
+
 fun induct_for_me ctxt xss rule i =
      let
        val (tss, ctxt') = (fold_map o fold_map) infer_term xss ctxt
@@ -218,11 +214,7 @@ fun induct_for_me ctxt xss rule i =
 (* var is the variable we want to do induction on *)
 fun induct_on_var_tac ctxt rule var i goalthm = 
     let
-      val (ithings, non_ithings) = inductable_things_in_sg i goalthm;
-
-      (*val _ = @{print} non_ithings
-      val _ = Pretty.writeln (Pretty.str "I-things")
-      val _ = @{print} ithings*)
+      val (ithings, non_ithings) = inductable_things_in_sg ctxt i goalthm;
 
       val (otherfrees, inductfrees) = (case var of
                                         NONE => mk_induct_insts ithings []
@@ -279,7 +271,7 @@ fun try_induct_on ctxt rule strat vars i =
 (* Find the variables we can induct on *)
 fun try_inductable_vars ctxt strat i thm = 
     let
-      val vars = map (fn (v,_) => [v]) (*fst*) (fst (inductable_things_in_sg i thm))
+      val vars = map (fn (v,_) => [v]) (*fst*) (fst (inductable_things_in_sg ctxt i thm))
       val _ = @{print} "argu"
       val _ = @{print} vars
     in
@@ -343,7 +335,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
 
 fun try_induct_schemes ctxt strat i thm =
     let
-      val vars = fst (inductable_things_in_sg i thm) (* map fst ... *)
+      val vars = fst (inductable_things_in_sg ctxt i thm) (* map fst ... *)
       val _ = @{print} vars
       (*val lemmas = ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt*)
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
