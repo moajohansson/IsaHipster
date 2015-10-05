@@ -4,8 +4,9 @@ Hipster is still under development, but feel free to play around with it! To
 install Hipster, you first need Isabelle, QuickSpec and HipSpec.
 
 Isabelle is available from: http://isabelle.in.tum.de/index.html. Hipster works
-with [Isabelle 2014][Isa14], preferably in jEdit if you want nice syntactic sugar (soon
-to be updated for [Isabelle 2015][Isa15]).
+with [Isabelle 2015][Isa15], preferably in jEdit if you want nice syntactic
+sugar (use the branch `Isabelle14` if you want the [Isabelle 2014][Isa14]
+compatible version).
 
 To install the appropriate [QuickSpec][QS]:
 
