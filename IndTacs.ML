@@ -15,12 +15,14 @@ signature IND_TACS =
 sig 
   type hardtac
   val simp_all : Proof.context -> thm list -> tactic
+  val sledgehammer_goals : Proof.context -> tactic
   val prove_by_simp : Proof.context -> thm list -> tactic
   val timed_metis_tac : Proof.context -> bool -> Thm.thm list -> int -> tactic
   val simp_or_metis : Proof.context -> (thm list * thm list) -> tactic 
 
   val induct_and_simp : thm list -> hardtac
   val induct_simp_or_metis : thm list * thm list -> hardtac
+  val induct_and_sledgehammer : hardtac
 
   val try_inductable_vars : Proof.context -> hardtac -> int -> tactic
   
@@ -29,7 +31,9 @@ sig
 
   (* Context -> list of simp rules (defs) -> tactic, to be pasted into proof script. *)
   val induct_simp_metis : Proof.context -> thm list -> tactic
-  
+  (* Context -> tactic, to be pasted into proof script. *)
+  val induct_sledgehammer_tac :  Proof.context -> tactic
+
   (* Context -> list of induct rules (schemes) -> tactic *)
   val induct_with_schemes : Proof.context -> thm list -> tactic
   val try_induct_schemes : Proof.context -> hardtac -> int -> tactic
@@ -39,7 +43,7 @@ end
 structure Ind_Tacs  : IND_TACS  =
 struct
 
-type hardtac = Proof.context -> thm list option -> string list option -> int -> tactic
+type hardtac = Proof.context -> thm list option -> string list option (*-> int*) -> tactic
 
 fun SOLVE_TIMEOUT mseconds tac t = 
   let val res = TimeLimit.timeLimit (Time.fromMilliseconds mseconds)
@@ -115,6 +119,13 @@ fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (prett
 (*REPEAT o FIRSTGOAL*) (*REPEAT_FIRST*)
 (*((REPEAT_ALL_NEW (metis_method ((NONE,NONE), lemmas) ctxt facts))))*)
 
+
+(* TODO: Maybe hack around with sledgehammer_with_metis to print string with actual facts as proof,
+ also maybe see if we can pass in stuff proved during theory exploration but not yet in proof script.*)
+(* Sledgehammer tactic *)
+fun sledgehammer_goals ctxt = 
+  ALLGOALS (Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt [] 
+              Sledgehammer_Fact.no_fact_override []); 
 
 (*-----------------------------------------------------------------------------------------*)
 (* Figure out what we can do induction on, and tries each variable until success.*) 
@@ -208,22 +219,26 @@ fun induct_on_var_tac ctxt rule var i goalthm =
 (*-----------------------------------------------------------------------------------------*)
 
 (* Apply induction on var and try to prove all cases by simp *)
-fun induct_and_simp lemmas ctxt rule var i = 
+fun induct_and_simp lemmas ctxt rule var (*i*) = 
   DEPTH_SOLVE (
     (Seq.DETERM (HEADGOAL ((induct_on_var_tac ctxt rule var )))) THEN (prove_by_simp ctxt lemmas) )
 
 (* Induction on var, then try to prove resulting subgoals by simp or metis *)
-fun induct_simp_or_metis (facts, lemmas) ctxt rule var i = 
+fun induct_simp_or_metis (facts, lemmas) ctxt rule var(* i*) = 
   DEPTH_SOLVE (
     (Seq.DETERM (HEADGOAL ((induct_on_var_tac ctxt rule var (*i*) )))) THEN (simp_or_metis ctxt (facts,lemmas)) )
 
+(* Induction on a var, then try to prove by sledgehammer *)
+fun induct_and_sledgehammer ctxt rule var =
+  DEPTH_SOLVE (
+    (Seq.DETERM (HEADGOAL ((induct_on_var_tac ctxt rule var)))) THEN (sledgehammer_goals ctxt))
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
 fun try_induct_on ctxt rule strat vars i =
   case vars of
     []        => no_tac
   | (v :: vs) =>  (*let val _ = Pretty.writeln (Pretty.str (" - vars: "^ @{make_string} v)) in*)
-      strat ctxt rule (SOME v) i (*THEN simp_all ctxt []*)
+      strat ctxt rule (SOME v) (*i*) (*THEN simp_all ctxt []*)
       ORELSE
       (try_induct_on ctxt rule strat vs i)
 
@@ -314,6 +329,9 @@ fun induct_simp_tac ctxt thm =
   in ALLGOALS(try_inductable_vars ctxt' (induct_and_simp lemmas)) thm
   end;
 
+fun induct_sledgehammer_tac ctxt thm = 
+  ALLGOALS(try_inductable_vars ctxt (induct_and_sledgehammer)) thm
+  
 end
 
 
@@ -356,6 +374,20 @@ fun final_tactic_str ctxt =
     "by (hipster_induct_simp_metis " ^ facts_str ^")"
   end;
 end
+
+(* Induction and the just Sledgehammer everything *)
+structure Sledgehammer_T : EXPL_TACS =
+struct
+
+(* FIXME: Use simp, so it can pick up stuff from theory exploration that hasn't been pasted yet.*)
+fun routine_tac ctxt = DEPTH_SOLVE (Ind_Tacs.sledgehammer_goals ctxt)
+val routine_tac_str = "sledgehammer"
+
+fun hard_tac ctxt = Ind_Tacs.induct_sledgehammer_tac ctxt
+fun final_tactic_str ctxt = "hipster_induct_sledgehammer"
+(*"by (tactic {* Ind_Tacs.induct_sledgehammer_tac @{context}*})"*)
+end;
+
 
 
 (* Induction with schemes! *)

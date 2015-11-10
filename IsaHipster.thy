@@ -1,5 +1,5 @@
 theory IsaHipster
-imports Main
+imports Main "$ISABELLE_HOME/src/HOL/TPTP/ATP_Problem_Import"
 keywords "hipster" "hipster_cond" :: thy_decl
 
 begin
@@ -58,6 +58,11 @@ method_setup hipster_induct_simp_metis = {*
       (Ind_Tacs.induct_simp_metis ctxt thms))
  *}
 
+method_setup hipster_induct_sledgehammer = {*
+  Scan.lift (Scan.succeed 
+    (fn ctxt => SIMPLE_METHOD 
+      (Ind_Tacs.induct_sledgehammer_tac ctxt)))
+   *}
 
 method_setup hipster_induct_schemes = {*
   Attrib.thms >> (fn thms => fn ctxt =>
