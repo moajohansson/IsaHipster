@@ -25,9 +25,10 @@ Lastly, you will also have to compile the `HipSpecifyer`:
 
     cabal install hipspecifyer/
     
-Finally, you should set the environment variable `$HIPSTER_HOME` (e.g. in your
-`.profile` file) to the path for the IsaHipster directory you just cloned. If
-you want to use Hipster from an Isabelle file, it needs to import the
+Finally, you need to tell Isabelle where to find Hipster, by setting the environment 
+variable `$HIPSTER_HOME` in the file `$ISABELLE_HOME_USER/etc/settings` (create this file if it does not exist yet), where Isabelle normally has set`$ISABELLE_HOME_USER` to `$USER_HOME/.isabelle`. `$HIPSTER_HOME` should then point to the path for the IsaHipster directory you just cloned. See the Isabelle Systems Manual for more info on how to set up Isabelle's system enviroment.
+
+If you want to use Hipster from an Isabelle theory file, it needs to import the
 `IsaHipster.thy` file (which essentially sets up Hipster) by including the
 line:
 
