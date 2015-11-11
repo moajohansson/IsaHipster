@@ -31,10 +31,9 @@ lemma lemma_ag [thy_expl]: "leq (S Z) x2 = geq x2 (S Z)" by hipster_induct_simp_
 lemma lemma_ah [thy_expl]: "geq (S Z) x2 = leq x2 (S Z)" by hipster_induct_simp_metis *)
 
 lemma geq2leq [thy_expl]: "geq x y = leq y x"  (* requires arbitrary care + schemes *)
-by hipster_induct_schemes (*
-apply(induction x rule: geq.induct)
-apply(simp_all add: lemma_ab)
-done*)
+apply(induction x y rule: geq.induct)
+apply(simp_all add: thy_expl)
+done
 
 (* Removed for symmetry reasons
 lemma unknownLG [thy_expl]: "leq (S x) y = geq y (S x)"
@@ -61,7 +60,12 @@ lemma lemma_aa2 [thy_expl]: "eqN x2 x2 = True"
 by (hipster_induct_simp_metis Naturals.lez.simps Naturals.leq.simps Naturals.eqN.simps Naturals.geq.simps)
 
 lemma lemma_ab2 [thy_expl]: "geq x2 x2 = True"
-by (hipster_induct_simp_metis Naturals.lez.simps Naturals.leq.simps Naturals.eqN.simps Naturals.geq.simps)
+apply (induction x2)
+apply simp_all
+(*by (hipster_induct_simp_metis Naturals.lez.simps Naturals.leq.simps Naturals.eqN.simps Naturals.geq.simps)*)
+oops
+
+hipster leq geq
 
 (* TODO: uncomment, for now comment some of the def-dependent ones*)
 lemma lemma_ac2 [thy_expl]: "leq x2 Z = lez x2" (* NB: used to be problematic *)
