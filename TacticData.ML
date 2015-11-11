@@ -45,6 +45,11 @@ val induct_simp = Data {routine_tac = Simp_T.routine_tac,
                         routine_tac_str = Simp_T.routine_tac_str,
                         hard_tac_str = Simp_T.final_tactic_str}
 
+(* Sledgehammer, or sledgehammer + induction *)
+val induct_sledgehammer = Data {routine_tac = Sledgehammer_T.routine_tac,
+                         hard_tac = Sledgehammer_T.hard_tac,
+                         routine_tac_str = Sledgehammer_T.routine_tac_str,
+                         hard_tac_str = Sledgehammer_T.final_tactic_str}
 
 (* Data stored in an Isabelle context, default to induct_with_schemes tactics.
    THINK: Maybe this should be stored in the theory instead? *)

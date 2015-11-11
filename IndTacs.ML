@@ -49,7 +49,7 @@ fun SOLVE_TIMEOUT mseconds tac t =
   let val res = TimeLimit.timeLimit (Time.fromMilliseconds mseconds)
                   (fn () => SINGLE ( tac) t) ()
                 handle TimeLimit.TimeOut => NONE
-                     | ERROR _ => NONE
+                     | ERROR message => (warning ("Error: " ^ message ^ "\n"); NONE)
   in
     case res of
       NONE => Seq.empty  (* Output.tracing ("Timeout :(") *)
@@ -124,8 +124,12 @@ fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (prett
  also maybe see if we can pass in stuff proved during theory exploration but not yet in proof script.*)
 (* Sledgehammer tactic *)
 fun sledgehammer_goals ctxt = 
-  ALLGOALS (Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt [] 
-              Sledgehammer_Fact.no_fact_override []); 
+  let 
+    val proved = ThyExpl_Data.proved_of_ctxt ctxt
+  in  
+    ALLGOALS (Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt [] 
+              Sledgehammer_Fact.no_fact_override proved)
+  end; 
 
 (*-----------------------------------------------------------------------------------------*)
 (* Figure out what we can do induction on, and tries each variable until success.*) 
@@ -189,7 +193,7 @@ fun inductable_things_in_sg ctxt i thm =
 (* Rule can be NONE if we just want plain structural induction. *)
 (* var is the variable we want to do induction on *)
 fun induct_on_var_tac ctxt rule var i goalthm = 
-  let val (ithings, non_ithings) = inductable_things_in_sg ctxt i goalthm;
+  let val (ithings, _) = inductable_things_in_sg ctxt i goalthm;
       val (otherfrees, inductfrees) = (case var of
                                         NONE => mk_induct_insts ithings []
                                       | SOME v => mk_induct_insts ithings v (*[v]*))
@@ -207,8 +211,8 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                        | SOME (_, (Free (v,_),false)) => v) insts))^
                 "; otherfrees: "^ (Library.space_implode ", " (map fst otherfrees))) *)
       val nw_thms = Induction.induction_tac ctxt false
-                      [insts] [(*non_ithings*)otherfrees] [] rule [] i goalthm
-                    handle ERROR _ => Seq.empty
+                      [insts] [otherfrees] [] rule [] i goalthm
+                    handle ERROR message => (warning ("Error: " ^ message ^ "\n"); Seq.empty)
   in
     (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty*) Seq.map snd nw_thms
   end;
@@ -264,7 +268,7 @@ fun try_induction_with ctxt scheme_rules strat vars i =
       fun rec_ind_tac rules =
         case rules of
           []            => no_tac
-        | ((n,r) :: rs) =>
+        | ((_,r) :: rs) =>
             let (*val _ = Output.tracing ("Rule: "^n)*)
                 val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
                 val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
