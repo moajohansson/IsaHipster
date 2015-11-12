@@ -38,6 +38,7 @@ ML_file "HipsterUtils.ML"
 ML_file "SchemeInstances.ML"
 ML_file "ThyExplData.ML"
 
+ML_file "SledgehammerTacs.ML"
 ML_file "HipTacOps.ML"
 ML_file "IndTacs.ML"
 

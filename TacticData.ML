@@ -13,7 +13,7 @@ struct
 
 datatype T = Data of
   { routine_tac : Proof.context -> tactic,
-    hard_tac : Proof.context -> tactic,
+    hard_tac : Proof.context -> (string list * tactic), (* Factnames for proof in string list *)
     routine_tac_str : string,
     hard_tac_str : Proof.context -> string }
 

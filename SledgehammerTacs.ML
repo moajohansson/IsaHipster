@@ -1,5 +1,6 @@
 (* Copied from Isabelle's Sledgehammer_Tactics to avoid hiding behind signature *)
-structure Hipster_Sledgehammer_Tactics =
+
+structure Hipster_Sledgehammer_Tactics  =
 struct
 
 open Sledgehammer_Util
@@ -37,14 +38,30 @@ fun run_prover override_params fact_override chained i n ctxt goal =
     handle ERROR message => (warning ("Error: " ^ message ^ "\n"); NONE)
   end
 
+(* Tactic to call during theory exploration. Return facts sledgehammer finds,
+   so we can paste in the relevant ones into the proof script later *)
 fun sledgehammer_with_metis_tac ctxt override_params fact_override chained i th =
   let val override_params = override_params @ [("preplay_timeout", "0")] in
     (case run_prover override_params fact_override chained i i ctxt th of
       SOME facts =>
-      Metis_Tactic.metis_tac [] ATP_Problem_Generate.combs_or_liftingN ctxt
-        (maps (thms_of_name ctxt) facts) i th
-    | NONE => Seq.empty)
+      (facts, (Metis_Tactic.metis_tac [] ATP_Problem_Generate.combs_or_liftingN ctxt
+          (maps (thms_of_name ctxt) facts) i))
+    | NONE => ([],no_tac))
   end
 
+fun sledgehammer_with_metis_all_goals ctxt override_params fact_override chained th =
+  let
+    fun MAP_THEN [] = all_tac
+      | MAP_THEN (t::tacs) = t THEN (MAP_THEN tacs)
+
+    fun repeate 0 facts tacs thm = (facts, MAP_THEN tacs)
+      | repeate n facts tacs thm = 
+        let val (more_fs, tac2) = 
+          sledgehammer_with_metis_tac ctxt override_params fact_override chained n thm
+        in repeate (n-1) (facts@more_fs) (tacs@[tac2]) thm end
+  in 
+    repeate (*(sledgehammer_with_metis_tac ctxt override_params fact_override chained)*)
+            (Thm.nprems_of th) [] [] th
+  end
 
 end;
