@@ -11,6 +11,7 @@ sig
   type instance_bins = instance list list
   val empty_instance : instance_bins
   val var_typ_ord : var_typ * var_typ -> order
+  val predicate_typ : term -> typ
   val instances_for_with : typ list -> var_typ list -> instance_bins
   val flatten_instances : bool -> instance_bins -> instance list
 end
@@ -29,6 +30,12 @@ fun var_typ_ord ((x,t1),(y,t2)) =
   | LESS => LESS
   | GREATER => GREATER
 
+fun predicate_typ p = case p of
+    Var (_,t)   => t
+  | t$_         => predicate_typ t
+  | Abs (_,t,_) => t
+  | Free (_, t) => t; (* TODO: Bound, Const *)
+
 val empty_instance = [[[]]]
 val merge_n_instances = fold (Ord_List.insert (dict_ord var_typ_ord))
 
@@ -39,7 +46,7 @@ fun index_bins v (bin1s::bin0s::binss) =
   | index_bins _ [[[]]] = [[[]]]
   | index_bins _ _      = []
 
-(* TODO: extract elsewhere? *)
+(* TODO: extract elsewhere *)
 fun zipWith f xs ys = ListPair.foldr (fn (a, b, cs) => f(a, b)::cs) [] (xs, ys)
 fun foldl1 _ nil     = raise Empty (* TODO: really raise error ? *)
   | foldl1 f (x::xs) = fold f xs x

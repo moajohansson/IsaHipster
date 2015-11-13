@@ -43,13 +43,13 @@ end
 structure Ind_Tacs  : IND_TACS  =
 struct
 
-type hardtac = Proof.context -> thm list option -> string list option (*-> int*) -> tactic
+type hardtac = Proof.context -> thm list option -> string list option (*-> int*) -> tactic (*int removed?*)
 
 fun SOLVE_TIMEOUT mseconds tac t = 
   let val res = TimeLimit.timeLimit (Time.fromMilliseconds mseconds)
                   (fn () => SINGLE ( tac) t) ()
                 handle TimeLimit.TimeOut => NONE
-                     | ERROR message => (warning ("Error: " ^ message ^ "\n"); NONE)
+                     | ERROR message => (warning ("Error: " ^ message ^ "\n"); NONE) (*update warning method?*)
   in
     case res of
       NONE => Seq.empty  (* Output.tracing ("Timeout :(") *)
@@ -99,9 +99,10 @@ fun metis_method ((override_type_encs, lam_trans), ths) ctxt facts =
   let val (schem_facts, nonschem_facts) = List.partition has_tvar facts
       val timeout = Hip_Tac_Ops.metis_to ctxt
   in
-     (Method.insert_tac nonschem_facts THEN'
-      CHANGED_PROP o (SOLVE_TIMEOUT timeout) o Metis_Tactic.metis_tac (these override_type_encs)
-        (the_default ATP_Proof_Reconstruct.default_metis_lam_trans lam_trans) ctxt (schem_facts @ ths)) end
+    (Method.insert_tac nonschem_facts THEN'
+     CHANGED_PROP o (SOLVE_TIMEOUT timeout) o Metis_Tactic.metis_tac (these override_type_encs)
+       (the_default ATP_Proof_Reconstruct.default_metis_lam_trans lam_trans) ctxt (schem_facts @ ths))
+  end
 
 
 (* First simp, and if nessecary, let Metis deal with the rest *)
@@ -210,9 +211,8 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                 (map (fn NONE => "; "
                        | SOME (_, (Free (v,_),false)) => v) insts))^
                 "; otherfrees: "^ (Library.space_implode ", " (map fst otherfrees))) *)
-      val nw_thms = Induction.induction_tac ctxt false
-                      [insts] [otherfrees] [] rule [] i goalthm
-                    handle ERROR message => (warning ("Error: " ^ message ^ "\n"); Seq.empty)
+      val nw_thms = Induction.induction_tac ctxt false [insts] [otherfrees] [] rule [] i goalthm
+                    handle ERROR message => (warning ("Error: " ^ message ^ "\n"); Seq.empty) (*update warning fn*)
   in
     (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty*) Seq.map snd nw_thms
   end;
@@ -264,14 +264,14 @@ fun try_inductable_vars ctxt strat i thm =
 fun try_induction_with ctxt scheme_rules strat vars i =
   (* let val vars = map fst (fst (inductable_things_in_sg i thm)) *)
   let val struct_tac = try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i
-          (* Output.tracing "Rule: none" *)
       fun rec_ind_tac rules =
         case rules of
           []            => no_tac
         | ((_,r) :: rs) =>
             let (*val _ = Output.tracing ("Rule: "^n)*)
-                val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
-                val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
+                val argTyps = (binder_types o Scheme_Instances.predicate_typ)
+                                ((HOLogic.dest_Trueprop o Thm.concl_of) ((hd o the) r))
+                val all_instances = Scheme_Instances.instances_for_with argTyps vars
               (*val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)*)
                 val instt = hd all_instances
               (*val _ = @{print} instances   val _ = @{print} instt*)
