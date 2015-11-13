@@ -298,7 +298,7 @@ fun try_induct_schemes ctxt strat i thm =
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
-                        handle _ => (n, NONE) )
+                        handle ERROR m  => (warning ("Error: " ^ m ^ "\n"); (n, NONE))) 
                     (distinct (op =) (map (fn c => (c^".induct")) consts))
       val schemes = rev (*the o snd*) (filter (Basics.is_some o snd) thinds)
       (* FIXME: distinct ... *)
@@ -354,7 +354,7 @@ signature EXPL_TACS =
 sig
   val routine_tac : Proof.context -> tactic
   val routine_tac_str : string
-  val hard_tac : Proof.context -> (string list * tactic)
+  val hard_tac : Proof.context -> Thm.thm -> (string list * tactic)
   val final_tactic_str : Proof.context -> string
 end
 
@@ -370,7 +370,7 @@ fun routine_tac ctxt = DEPTH_SOLVE (
 
 val routine_tac_str = "by (tactic {* Simp_Metis_Tacs.routine_tac @{context} *})"; 
 
-fun hard_tac ctxt =
+fun hard_tac ctxt thm =
   let val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
       val facts = ThyExpl_Data.facts_of_ctxt ctxt
   in
@@ -394,7 +394,10 @@ struct
 fun routine_tac ctxt = DEPTH_SOLVE (Ind_Tacs.sledgehammer_goals ctxt)
 val routine_tac_str = "sledgehammer"
 
-fun hard_tac ctxt = ([],Ind_Tacs.induct_sledgehammer_tac ctxt)
+(* We should call here a tactic that runs sledgehammer, but return one that calls metis 
+   with exactly the right arguments. Ideally, it should also know what it did induction on,
+   so it doesn't have to repeat it. *)
+fun hard_tac ctxt thm = ([],Ind_Tacs.induct_sledgehammer_tac ctxt)
 fun final_tactic_str ctxt = "hipster_induct_sledgehammer"
 (*"by (tactic {* Ind_Tacs.induct_sledgehammer_tac @{context}*})"*)
 end;
@@ -411,7 +414,7 @@ fun routine_tac ctxt = DEPTH_SOLVE (
 
 val routine_tac_str = "by (tactic {* Ind_Schemes_Tacs.routine_tac @{context} *})"; 
 
-fun hard_tac ctxt = 
+fun hard_tac ctxt thm = 
   let val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
       val facts = ThyExpl_Data.facts_of_ctxt ctxt
   in
@@ -438,7 +441,7 @@ fun routine_tac ctxt =
 
 val routine_tac_str = "by (tactic {*Simp_Tacs.routine_tac @{context}*})";
 
-fun hard_tac ctxt =
+fun hard_tac ctxt thm =
   let val lemmas = ThyExpl_Data.proved_of_ctxt ctxt @ Hipster_Rules.get ctxt
   in
     ([],ALLGOALS (Ind_Tacs.try_inductable_vars ctxt (Ind_Tacs.induct_and_simp lemmas)))
