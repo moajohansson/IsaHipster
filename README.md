@@ -12,6 +12,7 @@ To install the appropriate [QuickSpec][QS]:
 
 	git clone https://github.com/nick8325/quickspec.git
 	cd quickspec
+	git checkout hipster
 	cabal install
 
 To install [HipSpec][HS], you will need to run the following commands:
