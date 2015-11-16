@@ -37,6 +37,7 @@ setup {* Hipster_Rules.setup;*}
 ML_file "HipsterUtils.ML"
 ML_file "SchemeInstances.ML"
 ML_file "ThyExplData.ML"
+ML_file "CTacs/CTac.ML"
 
 ML_file "SledgehammerTacs.ML"
 ML_file "HipTacOps.ML"
