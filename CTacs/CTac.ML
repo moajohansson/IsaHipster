@@ -4,18 +4,20 @@
    useful for tactics that do search, e.g. induction, then we can record
    what induction scheme, variable and lemmas were needed.
 *)
-infix 1 THEN 
-infix 0 ORELSE
+
 
 signature CONTEXTUAL_TACTIC =
 sig
-type ctactic
+type ctactic = (Proof.context * Thm.thm) -> (Proof.context * Thm.thm) Seq.seq
 
 val AS_CTACTIC : tactic -> ctactic;
 val AS_TAC : Proof.context -> ctactic -> tactic;
 
-val THEN : ctactic * ctactic -> ctactic;
-val ORELSE : ctactic * ctactic -> ctactic; 
+val all_ctac : ctactic;
+val no_ctac : ctactic;
+
+val CTHEN : ctactic * ctactic -> ctactic;
+val CORELSE : ctactic * ctactic -> ctactic; 
 val CHANGED_PROP : ctactic -> ctactic;
 val COND: (Proof.context * Thm.thm -> bool) -> ctactic -> ctactic -> ctactic
 
@@ -31,8 +33,11 @@ val SOLVE_TIMEOUT : int -> ctactic -> ctactic
 end 
 
 
-structure CTac : CONTEXTUAL_TACTIC  = 
+structure CTac : CONTEXTUAL_TACTIC   = 
 struct
+
+infix 1 CTHEN
+infix 0 CORELSE
 
 type ctactic = (Proof.context * Thm.thm) -> (Proof.context * Thm.thm) Seq.seq
 
@@ -52,13 +57,15 @@ fun AS_TAC ctxt ctac = fn thm => (Seq.map snd (ctac (ctxt,thm)));
 (*passes all proofs through unchanged;  identity of THEN*)
 fun all_ctac st = Seq.single st;
 
+fun no_ctac _ = Seq.empty;
+
 (*the tactical THEN performs one tactic followed by another *)
-fun (ctac1 THEN ctac2) st = Seq.maps ctac2 (ctac1 st);
+fun (ctac1 CTHEN ctac2) st = Seq.maps ctac2 (ctac1 st);
 
 (*The tactical ORELSE uses the first tactic that returns a nonempty sequence.
   Like in LCF, ORELSE commits to either tac1 or tac2 immediately.
   Does not backtrack to tac2 if tac1 was initially chosen. *)
-fun (ctac1 ORELSE ctac2) st =
+fun (ctac1 CORELSE ctac2) st =
     case Seq.pull(ctac1 st) of
         NONE       => ctac2 st
       | sequencecell => Seq.make(fn()=> sequencecell);
@@ -87,7 +94,7 @@ val IF_UNSOLVED = COND ((has_fewer_prems 1) o snd) all_ctac;
   Essential to work backwards since tac(i) may add/delete subgoals at i. *)
 fun ALLGOALS ctac st =
   let fun doall 0 = all_ctac
-        | doall n = ctac(n) THEN doall(n-1)
+        | doall n = ctac(n) CTHEN doall(n-1)
   in  doall (Thm.nprems_of (snd st)) st  end;
 
 (*First subgoal only.*)

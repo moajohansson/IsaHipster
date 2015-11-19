@@ -35,7 +35,7 @@ fun try_nxt_conj ctxt =
             in SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
             end
         | NONE => (* Only care about first proof found *)
-            let val (facts,hard_tac) = Tactic_Data.hard_tac ctxt c in
+            let val hard_tac = Tactic_Data.hard_tac ctxt in
             case (SINGLE hard_tac c) of
               SOME proved_thm =>
                 let
@@ -51,8 +51,8 @@ fun try_nxt_conj ctxt =
                   SOME (ctxt'
                           |> ThyExpl_Data.set_open_conjs_ctxt cs
                           |> ThyExpl_Data.add_proved_ctxt final_thm
-                          |> ThyExpl_Data.set_progress_ctxt true
-                          |> ThyExpl_Data.add_proof_facts_ctxt (new_nm,facts))
+                          |> ThyExpl_Data.set_progress_ctxt true)
+                         (* |> ThyExpl_Data.add_proof_facts_ctxt (new_nm,facts))*)
                 end
             (* NONE indicates that the tactic failed to prove c *)
             | NONE =>

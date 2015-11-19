@@ -42,6 +42,7 @@ ML_file "CTacs/CTac.ML"
 ML_file "SledgehammerTacs.ML"
 ML_file "HipTacOps.ML"
 ML_file "IndTacs.ML"
+ML_file "CTacs/InductCTac.ML"
 
 ML_file "TacticData.ML"
 ML_file "HipsterExplore.ML"
