@@ -27,7 +27,7 @@ sig
   val try_inductable_vars : Proof.context -> hardtac -> int -> tactic
   
   (* Does induction on specified var.  *)
-  val induct_on_var_tac : Proof.context -> thm list option -> string list option -> int -> tactic
+  val induct_on_var_tac : Proof.context -> (string * thm list) option -> string list option -> int -> tactic
 
   (* Get variable names to try structural induction on *)
   val inductable_things_in_sg : Proof.context -> int -> thm -> (string * typ) list * (string * typ) list
@@ -46,10 +46,10 @@ sig
 
 end
 
-structure Ind_Tacs  : IND_TACS   =
+structure Ind_Tacs  : IND_TACS  =
 struct
 
-type hardtac = Proof.context -> thm list option -> string list option (*-> int*) -> tactic
+type hardtac = Proof.context -> (string * thm list) option -> string list option (*-> int*) -> tactic
 
 fun SOLVE_TIMEOUT mseconds tac t = 
   let val res = TimeLimit.timeLimit (Time.fromMilliseconds mseconds)
@@ -223,8 +223,9 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                 (map (fn NONE => "; "
                        | SOME (_, (Free (v,_),false)) => v) insts))^
                 "; otherfrees: "^ (Library.space_implode ", " (map fst otherfrees))) *)
+      val rule' = case rule of NONE => NONE | SOME (n,thms) => SOME thms
       val nw_thms = Induction.induction_tac ctxt false
-                      [insts] [otherfrees] [] rule [] i goalthm
+                      [insts] [otherfrees] [] rule' [] i goalthm
                     handle ERROR message => (warning ("Error: " ^ message ^ "\n"); Seq.empty)
   in
     (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty*) Seq.map snd nw_thms
@@ -274,23 +275,25 @@ fun try_inductable_vars ctxt strat i thm =
 
 
 (* Proof.context -> thm list list -> hardtac -> vars -> int -> tactic *)
-fun try_induction_with ctxt scheme_rules strat vars i =
+fun try_induction_with ctxt (scheme_rules : (string * Thm.thm list) list) strat vars i =
   (* let val vars = map fst (fst (inductable_things_in_sg i thm)) *)
   let val struct_tac = try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i
           (* Output.tracing "Rule: none" *)
       fun rec_ind_tac rules =
         case rules of
           []            => no_tac
-        | ((_,r) :: rs) =>
+        | ((n,r) :: rs) =>
             let (*val _ = Output.tracing ("Rule: "^n)*)
-                val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r))))
+                val argTyps =  binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of (hd r))))
+                            (* binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r)))) *)
+                            
                 val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
               (*val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)*)
                 val instt = hd all_instances
               (*val _ = @{print} instances   val _ = @{print} instt*)
               (* FIXME: vars types filter *)
             in
-              try_induct_on ctxt r strat (map (map fst) instt) i
+              try_induct_on ctxt (SOME (n,r)) strat (map (map fst) instt) i
               ORELSE
               rec_ind_tac rs (*ctxt rs strat vars i*)
             end
@@ -303,10 +306,15 @@ fun try_induct_schemes ctxt strat i thm =
   let val vars = fst (inductable_things_in_sg ctxt i thm) (* map fst ... *)
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
-      val thinds = map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
+      val thinds = map_filter (fn n => SOME (n, (Sledgehammer_Util.thms_of_name ctxt n))
+                        handle ERROR m  => (warning ("Error: " ^ m ^ "\n"); NONE)) 
+                    (distinct (op =) (map (fn c => (c^".induct")) consts))
+
+                    (* map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
                         handle ERROR m  => (warning ("Error: " ^ m ^ "\n"); (n, NONE))) 
                     (distinct (op =) (map (fn c => (c^".induct")) consts))
-      val schemes = rev (*the o snd*) (filter (Basics.is_some o snd) thinds)
+                    *)
+      val schemes = rev thinds (* (filter (Basics.is_some (*o snd*)) thinds) *)
       (* FIXME: distinct ... *)
   in
     (try_induction_with ctxt schemes strat (distinct (op =) vars) i) thm
