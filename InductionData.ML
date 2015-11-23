@@ -34,7 +34,7 @@ fun set_induction_rule rule = update_induction_rule (K rule)
 fun set_induction_vars vars = update_induction_vars (K vars)
 fun set_subgoal_tac_strs tacs = update_subgoal_tac_strs (K tacs)
 
-fun add_subgoal_tac tac = update_subgoal_tac_strs (fn tacs => tacs @ [tac])
+fun add_subgoal_tac tac = update_subgoal_tac_strs (fn tacs => tac::tacs)
 
 (* Induction rule NONE defaults to structural induction, as per Isabelle's induction tactic *)
 val empty = Data{induction_rule = NONE, induction_vars = [], subgoal_tacs_strs = []}

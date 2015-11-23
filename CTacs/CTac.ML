@@ -18,8 +18,13 @@ val no_ctac : ctactic;
 
 val CTHEN : ctactic * ctactic -> ctactic;
 val CORELSE : ctactic * ctactic -> ctactic; 
+val CTHEN': ('a -> ctactic) * ('a -> ctactic) -> 'a -> ctactic
+val CORELSE': ('a -> ctactic) * ('a -> ctactic) -> 'a -> ctactic
+
 val CHANGED_PROP : ctactic -> ctactic;
 val COND: (Proof.context * Thm.thm -> bool) -> ctactic -> ctactic -> ctactic
+val TRY: ctactic -> ctactic
+val TRY': ('a -> ctactic) -> 'a -> ctactic
 
 val ALLGOALS: (int -> ctactic) -> ctactic;
 val HEADGOAL: (int -> ctactic) -> ctactic;
@@ -33,11 +38,11 @@ val SOLVE_TIMEOUT : int -> ctactic -> ctactic
 end 
 
 
-structure CTac : CONTEXTUAL_TACTIC   = 
+structure CTac : CONTEXTUAL_TACTIC  = 
 struct
 
-infix 1 CTHEN
-infix 0 CORELSE
+infix 1 CTHEN CTHEN'
+infix 0 CORELSE CORELSE'
 
 type ctactic = (Proof.context * Thm.thm) -> (Proof.context * Thm.thm) Seq.seq
 
@@ -62,6 +67,8 @@ fun no_ctac _ = Seq.empty;
 (*the tactical THEN performs one tactic followed by another *)
 fun (ctac1 CTHEN ctac2) st = Seq.maps ctac2 (ctac1 st);
 
+fun (ctac1 CTHEN' ctac2) x = ctac1 x CTHEN ctac2 x;
+
 (*The tactical ORELSE uses the first tactic that returns a nonempty sequence.
   Like in LCF, ORELSE commits to either tac1 or tac2 immediately.
   Does not backtrack to tac2 if tac1 was initially chosen. *)
@@ -70,11 +77,16 @@ fun (ctac1 CORELSE ctac2) st =
         NONE       => ctac2 st
       | sequencecell => Seq.make(fn()=> sequencecell);
 
+fun (ctac1 CORELSE' ctac2) x = ctac1 x CORELSE ctac2 x;
+
 (*Conditional tactical: testfun controls which tactic to use next.
   Beware: due to eager evaluation, both thentac and elsetac are evaluated.*)
 fun COND testfun thenf elsef = (fn prf =>
     if testfun prf then thenf prf else elsef prf);
 
+(*Do the tactic or else do nothing*)
+fun TRY ctac = ctac CORELSE all_ctac;
+fun TRY' ctac1 x = TRY (ctac1 x);
 (* ------------------------------------------------------------------------------------------ *)
 
 (*Accept only next states that change the theorem's prop field
