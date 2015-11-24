@@ -16,12 +16,12 @@ struct
 type hardCTac =  Thm.thm list option -> string list -> int -> CTac.ctactic
 
 (* Apply Sledgehammer and record which facts we need to give Metis to reconstruct proof *)
-fun sledgehammer_ctac i (ctxt,thm) = 
+fun sledgehammer_ctac i(ctxt,thm) = 
   let
     val proved = ThyExpl_Data.proved_of_ctxt ctxt
     val (facts,metis_tac) = Hipster_Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt [] 
-                            Sledgehammer_Fact.no_fact_override proved i thm
-    val facts_str = String.concatWith " " facts
+                              Sledgehammer_Fact.no_fact_override proved i thm
+    val facts_str = String.concatWith " " (Library.distinct (op =) facts)
   in
     Seq.map 
     (fn nwthm => (Induction_Data.add_subgoal_tac_ctxt ("(metis " ^ facts_str ^ ")") ctxt, nwthm)) 
@@ -36,72 +36,49 @@ fun simp_goal_ctac i (ctxt,thm) =
 
 (* TODO: Implement and record if simp or metis+which facts should be used to replay *)
 val simp_or_sledgehammer_ctac = 
-  CTac.ALLGOALS (CTac.CTHEN' ((CTac.TRY' simp_goal_ctac), sledgehammer_ctac))
+ (* (CTac.CTHEN ((CTac.TRY simp_goal_ctac), sledgehammer_ctac)) *)
+   CTac.CORELSE (CTac.ALLGOALS simp_goal_ctac, CTac.ALLGOALS sledgehammer_ctac)
 
 
 (* Apply induction and record which rule was used, and on which variables *)
 fun induct_on_var_ctac rule var i (ctxt,thm) = 
   let 
-    val _ = @{print} var;
-    val _ = @{print} i;
     val results = Ind_Tacs.induct_on_var_tac ctxt rule (SOME var) i thm
-
     (* If rule is NONE, we do structural induction *)                
     fun set_rule r  = case r of NONE => Induction_Data.set_induction_rule_ctxt NONE
                               | SOME (nm,_) => Induction_Data.set_induction_rule_ctxt (SOME nm)
   in 
-    Seq.map (fn (thm') => 
+    Seq.map (fn thm' => 
       (ctxt 
        |> Induction_Data.set_induction_vars_ctxt var 
        |> set_rule rule, thm')) results
   end;
 
-(* FIXME! Bug here. Somehow calls induction twice. Prob. need some check to see if done already. *)
-(* Induction on a var, then try to prove by sledgehammer *)
-(*fun induct_and_sledgehammer ctxt rule var =
-  DEPTH_SOLVE (
-    (Seq.DETERM (HEADGOAL ((induct_on_var_tac ctxt rule var)))) THEN (sledgehammer_goals ctxt))
- *)
 
-fun induct_and_sledgehammer_ctac rule var i =
+
+fun induct_and_sledgehammer_ctac rule var =
+  CTac.DEPTH_SOLVE(
   CTac.CTHEN(  
-    (CTac.DEPTH_SOLVE (
-      Seq.DETERM (      
-              (CTac.HEADGOAL (induct_on_var_ctac rule var)))),
-             simp_or_sledgehammer_ctac))
-          
-(*    CTac.CTHEN 
-        (CTac.DEPTH_SOLVE
-          ((Seq.DETERM (induct_on_var_ctac rule var i))), 
-        simp_or_sledgehammer_ctac)
-*)
- 
+    Seq.DETERM (CTac.HEADGOAL (induct_on_var_ctac rule var)),
+    simp_or_sledgehammer_ctac))
+
 (* Try induction (using the strategy strat) 
    on each variable in vars, until we find one that allows a proof. 
    rule states if we are to use some particular induction rule, e.g.
    recursion induction. If rule is NONE, we do stuctural induction. *)
-fun try_induct_on_ctac rule strat vars i =
-  let 
-  val _ = @{print} vars;
-  val _ = @{print} i;
+fun try_induct_on_ctac rule strat vars i (ctxt,thm) = 
+  let
+  val ctxt2 = Induction_Data.reset_ind_proof_data_ctxt ctxt
   in  
-  case vars of
+  (case vars of
     []        => CTac.no_ctac 
   | (v :: vs) => 
     CTac.CORELSE
-      (strat rule v i,
+      (strat rule v,
       try_induct_on_ctac rule strat vs i)
+   ) (ctxt2,thm)
   end;
-(* 
-fun try_induct_on ctxt rule strat vars i =
-  case vars of
-    []        => no_tac
-  | (v :: vs) =>  
-      strat ctxt rule (SOME v) (*i*) (*THEN simp_all ctxt []*)
-      ORELSE
-      (try_induct_on ctxt rule strat vs i)
 
-*)
 (* Structural Induction: Find the variables we can induct on *)
 fun try_inductable_vars_ctac strat i (ctxt,thm) = 
     let 
@@ -112,13 +89,17 @@ fun try_inductable_vars_ctac strat i (ctxt,thm) =
 
 fun test_tac ctxt thm = 
   let 
-  val res =
- (* ALLGOALS(try_inductable_vars ctxt' (induct_and_simp lemmas)) thm *)
-   CTac.ALLGOALS (try_inductable_vars_ctac induct_and_sledgehammer_ctac) (ctxt,thm)
-
-    val _ = Seq.map (fn (ctx',_) => Output.tracing (Induction_Data.get_proof_scrip_ctxt ctx')) res
+  (* val _ = @{print} (Thm.nprems_of thm) *)
+   val res = if (Thm.no_prems thm) then Seq.empty
+             else (CTac.ALLGOALS (try_inductable_vars_ctac induct_and_sledgehammer_ctac) (ctxt,thm))
+   
+    val _ =  case (Seq.list_of res) of [] => ()
+                  | ((ctxt1,_)::_) => (*@{print} (Induction_Data.get_proof_scrip_ctxt ctxt1) *)
+                    Sledgehammer_Util.with_vanilla_print_mode writeln
+                    (Active.sendback_markup [Markup.padding_command] (Induction_Data.get_proof_scrip_ctxt ctxt1))
+   (* val _ =  @{print} thm1 *)
   in  
-    Seq.map snd res
-    
+   (*Seq.map snd res *)
+   all_tac thm
   end 
 end

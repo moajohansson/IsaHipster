@@ -41,18 +41,24 @@ val empty = Data{induction_rule = NONE, induction_vars = [], subgoal_tacs_strs =
 
 fun get_proof_script (Data d) = 
   let 
-  val vars = String.concatWith " " (#induction_vars d)
-  val induction = "apply (induction " ^
-    (case (#induction_rule d) of 
-      NONE => vars ^ ")"
-    | SOME rule => vars ^ " rule: " ^ rule ^ ")")
+
+  fun mk_ind_str [] = ""
+    | mk_ind_str vars_list = 
+      let 
+      val vars = String.concatWith " " vars_list
+      val induction = "apply (induction " 
+      in  
+        (case (#induction_rule d) of 
+          NONE => induction ^ vars ^ ")\n"
+          | SOME rule => induction ^ vars ^ " rule: " ^ rule ^ ")\n")
+      end;
 
   fun mk_app_str [] s = s
-    | mk_app_str [t] s = s ^ "\n by " ^ t
-    | mk_app_str (t::ts) s = mk_app_str ts (s ^ "\n apply " ^ t);
+    | mk_app_str [t] s = s ^ "by " ^ t
+    | mk_app_str (t::ts) s = mk_app_str ts (s ^ "apply " ^ t ^"\n");
     
   in
-    induction ^ "\n" ^ (mk_app_str (#subgoal_tacs_strs d) "")
+    (mk_ind_str (#induction_vars d)) ^ (mk_app_str (#subgoal_tacs_strs d) "")
   end;
 
 structure IndData = Proof_Data (type T = T
