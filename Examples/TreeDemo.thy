@@ -26,6 +26,15 @@ where
 
 (* First call to Hipster: Explore tmap and mirror *)
 hipster tmap mirror
+lemma lemma_a [thy_expl]: "mirror (tmap x y) = tmap x (mirror y)"
+apply (induction y)
+apply simp
+by simp
+
+lemma lemma_aa [thy_expl]: "mirror (mirror x) = x"
+apply (induction x)
+apply simp
+by simp
 
 
 
@@ -37,6 +46,17 @@ where
 
 (* Second call to Hipster: Explore relation to lists: flat_tree tmap mirror rev map *)
 hipster flat_tree tmap mirror rev map
+lemma lemma_ab [thy_expl]: "flat_tree (tmap x y) = map x (flat_tree y)"
+apply (induction y)
+apply simp
+by simp
+
+lemma lemma_ac [thy_expl]: "flat_tree (mirror x) = rev (flat_tree x)"
+apply (induction x)
+apply simp
+by simp
+
+
 
 
 fun rightmost :: "'a Tree \<Rightarrow> 'a"
@@ -51,6 +71,24 @@ where
 
 (* Third call to Hipster: hd mirror flat_tree  rightmost leftmost*)
 hipster hd mirror flat_tree rightmost leftmost
+lemma lemma_ad [thy_expl]: "leftmost (mirror x) = rightmost x"
+apply (induction x)
+apply simp
+by simp
+
+lemma lemma_ae [thy_expl]: "rightmost (mirror x) = leftmost x"
+apply (induction x)
+apply simp
+by simp
+
+lemma lemma_af [thy_expl]: "hd (xs @ xs) = hd xs"
+apply (induction xs)
+apply simp
+by simp
+
+lemma unknown [thy_expl]: "hd (flat_tree x) = leftmost x"
+oops
+
 
 
 

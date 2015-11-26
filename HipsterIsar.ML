@@ -46,5 +46,11 @@ Outer_Syntax.local_theory @{command_keyword "hipster_cond"}
       "Theory Exploration for conditional lemmas with Hipster"
       (Scan.repeat1 Parse.const >> call_hipster)
 end;
-
-
+(*
+(* Use simp and or sledgehammer, then prints out Isar snippet using standard Isabelle tactics. *)
+method_setup hipster_induct = {*
+  Scan.lift (Scan.succeed 
+    (fn ctxt => SIMPLE_METHOD 
+      (Induct_CTac.hipster_induct ctxt)))
+   *}
+*)

@@ -81,6 +81,6 @@ fun add_subgoal_tac_ctxt tac ctxt =
 
 val reset_ind_proof_data_ctxt = IndData.put empty 
 
-fun get_proof_scrip_ctxt ctxt = get_proof_script (IndData.get ctxt)
+fun get_proof_script_ctxt ctxt = get_proof_script (IndData.get ctxt)
 
 end

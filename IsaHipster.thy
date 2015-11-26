@@ -46,7 +46,7 @@ ML_file "IndTacs.ML"
 ML_file "CTacs/InductCTac.ML"
 
 ML_file "TacticData.ML"
-ML_file "HipsterExplore.ML"
+ML_file "HipsterExplore2.ML"
 ML_file "HipsterIsar.ML"
 
 
@@ -74,6 +74,12 @@ method_setup hipster_induct_schemes = {*
       (Ind_Tacs.induct_with_schemes ctxt thms))
  *}
 
+(* Use simp and or sledgehammer, then prints out Isar snippet using standard Isabelle tactics. *)
+method_setup hipster_induct = {*
+  Scan.lift (Scan.succeed 
+    (fn ctxt => SIMPLE_METHOD 
+      (Induct_CTac.hipster_induct ctxt)))
+   *}
 (*
 ML{*
 Method.setup;

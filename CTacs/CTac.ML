@@ -25,6 +25,8 @@ val CHANGED_PROP : ctactic -> ctactic;
 val COND: (Proof.context * Thm.thm -> bool) -> ctactic -> ctactic -> ctactic
 val TRY: ctactic -> ctactic
 val TRY': ('a -> ctactic) -> 'a -> ctactic
+val CHANGED :  ctactic -> ctactic
+val SOLVE_OR_FAIL : ctactic -> ctactic 
 
 val ALLGOALS: (int -> ctactic) -> ctactic;
 val HEADGOAL: (int -> ctactic) -> ctactic;
@@ -88,6 +90,10 @@ fun COND testfun thenf elsef = (fn prf =>
 fun TRY ctac = ctac CORELSE all_ctac;
 fun TRY' ctac1 x = TRY (ctac1 x);
 (* ------------------------------------------------------------------------------------------ *)
+(*Accept only next states that change the theorem somehow*)
+fun CHANGED ctac (ctxt,thm) =
+  let fun diff (_,thm') = not (Thm.eq_thm (thm, thm'));
+  in Seq.filter diff (ctac (ctxt,thm)) end;
 
 (*Accept only next states that change the theorem's prop field
   (changes to signature, hyps, etc. don't count)*)
@@ -100,6 +106,9 @@ fun SINGLE ctacf = Option.map fst o Seq.pull o ctacf
 (*Apply a tactic if subgoals remain, else do nothing.*)
 val IF_UNSOLVED = COND ((has_fewer_prems 1) o snd) all_ctac;
 
+fun SOLVE_OR_FAIL ctac st =  
+  let fun solved st = has_fewer_prems 1 (snd st);
+  in Seq.filter solved (ctac st) end;
 (* ------------------------------------------------------------------------------------------ *)
 
 (*For n subgoals, performs tac(n) THEN ... THEN tac(1)

@@ -7,8 +7,15 @@ Hipster theory exploration with HipSpec/QuickSpec
 (* Call the HipSpec theory exploration system. Prove the resulting conjectures. Those provable by 
    routine reasoning are deemed non-interesting and discarded. Those requiring "hard" reasoning are
    kept. *)
+signature HIPSTER_THY_EXPLORATION =
+sig
 
-structure Hipster_Explore = 
+val explore : Proof.context -> string list -> Proof.context * unit
+val explore_cond : string option -> Proof.context -> string list -> Proof.context * unit
+
+end
+
+structure Hipster_Explore : HIPSTER_THY_EXPLORATION = 
 struct
 
 
