@@ -25,6 +25,10 @@ lemma insTwiceComm : "insert r (insert t ts) = insert t (insert r ts)"
 (* case with r = Z *)
 oops
 
+hipster_cond leq isort insert
+
+lemma kerIsort : "isort (isort ts) = isort ts"
+
 lemma isortIds : "sorted ts \<Longrightarrow> isort ts = ts"
 by hipster_induct_schemes (*
 apply(induction ts rule: sorted.induct)
