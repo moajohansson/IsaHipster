@@ -37,7 +37,6 @@ apply simp
 by simp
 
 
-
 fun flat_tree :: "'a Tree => 'a list"
 where
   "flat_tree (Leaf x) = [x]"
@@ -55,8 +54,6 @@ lemma lemma_ac [thy_expl]: "flat_tree (mirror x) = rev (flat_tree x)"
 apply (induction x)
 apply simp
 by simp
-
-
 
 
 fun rightmost :: "'a Tree \<Rightarrow> 'a"

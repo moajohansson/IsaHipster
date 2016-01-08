@@ -13,18 +13,18 @@ parameterising theory exploration.
 
 signature IND_TACS =
 sig 
-  type hardtac
+  type inductionStrategy
   val simp_all : Proof.context -> thm list -> tactic
   val sledgehammer_goals : Proof.context -> tactic
   val prove_by_simp : Proof.context -> thm list -> tactic
   val timed_metis_tac : Proof.context -> bool -> Thm.thm list -> int -> tactic
   val simp_or_metis : Proof.context -> (thm list * thm list) -> tactic 
+  val simp_or_sledgehammer_tac : Proof.context -> tactic 
+  val induct_and_simp : thm list -> inductionStrategy
+  val induct_simp_or_metis : thm list * thm list -> inductionStrategy
+  val induct_and_sledgehammer : inductionStrategy
 
-  val induct_and_simp : thm list -> hardtac
-  val induct_simp_or_metis : thm list * thm list -> hardtac
-  val induct_and_sledgehammer : hardtac
-
-  val try_inductable_vars : Proof.context -> hardtac -> int -> tactic
+  val try_inductable_vars : Proof.context -> inductionStrategy -> int -> tactic
   
   (* Does induction on specified var.  *)
   val induct_on_var_tac : Proof.context -> (string * thm list) option -> string list option -> int -> tactic
@@ -42,14 +42,14 @@ sig
 
   (* Context -> list of induct rules (schemes) -> tactic *)
   val induct_with_schemes : Proof.context -> thm list -> tactic
-  val try_induct_schemes : Proof.context -> hardtac -> int -> tactic
+  val try_induct_schemes : Proof.context -> inductionStrategy -> int -> tactic
 
 end
 
 structure Ind_Tacs  : IND_TACS  =
 struct
 
-type hardtac = Proof.context -> (string * thm list) option -> string list option (*-> int*) -> tactic
+type inductionStrategy = Proof.context -> (string * thm list) option -> string list option (*-> int*) -> tactic
 
 fun SOLVE_TIMEOUT mseconds tac t = 
   let val res = TimeLimit.timeLimit (Time.fromMilliseconds mseconds)
@@ -132,11 +132,20 @@ fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (prett
 fun sledgehammer_goals ctxt = 
   let 
     val proved = ThyExpl_Data.proved_of_ctxt ctxt
+    val _ = @{print} proved
   in  
     ALLGOALS (Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt [] 
               Sledgehammer_Fact.no_fact_override proved)
   end; 
 
+fun SOLVE_OR_FAIL tac st =  
+  let fun solved st = has_fewer_prems 1 st;
+  in Seq.filter solved (tac st) end;
+
+(* Must fail if there are any open subgoals left *)
+fun simp_or_sledgehammer_tac ctxt = 
+   SOLVE_OR_FAIL ((simp_all ctxt []) THEN IF_UNSOLVED (sledgehammer_goals ctxt))
+(*
 fun sledgehammer_goals_explore ctxt = 
   let 
     val proved = ThyExpl_Data.proved_of_ctxt ctxt
@@ -144,6 +153,7 @@ fun sledgehammer_goals_explore ctxt =
     (Hipster_Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt [] 
              Sledgehammer_Fact.no_fact_override proved) 
   end
+*)
 (*-----------------------------------------------------------------------------------------*)
 (* Figure out what we can do induction on, and tries each variable until success.*) 
 (* Stolen from IsaPlanner...                                                               *)
@@ -249,7 +259,7 @@ fun induct_simp_or_metis (facts, lemmas) ctxt rule var(* i*) =
 (* Induction on a var, then try to prove by sledgehammer *)
 fun induct_and_sledgehammer ctxt rule var =
   DEPTH_SOLVE (
-    (Seq.DETERM (HEADGOAL ((induct_on_var_tac ctxt rule var)))) THEN (sledgehammer_goals ctxt))
+    (Seq.DETERM (HEADGOAL ((induct_on_var_tac ctxt rule var)))) THEN (simp_or_sledgehammer_tac ctxt))
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
 fun try_induct_on ctxt rule strat vars i =
@@ -274,7 +284,7 @@ fun try_inductable_vars ctxt strat i thm =
       | (Free (_, t)) => t; (* TODO: Bound, Const *)
 
 
-(* Proof.context -> thm list list -> hardtac -> vars -> int -> tactic *)
+(* Proof.context -> thm list list -> inductionStrategy -> vars -> int -> tactic *)
 fun try_induction_with ctxt (scheme_rules : (string * Thm.thm list) list) strat vars i =
   (* let val vars = map fst (fst (inductable_things_in_sg i thm)) *)
   let val struct_tac = try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i
@@ -405,7 +415,7 @@ structure Sledgehammer_T : EXPL_TACS =
 struct
 
 (* FIXME: Use simp, so it can pick up stuff from theory exploration that hasn't been pasted yet.*)
-fun routine_tac ctxt = DEPTH_SOLVE (Ind_Tacs.sledgehammer_goals ctxt)
+fun routine_tac ctxt = DEPTH_SOLVE (Ind_Tacs.simp_or_sledgehammer_tac ctxt)
 val routine_tac_str = "sledgehammer"
 
 (* We should call here a tactic that runs sledgehammer, but return one that calls metis 

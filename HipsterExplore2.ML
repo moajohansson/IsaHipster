@@ -4,15 +4,15 @@ structure Hipster_Explore (* : HIPSTER_THY_EXPLORATION *) =
 struct
 
 
-fun proof_str ctxt proof_script thm = 
+fun proof_str ctxt proof_script name thm = 
   let 
     (* Print variables without ? *)
     val ctxt' = Config.put show_question_marks false ctxt
     (* Disables silly Isabelle YXML markup for printing *)
     val str_of_term = Sledgehammer_Util.with_vanilla_print_mode (Syntax.string_of_term ctxt')
     val lemma_str = Library.quote (str_of_term (Thm.concl_of thm))
-    val name = Long_Name.base_name (Thm.get_name_hint thm)
-    val _ = @{print} name
+    (*val name = Long_Name.base_name (Thm.get_name_hint thm)
+    val _ = @{print} name *)
   in
     (* FIXME: Make keeping track of used names used better. Put in theory data instead of having tag *)
     "lemma " ^ name ^" [thy_expl]: " ^ lemma_str ^ "\n" ^ proof_script
@@ -46,14 +46,14 @@ fun try_nxt_conj ctxt =
               SOME (ctxt1, proved_thm) =>
                 let
                   val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt1
-
-                  (* FIXME: Don't name theorem twice. *)
-                  (* Thm used by simp need to be lifted so it use meta-variables *)
+                  val proof_script = 
+                      proof_str ctxt'(Induction_Data.get_proof_script_ctxt ctxt') new_nm proved_thm
                   val final_thm = proved_thm
+                                    |> Drule.generalize 
+                                      (Hipster_Utils.frees_and_tfrees_of_thm proved_thm) 
                                     |> Goal.finish ctxt'
                                     |> Thm.put_name_hint new_nm
-                 val proof_script = 
-                    proof_str ctxt'(Induction_Data.get_proof_script_ctxt ctxt') final_thm
+                 
                   val gen_thm = Drule.generalize 
                             (Hipster_Utils.frees_and_tfrees_of_thm final_thm) final_thm
                   val _ = Sledgehammer_Util.with_vanilla_print_mode writeln
@@ -149,7 +149,7 @@ fun mk_lemma_str ctxt thm =
     val name = Long_Name.base_name (Thm.get_name_hint thm)
     val proof_script = 
         case (ThyExpl_Data.proof_script_of_thm name ctxt) of
-          NONE => proof_str ctxt "oops" thm
+          NONE => proof_str ctxt "oops" name thm
        |  SOME proof => proof
   in
     proof_script

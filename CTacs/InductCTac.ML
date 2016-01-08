@@ -9,25 +9,27 @@
 signature INDUCT_CTAC =
 sig
 
-type hardCTac (*= (string * Thm.thm list) option -> string list -> CTac.ctactic *)
+type inductionStrategy 
 
 
 val sledgehammer_ctac : int -> CTac.ctactic
 val simp_goal_ctac: int -> CTac.ctactic
 val simp_or_sledgehammer_ctac : CTac.ctactic
-val induct_and_sledgehammer_ctac : hardCTac
 
-val structural_induction_ctac : hardCTac -> int -> CTac.ctactic
+val induct_and_sledgehammer_ctac : inductionStrategy
+
+val structural_induction_ctac : inductionStrategy -> int -> CTac.ctactic
+val recursion_induction_ctac : inductionStrategy -> int -> CTac.ctactic
 
 val hipster_induct : Proof.context -> tactic
 val thy_expl_hard_ctac : CTac.ctactic
 end
 
-structure Induct_CTac  : INDUCT_CTAC  = 
+structure Induct_CTac  : INDUCT_CTAC   = 
 struct
 
-(* Arguments to hardCTac type: 
-  (string * Thm.thm) list option: 
+(* Arguments to inductionStrategy type: 
+  (string * Thm.thm list) option: 
     Name of induction theorem plus the theorem(s) as Isabelle return a list when looking up a name.
     If NONE, this means we just try structural induction.
   string list :
@@ -35,7 +37,7 @@ struct
   ctactic :
     The actual ctactic, which applies induction and tries to solve step- and basecases.
   *)
-type hardCTac =  (string * Thm.thm list) option -> string list  -> CTac.ctactic
+type inductionStrategy =  (string * Thm.thm list) option -> string list -> CTac.ctactic
 
 (* Apply Sledgehammer and record which facts we need to give Metis to reconstruct proof.
    Oddity: Seems we can get duplicate facts back from Sledgehammer, so remove those.  *)
@@ -60,7 +62,8 @@ fun simp_goal_ctac i (ctxt,thm) =
 
 (* Must fail if there are any open subgoals left *)
 val simp_or_sledgehammer_ctac = 
-   CTac.SOLVE_OR_FAIL (CTac.CORELSE (CTac.ALLGOALS simp_goal_ctac, CTac.ALLGOALS sledgehammer_ctac))
+   CTac.SOLVE_OR_FAIL (CTac.CTHEN (CTac.ALLGOALS simp_goal_ctac, 
+                                  CTac.IF_UNSOLVED (CTac.ALLGOALS sledgehammer_ctac)))
 
 
 (* Apply induction and record which rule was used, and on which variables *)
@@ -111,15 +114,45 @@ fun structural_induction_ctac strat i (ctxt,thm) =
       (try_induct_on_ctac NONE strat vars i) (ctxt,thm)
     end;
 
+(* Recursion Induction: Search over possible function we can get an induction scheme from. *)
+(* Q: Shouldn't this do just recursion induction, so we can have a separate tactic for trying
+   both this and structural? *)
+fun try_rec_induction_schemes_ctac scheme_rules strat vars i =
+  case scheme_rules of
+        [] => CTac.no_ctac (* try_induct_on_ctac NONE strat vars i *)
+      | (ind_scheme :: rs) => 
+          CTac.CORELSE 
+          (try_induct_on_ctac (SOME ind_scheme) strat vars i,
+          (try_rec_induction_schemes_ctac rs strat vars i));
+
+fun recursion_induction_ctac strat i (ctxt,thm) =
+  let
+      val vars = map (fn (v,_) => [v]) (fst (Ind_Tacs.inductable_things_in_sg ctxt i thm))
+      val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
+      val consts = Hipster_Utils.thy_consts_of thynm thm
+      val schemes =  map_filter (try (fn n => (n, Sledgehammer_Util.thms_of_name ctxt n)))
+                            (distinct (op =) (map (fn c => (c^".induct")) consts))
+      (* Q: Do we need to reverse this? *)
+      (* val schemes = (*rev*) thinds *) 
+    in 
+      (try_rec_induction_schemes_ctac schemes strat vars i) (ctxt,thm)
+    end;
+
 (* A tactic for automated induction to be called from Isar method hipster_induct, see IsaHipster.thy 
-  It does the search over which variables one could do (currently only structural) induction, and 
+  It does the search over which variables one could do structural induction, or else which functions
+  one can do recursion induction over and then  
   follows by simp or sledgehammer. 
   Outputs a snippet of Isar for the proof found, which only used standard Isabelle tactics and avoid 
   repeating search. *)
 fun hipster_induct ctxt0 thm = 
   let 
     val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
-    val result = CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm)
+    val result = (*CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm) *)
+                 (* CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm) *)
+                (CTac.CORELSE 
+                  ( CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac),
+                    CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac))) 
+                 (ctxt,thm)
     in 
       case (Seq.list_of result) of [] => Seq.empty
                     | ((ctxt1,thm)::_) => 
@@ -133,5 +166,10 @@ fun hipster_induct ctxt0 thm =
 fun thy_expl_hard_ctac (ctxt0, thm) = 
    let 
     val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
-    in CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm) end;
+    in (* CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm) *)
+      (CTac.CORELSE 
+                  ( CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac),
+                    CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac))) 
+                 (ctxt,thm)
+    end;
 end

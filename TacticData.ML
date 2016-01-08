@@ -75,6 +75,7 @@ val set_tacs = Data.put
 val set_induct_simp_metis = set_tacs induct_simp_metis
 val set_induct_simp = set_tacs induct_simp
 val set_induct_with_schemes = set_tacs induct_with_schemes
+val set_induct_sledgehammer = set_tacs induct_sledgehammer
 
 end
 
