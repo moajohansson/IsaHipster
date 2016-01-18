@@ -118,10 +118,10 @@ by (simp_all add: len0)*)
 
 (* TODO: strategy: start with tailing call? nah, didn't matter: both take.induct and drop.induct get us there *)
 lemma dropTake : "ts = app (take n ts) (drop n ts)" (* XXX: ill-instantiation again... *)
-apply(induction ts)
+(*apply(induction ts)
 apply(metis Nat.exhaust list.exhaust take.simps app.simps drop.simps)
 apply(metis (full_types) Nat.exhaust list.exhaust take.simps app.simps drop.simps)
-done
+done*)
 by hipster_induct_schemes (*
 apply(induction ts rule: take.induct)
 apply(case_tac n)
@@ -222,6 +222,8 @@ apply(simp_all)
 apply(case_tac n)
 apply auto
 oops
+
+hipster app rotate
 
 end
 

@@ -236,7 +236,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
       val rule' = case rule of NONE => NONE | SOME (n,thms) => SOME thms
       val nw_thms = Induction.induction_tac ctxt false
                       [insts] [otherfrees] [] rule' [] i goalthm
-                    handle ERROR message => (warning ("Error: " ^ message ^ "\n"); Seq.empty)
+                    handle ERROR message => (warning ("Error in: " ^ message ^ "\n"); Seq.empty)
   in
     (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty*) Seq.map snd nw_thms
   end;
@@ -317,7 +317,7 @@ fun try_induct_schemes ctxt strat i thm =
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val thinds = map_filter (fn n => SOME (n, (Sledgehammer_Util.thms_of_name ctxt n))
-                        handle ERROR m  => (warning ("Error: " ^ m ^ "\n"); NONE)) 
+                        handle ERROR m  => (warning ("Error try: " ^ m ^ "\n"); NONE)) 
                     (distinct (op =) (map (fn c => (c^".induct")) consts))
 
                     (* map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
@@ -325,6 +325,7 @@ fun try_induct_schemes ctxt strat i thm =
                     (distinct (op =) (map (fn c => (c^".induct")) consts))
                     *)
       val schemes = rev thinds (* (filter (Basics.is_some (*o snd*)) thinds) *)
+      val _ = warning ("For thm: " ^ (@{make_string} thm))
       (* FIXME: distinct ... *)
   in
     (try_induction_with ctxt schemes strat (distinct (op =) vars) i) thm

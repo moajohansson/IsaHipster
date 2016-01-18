@@ -128,7 +128,21 @@ apply (induction n ts rule: drop.induct)
 apply simp_all
 oops
 
+lemma wr : "rotate x (rotate y z) = rotate y (rotate x z)"
+apply(induction x z rule: rotate.induct)
+oops
+hipster rotate
+
+hipster leq add
+
+(*hipster rotate
+*)
+lemma ar : " Listing.rotate (S v) (Listing.rotate x Listing.List.Nil) \<noteq> Listing.List.Nil"
+oops
+
 ML {*
+fun ute hyps = map (fn t => warning (@{print} t ^ (if K false t then "eek" else "nek"))) hyps
+
 fun inductable_things_in_term thry t =
     let val _ = @{print} (Hipster_Utils.frees_of t)
         val _ = @{print} (Term.strip_all_vars t)
