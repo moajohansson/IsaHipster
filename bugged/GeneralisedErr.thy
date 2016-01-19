@@ -20,9 +20,8 @@ fun rotate :: "Nat \<Rightarrow> 'a List \<Rightarrow> 'a List" where
 hipster rotate
 
 lemma problem : "rotate (S Z) (rotate x y) = rotate (S x) y"
-apply(induction x y rule: rotate.induct)
-apply simp_all
-
-done
-
+by hipster_induct_schemes
+(* Actually equivalent to:
+    apply(induction x y rule: rotate.induct)
+    apply simp_all *)
 
