@@ -120,23 +120,38 @@ fun structural_induction_ctac strat i (ctxt,thm) =
 (* Recursion Induction: Search over possible function we can get an induction scheme from. *)
 (* Q: Shouldn't this do just recursion induction, so we can have a separate tactic for trying
    both this and structural? *)
+
+  fun reP uu = case uu of
+        Var (_,t) => t
+      | (t$_) => reP t
+      | (Abs (_, t, _)) => t
+      | (Free (_, t)) => t; (* TODO: Bound, Const *)
+
+
 fun try_rec_induction_schemes_ctac scheme_rules strat vars i =
   case scheme_rules of
         [] => CTac.no_ctac (* try_induct_on_ctac NONE strat vars i *)
-      | (ind_scheme :: rs) => 
+      | ((n,r)(*ind_scheme*) :: rs) =>
+        let
+          val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of (hd r))))
+          val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
+          val instt = hd all_instances
+        in
           CTac.CORELSE 
-          (try_induct_on_ctac (SOME ind_scheme) strat vars i,
-          (try_rec_induction_schemes_ctac rs strat vars i));
+          (try_induct_on_ctac (SOME (n,r)(*ind_scheme*)) strat (map (map fst) instt) (*vars*) i,
+          (try_rec_induction_schemes_ctac rs strat vars i))
+        end;
 
 fun recursion_induction_ctac strat i (ctxt,thm) =
   let
-      val vars = map (fn (v,_) => [v]) (fst (Ind_Tacs.inductable_things_in_sg ctxt i thm))
+      val vars = (*map (fn (v,_) => v*) (fst (Ind_Tacs.inductable_things_in_sg ctxt i thm))
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val schemes =  map_filter (try (fn n => (n, Sledgehammer_Util.thms_of_name ctxt n)))
                             (distinct (op =) (map (fn c => (c^".induct")) consts))
       (* Q: Do we need to reverse this? *)
-      (* val schemes = (*rev*) thinds *) 
+      (* val schemes = (*rev*) thinds *)
+      val _ = @{print} vars
     in 
       (try_rec_induction_schemes_ctac schemes strat vars i) (ctxt,thm)
     end;

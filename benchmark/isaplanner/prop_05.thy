@@ -15,6 +15,36 @@ begin
        (if equal2 x z then S (count x ys) else count x ys)"
   (*hipster equal2 count *)
   hipster equal2
+lemma lemma_a [thy_expl]: "equal2 x x = True"
+apply (induction x)
+apply simp
+by simp
+
+lemma lemma_aa [thy_expl]: "equal2 Z x = equal2 x Z"
+apply (induction x)
+apply simp
+by simp
+
+lemma lemma_ab [thy_expl]: "equal2 (S x) y = equal2 y (S x)"
+apply (induction y)
+(*apply (metis equal2.elims(2) equal2.simps(1))*)
+sledgehammer
+apply simp
+apply simp
+sledgehammer
+oops
+
+lemma lemma_ac [thy_expl]: "equal2 x (S x) = False"
+apply (induction x)
+apply simp
+by simp
+(*
+lemma lemma_ad [thy_expl]: "equal2 (S x) (S y) = equal2 y x"
+apply (induction x)
+apply (metis equal2.elims(2) equal2.simps(1) equal2.simps(3))
+apply (metis Nat.distinct(1) Nat.inject equal2.elims(2) equal2.elims(3) equal2.simps(2) equal2.simps(3) equal2.simps(4))
+apply simp
+by simp
 lemma lemma_a [thy_expl]: "equal2 x4 y4 = equal2 y4 x4"
 by (hipster_induct_schemes prop_05.equal2.simps)
 
