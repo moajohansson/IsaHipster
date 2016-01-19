@@ -44,6 +44,8 @@ type inductionStrategy =  (string * Thm.thm list) option -> string list -> CTac.
 fun sledgehammer_ctac i (ctxt,thm) = 
   let
     val proved = ThyExpl_Data.proved_of_ctxt ctxt
+    val _ = @{print} "Using proved: "
+    val _ = @{print} proved
     val (facts,metis_tac) = Hipster_Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt [] 
                               Sledgehammer_Fact.no_fact_override proved i thm
     val facts_str = String.concatWith " " (Library.distinct (op =) facts)
@@ -64,6 +66,7 @@ fun simp_goal_ctac i (ctxt,thm) =
 val simp_or_sledgehammer_ctac = 
    CTac.SOLVE_OR_FAIL (CTac.CTHEN (CTac.ALLGOALS simp_goal_ctac, 
                                   CTac.IF_UNSOLVED (CTac.ALLGOALS sledgehammer_ctac)))
+  (* Note: will do subgoals in reverse order, starting with the highest number, working backwards! *)                                
 
 
 (* Apply induction and record which rule was used, and on which variables *)
