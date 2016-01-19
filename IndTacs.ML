@@ -234,10 +234,11 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                        | SOME (_, (Free (v,_),false)) => v) insts))^
                 "; otherfrees: "^ (Library.space_implode ", " (map fst otherfrees))) *)
       val rule' = case rule of NONE => NONE | SOME (n,thms) => SOME thms
-      val _ = @{print} (goalthm, rule, var)
       val nw_thms = Induction.induction_tac ctxt false
                       [insts] [otherfrees] [] rule' [] i goalthm
                     handle ERROR message => (warning ("Error in: " ^ message ^ "\n"); Seq.empty)
+                    handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); Seq.empty)
+      val _ = @{print} (goalthm, rule', var)
   in
     (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty*) Seq.map snd nw_thms
   end;
