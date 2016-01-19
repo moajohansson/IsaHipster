@@ -92,7 +92,75 @@ fun insert :: "Nat \<Rightarrow> Nat List \<Rightarrow> Nat List" where
 datatype NL = NN | NC Nat NL
 
 
-(*hipster drop take app*)
+hipster drop take app
+lemma lemma_a [thy_expl]: "app x Listing.List.Nil = x"
+apply (induction x)
+apply simp
+by simp
+
+lemma lemma_aa [thy_expl]: "Listing.drop x Listing.List.Nil = Listing.List.Nil"
+apply (induction x)
+apply simp
+by simp
+
+lemma lemma_ab [thy_expl]: "Listing.take x Listing.List.Nil = Listing.List.Nil"
+apply (induction x)
+apply simp
+by simp
+
+lemma lemma_ac [thy_expl]: "app (app x y) z = app x (app y z)"
+apply (induction x)
+apply simp
+by simp
+
+lemma lemma_ad [thy_expl]: "Listing.drop (S x) (Listing.List.Cons y Listing.List.Nil) = Listing.List.Nil"
+apply (induction x)
+apply simp
+by simp
+
+lemma lemma_ae [thy_expl]: "Listing.take (S x) (Listing.List.Cons y Listing.List.Nil) =
+Listing.List.Cons y Listing.List.Nil"
+apply (induction x)
+apply simp
+by simp
+
+lemma lemma_af [thy_expl]: "Listing.take (S Z) (app x x) = Listing.take (S Z) x"
+apply (induction x)
+apply simp
+by simp
+
+lemma unknown []: "Listing.drop x (Listing.drop y z) = Listing.drop y (Listing.drop x z)"
+oops
+
+lemma unknown []: "Listing.take x (Listing.take y z) = Listing.take y (Listing.take x z)"
+oops
+
+lemma unknown []: "Listing.drop x (Listing.take x y) = Listing.List.Nil"
+oops
+
+lemma unknown []: "Listing.take x (Listing.take x y) = Listing.take x y"
+oops
+
+lemma unknown []: "Listing.drop (S x) (Listing.drop y z) =
+Listing.drop (S y) (Listing.drop x z)"
+oops
+
+lemma unknown []: "app (Listing.take x y) (Listing.drop x y) = y"
+oops
+
+lemma unknown []: "Listing.drop (S x) (Listing.take x y) = Listing.List.Nil"
+oops
+
+lemma unknown []: "Listing.take (S x) (Listing.take x y) = Listing.take x y"
+oops
+
+lemma unknown []: "Listing.drop (S Z) (Listing.drop x y) = Listing.drop (S x) y"
+oops
+
+hipster rotate
+
+lemma u : "Listing.rotate (S Z) (Listing.rotate x y) = Listing.rotate (S x) y"
+apply(hipster_induct_schemes)
 
 (*hipster_cond notNil tail app*)
 
@@ -131,7 +199,6 @@ oops
 lemma wr : "rotate x (rotate y z) = rotate y (rotate x z)"
 apply(induction x z rule: rotate.induct)
 oops
-hipster rotate
 
 hipster leq add
 
