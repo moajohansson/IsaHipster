@@ -40,16 +40,18 @@ fun run_prover override_params fact_override chained i n ctxt goal =
 
 (* Tactic to call during theory exploration. Return facts sledgehammer finds,
    so we can paste in the relevant ones into the proof script later *)
-fun sledgehammer_with_metis_tac ctxt override_params fact_override chained i th =
-  let val override_params = override_params @ [("preplay_timeout", "0")] in
-    (case run_prover override_params fact_override chained i i ctxt th of
+fun sledgehammer_with_metis_tac ctxt override_params fact_override chained i thm =
+  let 
+    val override_params = override_params @ [("preplay_timeout", "0")] 
+    in
+    (case run_prover override_params fact_override chained i i ctxt thm of
       SOME facts =>
       (facts, (Metis_Tactic.metis_tac [] ATP_Problem_Generate.combs_or_liftingN ctxt
           (maps (thms_of_name ctxt) facts) i))
     | NONE => ([],no_tac))
   end
 
-fun sledgehammer_with_metis_all_goals ctxt override_params fact_override chained th =
+fun sledgehammer_with_metis_all_goals ctxt override_params fact_override chained  th =
   let
     fun MAP_THEN [] = all_tac
       | MAP_THEN (t::tacs) = t THEN (MAP_THEN tacs)
