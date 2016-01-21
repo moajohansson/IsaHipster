@@ -143,8 +143,11 @@ fun SOLVE_OR_FAIL tac st =
   in Seq.filter solved (tac st) end;
 
 (* Must fail if there are any open subgoals left *)
-fun simp_or_sledgehammer_tac ctxt = 
+fun simp_or_sledgehammer_tac ctxt = let val _ = @{print} "simp or" in
    SOLVE_OR_FAIL ((simp_all ctxt []) THEN IF_UNSOLVED (sledgehammer_goals ctxt))
+      handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); fn x =>  Seq.empty)
+end
+
 (*
 fun sledgehammer_goals_explore ctxt = 
   let 
@@ -234,10 +237,11 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                        | SOME (_, (Free (v,_),false)) => v) insts))^
                 "; otherfrees: "^ (Library.space_implode ", " (map fst otherfrees))) *)
       val rule' = case rule of NONE => NONE | SOME (n,thms) => SOME thms
-      val _ = @{print} (goalthm, rule, var)
       val nw_thms = Induction.induction_tac ctxt false
                       [insts] [otherfrees] [] rule' [] i goalthm
                     handle ERROR message => (warning ("Error in: " ^ message ^ "\n"); Seq.empty)
+                    handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); Seq.empty)
+      val _ = @{print} (goalthm, rule', var)
   in
     (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty*) Seq.map snd nw_thms
   end;
@@ -258,9 +262,10 @@ fun induct_simp_or_metis (facts, lemmas) ctxt rule var(* i*) =
     (Seq.DETERM (HEADGOAL ((induct_on_var_tac ctxt rule var (*i*) )))) THEN (simp_or_metis ctxt (facts,lemmas)) )
 
 (* Induction on a var, then try to prove by sledgehammer *)
-fun induct_and_sledgehammer ctxt rule var =
+fun induct_and_sledgehammer ctxt rule var = let val _ = @{print} "induct_and_sl" in
   DEPTH_SOLVE (
     (Seq.DETERM (HEADGOAL ((induct_on_var_tac ctxt rule var)))) THEN (simp_or_sledgehammer_tac ctxt))
+end
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
 fun try_induct_on ctxt rule strat vars i =
@@ -366,8 +371,8 @@ fun induct_simp_tac ctxt thm =
   in ALLGOALS(try_inductable_vars ctxt' (induct_and_simp lemmas)) thm
   end;
 
-fun induct_sledgehammer_tac ctxt thm = 
-  ALLGOALS(try_inductable_vars ctxt (induct_and_sledgehammer)) thm
+fun induct_sledgehammer_tac ctxt thm = let val _ = @{print} "ind-sl-tac" in
+  ALLGOALS(try_inductable_vars ctxt (induct_and_sledgehammer)) thm end
   
 end
 

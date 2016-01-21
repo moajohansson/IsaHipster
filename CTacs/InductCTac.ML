@@ -46,11 +46,14 @@ fun sledgehammer_ctac i (ctxt,thm) =
     val proved = ThyExpl_Data.proved_of_ctxt ctxt
     val (facts,metis_tac) = Hipster_Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt [] 
                               Sledgehammer_Fact.no_fact_override [] i thm
+      handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); ([], atac 1))
+    val _ = @{print} "no sledge?"
     val facts_str = String.concatWith " " (Library.distinct (op =) facts)
   in
     Seq.map 
     (fn nwthm => (Induction_Data.add_subgoal_tac_ctxt ("(metis " ^ facts_str ^ ")") ctxt, nwthm)) 
         (CHANGED metis_tac thm)  
+    handle ERROR  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); Seq.empty)
   end;
 
 (* Apply simp to subgoal i and record that we've done that, 
@@ -69,8 +72,9 @@ val simp_or_sledgehammer_ctac =
 
 (* Apply induction and record which rule was used, and on which variables *)
 fun induct_on_var_ctac rule var i (ctxt,thm) = 
-  let 
+  let
     val results = Ind_Tacs.induct_on_var_tac ctxt rule (SOME var) i thm
+      handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); Seq.empty)
     (* If rule is NONE, we do structural induction *)                
     fun set_rule r  = case r of NONE => Induction_Data.set_induction_rule_ctxt NONE
                               | SOME (nm,_) => Induction_Data.set_induction_rule_ctxt (SOME nm)
@@ -83,11 +87,13 @@ fun induct_on_var_ctac rule var i (ctxt,thm) =
 
 
 
-fun induct_and_sledgehammer_ctac rule var =
+fun induct_and_sledgehammer_ctac rule var = fn (c,t) =>
   (*CTac.DEPTH_SOLVE( *)
-  CTac.CTHEN(  
+  (CTac.CTHEN(  
     Seq.DETERM (CTac.HEADGOAL (induct_on_var_ctac rule var)),
-    simp_or_sledgehammer_ctac)
+    simp_or_sledgehammer_ctac)) (c,t)
+  handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); Seq.single (c,t))
+
 
 
 (* Try induction (using the strategy strat) 
@@ -149,7 +155,6 @@ fun recursion_induction_ctac strat i (ctxt,thm) =
                             (distinct (op =) (map (fn c => (c^".induct")) consts))
       (* Q: Do we need to reverse this? *)
       (* val schemes = (*rev*) thinds *)
-      val _ = @{print} vars
     in 
       (try_rec_induction_schemes_ctac schemes strat vars i) (ctxt,thm)
     end;

@@ -34,6 +34,8 @@ fun try_nxt_conj ctxt =
   | (c::cs) => (* try proving next open conj *)
       let 
         val lemma_str = Syntax.string_of_term ctxt (Thm.concl_of c)
+        val _ = @{print} "Proving: "
+        val _ = @{print} c
       in
         case (SINGLE (Tactic_Data.routine_tac ctxt) c) of (* Discard this, it is trivial *)
           SOME _ => 
