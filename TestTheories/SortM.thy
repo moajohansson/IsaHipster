@@ -22,6 +22,7 @@ fun qsort :: "Nat list \<Rightarrow> Nat list" where
   "qsort [] = []"
 | "qsort (t # ts) = (qsort [r <- ts. leq r t]) @ [t] @ (qsort [r <- ts. \<not> (leq r t)])"
 
+thm qsort.induct
 
 fun sorted2 :: "Nat list \<Rightarrow> bool" where
   "sorted2 []                   = True"
@@ -64,13 +65,13 @@ by (hipster_induct_schemes leq.simps Nat.exhaust)
 lemma le_trans [thy_expl]: "leq z y \<and> leq x z \<Longrightarrow> leq x y = True"
 by (hipster_induct_schemes leq.simps Nat.exhaust)
 
-hipster_cond leq sorted2 merge leq
+(*hipster_cond leq sorted2 merge leq
 
 hipster_cond sorted2 leq merge sorted2
 
 
 hipster merge sorted2
-
+*)
 
 (* lemma sortCons: "r \<le> t \<and> sorted2 (t # ts) \<Longrightarrow> sorted2 (r # (t # ts))" by simp *)
 lemma insSortInvar : "sorted ts \<Longrightarrow> sorted (insert t ts)"
