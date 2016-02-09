@@ -17,9 +17,11 @@ fun rotate :: "Nat \<Rightarrow> 'a List \<Rightarrow> 'a List" where
 | "rotate (S n) (Cons x xs) = rotate n (app xs (Cons x Nil))"
 | "rotate n     Nil         = Nil"
 
+setup Tactic_Data.set_induct_simp
+
 hipster rotate
 
-lemma problem : "rotate (S Z) (rotate x y) = rotate (S x) y"
+lemma problem [thy_expl] : "rotate (S Z) (rotate x y) = rotate (S x) y"
 by hipster_induct_schemes
 
 lemma generalP: "rotate x (rotate y z) = rotate y (rotate x z)"
