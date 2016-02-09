@@ -75,7 +75,7 @@ fun simp_all ctxt lemmas thm =
     end;
 
 (* Fails if all there are some subgoals left after application of simp *)
- fun prove_by_simp ctxt lemmas = SOLVE_TIMEOUT 500 (simp_all ctxt lemmas); 
+ fun prove_by_simp ctxt lemmas = SOLVE_TIMEOUT 500 (simp_all ctxt lemmas);
 
 
 (*-----------------------------------------------------------------------------------------*)
@@ -225,7 +225,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
 (* Apply induction on var and try to prove all cases by simp *)
 fun induct_and_simp lemmas ctxt rule var (*i*) = 
   DEPTH_SOLVE (
-    (Seq.DETERM (HEADGOAL ((induct_on_var_tac ctxt rule var )))) THEN (prove_by_simp ctxt lemmas) )
+    (Seq.DETERM (HEADGOAL ((induct_on_var_tac ctxt rule var )))) THEN (prove_by_simp ctxt lemmas THEN IF_UNSOLVED no_tac))
 
 (* Induction on var, then try to prove resulting subgoals by simp or metis *)
 fun induct_simp_or_metis (facts, lemmas) ctxt rule var(* i*) = 
