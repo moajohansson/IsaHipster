@@ -130,7 +130,6 @@ fun structural_induction_ctac strat i (ctxt,thm) =
       | (Abs (_, t, _)) => t
       | (Free (_, t)) => t; (* TODO: Bound, Const *)
 
-
 fun try_rec_induction_schemes_ctac scheme_rules strat vars i =
   case scheme_rules of
         [] => CTac.no_ctac (* try_induct_on_ctac NONE strat vars i *)
@@ -155,7 +154,7 @@ fun recursion_induction_ctac strat i (ctxt,thm) =
       (* Q: Do we need to reverse this? *)
       (* val schemes = (*rev*) thinds *)
     in 
-      (try_rec_induction_schemes_ctac schemes strat vars i) (ctxt,thm)
+      try_rec_induction_schemes_ctac schemes strat vars i (ctxt,thm)
     end;
 
 (* A tactic for automated induction to be called from Isar method hipster_induct, see IsaHipster.thy 

@@ -28,7 +28,7 @@ fun try_nxt_conj ctxt =
         then SOME (ctxt 
                     |> ThyExpl_Data.set_open_conjs_ctxt (ThyExpl_Data.failed_of_ctxt ctxt)
                     |> ThyExpl_Data.set_failed_ctxt []
-                    |> ThyExpl_Data.set_progress_ctxt false)                
+                    |> ThyExpl_Data.set_progress_ctxt false)
         else NONE
 
   | (c::cs) => (* try proving next open conj *)
@@ -48,22 +48,22 @@ fun try_nxt_conj ctxt =
               SOME (ctxt1, proved_thm) =>
                 let
                   val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt1
-                  val proof_script = 
+                  val proof_script =
                       proof_str ctxt'(Induction_Data.get_proof_script_ctxt ctxt') new_nm proved_thm
                   val final_thm = proved_thm
                                     |> Drule.generalize 
-                                      (Hipster_Utils.frees_and_tfrees_of_thm proved_thm) 
+                                      (Hipster_Utils.frees_and_tfrees_of_thm proved_thm)
                                     |> Goal.finish ctxt'
                                     |> Thm.put_name_hint new_nm
                  
-                  val gen_thm = Drule.generalize 
-                            (Hipster_Utils.frees_and_tfrees_of_thm final_thm) final_thm
+                  (*val gen_thm = Runtime.exn_trace (fn () => Drule.generalize 
+                            (Hipster_Utils.frees_and_tfrees_of_thm final_thm) final_thm)*)
                   val _ = Sledgehammer_Util.with_vanilla_print_mode writeln
                             ("Proved: " ^ lemma_str)
                 in
                   SOME (ctxt'
                           |> ThyExpl_Data.set_open_conjs_ctxt cs
-                          |> ThyExpl_Data.add_proved_ctxt (Thm.put_name_hint new_nm gen_thm)                            
+                          |> ThyExpl_Data.add_proved_ctxt ((*Thm.put_name_hint new_nm *)final_thm)                            
                           |> ThyExpl_Data.set_progress_ctxt true
                           |> ThyExpl_Data.add_proof_script_ctxt (new_nm, proof_script))
                 end
@@ -82,7 +82,7 @@ fun proof_loop ctxt cand_lemmas_str =
   let
     val ctxt1 = ThyExpl_Data.init_expl ctxt [] [] NONE
                   (Library.split_lines (Library.trim_line cand_lemmas_str))
-    fun recf ctxt = 
+    fun recf ctxt = (* XXX: generalised error *)
       case (try_nxt_conj ctxt) of
         NONE => ctxt
       | SOME ctxt' => recf ctxt'
