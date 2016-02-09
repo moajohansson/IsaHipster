@@ -48,7 +48,7 @@ fun sledgehammer_with_metis_tac ctxt override_params fact_override chained i th 
                         val (ffss, m) =
       (facts, (Metis_Tactic.metis_tac [] ATP_Problem_Generate.combs_or_liftingN ctxt
           (maps (thms_of_name ctxt) facts) i))
-                        val _ = @{print} "full sledge" in
+                        val _ = @{print} facts in
       (ffss, m) end
     | NONE => ([],no_tac))
   handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); ([], no_tac))

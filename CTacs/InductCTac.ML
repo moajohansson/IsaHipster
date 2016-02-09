@@ -17,6 +17,7 @@ val simp_goal_ctac: int -> CTac.ctactic
 val simp_or_sledgehammer_ctac : CTac.ctactic
 
 val induct_and_sledgehammer_ctac : inductionStrategy
+val induct_and_simp_ctac : inductionStrategy
 
 val structural_induction_ctac : inductionStrategy -> int -> CTac.ctactic
 val recursion_induction_ctac : inductionStrategy -> int -> CTac.ctactic
@@ -43,17 +44,14 @@ type inductionStrategy =  (string * Thm.thm list) option -> string list -> CTac.
    Oddity: Seems we can get duplicate facts back from Sledgehammer, so remove those.  *)
 fun sledgehammer_ctac i (ctxt,thm) = 
   let
-    val proved = ThyExpl_Data.proved_of_ctxt ctxt
+    (*val proved = ThyExpl_Data.proved_of_ctxt ctxt *)
     val (facts,metis_tac) = Hipster_Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt [] 
                               Sledgehammer_Fact.no_fact_override [] i thm
-      handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); ([], atac 1))
-    val _ = @{print} "no sledge?"
     val facts_str = String.concatWith " " (Library.distinct (op =) facts)
   in
     Seq.map 
     (fn nwthm => (Induction_Data.add_subgoal_tac_ctxt ("(metis " ^ facts_str ^ ")") ctxt, nwthm)) 
         (CHANGED metis_tac thm)  
-    handle ERROR  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); Seq.empty)
   end;
 
 (* Apply simp to subgoal i and record that we've done that, 
@@ -74,7 +72,6 @@ val simp_or_sledgehammer_ctac =
 fun induct_on_var_ctac rule var i (ctxt,thm) = 
   let
     val results = Ind_Tacs.induct_on_var_tac ctxt rule (SOME var) i thm
-      handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); Seq.empty)
     (* If rule is NONE, we do structural induction *)                
     fun set_rule r  = case r of NONE => Induction_Data.set_induction_rule_ctxt NONE
                               | SOME (nm,_) => Induction_Data.set_induction_rule_ctxt (SOME nm)
@@ -86,15 +83,17 @@ fun induct_on_var_ctac rule var i (ctxt,thm) =
   end;
 
 
-
 fun induct_and_sledgehammer_ctac rule var = fn (c,t) =>
   (*CTac.DEPTH_SOLVE( *)
   (CTac.CTHEN(  
     Seq.DETERM (CTac.HEADGOAL (induct_on_var_ctac rule var)),
     simp_or_sledgehammer_ctac)) (c,t)
-  handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); Seq.single (c,t))
 
-
+fun induct_and_simp_ctac rule var = 
+  CTac.SOLVE_OR_FAIL 
+    (CTac.CTHEN(  
+         Seq.DETERM (CTac.HEADGOAL (induct_on_var_ctac rule var)),
+         CTac.ALLGOALS simp_goal_ctac))
 
 (* Try induction (using the strategy strat) 
    on each variable in vars, until we find one that allows a proof. 
@@ -187,10 +186,11 @@ fun hipster_induct ctxt0 thm =
 fun thy_expl_hard_ctac (ctxt0, thm) = 
    let 
     val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
-    in (* CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm) *)
-      (CTac.CORELSE 
+    in CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac (*induct_and_simp_ctac *)) (ctxt,thm)
+    (* CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm) *)
+     (* (CTac.CORELSE 
                   ( CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac),
                     CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac))) 
-                 (ctxt,thm)
+                 (ctxt,thm) *)
     end;
 end
