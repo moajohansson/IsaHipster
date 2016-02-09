@@ -47,7 +47,6 @@ fun sledgehammer_ctac i (ctxt,thm) =
     val (facts,metis_tac) = Hipster_Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt [] 
                               Sledgehammer_Fact.no_fact_override [] i thm
       handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); ([], atac 1))
-    val _ = @{print} "no sledge?"
     val facts_str = String.concatWith " " (Library.distinct (op =) facts)
   in
     Seq.map 
