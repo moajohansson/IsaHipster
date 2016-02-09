@@ -1,0 +1,11 @@
+*~
+.cabal-sandbox/
+dist/
+.DS_Store
+*.log
+*.blg
+*.out
+*.aux
+*.synctex.*
+*.pdf
+GenCode/*.hs
