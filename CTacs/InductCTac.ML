@@ -14,7 +14,7 @@ type inductionStrategy
 
 val sledgehammer_ctac : int -> CTac.ctactic
 val simp_goal_ctac: int -> CTac.ctactic
-val simp_or_sledgehammer_ctac : CTac.ctactic
+val simp_or_sledgehammer_ctac : int -> CTac.ctactic
 
 val induct_and_sledgehammer_ctac : inductionStrategy
 val induct_and_simp_ctac : inductionStrategy
@@ -60,13 +60,13 @@ fun sledgehammer_ctac i (ctxt,thm) =
 fun simp_goal_ctac i (ctxt,thm) =
   Seq.map
     (fn (ctxt',thm') => (Induction_Data.add_subgoal_tac_ctxt "simp" ctxt',thm'))
-    (CTac.CHANGED (CTac.AS_CTACTIC (Simplifier.asm_full_simp_tac ctxt i)) (ctxt,thm))
+    (*(CTac.CHANGED *) (CTac.AS_CTACTIC (Simplifier.asm_full_simp_tac ctxt i) (ctxt,thm))
 
 (* Must fail if there are any open subgoals left *)
 val simp_or_sledgehammer_ctac =
-   CTac.SOLVE_OR_FAIL (CTac.CTHEN (CTac.ALLGOALS simp_goal_ctac,
-                                  CTac.IF_UNSOLVED (CTac.ALLGOALS sledgehammer_ctac)))
-  (* Note: will do subgoals in reverse order, starting with the highest number, working backwards! *)
+  (*   CTac.SOLVE_OR_FAIL (CTac.ALLGOALS (CTac.CTHEN_MAYBE'( 
+                                          simp_goal_ctac, sledgehammer_ctac))) *)
+  CTac.CTHEN_MAYBE' (simp_goal_ctac, sledgehammer_ctac)                               
 
 
 (* Apply induction and record which rule was used, and on which variables *)
@@ -83,12 +83,13 @@ fun induct_on_var_ctac rule var i (ctxt,thm) =
        |> set_rule rule, thm')) results
   end;
 
+(* Note: ALLGOALS will do subgoals in reverse order, starting with the highest number, working backwards! *)
 
-fun induct_and_sledgehammer_ctac rule var = fn (c,t) =>
-  (*CTac.DEPTH_SOLVE( *)
+fun induct_and_sledgehammer_ctac rule var = 
+  CTac.SOLVE_OR_FAIL
   (CTac.CTHEN(
     Seq.DETERM (CTac.HEADGOAL (induct_on_var_ctac rule var)),
-    simp_or_sledgehammer_ctac)) (c,t)
+    CTac.ALLGOALS simp_or_sledgehammer_ctac))
 
 fun induct_and_simp_ctac rule var =
   CTac.SOLVE_OR_FAIL
@@ -186,8 +187,8 @@ fun hipster_induct ctxt0 thm =
 fun thy_expl_hard_ctac (ctxt0, thm) =
    let
     val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
-    in CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac (*induct_and_simp_ctac *)) (ctxt,thm)
-    (* CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm) *)
+    in (*CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac (*induct_and_simp_ctac *)) (ctxt,thm) *)
+       CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm)
      (* (CTac.CORELSE
                   ( CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac),
                     CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac)))

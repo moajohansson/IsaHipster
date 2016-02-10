@@ -20,7 +20,7 @@ where
   "rev Emp = Emp"
 | "rev (Cons x xs) = app (rev xs) (Cons x Emp)"
 
-(* hipster app rev FIXME: Outrageously slow with Sledgehammer. *)
+hipster app
 
 lemma lemma_a [thy_expl]: "app x Emp = x"
 apply (induction x)
@@ -31,6 +31,22 @@ lemma lemma_aa [thy_expl]: "app (app x y) z = app x (app y z)"
 apply (induction x)
 apply simp
 by simp
+
+ hipster rev 
+lemma lemma_ab [thy_expl]: "app (SmallListDemo.rev x) (SmallListDemo.rev y) =
+SmallListDemo.rev (app y x)"
+apply (induction y)
+apply simp
+apply (metis lemma_a)
+apply simp
+apply (metis lemma_aa)
+done
+
+lemma unknown [thy_expl]: "SmallListDemo.rev (SmallListDemo.rev x) = x"
+apply (induction x)
+apply simp
+apply simp
+by (metis SmallListDemo.rev.simps(1) SmallListDemo.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
 
 
 lemma lemma_ab [thy_expl]: "app (SmallListDemo.rev x) (SmallListDemo.rev y) =

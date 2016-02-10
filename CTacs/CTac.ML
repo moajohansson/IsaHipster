@@ -23,6 +23,10 @@ val CORELSE': ('a -> ctactic) * ('a -> ctactic) -> 'a -> ctactic
 
 val CHANGED_PROP : ctactic -> ctactic;
 val COND: (Proof.context * Thm.thm -> bool) -> ctactic -> ctactic -> ctactic
+
+val CTHEN_MAYBE: ctactic * ctactic -> ctactic
+val CTHEN_MAYBE': ('a -> ctactic) * ('a -> ctactic) -> 'a -> ctactic
+
 val TRY: ctactic -> ctactic
 val TRY': ('a -> ctactic) -> 'a -> ctactic
 val CHANGED :  ctactic -> ctactic
@@ -45,6 +49,7 @@ struct
 
 infix 1 CTHEN CTHEN'
 infix 0 CORELSE CORELSE'
+infix 1 CTHEN_MAYBE CTHEN_MAYBE';
 
 type ctactic = (Proof.context * Thm.thm) -> (Proof.context * Thm.thm) Seq.seq
 
@@ -81,6 +86,7 @@ fun (ctac1 CORELSE ctac2) st =
 
 fun (ctac1 CORELSE' ctac2) x = ctac1 x CORELSE ctac2 x;
 
+
 (*Conditional tactical: testfun controls which tactic to use next.
   Beware: due to eager evaluation, both thentac and elsetac are evaluated.*)
 fun COND testfun thenf elsef = (fn prf =>
@@ -89,6 +95,14 @@ fun COND testfun thenf elsef = (fn prf =>
 (*Do the tactic or else do nothing*)
 fun TRY ctac = ctac CORELSE all_ctac;
 fun TRY' ctac1 x = TRY (ctac1 x);
+
+(*Execute tac1, but only execute tac2 if there are at least as many subgoals
+  as before.  This ensures that tac2 is only applied to an outcome of tac1.*)
+fun (ctac1 CTHEN_MAYBE ctac2) (ctxt,thm) =
+  (ctac1 CTHEN COND (has_fewer_prems (Thm.nprems_of thm) o snd) all_ctac ctac2) (ctxt,thm);
+
+fun (ctac1 CTHEN_MAYBE' ctac2) x = ctac1 x CTHEN_MAYBE ctac2 x;
+
 (* ------------------------------------------------------------------------------------------ *)
 (*Accept only next states that change the theorem somehow*)
 fun CHANGED ctac (ctxt,thm) =
