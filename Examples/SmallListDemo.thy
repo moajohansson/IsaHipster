@@ -32,55 +32,21 @@ apply (induction x)
 apply simp
 by simp
 
- hipster rev 
 lemma lemma_ab [thy_expl]: "app (SmallListDemo.rev x) (SmallListDemo.rev y) =
 SmallListDemo.rev (app y x)"
 apply (induction y)
 apply simp
 apply (metis lemma_a)
 apply simp
-apply (metis lemma_aa)
-done
+by (metis lemma_aa)
 
-lemma unknown [thy_expl]: "SmallListDemo.rev (SmallListDemo.rev x) = x"
+hipster rev
+lemma lemma_ac [thy_expl]: "SmallListDemo.rev (SmallListDemo.rev x) = x"
 apply (induction x)
 apply simp
 apply simp
-by (metis SmallListDemo.rev.simps(1) SmallListDemo.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
+by (metis Lst.distinct(1) SmallListDemo.rev.simps(1) SmallListDemo.rev.simps(2) app.elims app.simps(2) lemma_a lemma_ab)
 
-
-lemma lemma_ab [thy_expl]: "app (SmallListDemo.rev x) (SmallListDemo.rev y) =
-SmallListDemo.rev (app y x)"
-apply (hipster_induct)
-apply (induction y)
-apply simp
-apply simp
-apply (metis lemma_aa)
-by (metis lemma_a)
-(*apply (induction y)
-apply simp
-apply (metis lemma_a)
-apply simp
-apply (metis lemma_aa)
-done*)
-
-
-lemma unknown [thy_expl]: "SmallListDemo.rev (SmallListDemo.rev x) = x"
-apply (induction x)
-apply simp
-apply simp
-sledgehammer
-
-lemma unknown [thy_expl]: "SmallListDemo.rev (SmallListDemo.rev x) = x"
-oops
-
-lemma unknown [thy_expl]: "app (SmallListDemo.rev x) (SmallListDemo.rev y) =
-SmallListDemo.rev (app y x)"
-oops
-
-lemma unknown [thy_expl]: "app (SmallListDemo.rev x) (SmallListDemo.rev x) =
-SmallListDemo.rev (app x x)"
-oops
 
 
 

@@ -13,7 +13,7 @@ struct
 datatype T = Data of
   { induction_rule : string option,
     induction_vars : string list, 
-    subgoal_tacs_strs : string list
+    subgoal_tacs_strs : (* string list *) (string list) Inttab.table
   }
 
 fun get_induction_rule (Data d) = (#induction_rule d)
@@ -34,13 +34,20 @@ fun set_induction_rule rule = update_induction_rule (K rule)
 fun set_induction_vars vars = update_induction_vars (K vars)
 fun set_subgoal_tac_strs tacs = update_subgoal_tac_strs (K tacs)
 
-fun add_subgoal_tac tac = update_subgoal_tac_strs (fn tacs => (*tac::tacs *) tacs @ [tac])
+(* FIXME: Need to store subgoal numbers tactic was applied to, for correct ordering. 
+   This is as we use ALL_GOALS sometimes, which work backwards (highest subgoal number first)) *)
+fun add_subgoal_tac (sg_number, tac) = 
+  update_subgoal_tac_strs (Inttab.insert_list (fn _ => false) (sg_number, tac))
+
 
 (* Induction rule NONE defaults to structural induction, as per Isabelle's induction tactic *)
-val empty = Data{induction_rule = NONE, induction_vars = [], subgoal_tacs_strs = []}
+val empty = Data{induction_rule = NONE, induction_vars = [], subgoal_tacs_strs = Inttab.empty}
 
 fun get_proof_script (Data d) = 
   let 
+
+  val tac_table = (#subgoal_tacs_strs d)
+  val subgoal_tacs = map (rev o snd) (Inttab.dest tac_table)
 
   fun mk_ind_str [] = ""
     | mk_ind_str vars_list = 
@@ -58,7 +65,7 @@ fun get_proof_script (Data d) =
     | mk_app_str (t::ts) s = mk_app_str ts (s ^ "apply " ^ t ^"\n");
     
   in
-    (mk_ind_str (#induction_vars d)) ^ (mk_app_str (#subgoal_tacs_strs d) "")
+    mk_ind_str (#induction_vars d) ^ (mk_app_str (flat subgoal_tacs)) ""
   end;
 
 structure IndData = Proof_Data (type T = T

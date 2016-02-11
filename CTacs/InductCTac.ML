@@ -51,7 +51,7 @@ fun sledgehammer_ctac i (ctxt,thm) =
     val facts_str = String.concatWith " " (Library.distinct (op =) facts)
   in
     Seq.map
-    (fn nwthm => (Induction_Data.add_subgoal_tac_ctxt ("(metis " ^ facts_str ^ ")") ctxt, nwthm))
+    (fn nwthm => (Induction_Data.add_subgoal_tac_ctxt (i,"(metis " ^ facts_str ^ ")") ctxt, nwthm))
         (CHANGED metis_tac thm)
   end;
 
@@ -59,8 +59,8 @@ fun sledgehammer_ctac i (ctxt,thm) =
    if simp managed to somehow make progress. *)
 fun simp_goal_ctac i (ctxt,thm) =
   Seq.map
-    (fn (ctxt',thm') => (Induction_Data.add_subgoal_tac_ctxt "simp" ctxt',thm'))
-    (*(CTac.CHANGED *) (CTac.AS_CTACTIC (Simplifier.asm_full_simp_tac ctxt i) (ctxt,thm))
+    (fn (ctxt',thm') => (Induction_Data.add_subgoal_tac_ctxt (i,"simp") ctxt',thm'))
+    (CTac.AS_CTACTIC (CHANGED (Simplifier.asm_full_simp_tac ctxt i)) (ctxt,thm))
 
 (* Must fail if there are any open subgoals left *)
 val simp_or_sledgehammer_ctac =
