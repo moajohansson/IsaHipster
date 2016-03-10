@@ -5,8 +5,11 @@ install Hipster, you first need Isabelle, QuickSpec and HipSpec.
 
 Isabelle is available from: http://isabelle.in.tum.de/index.html. Hipster works
 with [Isabelle 2015][Isa15], preferably in jEdit if you want nice syntactic
-sugar (use the branch `Isabelle14` if you want the [Isabelle 2014][Isa14]
+sugar (use the branch `Isabelle2014` if you want the [Isabelle 2014][Isa14]
 compatible version).
+
+For a version compatible with the newest [Isabelle 2016][Isa16] (although
+unstable due to further development), checkout the branch `Isabelle2016`.
 
 To install the appropriate [QuickSpec][QS]:
 
@@ -22,10 +25,10 @@ To install [HipSpec][HS], you will need to run the following commands:
     git checkout hipster
     cabal install 
 
-Lastly, you will also have to compile the `HipSpecifyer`:
+You will also have to compile the `HipSpecifyer`:
 
     cabal install hipspecifyer/
-    
+
 Finally, you need to tell Isabelle where to find Hipster, by setting the
 environment variable `$HIPSTER_HOME` in the file `$ISABELLE_HOME_USER/etc/settings`
 (create this file if it does not exist yet), where Isabelle normally has set
@@ -55,4 +58,6 @@ and we'll try to fix it.
 [QS]: https://github.com/nick8325/quickspec
 [HS]: https://github.com/danr/hipspec
 [Isa14]: http://isabelle.in.tum.de/download_past.html
-[Isa15]: http://isabelle.in.tum.de/installation.html
+[Isa15]: http://isabelle.in.tum.de/download_past.html
+[Isa16]: http://isabelle.in.tum.de/installation.html
+
