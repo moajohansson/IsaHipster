@@ -7,7 +7,7 @@ Isar commands for Hipster theory exploration invocation.
 (* Install a Parser for HipSpec. It takes a list of constant names as input *)
 let
 fun call_hipster consts =   
-  Local_Theory.target
+  (*Local_Theory.target *)
     (fn ctxt => 
       let 
         fun get_const_name ctxt c = 
@@ -17,8 +17,8 @@ fun call_hipster consts =
       in   
         consts 
           |> map (get_const_name ctxt)
-          |> Hipster_Explore.explore ctxt
-          |> fst
+          |> Hipster_Explore.explore ctxt;
+        ctxt
       end);
 in
 Outer_Syntax.local_theory @{command_keyword "hipster"} 

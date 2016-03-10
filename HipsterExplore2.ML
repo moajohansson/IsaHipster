@@ -62,6 +62,7 @@ fun try_nxt_conj ctxt =
                             ("Proved: " ^ lemma_str)
                 in
                   SOME (ctxt'
+                          |> snd o Local_Theory.note ((Binding.name new_nm,[]), [final_thm])
                           |> ThyExpl_Data.set_open_conjs_ctxt cs
                           |> ThyExpl_Data.add_proved_ctxt ((*Thm.put_name_hint new_nm *)final_thm)                            
                           |> ThyExpl_Data.set_progress_ctxt true

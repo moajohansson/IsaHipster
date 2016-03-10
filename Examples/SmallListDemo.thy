@@ -31,7 +31,7 @@ lemma lemma_aa [thy_expl]: "app (app x y) z = app x (app y z)"
 apply (induction x)
 apply simp
 by simp
-
+hipster rev
 lemma lemma_ab [thy_expl]: "app (SmallListDemo.rev x) (SmallListDemo.rev y) =
 SmallListDemo.rev (app y x)"
 apply (induction y)
@@ -40,14 +40,10 @@ apply (metis lemma_a)
 apply simp
 by (metis lemma_aa)
 
-hipster rev
 lemma lemma_ac [thy_expl]: "SmallListDemo.rev (SmallListDemo.rev x) = x"
 apply (induction x)
 apply simp
 apply simp
 by (metis Lst.distinct(1) SmallListDemo.rev.simps(1) SmallListDemo.rev.simps(2) app.elims app.simps(2) lemma_a lemma_ab)
-
-
-
 
 end
