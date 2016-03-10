@@ -105,7 +105,7 @@ fun metis_method ((override_type_encs, lam_trans), ths) ctxt facts =
   let val (schem_facts, nonschem_facts) = List.partition has_tvar facts
       val timeout = Hip_Tac_Ops.metis_to ctxt
   in
-     (Method.insert_tac nonschem_facts THEN'
+     (Method.insert_tac ctxt nonschem_facts THEN'
       CHANGED_PROP o (SOLVE_TIMEOUT timeout) o Metis_Tactic.metis_tac (these override_type_encs)
         (the_default ATP_Proof_Reconstruct.default_metis_lam_trans lam_trans) ctxt (schem_facts @ ths)) end
 
@@ -243,7 +243,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                     handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); Seq.empty)
       val _ = @{print} (goalthm, rule', var)
   in
-    (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty*) Seq.map snd nw_thms
+    (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty*) (*Seq.map snd*) nw_thms
   end;
 
 
