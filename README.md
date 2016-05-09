@@ -15,22 +15,28 @@ First install the following Haskell package, called `Happy`:
 	
 	cabal install happy
 
-To install the appropriate [QuickSpec][QS]:
+To download the appropriate [QuickSpec][QS]:
 
 	git clone https://github.com/nick8325/quickspec.git
 	cd quickspec
 	git checkout hipster
-	cabal install
+	cd ..
 
-To install [HipSpec][HS], you will need to run the following commands:
+To dowload [HipSpec][HS], you will need to run the following commands:
 
     git clone https://github.com/danr/hipspec
     cd hipspec
     git checkout hipster
-    cabal install 
+    cd ..
+	
+Then install QuickSpec and HipSpec together (avoids version conflicts) by issuing the command:
 
-You will also have to compile the `HipSpecifyer`:
+    cd cabal install hipspec/ quickspec/	
 
+You can now clone the Hipster repository itself, and compile the `HipSpecifyer`:
+
+    git clone https://github.com/moajohansson/IsaHipster.git
+    cd IsaHipster
     cabal install hipspecifyer/
 
 Finally, you need to tell Isabelle where to find Hipster, by setting the
@@ -51,8 +57,9 @@ line:
 imports "$HIPSTER_HOME/IsaHipster"
 ```
     
-Now, you should be able to try Hipster. Start up Isabelle on for example
-`Examples/TreeDemo.thy` and have a go.
+Now, you should be able to try Hipster. Currently, you will need to start Isabelle
+from the shell (using the command 'isabelle jedit') for all dependencies to work. 
+Start up Isabelle on for example `Examples/TreeDemo.thy` and have a go.
 
 _Disclaimer_: There are quite a few hacks around, and Hipster is not a polished
 and finished product by any means. Let us know if you run into anything too odd,
