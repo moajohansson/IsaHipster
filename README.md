@@ -11,6 +11,10 @@ compatible version).
 For a version compatible with the newest [Isabelle 2016][Isa16] (although
 unstable due to further development), checkout the branch `Isabelle2016`.
 
+First install the following Haskell package, called `Happy`:
+	
+	cabal install happy
+
 To install the appropriate [QuickSpec][QS]:
 
 	git clone https://github.com/nick8325/quickspec.git
