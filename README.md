@@ -61,8 +61,12 @@ Now, you should be able to try Hipster. Currently, you will need to start Isabel
 from the shell (using the command 'isabelle jedit') for all dependencies to work. 
 Start up Isabelle on for example `Examples/TreeDemo.thy` and have a go.
 
-_Disclaimer_: There are quite a few hacks around, and Hipster is not a polished
-and finished product by any means. Let us know if you run into anything too odd,
+_Common Issues_: As Hipster currently depends on specific versions of QuickSpec and HipSpec, some
+users have experienced problems with accidentally having conflicting cabal installation of several versions of the tools.
+If you've ended up with several versions of QuickSpec and/or HipSpec, you can remove unwanted 
+ones using the command line tool 'ghc-pkg unregister <Name-Of-Unwanted-Version>'. 
+
+_Disclaimer_: Hipster is always under development. Let us know if you run into anything too odd,
 and we'll try to fix it.
 
 
