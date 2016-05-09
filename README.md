@@ -62,9 +62,10 @@ from the shell (using the command 'isabelle jedit') for all dependencies to work
 Start up Isabelle on for example `Examples/TreeDemo.thy` and have a go.
 
 _Common Issues_: As Hipster currently depends on specific versions of QuickSpec and HipSpec, some
-users have experienced problems with accidentally having conflicting cabal installation of several versions of the tools.
+users have experienced problems with accidentally having conflicting cabal installation of several versions of the tools,
+which usually manifest itself in that Hipster gives you some strange error messages.
 If you've ended up with several versions of QuickSpec and/or HipSpec, you can remove unwanted 
-ones using the command line tool 'ghc-pkg unregister <Name-Of-Unwanted-Version>'. 
+ones using the command line tool `ghc-pkg unregister <Name-Of-Unwanted-Version>`. 
 
 _Disclaimer_: Hipster is always under development. Let us know if you run into anything too odd,
 and we'll try to fix it.
