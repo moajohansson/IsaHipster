@@ -31,7 +31,7 @@ To dowload [HipSpec][HS], you will need to run the following commands:
 	
 Then install QuickSpec and HipSpec together (avoids version conflicts) by issuing the command:
 
-    cd cabal install hipspec/ quickspec/	
+    cabal install hipspec/ quickspec/	
 
 You can now clone the Hipster repository itself, and compile the `HipSpecifyer`:
 
@@ -39,13 +39,17 @@ You can now clone the Hipster repository itself, and compile the `HipSpecifyer`:
     cd IsaHipster
     cabal install hipspecifyer/
 
-Finally, you need to tell Isabelle where to find Hipster, by setting the
-environment variable `$HIPSTER_HOME` in the file `$ISABELLE_HOME_USER/etc/settings`
+Finally, you need to tell Isabelle where to find Hipster, HipSpec, QuickSpec and the HipSpecifyer which you just installed. 
+Do this by setting the environment variables `$HIPSTER_HOME` and `$HASKELL_HOME` in the file `$ISABELLE_HOME_USER/etc/settings`
 (create this file if it does not exist yet), where Isabelle normally has set
 `$ISABELLE_HOME_USER` to `$USER_HOME/.isabelle`. `$HIPSTER_HOME` should then
-point to the path for the IsaHipster directory you just cloned. See the
-Isabelle System's Manual for more info on how to set up Isabelle's system
-enviroment. Alternatively, you may set `$HIPSTER_HOME` in your bash environment
+point to the path for the IsaHipster directory you just cloned. `$HASKELL_HOME`
+should point to where cabal installs your Haskell executables (usually something like `$HOME/Library/Haskell/bin/`).
+
+See the Isabelle System's Manual for more info on how to set up Isabelle's system
+enviroment. 
+
+Alternatively, you may set the environment variables in your bash environment
 file, but then Isabelle will only find Hipster if you start it from the
 terminal, so I would recommend the former approach.
 
@@ -57,8 +61,7 @@ line:
 imports "$HIPSTER_HOME/IsaHipster"
 ```
     
-Now, you should be able to try Hipster. Currently, you will need to start Isabelle
-from the shell (using the command 'isabelle jedit') for all dependencies to work. 
+Now, you should be able to try Hipster.  
 Start up Isabelle on for example `Examples/TreeDemo.thy` and have a go.
 
 _Common Issues_: As Hipster currently depends on specific versions of QuickSpec and HipSpec, some
