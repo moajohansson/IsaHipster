@@ -16,9 +16,19 @@ val basepath =
     "" => let val _ = Output.warning ("Hipster: Environment variable $HIPSTER_HOME not set."^
                          "\n  Using current directory.")
           in "./" end
-  | hip_home => hip_home^"/"
-val filepath = basepath^"GenCode/"
+  | hip_home => hip_home
+val filepath = basepath^"GenCode/";
 
+(* Set these to your path to Haskell executables for HipSpec/QuickSpec/Hipspecifyer *)
+val haskell_path = 
+  case getenv "HASKELL_HOME" of 
+    "" => let val _ = Output.warning ("Hipster: Environment variable $HASKELL_HOME not set."^
+                         "\n  Using current directory.")
+          in "./" end
+  | haskell_home => haskell_home;
+
+val hipspec_cmd = haskell_path ^ "hipster-hipspec ";
+val hipspecifyer_cmd = haskell_path ^ "HipSpecifyer "; 
 end
 
 structure Hipster_Rules = Named_Thms
