@@ -124,13 +124,13 @@ fun map_to_haskell isa_nm =
       solely in terms of themselves *)
 fun hipspec_plain consts file =
   let val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts
-  in "hipster-hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --tests=600"
+  in Hipster_Setup.hipspec_cmd ^ "--isabelle-mode " ^ add_funs  ^ file ^ " --tests=600"
   end
 
 (* FIXME: make cond-count a proper parameter controlled by user. *)
 fun hipspec_cond cond_name consts file = 
   let val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^(Long_Name.base_name nm)^ " "^s) " " consts
-  in "hipster-hipspec "^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^ (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
+  in Hipster_Setup.hipspec_cmd ^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^ (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
   end
 
 (* 'const_nms' are the name of the constants we wish to include in the Haskell 
@@ -149,7 +149,7 @@ fun hipspec_explore ctxt cond_opt const_nms =
     val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])]
     val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile
     (*val _ = Output.tracing (hipspec_cmd ^ " - " ^ args )*)
-    val _ = Isabelle_System.bash ("HipSpecifyer " ^ args)
+    val _ = Isabelle_System.bash (Hipster_Setup.hipspecifyer_cmd ^ args)
       (*("ghc -e 'let xs = " ^ args ^ " in System.Environment.withArgs xs HipSpecifyer.main'");*)
   in 
       fst (Isabelle_System.bash_output hipspec_cmd)
