@@ -5,11 +5,9 @@ install Hipster, you first need Isabelle, QuickSpec and HipSpec.
 
 Isabelle is available from: http://isabelle.in.tum.de/index.html. Hipster works
 with [Isabelle 2015][Isa15], preferably in jEdit if you want nice syntactic
-sugar (use the branch `Isabelle2014` if you want the [Isabelle 2014][Isa14]
-compatible version).
+sugar.
 
-For a version compatible with the newest [Isabelle 2016][Isa16] (although
-unstable due to further development), checkout the branch `Isabelle2016`.
+For a version compatible with the newest [Isabelle 2016][Isa16] (also containing some experimental features), checkout the branch `Isabelle2016`.
 
 First install the following Haskell package, called `Happy`:
 	
