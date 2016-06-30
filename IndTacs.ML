@@ -67,7 +67,9 @@ fun SOLVE_TIMEOUT mseconds tac t =
 (* Simp tactics *) 
 (*-----------------------------------------------------------------------------------------*)
 (*fun pretty_thm ctxt thm = Syntax.pretty_term ctxt (prop_of thm);*)
-
+fun SOLVE_OR_FAIL tac st =  
+  let fun solved st = has_fewer_prems 1 st;
+  in Seq.filter solved (tac st) end;
 
 (* Apply simp to all subgoals *)
 fun simp_all ctxt lemmas thm = 
@@ -81,7 +83,7 @@ fun simp_all ctxt lemmas thm =
     end;
 
 (* Fails if all there are some subgoals left after application of simp *)
- fun prove_by_simp ctxt lemmas = SOLVE_TIMEOUT 500 (simp_all ctxt lemmas); 
+ fun prove_by_simp ctxt lemmas = SOLVE_OR_FAIL (SOLVE_TIMEOUT 500 (simp_all ctxt lemmas)); 
 
 
 (*-----------------------------------------------------------------------------------------*)
@@ -138,9 +140,7 @@ fun sledgehammer_goals ctxt =
               Sledgehammer_Fact.no_fact_override proved)
   end; 
 
-fun SOLVE_OR_FAIL tac st =  
-  let fun solved st = has_fewer_prems 1 st;
-  in Seq.filter solved (tac st) end;
+
 
 (* Must fail if there are any open subgoals left *)
 fun simp_or_sledgehammer_tac ctxt = let val _ = @{print} "simp or" in
