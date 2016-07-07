@@ -107,6 +107,7 @@ fun map_to_haskell isa_nm =
   | SOME (_,hask_nm) => hask_nm
   end;
 
+(*
 fun hipspec_plain consts file =
   let val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^
         (Long_Name.base_name nm)^ " "^s) " " consts
@@ -119,22 +120,30 @@ fun hipspec_cond cond_name consts file =
   in  Hipster_Setup.hipspec_cmd ^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^ 
       (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
   end
+*)
+fun tipspec_plain consts file = 
+  let 
+  val add_funs = " --keep-all-functions " (*^ (List.foldr (fn (nm,s) => 
+                              (Long_Name.base_name nm) ^ "," ^ s) " " consts) *)
+  in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd end 
 
 fun hipspec_explore ctxt cond_opt const_nms =
   let
     val thy = Proof_Context.theory_of ctxt
     val thynm = Context.theory_name thy
-    val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^"_hipspec.hs"
-    val const_nms' = map map_to_haskell const_nms
-      
-    val hipspec_cmd = case cond_opt of NONE => hipspec_plain const_nms' outfile 
-                                     | SOME c => hipspec_cond c const_nms' outfile
+    val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^".hs"
+    val const_nms' = map map_to_haskell const_nms  
+    val hipspec_cmd = case cond_opt of NONE => tipspec_plain const_nms' outfile (*hipspec_plain const_nms' outfile *)
+                                     | SOME c => raise ERROR "Conditionals not yet supported in this version." 
+                                      (*hipspec_cond c const_nms' outfile *)
     val path_opt = SOME (Path.explode Hipster_Setup.filepath);    
-    val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])]
-    val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile
-    val _ = Isabelle_System.bash (Hipster_Setup.hipspecifyer_cmd ^ args)
+    val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
+    (* val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile *)
+    (* val _ = Isabelle_System.bash (Hipster_Setup.hipspecifyer_cmd ^ args) *)
+    val output = fst (Isabelle_System.bash_output hipspec_cmd)
   in 
-      fst (Isabelle_System.bash_output hipspec_cmd)
+      (* fst (Isabelle_System.bash_output hipspec_cmd) *)
+      ""
   end;
 
 (*-----------------------------------------------------------------------------------------*)
