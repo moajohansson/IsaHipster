@@ -31,7 +31,7 @@ val haskell_path =
 val hipspecifyer_cmd = haskell_path ^ "HipSpecifyer "; 
 *)
 val tipSpec_cmd = haskell_path ^ "tip-spec ";
-val tip_cmd = haskell_path ^ "tip ";
+val tip_cmd = haskell_path ^ "tip --hipster ";
 val tipGHC_cmd = haskell_path ^ "tip-ghc ";
 end
 

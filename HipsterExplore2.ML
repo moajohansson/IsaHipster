@@ -82,7 +82,8 @@ fun try_nxt_conj ctxt =
 fun proof_loop ctxt cand_lemmas_str = 
   let
     val ctxt1 = ThyExpl_Data.init_expl ctxt [] [] NONE
-                  (Library.split_lines (Library.trim_line cand_lemmas_str))
+                  (*(Library.split_lines (Library.trim_line cand_lemmas_str)) *)
+                  (filter (fn x =>  not (x = "")) (Library.split_lines (Library.trim_line cand_lemmas_str)))
     fun recf ctxt = (* XXX: generalised error *)
       case (try_nxt_conj ctxt) of
         NONE => ctxt
@@ -125,7 +126,7 @@ fun tipspec_plain consts file =
   let 
   val add_funs = " --keep-all-functions " (*^ (List.foldr (fn (nm,s) => 
                               (Long_Name.base_name nm) ^ "," ^ s) " " consts) *)
-  in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd end 
+  in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd  ^ " | " ^ Hipster_Setup.tip_cmd end 
 
 fun hipspec_explore ctxt cond_opt const_nms =
   let
@@ -134,16 +135,17 @@ fun hipspec_explore ctxt cond_opt const_nms =
     val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^".hs"
     val const_nms' = map map_to_haskell const_nms  
     val hipspec_cmd = case cond_opt of NONE => tipspec_plain const_nms' outfile (*hipspec_plain const_nms' outfile *)
-                                     | SOME c => raise ERROR "Conditionals not yet supported in this version." 
+                                     | SOME _ => raise ERROR "Conditionals not yet supported in this version." 
                                       (*hipspec_cond c const_nms' outfile *)
     val path_opt = SOME (Path.explode Hipster_Setup.filepath);    
     val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
     (* val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile *)
     (* val _ = Isabelle_System.bash (Hipster_Setup.hipspecifyer_cmd ^ args) *)
     val output = fst (Isabelle_System.bash_output hipspec_cmd)
+    (*val _ =  @{print} output *)
   in 
-      (* fst (Isabelle_System.bash_output hipspec_cmd) *)
-      ""
+       fst (Isabelle_System.bash_output hipspec_cmd)
+       
   end;
 
 (*-----------------------------------------------------------------------------------------*)
