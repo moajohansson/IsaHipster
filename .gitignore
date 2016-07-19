@@ -8,4 +8,4 @@ dist/
 *.aux
 *.synctex.*
 *.pdf
-GenCode/*.hs
+GenCode/*
