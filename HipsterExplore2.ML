@@ -81,9 +81,23 @@ fun try_nxt_conj ctxt =
 
 fun proof_loop ctxt cand_lemmas_str = 
   let
-    val ctxt1 = ThyExpl_Data.init_expl ctxt [] [] NONE
+    (* Split string with conjectures, and merge long ones split over two lines.
+    FIXME: Don't remove the empty strings until merging, if split over multiple lines.*)
+    fun merge_split_eqs [] = []
+      | merge_split_eqs [x] = if (x="") then [] else [x]
+      | merge_split_eqs (x::y::rest) = 
+        if (y="") (*String.isSuffix "=" x *)
+        then x::merge_split_eqs (y::rest) else (merge_split_eqs (x^y::rest))
+
+    val conjs = cand_lemmas_str
+                |> Library.split_lines 
+                |> merge_split_eqs
+(*
+    (filter (fn x =>  not (x = "")) 
+      (Library.split_lines (Library.trim_line cand_lemmas_str))) *)
+
+    val ctxt1 = ThyExpl_Data.init_expl ctxt [] [] NONE conjs
                   (*(Library.split_lines (Library.trim_line cand_lemmas_str)) *)
-                  (filter (fn x =>  not (x = "")) (Library.split_lines (Library.trim_line cand_lemmas_str)))
     fun recf ctxt = (* XXX: generalised error *)
       case (try_nxt_conj ctxt) of
         NONE => ctxt
@@ -96,16 +110,21 @@ fun proof_loop ctxt cand_lemmas_str =
 
 (* TODO: Implement properly. This is for mapping back to Isabelle constants those things that the
    code generator renamnes in Haskell. Otherwise, Isabelle will not understand the resulting lemmas. *)
-fun map_to_haskell isa_nm = 
+fun map_to_quickSpec isa_nm = 
   let 
+    (*
     val haskell_consts =
   [ ("List.rev","reverse"),("List.append","++"), ("HOL.conj", " '&&' "),
     ("Groups.plus_class.plus", "plus_nat"), ("Groups.zero_class.zero", "Zero_nat"),
-    ("Groups.one_class.one", "one_nat"),("<="," less_eq_nat "), ("<", " less_nat ") ]
+    ("Groups.one_class.one", "one_nat"),("<="," less_eq_nat "), ("<", " less_nat ") ] *)
+    val tip_consts = 
+    [ ("List.rev","reverse"),("List.append","++"), ("HOL.conj", " '&&' "),
+    ("Groups.plus_class.plus", "plusnat"), ("Groups.zero_class.zero", "Zeronat"),
+    ("Groups.one_class.one", "onenat"),("<="," lesseqnat "), ("<", " lessnat ") ]
   in
-  case (Library.find_first (fn (nm,_) => nm = isa_nm) haskell_consts) of 
+  case (Library.find_first (fn (nm,_) => nm = isa_nm) tip_consts) of 
     NONE => isa_nm
-  | SOME (_,hask_nm) => hask_nm
+  | SOME (_,qs_nm) => qs_nm
   end;
 
 (*
@@ -122,30 +141,31 @@ fun hipspec_cond cond_name consts file =
       (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
   end
 *)
-fun tipspec_plain consts file = 
+fun tipspec_plain file = 
   let 
   val add_funs = " --keep-all-functions " (*^ (List.foldr (fn (nm,s) => 
                               (Long_Name.base_name nm) ^ "," ^ s) " " consts) *)
-  in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd  ^ " | " ^ Hipster_Setup.tip_cmd end 
+  in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd ^ 
+      " | " ^ Hipster_Setup.tipTransl_cmd end 
 
 fun hipspec_explore ctxt cond_opt const_nms =
   let
     val thy = Proof_Context.theory_of ctxt
     val thynm = Context.theory_name thy
     val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^".hs"
-    val const_nms' = map map_to_haskell const_nms  
-    val hipspec_cmd = case cond_opt of NONE => tipspec_plain const_nms' outfile (*hipspec_plain const_nms' outfile *)
+    (*val const_nms' = map map_to_quickSpec const_nms  *)
+    val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile (*hipspec_plain const_nms' outfile *)
                                      | SOME _ => raise ERROR "Conditionals not yet supported in this version." 
                                       (*hipspec_cond c const_nms' outfile *)
     val path_opt = SOME (Path.explode Hipster_Setup.filepath);    
     val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
     (* val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile *)
     (* val _ = Isabelle_System.bash (Hipster_Setup.hipspecifyer_cmd ^ args) *)
-    val output = fst (Isabelle_System.bash_output hipspec_cmd)
-    (*val _ =  @{print} output *)
+
+    (*val output = fst (Isabelle_System.bash_output tipspec_cmd)
+    val _ =  @{print} output *)
   in 
-       fst (Isabelle_System.bash_output hipspec_cmd)
-       
+       fst (Isabelle_System.bash_output tipspec_cmd)
   end;
 
 (*-----------------------------------------------------------------------------------------*)

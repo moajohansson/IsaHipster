@@ -8,7 +8,7 @@ function_name.simps in all cases. This needs to be fixed. When just using simp i
 matter, but Metis needs to be fed the desired lemmas. Investigate how to select the relevant ones,
 and also, how to only get the neccesary ones to paste into proof-script.
 *)
-setup Tactic_Data.set_induct_simp
+(* setup Tactic_Data.set_induct_simp *)
 
 datatype 'a Tree = 
   Leaf 'a 
@@ -23,6 +23,7 @@ fun tmap :: "('a => 'b) => 'a Tree => 'b Tree"
 where
   "tmap f (Leaf x) = Leaf (f x)"
 | "tmap f (Node l r) = Node (tmap f l) (tmap f r)" 
+
 
 (* First call to Hipster: Explore tmap and mirror *)
 hipster tmap mirror
@@ -41,10 +42,12 @@ fun flat_tree :: "'a Tree => 'a list"
 where
   "flat_tree (Leaf x) = [x]"
 | "flat_tree (Node l r) = (flat_tree l) @ (flat_tree r)"
+hipster flat_tree
 
+ML{*@{term "((append y (Nil)) = Cons Groups.zero_class.zero y)" } *}
 
 (* Second call to Hipster: Explore relation to lists: flat_tree tmap mirror rev map *)
-hipster flat_tree tmap mirror rev map
+hipster tmap mirror rev map mirror
 lemma lemma_ab [thy_expl]: "flat_tree (tmap x y) = map x (flat_tree y)"
 apply (induction y)
 apply simp

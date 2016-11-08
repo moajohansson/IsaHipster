@@ -44,8 +44,7 @@ fun run_prover override_params fact_override chained i n ctxt goal =
 fun sledgehammer_with_metis_tac ctxt override_params fact_override chained i th =
   let val override_params = override_params @ [("preplay_timeout", "0")] in
     (case run_prover override_params fact_override chained i i ctxt th of
-      SOME facts => let val _ = @{print} "sledgeee"
-                        val (ffss, m) =
+      SOME facts => let val (ffss, m) =
       (facts, (Metis_Tactic.metis_tac [] ATP_Problem_Generate.combs_or_liftingN ctxt
           (maps (thms_of_name ctxt) facts) i))
                         val _ = @{print} facts in
