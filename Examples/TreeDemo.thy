@@ -3,75 +3,112 @@ imports "$HIPSTER_HOME/IsaHipster"
 
 begin
 
-(* FIXME: Simp-rules for map and hd have new names in Isabelle2014. We can't rely on 
-function_name.simps in all cases. This needs to be fixed. When just using simp it doesn't
-matter, but Metis needs to be fed the desired lemmas. Investigate how to select the relevant ones,
-and also, how to only get the neccesary ones to paste into proof-script.
-*)
 (* setup Tactic_Data.set_induct_simp *)
 
 datatype 'a Tree = 
   Leaf 'a 
-  | Node "'a Tree""'a Tree"
+  | Node "'a Tree" 'a "'a Tree"
 
 fun mirror :: "'a Tree => 'a Tree"
 where
   "mirror (Leaf x) = Leaf x"
-| "mirror (Node l r) = Node (mirror r) (mirror l)"
+| "mirror (Node l x r) = Node (mirror r) x (mirror l)"
 
 fun tmap :: "('a => 'b) => 'a Tree => 'b Tree"
 where
   "tmap f (Leaf x) = Leaf (f x)"
-| "tmap f (Node l r) = Node (tmap f l) (tmap f r)" 
+| "tmap f (Node l x r) = Node (tmap f l) (f x) (tmap f r)" 
 
 
 (* First call to Hipster: Explore tmap and mirror *)
-hipster tmap mirror
-lemma lemma_a [thy_expl]: "mirror (tmap x y) = tmap x (mirror y)"
+ hipster tmap mirror
+lemma lemma_a [thy_expl]: "mirror (mirror y) = y"
 apply (induction y)
 apply simp
 by simp
 
-lemma lemma_aa [thy_expl]: "mirror (mirror x) = x"
-apply (induction x)
+lemma lemma_aa [thy_expl]: "mirror (tmap y z) = tmap y (mirror z)"
+apply (induction z)
 apply simp
 by simp
+
+
 
 
 fun flat_tree :: "'a Tree => 'a list"
 where
   "flat_tree (Leaf x) = [x]"
-| "flat_tree (Node l r) = (flat_tree l) @ (flat_tree r)"
-hipster flat_tree
-
-ML{*@{term "((append y (Nil)) = Cons Groups.zero_class.zero y)" } *}
+| "flat_tree (Node l x r) = (flat_tree l) @ [x] @ (flat_tree r)"
 
 (* Second call to Hipster: Explore relation to lists: flat_tree tmap mirror rev map *)
-hipster tmap mirror rev map mirror
-lemma lemma_ab [thy_expl]: "flat_tree (tmap x y) = map x (flat_tree y)"
+hipster flat_tree tmap mirror rev map
+lemma lemma_ab [thy_expl]: "rev (flat_tree y) = flat_tree (mirror y)"
 apply (induction y)
 apply simp
 by simp
 
-lemma lemma_ac [thy_expl]: "flat_tree (mirror x) = rev (flat_tree x)"
-apply (induction x)
+lemma lemma_ac [thy_expl]: "flat_tree (tmap y z) = map y (flat_tree z)"
+apply (induction z)
 apply simp
 by simp
+
 
 
 fun rightmost :: "'a Tree \<Rightarrow> 'a"
 where 
   "rightmost (Leaf x) = x"
-| "rightmost (Node l r) = rightmost r"
+| "rightmost (Node l x r) = rightmost r"
 
 fun leftmost :: "'a Tree \<Rightarrow> 'a"
 where 
   "leftmost (Leaf x) = x"
-| "leftmost (Node l r) = leftmost l"
+| "leftmost (Node l x r) = leftmost l"
 
+(* Explore leftmost rightmost mirror tmap *)
+hipster leftmost rightmost mirror tmap
+lemma lemma_ad [thy_expl]: "leftmost (mirror y) = rightmost y"
+apply (induction y)
+apply simp
+by simp
+
+lemma lemma_ae [thy_expl]: "leftmost (tmap y z) = y (leftmost z)"
+apply (induction z)
+apply simp
+by simp
+
+
+
+
+
+
+
+
+
+(*
 (* Third call to Hipster: hd mirror flat_tree  rightmost leftmost*)
 hipster hd mirror flat_tree rightmost leftmost
-lemma lemma_ad [thy_expl]: "leftmost (mirror x) = rightmost x"
+
+(* Bug, produces the wrong proof as sledgehammer gives back a simp-proof it 
+   seems to loose the last line! *)
+lemma lemma_ad [thy_expl]: "hd (flat_tree z @ y) = hd (flat_tree z)"
+apply (induction z)
+apply simp
+apply simp
+by (simp add: hd_append) (* Misses this!*)
+
+lemma lemma_ae [thy_expl]: "hd (flat_tree y) = leftmost y"
+apply (induction y)
+apply simp
+apply simp
+by (metis TreeDemo.lemma_ad)
+
+lemma lemma_af [thy_expl]: "leftmost (mirror y) = rightmost y"
+apply (induction y)
+apply simp
+by simp
+*)
+
+(* lemma lemma_ad [thy_expl]: "leftmost (mirror x) = rightmost x"
 apply (induction x)
 apply simp
 by simp
@@ -89,7 +126,7 @@ by simp
 lemma unknown [thy_expl]: "hd (flat_tree x) = leftmost x"
 oops
 
-
+*)
 
 
 

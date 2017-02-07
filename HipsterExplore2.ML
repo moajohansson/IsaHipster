@@ -1,9 +1,21 @@
+(*  Authors:     Moa Johansson, Chalmers University of Technology
+                 Irene Lobo Valbuena, Chalmers University of Technology
+
+Hipster theory exploration with QuickSpec 2 via tip-spec
+*)
+
+(* Call the QuickSpec 2 theory exploration system. Prove the resulting conjectures. Those provable by 
+   routine reasoning are deemed non-interesting and discarded. Those requiring "hard" reasoning are
+   kept. *)
+
 (* Re-factoring of Hipster_Explore to use ctactics and tracing proofs *)
 
 structure Hipster_Explore (* : HIPSTER_THY_EXPLORATION *) = 
 struct
 
-
+(*-----------------------------------------------------------------------------------------*)
+(* Create a proof script for lemmas found.  *) 
+(*-----------------------------------------------------------------------------------------*)
 fun proof_str ctxt proof_script name thm = 
   let 
     (* Print variables without ? *)
@@ -19,7 +31,7 @@ fun proof_str ctxt proof_script name thm =
   end
 
 (*-----------------------------------------------------------------------------------------*)
-(* The proof-loop, trying to prove the conjectures found by HipSpec  *) 
+(* The proof-loop, trying to prove the conjectures found by QuickSpec  *) 
 (*-----------------------------------------------------------------------------------------*)
 fun try_nxt_conj ctxt =
   case (ThyExpl_Data.open_conjs_of_ctxt ctxt) of
@@ -68,7 +80,7 @@ fun try_nxt_conj ctxt =
                           |> ThyExpl_Data.set_progress_ctxt true
                           |> ThyExpl_Data.add_proof_script_ctxt (new_nm, proof_script))
                 end
-            (* NONE indicates that the tactic failed to prove c *)
+            (* NONE indicates that the tactic failed to prove c, put back with open_conjs *)
             | NONE =>
                 let val _ = Output.tracing ("Failed proving: "^lemma_str)
                 in SOME (ctxt
@@ -81,24 +93,21 @@ fun try_nxt_conj ctxt =
 
 fun proof_loop ctxt cand_lemmas_str = 
   let
-    (* Split string with conjectures, and merge long ones split over two lines.
-    FIXME: Don't remove the empty strings until merging, if split over multiple lines.*)
+    (* Split long string with conjectures (blank lines in between), 
+       after merge long ones split over two lines. *)
     fun merge_split_eqs [] = []
       | merge_split_eqs [x] = if (x="") then [] else [x]
       | merge_split_eqs (x::y::rest) = 
-        if (y="") (*String.isSuffix "=" x *)
+        if (y="")
         then x::merge_split_eqs (y::rest) else (merge_split_eqs (x^y::rest))
 
     val conjs = cand_lemmas_str
                 |> Library.split_lines 
                 |> merge_split_eqs
-(*
-    (filter (fn x =>  not (x = "")) 
-      (Library.split_lines (Library.trim_line cand_lemmas_str))) *)
 
     val ctxt1 = ThyExpl_Data.init_expl ctxt [] [] NONE conjs
-                  (*(Library.split_lines (Library.trim_line cand_lemmas_str)) *)
-    fun recf ctxt = (* XXX: generalised error *)
+                 
+    fun recf ctxt = 
       case (try_nxt_conj ctxt) of
         NONE => ctxt
       | SOME ctxt' => recf ctxt'
@@ -108,8 +117,10 @@ fun proof_loop ctxt cand_lemmas_str =
 
 (*-----------------------------------------------------------------------------------------*)
 
-(* TODO: Implement properly. This is for mapping back to Isabelle constants those things that the
+(* FIXED: Now to be done on the tip side, see tip --hipster. 
+   This is for mapping back to Isabelle constants those things that the
    code generator renamnes in Haskell. Otherwise, Isabelle will not understand the resulting lemmas. *)
+(*
 fun map_to_quickSpec isa_nm = 
   let 
     (*
@@ -126,6 +137,23 @@ fun map_to_quickSpec isa_nm =
     NONE => isa_nm
   | SOME (_,qs_nm) => qs_nm
   end;
+*)
+
+
+(* Get names of functions which Isabelle's code generator translates to Haskell Prelude functions *)
+fun map_to_haskell isa_nm = 
+  let 
+    val prelude_funs = [("List.rev", "Prelude.reverse"), ("List.append","Prelude.++"),
+                        ("List.list.map", "Prelude.map")];
+    in 
+      case (Library.find_first (fn (nm,_) => nm = isa_nm) prelude_funs) of 
+        NONE => Long_Name.base_name isa_nm
+      | SOME (_,hs_nm) => hs_nm
+  end;
+
+(*-----------------------------------------------------------------------------------------*)
+(* Call QuickSpec 2 (via tip-spec command-line tool)                                       *) 
+(*-----------------------------------------------------------------------------------------*)
 
 (*
 fun hipspec_plain consts file =
@@ -141,26 +169,27 @@ fun hipspec_cond cond_name consts file =
       (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
   end
 *)
-fun tipspec_plain file = 
+fun tipspec_plain file consts = 
   let 
-  val add_funs = " --keep-all-functions " (*^ (List.foldr (fn (nm,s) => 
+  val add_funs =  " -k " ^ Library.space_implode "," (map map_to_haskell consts)
+  (* val _ = @{print} add_funs *)
+  (* ^ List.foldl (fn (nm,s) => s ^","^(map_to_haskell nm)) " " consts *)
+                  (*^ (List.foldr (fn (nm,s) => 
                               (Long_Name.base_name nm) ^ "," ^ s) " " consts) *)
   in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd ^ 
       " | " ^ Hipster_Setup.tipTransl_cmd end 
 
-fun hipspec_explore ctxt cond_opt const_nms =
+fun tipspec_explore ctxt cond_opt const_nms =
   let
     val thy = Proof_Context.theory_of ctxt
     val thynm = Context.theory_name thy
     val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^".hs"
     (*val const_nms' = map map_to_quickSpec const_nms  *)
-    val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile (*hipspec_plain const_nms' outfile *)
+    val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms (*hipspec_plain const_nms' outfile *)
                                      | SOME _ => raise ERROR "Conditionals not yet supported in this version." 
                                       (*hipspec_cond c const_nms' outfile *)
     val path_opt = SOME (Path.explode Hipster_Setup.filepath);    
     val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
-    (* val args = "H " ^ Hipster_Setup.filepath^thynm^".hs " ^outfile *)
-    (* val _ = Isabelle_System.bash (Hipster_Setup.hipspecifyer_cmd ^ args) *)
 
     (*val output = fst (Isabelle_System.bash_output tipspec_cmd)
     val _ =  @{print} output *)
@@ -169,17 +198,11 @@ fun hipspec_explore ctxt cond_opt const_nms =
   end;
 
 (*-----------------------------------------------------------------------------------------*)
-(* The output string for each lemma discovered. *)
+(* Start theory exporation and then output lemmas and their proof scripts.                 *)
+(*-----------------------------------------------------------------------------------------*)
+
 fun mk_lemma_str ctxt thm = 
   let 
-   (* val lemma = (*Thm.prop_of thm  *) Thm.concl_of thm
- 
-    (* Print variables without ? *)
-    val ctxt' = Config.put show_question_marks false ctxt
-    (* Disables silly Isabelle YXML markup for printing *)
-    val str_of_term = Sledgehammer_Util.with_vanilla_print_mode (Syntax.string_of_term ctxt')
-    val lemma_str = Library.quote (str_of_term lemma)
-    *)
     val name = Long_Name.base_name (Thm.get_name_hint thm)
     val proof_script = 
         case (ThyExpl_Data.proof_script_of_thm name ctxt) of
@@ -187,14 +210,13 @@ fun mk_lemma_str ctxt thm =
        |  SOME proof => proof
   in
     proof_script
-    (* FIXME: Make keeping track of names used better. Put in theory data instead of having tag *)
-  (*  "lemma " ^ name ^" [thy_expl]: " ^ lemma_str ^ "\n" ^ proof_script *)
   end
 
-(* Outputs snippets of proof script with the discovered lemmas that can be pasted into the theory file. *)
+(* Outputs snippets of proof script with the discovered lemmas,
+   that can be pasted into the theory file. *)
 fun explore' cond_opt ctxt const_nms =
   let
-    val conjs = hipspec_explore ctxt cond_opt const_nms
+    val conjs = tipspec_explore ctxt cond_opt const_nms
     val res_ctxt = proof_loop ctxt conjs  
     val output = Library.space_implode "\n\n"
                 (map (mk_lemma_str res_ctxt) 
@@ -206,6 +228,41 @@ fun explore' cond_opt ctxt const_nms =
   end
 
 val explore = explore' NONE;
+(* TODO: Hook for conditionals into QuickSpec 2. Currently not available. *)
 fun explore_cond cond = explore' cond;
+
+
+(*-----------------------------------------------------------------------------------------*)
+(* Theory exporation from an ongoing proof: Find lemmas to solve this subgoal              *)
+(*-----------------------------------------------------------------------------------------*)
+
+(* A tactic which picks up the constants from a subgoal, and applies theory exploration on these
+   The aim is to find lemma(s) which allows for the goal to be proved. *)
+fun explore_goal ctxt const_nms thm =
+  let
+      (* FIXME: When the context comes from and ongoing proof attempt,
+         it might already have variables with bound types! If another lemma
+         happen to use the same var name, you get an error. *)
+      val res_ctxt =(* proof_loop_w_prio ctxt (SOME thm) *)
+                       proof_loop ctxt
+                      (tipspec_explore ctxt NONE const_nms)
+      val lemma_list = ThyExpl_Data.proved_of_ctxt res_ctxt     
+      val lemmas = Library.space_implode "\n\n"
+                          (map (mk_lemma_str res_ctxt) lemma_list)
+  in
+    case lemma_list of
+      [] =>
+        let val _ = writeln ("Failed to find lemmas which will prove goal.")
+        in no_tac thm end
+    | _ => (* Success, provided the explored lemmas, the thm can be proved. *)
+        let 
+          (* val _ = writeln ("Try first proving lemmas:\n\n" ^ lemmas ^ "\n\n" ^
+                             "Use these prove the open goal "^ (@{make_string} thm) ^ " " ^
+                             (Tactic_Data.routine_tac_str res_ctxt)) 
+          *)
+        in
+          Seq.single thm
+        end
+  end
 
 end;

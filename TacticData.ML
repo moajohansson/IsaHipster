@@ -29,6 +29,9 @@ fun get_hard_str (Data d) = (#hard_tac_str d)
 (*val empty = Data{routine_tac = K FAIL, hard_tac = K FAIL,
                 routine_tac_str = "FAIL", hard_tac_str = fn _ => K "FAIL"}; *)
 
+(* Work in progress: All the below has the same hard_ctac right now. This is what's used by 
+   Hipster during exploration, and obviously due to change. 
+ *)
 (* Routine: simplification and FO reasoning. Hard: Induction, then routine. *)
 val induct_with_schemes = Data {routine_tac = Ind_Schemes_T.routine_tac,
                                 hard_tac = Ind_Schemes_T.hard_tac,
