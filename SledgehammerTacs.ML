@@ -11,6 +11,62 @@ open Sledgehammer_Prover_Minimize
 open Sledgehammer_MaSh
 open Sledgehammer_Commands
 
+(* Modified version of Sledgehammer.play_one_line_proof, which tries to reconstruct an ATP/SMT 
+   proof in Isabelle using various methods (avoids some Isar specific stuff). *)
+fun play_one_line_proof ctxt minimize timeout used_facts0 thm i (preferred_meth, methss) =
+  let val used_facts = filter_out (fn (_, (sc, _)) => sc = ATP_Problem_Generate.Chained) used_facts0 in
+    if timeout = Time.zeroTime then
+      (used_facts, (preferred_meth, Sledgehammer_Proof_Methods.Play_Timed_Out Time.zeroTime))
+    else
+      let
+        val fact_names = map fst used_facts
+        val goal_t = Logic.get_goal (Thm.prop_of thm) i
+
+        fun try_methss [] [] = (used_facts, (preferred_meth, Sledgehammer_Proof_Methods.Play_Timed_Out Time.zeroTime))
+          | try_methss ress [] =
+            (used_facts,
+             (case AList.lookup (op =) ress preferred_meth of
+               SOME play => (preferred_meth, play)
+             | NONE => hd (sort (Sledgehammer_Proof_Methods.play_outcome_ord o apply2 snd) (rev ress))))
+          | try_methss ress (meths :: methss) =
+            let
+
+              fun is_metis_method (Sledgehammer_Proof_Methods.Metis_Method _) = true
+                | is_metis_method _ = false
+
+              fun mk_step fact_names meths =
+                Sledgehammer_Isar_Proof.Prove ([], [], ("", 0), goal_t, [], ([], fact_names), meths, "")
+              
+              val chained = [];
+            in
+              (case Sledgehammer_Isar_Preplay.preplay_isar_step ctxt chained timeout [] (mk_step fact_names meths) of
+                (res as (meth, Sledgehammer_Proof_Methods.Played time)) :: _ =>
+                (* if a fact is needed by an ATP, it will be needed by "metis" *)
+                if not minimize orelse is_metis_method meth then
+                  (used_facts, res)
+                else
+                  let
+                    val (time', used_names') =
+                       Sledgehammer_Isar_Minimize.minimized_isar_step ctxt time (mk_step fact_names [meth])
+                      ||> (Sledgehammer_Isar_Proof.facts_of_isar_step #> snd)
+                    val used_facts' = filter (member (op =) used_names' o fst) used_facts
+                  in
+                    (used_facts', (meth, Sledgehammer_Proof_Methods.Played time'))
+                  end
+              | ress' => try_methss (ress' @ ress) methss)
+            end
+      in
+        try_methss [] methss
+      end
+  end
+
+fun test_preplay ctxt thm subgoal (params as {minimize, timeout,...} ) 
+                 (result as {preferred_methss, used_facts, ...}) =
+  let
+     val x = play_one_line_proof ctxt minimize timeout used_facts thm subgoal preferred_methss
+     val _ =  @{print} x
+     in result end
+ 
 (* If parameter minimize is true (default) tries to minimise the list of facts from the external prover,
    i.e. it removes redundant ones to create nicer proofs. Takes a bit longer, but avoids 
    proofs that have extra facts in them. *)
@@ -39,8 +95,11 @@ fun run_prover override_params fact_override chained i n ctxt goal =
     val problem =
       {comment = "", state = Proof.init ctxt, goal = goal, subgoal = i, subgoal_count = n,
        factss = [("", facts)]}
+
+    val result = test_preplay ctxt goal i params (prover problem) 
+
   in
-   (case prover problem of (* This is of type Sledgehammer_Prover.prover_result*)
+   (case result (*prover problem*) of (* This is of type Sledgehammer_Prover.prover_result*)
       {outcome = NONE, used_facts,...} => 
       (*let val _ = @{print} (preferred_methss) in *)
       used_facts |> map fst |> SOME
@@ -52,7 +111,7 @@ fun run_prover override_params fact_override chained i n ctxt goal =
 fun sledgehammer_with_metis_tac ctxt override_params fact_override chained i th =
   let 
     (* If no minimization of facts is desired, set ("minimize","false") *) 
-    val override_params = override_params @ [("preplay_timeout", "0"), ("timeout","10")] 
+    val override_params = override_params @ [("preplay_timeout", "0.5"), ("timeout","10")] 
   in
     (case run_prover override_params fact_override chained i i ctxt th of
       SOME facts => 
