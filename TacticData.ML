@@ -64,7 +64,7 @@ val induct_sledgehammer = Data {routine_tac = Sledgehammer_T.routine_tac,
    THINK: Maybe this should be stored in the theory instead? *)
 structure Data = Theory_Data
   ( type T = T
-    val empty = induct_with_schemes (* Default tactics *)
+    val empty = induct_sledgehammer(* induct_with_schemes *)(* Default tactics *)
     val extend = I
     val merge = fst )
 

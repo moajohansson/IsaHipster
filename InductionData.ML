@@ -12,7 +12,8 @@ struct
 
 datatype T = Data of
   { induction_rule : string option,
-    induction_vars : string list, 
+    induction_vars : string list,
+    arbitrary_vars : string list,
     subgoal_tacs_strs : (* string list *) (string list) Inttab.table
   }
 
@@ -21,17 +22,25 @@ fun get_induction_vars (Data d) = (#induction_vars d)
 fun get_subgoal_tac_strs (Data d) = (#subgoal_tacs_strs d)
 
 fun update_induction_rule f (Data d) = Data{induction_rule = f (#induction_rule d), 
-                                       induction_vars = #induction_vars d, 
+                                       induction_vars = #induction_vars d,
+                                       arbitrary_vars = #arbitrary_vars d,
                                        subgoal_tacs_strs = #subgoal_tacs_strs d}
 fun update_induction_vars f (Data d) =  Data{induction_rule = #induction_rule d, 
-                                       induction_vars = f (#induction_vars d), 
+                                       induction_vars = f (#induction_vars d),
+                                       arbitrary_vars = #arbitrary_vars d,
+                                       subgoal_tacs_strs = #subgoal_tacs_strs d}
+fun update_arbitrary_vars f (Data d) =  Data{induction_rule = #induction_rule d, 
+                                       induction_vars = #induction_vars d,
+                                       arbitrary_vars = f (#arbitrary_vars d),
                                        subgoal_tacs_strs = #subgoal_tacs_strs d}
 fun update_subgoal_tac_strs f (Data d) = Data{induction_rule = #induction_rule d, 
                                        induction_vars = #induction_vars d, 
+                                       arbitrary_vars = #arbitrary_vars d,
                                        subgoal_tacs_strs = f (#subgoal_tacs_strs d)}
 
 fun set_induction_rule rule = update_induction_rule (K rule)
 fun set_induction_vars vars = update_induction_vars (K vars)
+fun set_arbitrary_vars vars = update_arbitrary_vars (K vars)
 fun set_subgoal_tac_strs tacs = update_subgoal_tac_strs (K tacs)
 
 (* FIXME: Need to store subgoal numbers tactic was applied to, for correct ordering. 
@@ -41,7 +50,8 @@ fun add_subgoal_tac (sg_number, tac) =
 
 
 (* Induction rule NONE defaults to structural induction, as per Isabelle's induction tactic *)
-val empty = Data{induction_rule = NONE, induction_vars = [], subgoal_tacs_strs = Inttab.empty}
+val empty = Data{induction_rule = NONE, induction_vars = [], 
+                  arbitrary_vars = [], subgoal_tacs_strs = Inttab.empty}
 
 fun get_proof_script (Data d) = 
   let 
@@ -53,11 +63,14 @@ fun get_proof_script (Data d) =
     | mk_ind_str vars_list = 
       let 
       val vars = String.concatWith " " vars_list
-      val induction = "apply (induction " 
+      val vars' = case (#arbitrary_vars d) of 
+                        [] => vars
+                        | arb_vs => vars ^ " arbitrary: " ^ String.concatWith " " arb_vs
+      val induction = "apply (induct " 
       in  
         (case (#induction_rule d) of 
-          NONE => induction ^ vars ^ ")\n"
-          | SOME rule => induction ^ vars ^ " rule: " ^ rule ^ ")\n")
+          NONE => induction ^ vars' ^ ")\n"
+          | SOME rule => induction ^ vars' ^ " rule: " ^ rule ^ ")\n")
       end;
 
   fun mk_app_str [] s = s
@@ -80,6 +93,8 @@ fun set_induction_rule_ctxt rule ctxt =
   IndData.put (set_induction_rule rule (IndData.get ctxt)) ctxt
 fun set_induction_vars_ctxt vars ctxt =
   IndData.put (set_induction_vars vars (IndData.get ctxt)) ctxt
+fun set_arbitrary_vars_ctxt arb_vars ctxt =
+  IndData.put (set_arbitrary_vars arb_vars (IndData.get ctxt)) ctxt
 fun set_subgoal_tac_strs_ctxt tacs ctxt =
   IndData.put (set_subgoal_tac_strs tacs (IndData.get ctxt)) ctxt
 
