@@ -74,8 +74,8 @@ fun maybe_preplay ctxt thm subgoal (params as {minimize, preplay_timeout,...})
     if (preplay_timeout = Time.zeroTime) then SOME (used_facts, fst preferred_methss)
   else (* Do preplay, find suitable method for proof reconstruction. *)
   let
-     val _ =  @{print} ("Result external prover", result)
-     val _ = @{print} ("Facts passed in", used_facts)
+     (* val _ =  @{print} ("Result external prover", result)
+     val _ = @{print} ("Facts passed in", used_facts)*)
      val (used_facts', (meth, outcome)) = 
         play_one_line_proof ctxt minimize preplay_timeout used_facts thm subgoal preferred_methss
      (* val _= @{print} (used_facts', meth, outcome) *)
@@ -107,8 +107,8 @@ fun run_prover override_params fact_override chained i n ctxt goal =
 
     (* Check if the prover should minimize (remove redundant facts) or not*)
     val learn = mash_learn_proof ctxt params (Thm.prop_of goal) facts
-    val prover = (*if minimize then get_minimizing_prover ctxt mode learn name params
-                 else *)get_prover ctxt mode name params
+    val prover =  if minimize then get_minimizing_prover ctxt mode learn name params
+                 else get_prover ctxt mode name params
     
     val problem =
       {comment = "", state = Proof.init ctxt, goal = goal, subgoal = i, subgoal_count = n,
@@ -127,22 +127,23 @@ fun sledgehammer_get_tac ctxt override_params fact_override chained i th =
     (case run_prover override_params fact_override chained i i ctxt th of
       SOME (facts, meth) => 
         let 
-        (* NOTE: Can't use this, it's providing faulty proof-strings e.g. "blast some_lemma" 
-            instead of "using some_lemma blast) so don't work well with apply style proofs. *)
-         val meth_str = Sledgehammer_Proof_Methods.string_of_proof_method ctxt (map fst facts) meth
-         
+        (* NOTE: Problems using this, it's providing faulty proof-strings e.g. "blast some_lemma" 
+            instead of "using some_lemma blast) so don't work well with apply style proofs. 
+           NOTE 2: Theorems discovered during a round of theory exploration are Local_Facts,
+                   tac_of_proof_method ignores Local_Facts, so replaying tactic won't work! *)         
          val (local_fs, global_fs) = 
               List.partition (fn (_, (sc, _)) => sc = ATP_Problem_Generate.Local) 
               (filter_out (fn (_, (sc, _)) => sc = ATP_Problem_Generate.Chained orelse 
                                               sc = ATP_Problem_Generate.Assum) facts);
+          (* Hack: Getting the right tactic from Sledgehammer only seem to work if pretending
+             that local facts (here things discovered during theory exploration) are in fact 
+             Global Facts (normal lemmas from proof script). Might want to write our own alternative
+             to this method. *)
           val meth_tac = Sledgehammer_Proof_Methods.tac_of_proof_method ctxt 
-                        (maps (thms_of_name ctxt o fst) local_fs, 
-                          maps (thms_of_name ctxt o fst) global_fs) meth 
-        in SOME (meth_tac, meth_str) end
-     (* let val (ffss, m) = 
-        (facts, (Metis_Tactic.metis_tac [] ATP_Problem_Generate.combs_or_liftingN ctxt
-            (maps (thms_of_name ctxt) facts) i))
-          in (ffss, m) end *)
+                        (* (maps (thms_of_name ctxt o fst) local_fs, *)
+                          ([],
+                          maps (thms_of_name ctxt o fst) (global_fs@local_fs)) meth 
+        in SOME (meth_tac, (meth, map fst facts)) end
     | NONE => NONE (* ([], no_tac, "no_tac")) *)
   handle Fail  msg => (warning ("Failure in: *" ^ msg ^"\n"); NONE))
 end;

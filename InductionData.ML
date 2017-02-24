@@ -10,11 +10,27 @@ Hipster theory exploration information about what tactic succeeded in a proof at
 structure Induction_Data =
 struct
 
+(* Add proof methods that can be use by Hipster in Proof scripts. In addition to what comes from
+    Sledgehammer, Hipster can merge simp calls to simp_all. *)
+datatype Hipster_Proof_Method = 
+      Sledgehammer_Meth of Sledgehammer_Proof_Methods.proof_method 
+   |  Simp_All_Meth
+
+ fun string_of_meth ctxt (m,facts) = 
+      case m of Sledgehammer_Meth meth => 
+          (* FIXME: If this is a method that acts on all subgoal, like auto, we might get a
+             faulty proof script, unless we take this into account! Furthermore, the string
+             might not fit into an apply-style script, e.g. apply (auto some_facts) isn't allowed 
+             in Isabelle. *) 
+          Sledgehammer_Proof_Methods.string_of_proof_method ctxt facts meth
+           | Simp_All_Meth => if (null facts) then "simp_all" 
+                              else "(simp_all add: " ^ space_implode " " facts ^")"
 datatype T = Data of
   { induction_rule : string option,
     induction_vars : string list,
     arbitrary_vars : string list,
-    subgoal_tacs_strs : (* string list *) (string list) Inttab.table
+    subgoal_tacs_strs : 
+      ((Hipster_Proof_Method * string list) list) Inttab.table
   }
 
 fun get_induction_rule (Data d) = (#induction_rule d)
@@ -53,7 +69,7 @@ fun add_subgoal_tac (sg_number, tac) =
 val empty = Data{induction_rule = NONE, induction_vars = [], 
                   arbitrary_vars = [], subgoal_tacs_strs = Inttab.empty}
 
-fun get_proof_script (Data d) = 
+fun get_proof_script (Data d) ctxt = 
   let 
 
   val tac_table = (#subgoal_tacs_strs d)
@@ -73,12 +89,27 @@ fun get_proof_script (Data d) =
           | SOME rule => induction ^ vars' ^ " rule: " ^ rule ^ ")\n")
       end;
 
-  fun mk_app_str [] s = s
-    | mk_app_str [t] s = s ^ "by " ^ t
-    | mk_app_str (t::ts) s = mk_app_str ts (s ^ "apply " ^ t ^"\n");
-    
+  fun is_simp m = (m=Simp_All_Meth orelse 
+                   m=Sledgehammer_Meth (Sledgehammer_Proof_Methods.Simp_Method))
+
+  fun merge_same_meths ms new_m = 
+      case ms of [] => new_m
+          | [(m,fs)] => new_m @ [string_of_meth ctxt (m,fs)]
+          | ((m1,f1)::(m2,f2)::ms) => 
+              if (is_simp m1 andalso is_simp m2)
+              then merge_same_meths ((Simp_All_Meth,f1@f2)::ms) new_m
+              else merge_same_meths ((m2,f2)::ms) (new_m @ [string_of_meth ctxt (m1,f1)])
+
+ fun mk_app_str meths s = 
+    case meths of 
+      [] => s
+    | (m::ms) => 
+       (*let val meth_str = string_of_meth ctxt m
+       in *)if (null ms)
+          then s ^ "by " ^ m 
+          else mk_app_str ms (s ^ "apply " ^ m ^"\n")
   in
-    mk_ind_str (#induction_vars d) ^ (mk_app_str (flat subgoal_tacs)) ""
+    mk_ind_str (#induction_vars d) ^ (mk_app_str (merge_same_meths (flat subgoal_tacs) [])) ""
   end;
 
 structure IndData = Proof_Data (type T = T
@@ -103,6 +134,6 @@ fun add_subgoal_tac_ctxt tac ctxt =
 
 val reset_ind_proof_data_ctxt = IndData.put empty 
 
-fun get_proof_script_ctxt ctxt = get_proof_script (IndData.get ctxt)
+fun get_proof_script_ctxt ctxt = get_proof_script (IndData.get ctxt) ctxt
 
 end

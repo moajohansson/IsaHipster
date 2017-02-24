@@ -40,25 +40,18 @@ struct
   *)
 type inductionStrategy =  (string * Thm.thm list) option -> string list -> CTac.ctactic
 
-(* Apply Sledgehammer and record which facts we need to give Metis to reconstruct proof.
-   Oddity: Seems we can get duplicate facts back from Sledgehammer, so remove those.  *)
+
 fun sledgehammer_ctac i (ctxt,thm) =
   case (Hipster_Sledgehammer_Tactics.sledgehammer_get_tac ctxt []
                                         Sledgehammer_Fact.no_fact_override [] i thm) of
-  SOME (meth_tac, meth_str) =>
+  SOME (meth_tac, (meth, facts)) =>
     let
-    (*val proved = ThyExpl_Data.proved_of_ctxt ctxt 
-    val (facts, meth_tac, meth_str) = Hipster_Sledgehammer_Tactics.sledgehammer_get_tac ctxt []
-                                        Sledgehammer_Fact.no_fact_override [] i thm *)
-    (* NOTE: This function seems to expect an unchanged seq of theorems rather than an empty one
-       representing failure (as simp works) sledgehammer*)
-    val _ = @{print} ("Method:", meth_str)
-    (* 
-    val facts_str = String.concatWith " " (Library.distinct (op =) facts)*)
+    val hipster_meth = Induction_Data.Sledgehammer_Meth meth
   in
     Seq.map
-    (fn nwthm => (Induction_Data.add_subgoal_tac_ctxt (i, meth_str) ctxt, nwthm))
-      (SOLVED' meth_tac i thm)   (* (CHANGED meth_tac thm) *)
+    (fn nwthm => (Induction_Data.add_subgoal_tac_ctxt 
+                   (i, (hipster_meth,facts)) ctxt, nwthm))
+       (meth_tac i thm) 
   end
  | NONE => Seq.single (ctxt, thm) (* Do nothing - Sledgehammer failed. *)
   
@@ -67,18 +60,10 @@ fun sledgehammer_ctac i (ctxt,thm) =
    if simp managed to somehow make progress. *)
 fun simp_goal_ctac i (ctxt,thm) =
   Seq.map
-    (fn (ctxt',thm') => (Induction_Data.add_subgoal_tac_ctxt (i,"simp") ctxt',thm'))
+    (fn (ctxt',thm') => (Induction_Data.add_subgoal_tac_ctxt 
+                        (i, (Induction_Data.Sledgehammer_Meth Sledgehammer_Proof_Methods.Simp_Method, [])) 
+                        ctxt',thm'))
      (CTac.AS_CTACTIC (CHANGED (Simplifier.asm_full_simp_tac ctxt i)) (ctxt,thm))
-    (*    (CTac.AS_CTACTIC (CHANGED (Simplifier.simp_tac ctxt i)) (ctxt,thm)) *)
-
-(* Apply simp to all subgoals *)
-fun simp_all_ctac (ctxt, thm) = 
-      Seq.map
-      (fn (ctxt',thm') => (Induction_Data.add_subgoal_tac_ctxt (1,"simp_all") ctxt',thm'))
-      (CTac.AS_CTACTIC (ALLGOALS (Simplifier.asm_full_simp_tac ctxt)) (ctxt,thm))
-
-val prove_by_simp_ctac =  CTac.SOLVE_OR_FAIL simp_all_ctac; 
-
 
 (* Must fail if there are any open subgoals left *)
 val simp_or_sledgehammer_ctac =
@@ -126,10 +111,8 @@ fun induct_and_sledgehammer_ctac rule var =
 fun induct_and_simp_ctac rule var =
   CTac.SOLVE_OR_FAIL
     (CTac.CTHEN(
-         Seq.DETERM (CTac.HEADGOAL (induct_on_var_ctac rule var)),
-         prove_by_simp_ctac 
-         (* simp_all_ctac *) ))
-         (*CTac.ALLGOALS simp_goal_ctac))*)
+         Seq.DETERM (CTac.HEADGOAL (induct_on_var_ctac rule var)), 
+         CTac.ALLGOALS simp_goal_ctac))
 
 (* Try induction (using the strategy strat)
    on each variable in vars, until we find one that allows a proof.
@@ -216,7 +199,6 @@ fun hipster_induct ctxt0 thm =
                 let val _ = Sledgehammer_Util.with_vanilla_print_mode writeln
                                    (Active.sendback_markup [Markup.padding_command]
                                      (Induction_Data.get_proof_script_ctxt ctxt1))
-                    val _ = @{print} thm1
                    in Seq.single thm1 end
           else Seq.empty)
     end                              
