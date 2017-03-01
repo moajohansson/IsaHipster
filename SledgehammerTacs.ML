@@ -53,8 +53,11 @@ fun play_one_line_proof ctxt minimize timeout used_facts0 thm i (preferred_meth,
                 else
                   let
                     val (time', used_names') =
-                       Sledgehammer_Isar_Minimize.minimized_isar_step ctxt time (mk_step fact_names [meth])
-                      ||> (Sledgehammer_Isar_Proof.facts_of_isar_step #> snd)
+                      Sledgehammer_Isar_Minimize.minimized_isar_step ctxt [] time (mk_step fact_names [meth])
+                     ||> (Sledgehammer_Isar_Proof.facts_of_isar_step #> snd)
+                      (* Sledgehammer_Isar_Minimize.minimized_isar_step ctxt time (mk_step fact_names [meth])
+                      ||> (Sledgehammer_Isar_Proof.facts_of_isar_step #> snd) *)
+
                     val used_facts' = filter (member (op =) used_names' o fst) used_facts
                   in
                      (used_facts', (meth, Sledgehammer_Proof_Methods.Played time'))
@@ -111,8 +114,10 @@ fun run_prover override_params fact_override chained i n ctxt goal =
                  else get_prover ctxt mode name params
     
     val problem =
+      (* TODO: In Isabelle2016-1 we have extra "found-proof :: unit \<rightarrow> unit" field. For now identity,
+        check what it's used for and where.*)
       {comment = "", state = Proof.init ctxt, goal = goal, subgoal = i, subgoal_count = n,
-       factss = [("", facts)]}
+       factss = [("", facts)], found_proof = I}
 
   in maybe_preplay ctxt goal i params (prover problem) 
     handle ERROR message => (warning ("Error: " ^ message ^ "\n"); NONE)

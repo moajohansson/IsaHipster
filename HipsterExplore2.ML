@@ -223,7 +223,8 @@ fun explore' cond_opt ctxt const_nms =
                     @ (ThyExpl_Data.failed_of_ctxt res_ctxt)))
   in
     (res_ctxt, Sledgehammer_Util.with_vanilla_print_mode writeln
-                  (Active.sendback_markup [Markup.padding_command] output))
+                 (* (Active.sendback_markup [Markup.padding_command] output))*)
+                    (Active.sendback_markup_command output))
   end
 
 val explore = explore' NONE;

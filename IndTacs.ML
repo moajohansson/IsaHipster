@@ -56,9 +56,9 @@ struct
 type inductionStrategy = Proof.context -> (string * thm list) option -> string list option (*-> int*) -> tactic
 
 fun SOLVE_TIMEOUT mseconds tac t = 
-  let val res = TimeLimit.timeLimit (Time.fromMilliseconds mseconds)
+  let val res = Timeout.apply (Time.fromMilliseconds mseconds)
                   (fn () => SINGLE ( tac) t) ()
-                handle TimeLimit.TimeOut => NONE
+                handle Timeout.TIMEOUT _ => NONE
                      | ERROR message => (warning ("Error: " ^ message ^ "\n"); NONE)
   in
     case res of
@@ -196,7 +196,10 @@ fun inductable_things_in_term ctxt t =
   let fun lookup s =
         case (BNF_FP_Def_Sugar.fp_sugar_of ctxt s) of
           NONE => NONE
-        | SOME di => SOME (di |> #fp_co_induct_sugar |> #co_inducts |> hd);
+        | SOME di => (* SOME (di |> #fp_co_induct_sugar |> #co_inducts |> hd); *)
+                      case (#fp_co_induct_sugar di) of 
+                        SOME c => SOME (#co_inducts c)
+                        | NONE => NONE
       
       fun datatype_chk (Type(tn,_)) = Basics.is_some (lookup tn)
         | datatype_chk _ = false;
