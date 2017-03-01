@@ -4,7 +4,7 @@ Hipster is always under development, but feel free to play around with it! To
 install Hipster, you first need Isabelle and TIP-tools.
 
 Isabelle is available from: http://isabelle.in.tum.de/index.html. Hipster works
-with [Isabelle 2016][Isa16], preferably in jEdit if you want nice syntactic
+with [Isabelle 2016-1][Isa16], preferably in jEdit if you want nice syntactic
 sugar.
 
 
