@@ -49,40 +49,40 @@ fun sledgehammer_ctac i (ctxt,thm) =
     val hipster_meth = Induction_Data.Sledgehammer_Meth meth
   in
     Seq.map
-    (fn nwthm => (Induction_Data.add_subgoal_tac_ctxt 
+    (fn nwthm => (Induction_Data.add_subgoal_tac_ctxt
                    (i, (hipster_meth,facts)) ctxt, nwthm))
-       (meth_tac i thm) 
+       (meth_tac i thm)
   end
  | NONE => Seq.single (ctxt, thm) (* Do nothing - Sledgehammer failed. *)
-  
+
 
 (* Apply simp to subgoal i and record that we've done that,
    if simp managed to somehow make progress. *)
 fun simp_goal_ctac i (ctxt,thm) =
   Seq.map
-    (fn (ctxt',thm') => (Induction_Data.add_subgoal_tac_ctxt 
-                        (i, (Induction_Data.Sledgehammer_Meth Sledgehammer_Proof_Methods.Simp_Method, [])) 
+    (fn (ctxt',thm') => (Induction_Data.add_subgoal_tac_ctxt
+                        (i, (Induction_Data.Sledgehammer_Meth Sledgehammer_Proof_Methods.Simp_Method, []))
                         ctxt',thm'))
      (CTac.AS_CTACTIC (CHANGED (Simplifier.asm_full_simp_tac ctxt i)) (ctxt,thm))
 
 (* Must fail if there are any open subgoals left *)
 val simp_or_sledgehammer_ctac =
-  (*   CTac.SOLVE_OR_FAIL (CTac.ALLGOALS (CTac.CTHEN_MAYBE'( 
+  (*   CTac.SOLVE_OR_FAIL (CTac.ALLGOALS (CTac.CTHEN_MAYBE'(
                                           simp_goal_ctac, sledgehammer_ctac))) *)
-  CTac.CTHEN_MAYBE' (simp_goal_ctac, sledgehammer_ctac)                               
+  CTac.CTHEN_MAYBE' (simp_goal_ctac, sledgehammer_ctac)
 
 
 (* Apply induction and record which rule was used, and on which variables *)
 fun induct_on_var_ctac rule var i (ctxt,thm) =
   let
     val (ithings, _) = Ind_Tacs.inductable_things_in_sg ctxt i thm;
-    val (otherfrees, inductfrees) = Ind_Tacs.mk_induct_insts ithings var  
+    val (otherfrees, inductfrees) = Ind_Tacs.mk_induct_insts ithings var
     val insts = map (fn NONE => NONE
                         | SOME v => SOME (NONE : Binding.binding option,(Free v,false)))
                   inductfrees
-        
+
     val rule' = case rule of NONE => NONE | SOME (_,thms) => SOME thms
-       
+
     val results = Induction.induction_tac ctxt false
                       [insts] [otherfrees] [] rule' [] i thm
                     handle ERROR msg => (warning ("Error in: " ^ msg ^ "\n"); Seq.empty)
@@ -96,14 +96,14 @@ fun induct_on_var_ctac rule var i (ctxt,thm) =
     Seq.map (fn thm' =>
       (ctxt     (* FIXME: Need to also set non-induct vars as arbitrary in Isar *)
        |> Induction_Data.set_induction_vars_ctxt var
-       |> Induction_Data.set_arbitrary_vars_ctxt (map fst otherfrees) 
+       |> Induction_Data.set_arbitrary_vars_ctxt (map fst otherfrees)
        |> set_rule rule, thm')) results
   end;
 
 (* Note: ALLGOALS will do subgoals in reverse order, starting with the highest number, working backwards! *)
-(* Note 2: auto always applies to all subgoals, so need to merge if two auto's are after one another. *) 
-fun induct_and_sledgehammer_ctac rule var = 
-  CTac.SOLVE_OR_FAIL 
+(* Note 2: auto always applies to all subgoals, so need to merge if two auto's are after one another. *)
+fun induct_and_sledgehammer_ctac rule var =
+  CTac.SOLVE_OR_FAIL
   (CTac.CTHEN(
     Seq.DETERM (CTac.HEADGOAL (induct_on_var_ctac rule var)),
     CTac.ALLGOALS  simp_or_sledgehammer_ctac))
@@ -111,7 +111,7 @@ fun induct_and_sledgehammer_ctac rule var =
 fun induct_and_simp_ctac rule var =
   CTac.SOLVE_OR_FAIL
     (CTac.CTHEN(
-         Seq.DETERM (CTac.HEADGOAL (induct_on_var_ctac rule var)), 
+         Seq.DETERM (CTac.HEADGOAL (induct_on_var_ctac rule var)),
          CTac.ALLGOALS simp_goal_ctac))
 
 (* Try induction (using the strategy strat)
@@ -189,10 +189,10 @@ fun hipster_induct ctxt0 thm =
                  (* CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm) *)
                  (CTac.CORELSE
                   ( CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac),
-                    CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac)))                    
-                 (ctxt,thm) 
+                    CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac)))
+                 (ctxt,thm)
     in
-      case (Seq.list_of result) of 
+      case (Seq.list_of result) of
       [] => Seq.empty
       | ((ctxt1,thm1)::_) => (* NOTE: Check if proved! otherwise fail *)
           (if (Thm.no_prems thm1) then  (* proved thm, no subgoals *)
@@ -202,7 +202,7 @@ fun hipster_induct ctxt0 thm =
                                      (Induction_Data.get_proof_script_ctxt ctxt1))
                    in Seq.single thm1 end
           else Seq.empty)
-    end                              
+    end
 (* Same as above, but no proof output directly. To be used only during theory exploration*)
 fun thy_expl_hard_ctac (ctxt0, thm) =
    let

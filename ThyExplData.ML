@@ -101,9 +101,9 @@ fun set_progress prog = update_progress (K prog)
 
 fun add_failed c = update_failed (fn cs => cs@[c])
 fun add_proved thm = update_proved (fn thms => thms@[thm])
-fun add_proof_script (thm_nm, proof) = 
+fun add_proof_script (thm_nm, proof) =
   update_proof_scripts (fn proofs => Symtab.update (thm_nm,proof) proofs)
- 
+
 val empty = Data{open_conjs = [], failed = [], proved = [], facts = [], fact_names = [],
                  proof_scripts = Symtab.empty,
                  used_thm_names = Name.context, priority_goal = NONE, progress = false}
@@ -168,9 +168,9 @@ fun goal_prop str ctxt =
   in Proof.theorem NONE (K I) [[(prop, [])]] ctxt
   end
 
-(* Assmume get list of strings from HipSpec, which can be directly parsed as Isabelle terms *)
+(* Assume get list of strings from HipSpec, which can be directly parsed as Isabelle terms *)
 fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
-  let 
+  let
       fun total_vs t =
         let val (frs,als) = Hipster_Utils.dangling_vars t
         in length frs + length als end
@@ -179,7 +179,7 @@ fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
             val freedom2 = total_vs t2
         in bool_ord (freedom2 < freedom1, freedom1 < freedom2)
         end
-      
+
       val conjs = lemma_strs
                     |> map (Syntax.read_prop ctxt)
                     (*|> sort term_var_ord*)
@@ -201,4 +201,3 @@ fun fresh_name ctxt =
   in (nm, set_used_thm_names_ctxt nm_ctxt ctxt) end
 
 end
-

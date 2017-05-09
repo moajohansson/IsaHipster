@@ -17,7 +17,7 @@ val all_ctac : ctactic;
 val no_ctac : ctactic;
 
 val CTHEN : ctactic * ctactic -> ctactic;
-val CORELSE : ctactic * ctactic -> ctactic; 
+val CORELSE : ctactic * ctactic -> ctactic;
 val CTHEN': ('a -> ctactic) * ('a -> ctactic) -> 'a -> ctactic
 val CORELSE': ('a -> ctactic) * ('a -> ctactic) -> 'a -> ctactic
 
@@ -30,7 +30,7 @@ val CTHEN_MAYBE': ('a -> ctactic) * ('a -> ctactic) -> 'a -> ctactic
 val TRY: ctactic -> ctactic
 val TRY': ('a -> ctactic) -> 'a -> ctactic
 val CHANGED :  ctactic -> ctactic
-val SOLVE_OR_FAIL : ctactic -> ctactic 
+val SOLVE_OR_FAIL : ctactic -> ctactic
 
 val ALLGOALS: (int -> ctactic) -> ctactic;
 val HEADGOAL: (int -> ctactic) -> ctactic;
@@ -41,10 +41,10 @@ val DEPTH_SOLVE: ctactic -> ctactic
 val IF_UNSOLVED: ctactic -> ctactic
 val SOLVE_TIMEOUT : int -> ctactic -> ctactic
 
-end 
+end
 
 
-structure CTac : CONTEXTUAL_TACTIC  = 
+structure CTac : CONTEXTUAL_TACTIC  =
 struct
 
 infix 1 CTHEN CTHEN'
@@ -120,7 +120,7 @@ fun SINGLE ctacf = Option.map fst o Seq.pull o ctacf
 (*Apply a tactic if subgoals remain, else do nothing.*)
 val IF_UNSOLVED = COND ((has_fewer_prems 1) o snd) all_ctac;
 
-fun SOLVE_OR_FAIL ctac st =  
+fun SOLVE_OR_FAIL ctac st =
   let fun solved st = has_fewer_prems 1 (snd st);
   in Seq.filter solved (ctac st) end;
 (* ------------------------------------------------------------------------------------------ *)
@@ -139,7 +139,7 @@ fun HEADGOAL ctac = ctac 1;
 (*Searches until "satp" reports proof tree as satisfied.
   Suppresses duplicate solutions to minimize search space.*)
 fun DEPTH_FIRST satp ctac =
- let 
+ let
      fun equal_thm ((_,t1),(_,t2)) = Thm.eq_thm (t1,t2)
      fun depth _ [] = NONE
        | depth used (q::qs) =
@@ -150,24 +150,24 @@ fun DEPTH_FIRST satp ctac =
                 then SOME(st, Seq.make
                                  (fn()=> depth (st::used) (stq::qs)))
                 else depth used (ctac st :: stq :: qs)
-  in (fn st => 
+  in (fn st =>
       case (depth [] [Seq.single st]) of
         NONE => Seq.empty
-      | SOME(st2,_) => Seq.single st2)      
+      | SOME(st2,_) => Seq.single st2)
  end;
 
 val DEPTH_SOLVE = DEPTH_FIRST ((has_fewer_prems 1) o snd);
 
 (* ------------------------------------------------------------------------------------------ *)
 
-fun SOLVE_TIMEOUT mseconds ctac st = 
+fun SOLVE_TIMEOUT mseconds ctac st =
   let val res = Timeout.apply (Time.fromMilliseconds mseconds)
                   (fn () => SINGLE ctac st) ()
                 handle Timeout.TIMEOUT _ => NONE
                      | ERROR message => (warning ("Error: " ^ message ^ "\n"); NONE)
   in
     case res of
-      NONE => Seq.empty 
+      NONE => Seq.empty
     | SOME st' => Seq.single st'
   end;
 
@@ -176,4 +176,4 @@ fun SOLVE_TIMEOUT mseconds ctac st =
 (* ------------------------------------------------------------------------------------------ *)
 
 
-end; 
+end;

@@ -12,6 +12,7 @@ sig
   val thy_consts_of : string -> Thm.thm -> string list
   val frees_of : Term.term -> (string * Term.typ) list
   val frees_and_tfrees_of_thm : Thm.thm -> string list * string list
+  val add_term_frees : Term.term * Term.term list -> Term.term list
 
   val dangling_vars : Term.term -> (string * Term.typ) list * (string * Term.typ) list
   val types_in_term : Term.term -> typ list

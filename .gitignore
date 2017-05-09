@@ -9,3 +9,4 @@ dist/
 *.synctex.*
 *.pdf
 GenCode/*
+*.swp

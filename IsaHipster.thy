@@ -59,7 +59,10 @@ ML_file "HipTacOps.ML"
 ML_file "ThyExplData.ML"
 ML_file "IndTacs.ML"
 ML_file "CTacs/InductCTac.ML"
-
+ML_file "CoIndTacs.ML"
+ML_file "CoinductionData.ML"
+ML_file "CTacs/CoinductCTac.ML"
+  
 ML_file "TacticData.ML"
 ML_file "HipsterExplore2.ML"
 ML_file "HipsterIsar.ML"
@@ -95,6 +98,12 @@ method_setup hipster_induct = {*
     (fn ctxt => SIMPLE_METHOD 
       (Induct_CTac.hipster_induct ctxt)))
    *}  
+
+method_setup hipster_coinduct = {*
+  Scan.lift (Scan.succeed
+    (fn ctxt => SIMPLE_METHOD
+      (Coind_Tacs.coinduct_and_sledgehammer ctxt)))
+*}
 
 (*
 ML{*
