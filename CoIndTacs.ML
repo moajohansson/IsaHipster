@@ -4,10 +4,12 @@
 signature COIND_TACS =
 sig
   (* Coinduction with specified vars set to arbitrary *)
-  val coinduct_with_arbitrary_tac: Proof.context -> term list  -> tactic
+  val coinduct_with_arbitrary_tac: Proof.context ->  term list  ->
+                                   (string * thm list) option -> tactic
 
   (* Coinduction with all free variables set to arbitrary *)
-  val coinduct_allfree_arbitrary_tac: Proof.context -> tactic
+  val coinduct_allfree_arbitrary_tac: Proof.context -> (string * thm list) option ->
+                                      tactic
 
   (* Coinduction with all free vars set to arbitrary,
      then try to use sledgehammer to prove remaining subgoals *)
@@ -18,21 +20,27 @@ end
 
 structure Coind_Tacs : COIND_TACS =
 struct
-  fun coinduct_with_arbitrary_tac ctxt vars goalthm =
-    let val nw_thms = HEADGOAL(Coinduction.coinduction_tac ctxt vars NONE []) goalthm
+  fun coinduct_with_arbitrary_tac ctxt vars rule goalthm =
+    let val typename = hd (Hipster_Utils.type_names (Thm.concl_of goalthm))
+        val rulename = typename ^ ".coinduct_strong"
+        val rule' = case rule of SOME (_,thms) => SOME thms
+                               | NONE => SOME [(Proof_Context.get_thm ctxt rulename)]
+        val nw_thms = HEADGOAL(Coinduction.coinduction_tac ctxt vars rule' []) goalthm
     in
       nw_thms
   end;
-  fun coinduct_allfree_arbitrary_tac ctxt goalthm =
+
+  fun coinduct_allfree_arbitrary_tac ctxt rule goalthm =
     let val t = Thm.concl_of goalthm
         val fvs = Hipster_Utils.add_term_frees(t, [])
-        val nw_thms = coinduct_with_arbitrary_tac ctxt fvs goalthm
+        val nw_thms = coinduct_with_arbitrary_tac ctxt fvs rule goalthm
     in
       nw_thms
   end;
+
   fun coinduct_and_sledgehammer ctxt =
     DEPTH_SOLVE (
-      (Seq.DETERM ((coinduct_allfree_arbitrary_tac ctxt) THEN
+      (Seq.DETERM ((coinduct_allfree_arbitrary_tac ctxt NONE) THEN
                     (Ind_Tacs.simp_or_sledgehammer_tac ctxt))))
 end
 

@@ -99,7 +99,7 @@ method_setup hipster_induct = {*
       (Induct_CTac.hipster_induct ctxt)))
    *}  
 
-method_setup hipster_coinduct = {*
+method_setup hipster_coinduct_sledgehammer = {*
   Scan.lift (Scan.succeed
     (fn ctxt => SIMPLE_METHOD
       (Coind_Tacs.coinduct_and_sledgehammer ctxt)))
