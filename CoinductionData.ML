@@ -9,10 +9,9 @@ structure Coinduction_Data =
 struct
 datatype T = Data of
   { coinduction_rule : string option,
-    arbitrary_vars : string list, (* should this be term list?*)
+    arbitrary_vars : string list,
     subgoal_tacs_strs :
       ((Induction_Data.Hipster_Proof_Method * string list) list) Inttab.table
-      (*What needs to be here?*)
   }
 fun get_coinduction_rule (Data d) = (#coinduction_rule d)
 fun get_subgoal_tac_strs (Data d) = (#subgoal_tacs_strs d)

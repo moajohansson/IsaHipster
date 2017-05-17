@@ -13,14 +13,15 @@ structure Coinduct_CTac  : COINDUCT_CTAC   =
 struct
 (* Apply coinduction and record which rule was used, and which variables were arbitrary *)
 fun coinduct_with_arb_ctac rule vars (ctxt,thm) =
-  let
-    fun rule' r = case r of NONE => NONE
-                | SOME (_,ts) => SOME ts
-    val results = HEADGOAL(Coinduction.coinduction_tac ctxt vars (rule' rule) []) thm
-    fun set_rule r  = case r of NONE =>
-                      Coinduction_Data.set_coinduction_rule_ctxt NONE
-                              | SOME (nm,_) =>
-                      Coinduction_Data.set_coinduction_rule_ctxt (SOME nm)
+  let val typename = hd (Hipster_Utils.type_names (Thm.concl_of thm))
+      val rulename = typename ^ ".coinduct_strong"
+      val rule' = case rule of SOME (_,thms) => SOME thms
+                               | NONE => SOME [(Proof_Context.get_thm ctxt rulename)]
+      val results = HEADGOAL(Coinduction.coinduction_tac ctxt vars rule' []) thm
+      fun set_rule r  = case r of NONE =>
+                        Coinduction_Data.set_coinduction_rule_ctxt (SOME rulename)
+                                | SOME (nm,_) =>
+                        Coinduction_Data.set_coinduction_rule_ctxt (SOME nm)
   in
     Seq.map (fn thm' =>
       (ctxt
