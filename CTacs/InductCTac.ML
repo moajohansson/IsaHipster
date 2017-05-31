@@ -23,7 +23,11 @@ val structural_induction_ctac : inductionStrategy -> int -> CTac.ctactic
 val recursion_induction_ctac : inductionStrategy -> int -> CTac.ctactic
 
 val hipster_induct : Proof.context -> tactic
-val thy_expl_hard_ctac : CTac.ctactic
+val thy_expl_hard_ctac_struct : CTac.ctactic
+val thy_expl_hard_ctac_rec : CTac.ctactic
+val thy_expl_hard_ctac_struct_or_rec : CTac.ctactic
+val thy_expl_hard_sledge_or_struct  : CTac.ctactic
+val thy_expl_hard_ctac_simp_struct : CTac.ctactic
 end
 
 structure Induct_CTac  : INDUCT_CTAC   =
@@ -197,21 +201,60 @@ fun hipster_induct ctxt0 thm =
       | ((ctxt1,thm1)::_) => (* NOTE: Check if proved! otherwise fail *)
           (if (Thm.no_prems thm1) then  (* proved thm, no subgoals *)
                 let val _ = Sledgehammer_Util.with_vanilla_print_mode writeln
-                                   (*(Active.sendback_markup [Markup.padding_command] *)
                                      (Active.sendback_markup_command
                                      (Induction_Data.get_proof_script_ctxt ctxt1))
                    in Seq.single thm1 end
           else Seq.empty)
-    end                              
+    end    
+                          
 (* Same as above, but no proof output directly. To be used only during theory exploration*)
-fun thy_expl_hard_ctac (ctxt0, thm) =
+
+(* Structural induction follwed by Sledgehammer *)
+fun thy_expl_hard_ctac_struct (ctxt0, thm) =
    let
     val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
-    in (*CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac (*induct_and_simp_ctac *)) (ctxt,thm) *)
+    in 
        CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm)
      (* (CTac.CORELSE
                   ( CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac),
                     CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac)))
                  (ctxt,thm) *)
     end;
+(* Structural induction follwed by Sledgehammer *)
+fun thy_expl_hard_ctac_simp_struct (ctxt0, thm) =
+   let
+    val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
+    in 
+       CTac.ALLGOALS (structural_induction_ctac induct_and_simp_ctac) (ctxt,thm)
+    end;
+
+(* Recursion induction followed by Sledgehammer *)
+fun thy_expl_hard_ctac_rec (ctxt0, thm) =
+   let
+    val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
+    in 
+      CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm) 
+    end;
+
+(* Structural induction follwed by Sledgehammer, orelse try recursion induction. *)
+fun thy_expl_hard_ctac_struct_or_rec (ctxt0, thm) =
+   let
+    val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
+    in 
+       (CTac.CORELSE
+                  ( CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac),
+                    CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac)))
+           (ctxt,thm) 
+    end;
+(* Here, hard reasoning is either Sledgehammer or structural induction, 
+   so more proofs will be considered "hard" *)
+fun thy_expl_hard_sledge_or_struct  (ctxt0, thm) =
+   let
+    val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
+     in
+      CTac.CORELSE
+                (CTac.SOLVE_OR_FAIL (CTac.ALLGOALS sledgehammer_ctac),
+                (CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac)))
+        (ctxt,thm)
+      end 
 end

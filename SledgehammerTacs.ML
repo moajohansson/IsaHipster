@@ -133,9 +133,7 @@ fun sledgehammer_get_tac ctxt override_params fact_override chained i th =
       SOME (facts, meth) => 
         let 
         (* NOTE: Problems using this, it's providing faulty proof-strings e.g. "blast some_lemma" 
-            instead of "using some_lemma blast) so don't work well with apply style proofs. 
-           NOTE 2: Theorems discovered during a round of theory exploration are Local_Facts,
-                   tac_of_proof_method ignores Local_Facts, so replaying tactic won't work! *)         
+            instead of "using some_lemma blast) so don't work well with apply style proofs.  *)         
          val (local_fs, global_fs) = 
               List.partition (fn (_, (sc, _)) => sc = ATP_Problem_Generate.Local) 
               (filter_out (fn (_, (sc, _)) => sc = ATP_Problem_Generate.Chained orelse 

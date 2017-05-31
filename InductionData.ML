@@ -18,13 +18,20 @@ datatype Hipster_Proof_Method =
 
  fun string_of_meth ctxt (m,facts) = 
       case m of Sledgehammer_Meth meth => 
-          (* FIXME: If this is a method that acts on all subgoal, like auto, we might get a
+          (
+            case meth of 
+             (* FIXME: If this is a method that acts on all subgoal, like auto, we might get a
              faulty proof script, unless we take this into account! Furthermore, the string
              might not fit into an apply-style script, e.g. apply (auto some_facts) isn't allowed 
-             in Isabelle. *) 
-          Sledgehammer_Proof_Methods.string_of_proof_method ctxt facts meth
-           | Simp_All_Meth => if (null facts) then "simp_all" 
-                              else "(simp_all add: " ^ space_implode " " facts ^")"
+             in Isabelle. It should say something like "using fact by auto" or "using fact apply auto" *) 
+              Sledgehammer_Proof_Methods.Auto_Method => if (null facts) then "auto" 
+                                                        else "using " ^ space_implode " " facts  ^ " apply auto"
+              | Sledgehammer_Proof_Methods.Blast_Method => if (null facts) then "blast" 
+                                                           else "using " ^ space_implode " " facts  ^ " apply blast"                                        
+              | _ => "apply " ^ Sledgehammer_Proof_Methods.string_of_proof_method ctxt facts meth ^""
+          )     
+           | Simp_All_Meth => "apply " ^ (if (null facts) then "simp_all" 
+                                         else "(simp_all add: " ^ space_implode " " facts)
 datatype T = Data of
   { induction_rule : string option,
     induction_vars : string list,
@@ -59,7 +66,7 @@ fun set_induction_vars vars = update_induction_vars (K vars)
 fun set_arbitrary_vars vars = update_arbitrary_vars (K vars)
 fun set_subgoal_tac_strs tacs = update_subgoal_tac_strs (K tacs)
 
-(* FIXME: Need to store subgoal numbers tactic was applied to, for correct ordering. 
+(* Need to store subgoal numbers tactic was applied to, for correct ordering. 
    This is as we use ALL_GOALS sometimes, which work backwards (highest subgoal number first)) *)
 fun add_subgoal_tac (sg_number, tac) = 
   update_subgoal_tac_strs (Inttab.insert_list (fn _ => false) (sg_number, tac))
@@ -71,9 +78,34 @@ val empty = Data{induction_rule = NONE, induction_vars = [],
 
 fun get_proof_script (Data d) ctxt = 
   let 
+  val simp_meth = Sledgehammer_Meth (Sledgehammer_Proof_Methods.Simp_Method)
+ 
+  fun is_simp m = (m=Simp_All_Meth orelse m=simp_meth)
+
+  (* If the same subgoal has several consecutive application of e.g. simp, then them and merge facts added *)
+   fun merge_same_meths_sg i ms new_m = 
+       case ms of [] => new_m
+        | [(m,fs)] => new_m @ [(m,fs)]
+        | ((m1,f1)::(m2,f2)::ms) => 
+              if (m1=simp_meth andalso m2=simp_meth)
+              then merge_same_meths_sg i ((simp_meth, distinct (op =) f1@f2)::ms) new_m
+              else merge_same_meths_sg i ((m2,f2)::ms) (new_m @ [(m1,f1)])
+
+  (* FIXME: Only do if EACH subgoal has Simp as first tactic *)
+  (* FIXME 2: For methods like auto/blast which work on all goals by default, also check this,
+      otherwise include some subgoal-specific stuff *)
+  fun merge_same_meths ms new_m = 
+      case ms of [] => new_m
+          | [(m,fs)] => new_m @ [string_of_meth ctxt (m,fs)]
+          | ((m1,f1)::(m2,f2)::ms) => 
+              if (is_simp m1 andalso is_simp m2)
+              then merge_same_meths ((Simp_All_Meth, distinct (op =)(f1@f2))::ms) new_m
+              else merge_same_meths ((m2,f2)::ms) (new_m @ [string_of_meth ctxt (m1,f1)])
 
   val tac_table = (#subgoal_tacs_strs d)
-  val subgoal_tacs = map (rev o snd) (Inttab.dest tac_table)
+                   |> Inttab.map (fn sg_meths => merge_same_meths_sg sg_meths []) 
+  (* For each subgoal, tactic applications is stored in reversed order, due to how Inttab works.*)
+  val subgoal_tacs =  map (rev o snd) (Inttab.dest tac_table)
 
   fun mk_ind_str [] = ""
     | mk_ind_str vars_list = 
@@ -89,27 +121,19 @@ fun get_proof_script (Data d) ctxt =
           | SOME rule => induction ^ vars' ^ " rule: " ^ rule ^ ")\n")
       end;
 
-  fun is_simp m = (m=Simp_All_Meth orelse 
-                   m=Sledgehammer_Meth (Sledgehammer_Proof_Methods.Simp_Method))
-
-  fun merge_same_meths ms new_m = 
-      case ms of [] => new_m
-          | [(m,fs)] => new_m @ [string_of_meth ctxt (m,fs)]
-          | ((m1,f1)::(m2,f2)::ms) => 
-              if (is_simp m1 andalso is_simp m2)
-              then merge_same_meths ((Simp_All_Meth,f1@f2)::ms) new_m
-              else merge_same_meths ((m2,f2)::ms) (new_m @ [string_of_meth ctxt (m1,f1)])
-
+  
  fun mk_app_str meths s = 
     case meths of 
-      [] => s
-    | (m::ms) => 
+      [] => s ^ "done"
+    | (m::ms) => mk_app_str ms (s ^ (string_of_meth ctxt m) ^"\n")
        (*let val meth_str = string_of_meth ctxt m
-       in *)if (null ms)
+       in *)
+       (*if (null ms)
           then s ^ "by " ^ m 
-          else mk_app_str ms (s ^ "apply " ^ m ^"\n")
+          else mk_app_str ms (s ^ "apply " ^ m ^"\n") *)
   in
-    mk_ind_str (#induction_vars d) ^ (mk_app_str (merge_same_meths (flat subgoal_tacs) [])) ""
+     (* mk_ind_str (#induction_vars d) ^ (mk_app_str (merge_same_meths (flat subgoal_tacs) []) "") *)
+      mk_ind_str (#induction_vars d) ^ (mk_app_str (flat subgoal_tacs)) ""
   end;
 
 structure IndData = Proof_Data (type T = T
