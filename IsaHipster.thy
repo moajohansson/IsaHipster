@@ -1,6 +1,6 @@
 theory IsaHipster
 imports Main "$ISABELLE_HOME/src/HOL/TPTP/ATP_Problem_Import"
-keywords "hipster" "hipster_cond" :: thy_decl
+keywords "hipster" "hipster_cond" "hipster_obs" :: thy_decl
 
 begin
 
@@ -31,9 +31,9 @@ val haskell_path =
 val hipspecifyer_cmd = haskell_path ^ "HipSpecifyer "; 
 *)
 
-val tipSpec_cmd = haskell_path ^ "tip-spec ";
-val tipTransl_cmd = haskell_path ^ "tip --hipster ";
-val tipGHC_cmd = haskell_path ^ "tip-ghc ";
+val tipSpec_cmd =  haskell_path ^ "tip-spec ";
+val tipTransl_cmd =  haskell_path ^ "tip --hipster ";
+val tipGHC_cmd =  haskell_path ^ "tip-ghc ";
 end
 
 structure Hipster_Rules = Named_Thms

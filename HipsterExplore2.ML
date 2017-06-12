@@ -171,32 +171,42 @@ fun hipspec_cond cond_name consts file =
       (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
   end
 *)
-fun tipspec_plain file consts =
+fun tipspec_plain file consts obs=
   let
   val add_funs =  " -k " ^ Library.space_implode "," (map map_to_haskell consts)
+  val _ = Output.tracing(add_funs)
+  val _ = Output.tracing(file)
   (* val _ = @{print} add_funs *)
   (* ^ List.foldl (fn (nm,s) => s ^","^(map_to_haskell nm)) " " consts *)
                   (*^ (List.foldr (fn (nm,s) =>
                               (Long_Name.base_name nm) ^ "," ^ s) " " consts) *)
+  val _ = Output.tracing(Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd ^
+      obs ^ " | " ^ Hipster_Setup.tipTransl_cmd)
   in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd ^
-      " | " ^ Hipster_Setup.tipTransl_cmd end
+      obs ^ " | " ^ Hipster_Setup.tipTransl_cmd end
 
-fun tipspec_explore ctxt cond_opt const_nms =
+fun tipspec_explore ctxt cond_opt obs_opt const_nms =
   let
     val thy = Proof_Context.theory_of ctxt
     val thynm = Context.theory_name thy
     val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^".hs"
+    val obs_str = case obs_opt of NONE     => ""
+                               |  SOME nms => "-e " ^ (hd nms) ^ " -o " ^ (hd (tl nms)) ^ " -f " ^ (hd (tl (tl nms))) ^ " -b " ^ (hd (tl (tl nms)))
+    val _ = Output.tracing(obs_str)
     (*val const_nms' = map map_to_quickSpec const_nms  *)
-    val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms (*hipspec_plain const_nms' outfile *)
+    val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms obs_str (*hipspec_plain const_nms' outfile *)
                                      | SOME _ => raise ERROR "Conditionals not yet supported in this version."
                                       (*hipspec_cond c const_nms' outfile *)
     val path_opt = SOME (Path.explode Hipster_Setup.filepath);
     val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
 
+    val _ = Output.tracing("cmd: " ^ tipspec_cmd)
     (*val output = fst (Isabelle_System.bash_output tipspec_cmd)
     val _ =  @{print} output *)
+    val boutput = Isabelle_System.bash_output tipspec_cmd
+    val _ = Output.tracing( "hello!" ^ (fst boutput))
   in
-       fst (Isabelle_System.bash_output tipspec_cmd)
+       fst boutput
   end;
 
 (*-----------------------------------------------------------------------------------------*)
@@ -216,9 +226,9 @@ fun mk_lemma_str ctxt thm =
 
 (* Outputs snippets of proof script with the discovered lemmas,
    that can be pasted into the theory file. *)
-fun explore' cond_opt ctxt const_nms =
+fun explore' cond_opt obs_opt ctxt const_nms =
   let
-    val conjs = tipspec_explore ctxt cond_opt const_nms
+    val conjs = tipspec_explore ctxt cond_opt obs_opt const_nms
     val res_ctxt = proof_loop ctxt conjs
     val output = Library.space_implode "\n\n"
                 (map (mk_lemma_str res_ctxt)
@@ -230,9 +240,11 @@ fun explore' cond_opt ctxt const_nms =
                     (Active.sendback_markup_command output))
   end
 
-val explore = explore' NONE;
+val explore = explore' NONE NONE;
 (* TODO: Hook for conditionals into QuickSpec 2. Currently not available. *)
-fun explore_cond cond = explore' cond;
+fun explore_cond cond = explore' cond NONE;
+
+fun explore_obs obs = explore' NONE obs;
 
 
 (*-----------------------------------------------------------------------------------------*)
@@ -248,7 +260,7 @@ fun explore_goal ctxt const_nms thm =
          happen to use the same var name, you get an error. *)
       val res_ctxt =(* proof_loop_w_prio ctxt (SOME thm) *)
                        proof_loop ctxt
-                      (tipspec_explore ctxt NONE const_nms)
+                      (tipspec_explore ctxt NONE NONE const_nms)
       val lemma_list = ThyExpl_Data.proved_of_ctxt res_ctxt
       val lemmas = Library.space_implode "\n\n"
                           (map (mk_lemma_str res_ctxt) lemma_list)
