@@ -25,6 +25,10 @@ sig
   val induct_and_sledgehammer : inductionStrategy
 
   val try_inductable_vars : Proof.context -> inductionStrategy -> int -> tactic
+
+  (* Utility function: figure out induction vars and arbitrary vars for induction tactic. *)
+  val mk_induct_insts : (string * typ) list -> string list -> 
+                        (string * typ) list * (string * typ) option list
   
   (* Does induction on specified var.  *)
   val induct_on_var_tac : Proof.context -> (string * thm list) option -> string list option -> int -> tactic
@@ -52,9 +56,9 @@ struct
 type inductionStrategy = Proof.context -> (string * thm list) option -> string list option (*-> int*) -> tactic
 
 fun SOLVE_TIMEOUT mseconds tac t = 
-  let val res = TimeLimit.timeLimit (Time.fromMilliseconds mseconds)
+  let val res = Timeout.apply (Time.fromMilliseconds mseconds)
                   (fn () => SINGLE ( tac) t) ()
-                handle TimeLimit.TimeOut => NONE
+                handle Timeout.TIMEOUT _ => NONE
                      | ERROR message => (warning ("Error: " ^ message ^ "\n"); NONE)
   in
     case res of
@@ -145,7 +149,7 @@ fun sledgehammer_goals ctxt =
 (* Must fail if there are any open subgoals left *)
 fun simp_or_sledgehammer_tac ctxt = let val _ = @{print} "simp or" in
    SOLVE_OR_FAIL ((simp_all ctxt []) THEN IF_UNSOLVED (sledgehammer_goals ctxt))
-      handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); fn x =>  Seq.empty)
+      handle Fail msg => (warning ("Failure in: *" ^ msg ^"\n"); fn x =>  Seq.empty)
 end
 
 (*
@@ -192,7 +196,10 @@ fun inductable_things_in_term ctxt t =
   let fun lookup s =
         case (BNF_FP_Def_Sugar.fp_sugar_of ctxt s) of
           NONE => NONE
-        | SOME di => SOME (di |> #fp_co_induct_sugar |> #co_inducts |> hd);
+        | SOME di => (* SOME (di |> #fp_co_induct_sugar |> #co_inducts |> hd); *)
+                      case (#fp_co_induct_sugar di) of 
+                        SOME c => SOME (#co_inducts c)
+                        | NONE => NONE
       
       fun datatype_chk (Type(tn,_)) = Basics.is_some (lookup tn)
         | datatype_chk _ = false;
@@ -236,7 +243,7 @@ fun induct_on_var_tac ctxt rule var i goalthm =
                 (map (fn NONE => "; "
                        | SOME (_, (Free (v,_),false)) => v) insts))^
                 "; otherfrees: "^ (Library.space_implode ", " (map fst otherfrees))) *)
-      val rule' = case rule of NONE => NONE | SOME (n,thms) => SOME thms
+      val rule' = case rule of NONE => NONE | SOME (_,thms) => SOME thms
       val nw_thms = Induction.induction_tac ctxt false
                       [insts] [otherfrees] [] rule' [] i goalthm
                     handle ERROR message => (warning ("Error in: " ^ message ^ "\n"); Seq.empty)
@@ -421,8 +428,15 @@ end
 structure Sledgehammer_T : EXPL_TACS =
 struct
 
-(* FIXME: Use simp, so it can pick up stuff from theory exploration that hasn't been pasted yet.*)
-fun routine_tac ctxt = DEPTH_SOLVE (Ind_Tacs.simp_or_sledgehammer_tac ctxt)
+fun sledgehammer_goals_tac ctxt thm = 
+  let 
+    val proved = ThyExpl_Data.proved_of_ctxt ctxt
+  in  
+    ALLGOALS (Hipster_Sledgehammer_Tactics.just_sledgehammer ctxt [] 
+              Sledgehammer_Fact.no_fact_override proved) thm
+  end; 
+(* Just trust Sledgehammer *)
+fun routine_tac ctxt = sledgehammer_goals_tac ctxt 
 val routine_tac_str = "sledgehammer"
 
 (* We should call here a tactic that runs sledgehammer, but return one that calls metis 

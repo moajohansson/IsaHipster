@@ -4,39 +4,41 @@ imports Main
 (*uses "../HipSpec.ML"*)
 
 begin
-ML_file "../HipsterExplore.ML"
 
-datatype boolex = 
+
+datatype Boolex = 
   Const bool | 
   Var nat | 
-  Neg boolex| 
-  And boolex boolex
+  Neg Boolex| 
+  And Boolex Boolex
 
-primrec "value" :: "boolex \<Rightarrow> (nat \<Rightarrow> bool) \<Rightarrow> bool" 
+primrec "valbool" :: "Boolex \<Rightarrow> (nat \<Rightarrow> bool) \<Rightarrow> bool" 
   where
-  "value (Const b) env = b" |
-  "value (Var x) env = env x" |
-  "value (Neg b) env = (\<not> value b env)" |
-  "value (And b c) env = (value b env \<and> value c env)"
+  "valbool (Const b) env = b" |
+  "valbool (Var x) env = env x" |
+  "valbool (Neg b) env = (\<not> valbool b env)" |
+  "valbool (And b c) env = (valbool b env \<and> valbool c env)"
 
-datatype ifex = CIF bool | VIF nat | IF ifex ifex ifex
+datatype Ifex = CIF bool | VIF nat | IF Ifex Ifex Ifex
 
-primrec valif :: "ifex \<Rightarrow> (nat \<Rightarrow> bool) \<Rightarrow> bool" 
+primrec valif :: "Ifex \<Rightarrow> (nat \<Rightarrow> bool) \<Rightarrow> bool" 
   where
   "valif (CIF b) env = b" |
   "valif (VIF x) env = env x" |
   "valif (IF b t e) env = (if valif b env then valif t env 
                            else valif e env)"
 
-primrec bool2if :: "boolex \<Rightarrow> ifex" 
+primrec bool2if :: "Boolex \<Rightarrow> Ifex" 
 where
   "bool2if (Const b) = CIF b" |
   "bool2if (Var x) = VIF x" |
   "bool2if (Neg b) = IF (bool2if b) (CIF False) (CIF True)" |
   "bool2if (And b c) = IF (bool2if b) (bool2if c) (CIF False)"
 
-
-
+hipster valbool valif bool2if
+lemma blah: "valbool b env = valif (bool2if b) env" (* It doesn't produce this for some reason..*)
+apply (induction b)
+apply simp_all
 
 ML {* val consts = ["BExp.value", "BExp.valif", "BExp.bool2if" ] ; *}
 

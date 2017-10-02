@@ -161,9 +161,9 @@ val DEPTH_SOLVE = DEPTH_FIRST ((has_fewer_prems 1) o snd);
 (* ------------------------------------------------------------------------------------------ *)
 
 fun SOLVE_TIMEOUT mseconds ctac st = 
-  let val res = TimeLimit.timeLimit (Time.fromMilliseconds mseconds)
+  let val res = Timeout.apply (Time.fromMilliseconds mseconds)
                   (fn () => SINGLE ctac st) ()
-                handle TimeLimit.TimeOut => NONE
+                handle Timeout.TIMEOUT _ => NONE
                      | ERROR message => (warning ("Error: " ^ message ^ "\n"); NONE)
   in
     case res of

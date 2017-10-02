@@ -1,48 +1,30 @@
 # Hipster - theory exploration in Isabelle/HOL
 
-Hipster is still under development, but feel free to play around with it! To
-install Hipster, you first need Isabelle, QuickSpec and HipSpec.
+Hipster is always under development, but feel free to play around with it! To
+install Hipster, you first need Isabelle and TIP-tools.
 
 Isabelle is available from: http://isabelle.in.tum.de/index.html. Hipster works
-with [Isabelle 2016][Isa16], preferably in jEdit if you want nice syntactic
+with [Isabelle 2016-1][Isa16], preferably in jEdit if you want nice syntactic
 sugar.
 
-For a older versions of Isabelle, se the appropriate branched in this repostiory.
 
-First install the following Haskell package, called `Happy`:
-	
-	cabal install happy
+Start by installing [TIP-tools][TIP]. You need to have Haskell installed, as well as [Stack][ST]: 
+    
+    git clone https://github.com/tip-org/tools.git
+    cd tools
+    stack setup
+    stack install
 
-To download the appropriate [QuickSpec][QS]:
-
-	git clone https://github.com/nick8325/quickspec.git
-	cd quickspec
-	git checkout hipster
-	cd ..
-
-To dowload [HipSpec][HS], you will need to run the following commands:
-
-    git clone https://github.com/danr/hipspec
-    cd hipspec
-    git checkout hipster
-    cd ..
-	
-Then install QuickSpec and HipSpec together (avoids version conflicts) by issuing the command:
-
-    cabal install hipspec/ quickspec/	
-
-You can now clone the Hipster repository itself, and compile the `HipSpecifyer`:
+You can now clone the Hipster repository itself:
 
     git clone https://github.com/moajohansson/IsaHipster.git
-    cd IsaHipster
-    cabal install hipspecifyer/
 
-Finally, you need to tell Isabelle where to find Hipster, HipSpec, QuickSpec and the HipSpecifyer which you just installed. 
+Finally, you need to tell Isabelle where to find Hipster and TIP-tools, which you just installed. 
 Do this by setting the environment variables `$HIPSTER_HOME` and `$HASKELL_HOME` in the file `$ISABELLE_HOME_USER/etc/settings`
 (create this file if it does not exist yet), where Isabelle normally has set
 `$ISABELLE_HOME_USER` to `$USER_HOME/.isabelle`. `$HIPSTER_HOME` should then
 point to the path for the IsaHipster directory you just cloned. `$HASKELL_HOME`
-should point to where cabal installs your Haskell executables (usually something like `$HOME/Library/Haskell/bin/`).
+should point to where Stack installs your Haskell executables (usually something like `$HOME/.local/bin/`).
 
 See the Isabelle System's Manual for more info on how to set up Isabelle's system
 enviroment. 
@@ -62,17 +44,11 @@ imports "$HIPSTER_HOME/IsaHipster"
 Now, you should be able to try Hipster.  
 Start up Isabelle on for example `Examples/TreeDemo.thy` and have a go.
 
-_Common Issues_: As Hipster currently depends on specific versions of QuickSpec and HipSpec, some
-users have experienced problems with accidentally having conflicting cabal installation of several versions of the tools,
-which usually manifest itself in that Hipster gives you some strange error messages.
-If you've ended up with several versions of QuickSpec and/or HipSpec, you can remove unwanted 
-ones using the command line tool `ghc-pkg unregister <Name-Of-Unwanted-Version>`. 
 
 _Disclaimer_: Hipster is always under development. Let us know if you run into anything too odd,
 and we'll try to fix it.
 
 
-[QS]: https://github.com/nick8325/quickspec
-[HS]: https://github.com/danr/hipspec
-[Isa15]: http://isabelle.in.tum.de/download_past.html
+[TIP]: https://github.com/tip-org/tools
 [Isa16]: http://isabelle.in.tum.de/installation.html
+[ST]: https://www.haskell.org/downloads

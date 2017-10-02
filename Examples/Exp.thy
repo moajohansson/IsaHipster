@@ -42,6 +42,7 @@ fun compile :: "('c,'v) expr \<Rightarrow> ('c,'v) program"
   "compile (Cex c) =  Const c Done" |
   "compile (Vex v) =  Load v Done" |
   "compile (Bex b e1 e2) = sequence (compile e2) (sequence (compile e1) (Apply b Done))"
+hipster exec
 (*
 hipster value exec compile sequence
 *)
