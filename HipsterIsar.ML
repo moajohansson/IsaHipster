@@ -55,14 +55,7 @@ fun call_hipster consts =
             |> dest_Const
             |> fst
 
-        (*fun get_type_name ctxt c =
-          c |> Proof_Context.read_type_name {proper = true, strict = false} ctxt
-            |> dest_Type
-            |> fst*)
-
         val const_nms = map (get_const_name ctxt) (drop 2 consts)
-        (*val type_nms = map (get_type_name ctxt) (take 2 consts)*)
-        val _ = Output.tracing(hd const_nms)
       in
         Hipster_Explore.explore_obs (SOME (take 3 consts)) ctxt const_nms;
         ctxt

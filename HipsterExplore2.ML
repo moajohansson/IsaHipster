@@ -174,16 +174,13 @@ fun hipspec_cond cond_name consts file =
 fun tipspec_plain file consts obs=
   let
   val add_funs =  " -k " ^ Library.space_implode "," (map map_to_haskell consts)
-  val _ = Output.tracing(add_funs)
-  val _ = Output.tracing(file)
   (* val _ = @{print} add_funs *)
   (* ^ List.foldl (fn (nm,s) => s ^","^(map_to_haskell nm)) " " consts *)
                   (*^ (List.foldr (fn (nm,s) =>
                               (Long_Name.base_name nm) ^ "," ^ s) " " consts) *)
-  val _ = Output.tracing(Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd ^
-      obs ^ " | " ^ Hipster_Setup.tipTransl_cmd)
   in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd ^
-      obs ^ " | " ^ Hipster_Setup.tipTransl_cmd end
+      obs ^ " | " ^ Hipster_Setup.tipTransl_cmd
+end
 
 fun tipspec_explore ctxt cond_opt obs_opt const_nms =
   let
@@ -192,21 +189,16 @@ fun tipspec_explore ctxt cond_opt obs_opt const_nms =
     val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^".hs"
     val obs_str = case obs_opt of NONE     => ""
                                |  SOME nms => "-e " ^ (hd nms) ^ " -o " ^ (hd (tl nms)) ^ " -f " ^ (hd (tl (tl nms))) ^ " -b " ^ (hd (tl (tl nms)))
-    val _ = Output.tracing(obs_str)
     (*val const_nms' = map map_to_quickSpec const_nms  *)
     val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms obs_str (*hipspec_plain const_nms' outfile *)
                                      | SOME _ => raise ERROR "Conditionals not yet supported in this version."
                                       (*hipspec_cond c const_nms' outfile *)
     val path_opt = SOME (Path.explode Hipster_Setup.filepath);
     val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
-
-    val _ = Output.tracing("cmd: " ^ tipspec_cmd)
     (*val output = fst (Isabelle_System.bash_output tipspec_cmd)
     val _ =  @{print} output *)
-    val boutput = Isabelle_System.bash_output tipspec_cmd
-    val _ = Output.tracing( "hello!" ^ (fst boutput))
   in
-       fst boutput
+       fst (Isabelle_System.bash_output tipspec_cmd)
   end;
 
 (*-----------------------------------------------------------------------------------------*)
