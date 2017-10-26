@@ -1,7 +1,7 @@
 (*  Author:     Sólrún Einarsdóttir, Chalmers University of Technology
 
     Hipster theory exploration information records about what choices
-    succeeded in an attempt at a coinductive proof. MUch borrowed from
+    succeeded in an attempt at a coinductive proof. Much borrowed from
     InductionData.ML.
 *)
 
