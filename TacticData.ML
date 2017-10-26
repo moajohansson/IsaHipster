@@ -31,38 +31,37 @@ fun get_hard_str (Data d) = (#hard_tac_str d)
 (*val empty = Data{routine_tac = K FAIL, hard_tac = K FAIL,
                 routine_tac_str = "FAIL", hard_tac_str = fn _ => K "FAIL"}; *)
 
-(* Work in progress: All the below has the same hard_ctac right now. This is what's used by
-   Hipster during exploration, and obviously due to change.
- *)
+(* Work in progress: Remove old hard_tac field etc: no longer in use *)
+
 (* Routine: simplification and FO reasoning. Hard: Induction, then routine. *)
 val induct_with_schemes = Data {technique = "induction",
                                 routine_tac = Ind_Schemes_T.routine_tac,
                                 hard_tac = Ind_Schemes_T.hard_tac,
-                                hard_ctac = Induct_CTac.thy_expl_hard_ctac,
+                                hard_ctac = Induct_CTac.thy_expl_hard_ctac_rec,
                                 routine_tac_str = Ind_Schemes_T.routine_tac_str,
                                 hard_tac_str = Ind_Schemes_T.final_tactic_str}
 
 (* Routine: simplification and FO reasoning. Hard: Induction, then routine. *)
-val induct_simp_metis = Data {technique = "induction",
-                              routine_tac = Simp_Metis_T.routine_tac,
-                              hard_tac = Simp_Metis_T.hard_tac,
-                              hard_ctac = Induct_CTac.thy_expl_hard_ctac,
-                              routine_tac_str = Simp_Metis_T.routine_tac_str,
-                              hard_tac_str = Simp_Metis_T.final_tactic_str}
+(* val induct_simp_metis = Data {technique = "induction",
+                                 routine_tac = Simp_Metis_T.routine_tac,
+                                 hard_tac = Simp_Metis_T.hard_tac,
+                                 hard_ctac = Induct_CTac.thy_expl_hard_ctac,
+                                 routine_tac_str = Simp_Metis_T.routine_tac_str,
+                                 hard_tac_str = Simp_Metis_T.final_tactic_str} *)
 
-(* Routine: simplification. Hard: Induction, then simp. *)
+(* Routine: simplification. Hard: Structural Induction, then simp. *)
 val induct_simp = Data {technique = "induction",
                         routine_tac = Simp_T.routine_tac,
                         hard_tac = Simp_T.hard_tac,
-                        hard_ctac = Induct_CTac.thy_expl_hard_ctac,
+                        hard_ctac = Induct_CTac.thy_expl_hard_ctac_simp_struct,
                         routine_tac_str = Simp_T.routine_tac_str,
                         hard_tac_str = Simp_T.final_tactic_str}
 
-(* Sledgehammer, or sledgehammer + induction *)
+(* Sledgehammer, or sledgehammer + structural induction *)
 val induct_sledgehammer = Data {technique = "induction",
                                 routine_tac = Sledgehammer_T.routine_tac,
                                 hard_tac = Sledgehammer_T.hard_tac,
-                                hard_ctac = Induct_CTac.thy_expl_hard_ctac,
+                                hard_ctac = Induct_CTac.thy_expl_hard_ctac_struct,
                                 routine_tac_str = Sledgehammer_T.routine_tac_str,
                                 hard_tac_str = Sledgehammer_T.final_tactic_str}
 
@@ -72,6 +71,13 @@ val coinduct_sledgehammer = Data {technique = "coinduction",
                                   hard_ctac = Coinduct_CTac.thy_expl_coind_ctac,
                                   routine_tac_str = Coinduct_T.routine_tac_str,
                                   hard_tac_str = Coinduct_T.final_tactic_str}
+
+(* Routine: simp, Hard: Sledgehammer orelse Induction + Sledgehammer *)
+val simp_sledgehammer_induct_sledgehammer = Data {routine_tac = Simp_T.routine_tac,
+                         hard_tac = Sledgehammer_T.hard_tac, (* Redundant *)
+                         hard_ctac = Induct_CTac.thy_expl_hard_sledge_or_struct,
+                         routine_tac_str = Simp_T.routine_tac_str, (* Redundant *)
+                         hard_tac_str = Sledgehammer_T.final_tactic_str}  (* Redundant *)
 
 (* Data stored in an Isabelle context, default to induct_with_schemes tactics.
    THINK: Maybe this should be stored in the theory instead? *)
@@ -89,10 +95,10 @@ val routine_tac_str = get_routine_str o (Data.get o Proof_Context.theory_of)
 val technique = get_technique o (Data.get o Proof_Context.theory_of)
 
 val set_tacs = Data.put
-val set_induct_simp_metis = set_tacs induct_simp_metis
+(* val set_induct_simp_metis = set_tacs induct_simp_metis *)
 val set_induct_simp = set_tacs induct_simp
 val set_induct_with_schemes = set_tacs induct_with_schemes
 val set_induct_sledgehammer = set_tacs induct_sledgehammer
 val set_coinduct_sledgehammer = set_tacs coinduct_sledgehammer
-
+val set_sledge_induct_sledge = set_tacs simp_sledgehammer_induct_sledgehammer
 end
