@@ -73,11 +73,12 @@ val coinduct_sledgehammer = Data {technique = "coinduction",
                                   hard_tac_str = Coinduct_T.final_tactic_str}
 
 (* Routine: simp, Hard: Sledgehammer orelse Induction + Sledgehammer *)
-val simp_sledgehammer_induct_sledgehammer = Data {routine_tac = Simp_T.routine_tac,
-                         hard_tac = Sledgehammer_T.hard_tac, (* Redundant *)
-                         hard_ctac = Induct_CTac.thy_expl_hard_sledge_or_struct,
-                         routine_tac_str = Simp_T.routine_tac_str, (* Redundant *)
-                         hard_tac_str = Sledgehammer_T.final_tactic_str}  (* Redundant *)
+val simp_sledgehammer_induct_sledgehammer = Data {technique = "induction",
+                                                  routine_tac = Simp_T.routine_tac,
+                                                  hard_tac = Sledgehammer_T.hard_tac, (* Redundant *)
+                                                  hard_ctac = Induct_CTac.thy_expl_hard_sledge_or_struct,
+                                                  routine_tac_str = Simp_T.routine_tac_str, (* Redundant *)
+                                                  hard_tac_str = Sledgehammer_T.final_tactic_str}  (* Redundant *)
 
 (* Data stored in an Isabelle context, default to induct_with_schemes tactics.
    THINK: Maybe this should be stored in the theory instead? *)

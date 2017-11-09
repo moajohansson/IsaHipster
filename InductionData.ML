@@ -131,7 +131,7 @@ fun get_proof_script (Data d) ctxt =
           then s ^ "by " ^ m
           else mk_app_str ms (s ^ "apply " ^ m ^"\n") *)
   in
-s     (* mk_ind_str (#induction_vars d) ^ (mk_app_str (merge_same_meths (flat subgoal_tacs) []) "") *)
+     (* mk_ind_str (#induction_vars d) ^ (mk_app_str (merge_same_meths (flat subgoal_tacs) []) "") *)
       mk_ind_str (#induction_vars d) ^ (mk_app_str (flat subgoal_tacs)) ""
   end;
 
