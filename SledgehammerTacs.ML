@@ -14,7 +14,8 @@ open Sledgehammer_Commands
 (* Modified version of Sledgehammer.play_one_line_proof, which tries to reconstruct an ATP/SMT 
    proof in Isabelle using various methods (avoids some Isar specific stuff). *)
 fun play_one_line_proof ctxt minimize timeout used_facts0 thm i (preferred_meth, methss) =
-  let val used_facts = filter_out (fn (_, (sc, _)) => sc = ATP_Problem_Generate.Chained) used_facts0
+  let
+    val used_facts = filter_out (fn (_, (sc, _)) => sc = ATP_Problem_Generate.Chained) used_facts0
   in
     if timeout = Time.zeroTime then
       (used_facts, (preferred_meth, Sledgehammer_Proof_Methods.Play_Timed_Out Time.zeroTime))
@@ -39,9 +40,10 @@ fun play_one_line_proof ctxt minimize timeout used_facts0 thm i (preferred_meth,
 
               fun mk_step fact_names meths =
                 Sledgehammer_Isar_Proof.Prove ([], [], ("", 0), goal_t, [], ([], fact_names), meths, "")
-             
+              val _ = @{print} ("mk_step", mk_step fact_names meths)
+              val ctxt' = Context_Position.set_visible false ctxt
             in
-              (case Sledgehammer_Isar_Preplay.preplay_isar_step ctxt [] timeout [] (mk_step fact_names meths) of
+              (case Sledgehammer_Isar_Preplay.preplay_isar_step ctxt' [] timeout [] (mk_step fact_names meths) of
                 (* Why only picking first one? It might not make any progress! *)
                 (res as (meth, Sledgehammer_Proof_Methods.Played time)) :: more_stuff =>
                 let val _ = @{print} ("All results", res::more_stuff)
@@ -62,7 +64,7 @@ fun play_one_line_proof ctxt minimize timeout used_facts0 thm i (preferred_meth,
                   in
                      (used_facts', (meth, Sledgehammer_Proof_Methods.Played time'))
                   end
-                  end
+                end
               | ress' => try_methss (ress' @ ress) methss)
             end
       in
