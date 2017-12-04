@@ -17,6 +17,8 @@ sig
   val dangling_vars : Term.term -> (string * Term.typ) list * (string * Term.typ) list
   val types_in_term : Term.term -> typ list
   val type_names : Term.term -> string list
+  val inductible_types : Term.term -> Proof.context -> string list
+  val coinductible_types : Term.term -> Proof.context -> string list
 end
 
 
@@ -92,6 +94,12 @@ fun type_names t =
       |> List.concat
       |> filter sieve o distinct (op =)
   end
+
+fun inductible_types t ctxt =
+  filter (fn t => is_some(Proof_Context.lookup_fact ctxt (t^".induct")))  (type_names t)
+
+fun coinductible_types t ctxt =
+  filter (fn t => is_some(Proof_Context.lookup_fact ctxt (t^".coinduct")))  (type_names t)
 
 end
 (*
