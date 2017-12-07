@@ -28,7 +28,9 @@ datatype Hipster_Proof_Method =
                                                         else "using " ^ space_implode " " facts  ^ " apply auto"
               | Sledgehammer_Proof_Methods.Blast_Method => if (null facts) then "blast"
                                                            else "using " ^ space_implode " " facts  ^ " apply blast"
-              | _ => Sledgehammer_Proof_Methods.string_of_proof_method ctxt facts meth ^""
+              | Sledgehammer_Proof_Methods.Fastforce_Method => if (null facts) then "fastforce"
+                                                           else "using " ^ space_implode " " facts  ^ " apply fastforce"
+              | _ => "apply " ^ Sledgehammer_Proof_Methods.string_of_proof_method ctxt facts meth ^""
           )
            | Simp_All_Meth => "apply " ^ (if (null facts) then "simp_all"
                                          else "(simp_all add: " ^ space_implode " " facts)

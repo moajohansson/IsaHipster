@@ -54,23 +54,24 @@ fun get_proof_script (Data d) ctxt =
                    m = Induction_Data.Sledgehammer_Meth
                        (Sledgehammer_Proof_Methods.Simp_Method))
 
-  fun merge_same_meths ms new_m =
+(*  fun merge_same_meths ms new_m =
       case ms of [] => new_m
           | [(m,fs)] => new_m @ [Induction_Data.string_of_meth ctxt (m,fs)]
           | ((m1,f1)::(m2,f2)::ms) =>
               if (is_simp m1 andalso is_simp m2)
               then merge_same_meths ((Induction_Data.Simp_All_Meth,f1@f2)::ms) new_m
               else merge_same_meths ((m2,f2)::ms) (new_m @ [Induction_Data.string_of_meth ctxt (m1,f1)])
-
+*)
  fun mk_app_str meths s =
     case meths of
-      [] => s
-    | (m::ms) =>
-       if (null ms)
+      [] => s ^ "done"
+    | (m::ms) => mk_app_str ms (s ^ (Induction_Data.string_of_meth ctxt m) ^"\n")
+       (*if (null ms)
        then s ^ "by " ^ m
-       else mk_app_str ms (s ^ "apply " ^ m ^"\n")
+       else mk_app_str ms (s ^ "apply " ^ m ^"\n")*)
   in
-    coind_str ^ (mk_app_str (merge_same_meths (flat subgoal_tacs) [])) ""
+    (*coind_str ^ (mk_app_str (merge_same_meths (flat subgoal_tacs) [])) ""*)
+    coind_str ^ (mk_app_str (flat subgoal_tacs)) ""
   end;
 
 structure CoIndData = Proof_Data (type T = T
