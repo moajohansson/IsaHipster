@@ -104,7 +104,6 @@ val set_tacs = Data.put
 val set_induct_simp = set_tacs [induct_simp]
 val set_induct_with_schemes = set_tacs [induct_with_schemes]
 val set_induct_sledgehammer = set_tacs [induct_sledgehammer]
-val set_coinduct_sledgehammer = set_tacs [coinduct_sledgehammer]
-val set_induct_and_coinduct_sledgehammer = set_tacs [induct_sledgehammer,coinduct_sledgehammer]
+val set_coinduct_sledgehammer = set_tacs [induct_sledgehammer,coinduct_sledgehammer]
 val set_sledge_induct_sledge = set_tacs [simp_sledgehammer_induct_sledgehammer]
 end
