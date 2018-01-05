@@ -45,11 +45,6 @@ fun simp_goal_ctac i (ctxt,thm) =
 
 fun simp_no_goal_ctac i =
   CTac.CORELSE(CTac.SOLVE_OR_FAIL (simp_goal_ctac i), CTac.all_ctac)
-(*Seq.map
-    (fn (ctxt',thm') => (Coinduction_Data.add_subgoal_tac_ctxt
-                        (i, (Induction_Data.Sledgehammer_Meth Sledgehammer_Proof_Methods.Simp_Method, []))
-                        ctxt',thm'))
-     (CTac.AS_CTACTIC (TRY(SOLVED' (Simplifier.asm_full_simp_tac ctxt) i)) (ctxt,thm))*)
 
 fun sledgehammer_ctac i (ctxt,thm) =
   case (Hipster_Sledgehammer_Tactics.sledgehammer_get_tac ctxt []
