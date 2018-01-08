@@ -49,19 +49,21 @@ fun try_nxt_conj ctxt =
       let
         val lemma_str = Syntax.string_of_term ctxt (Thm.concl_of c)
         val _ = Output.tracing ("Proving: "^lemma_str)
+        val sl = (if not(null(Hipster_Utils.coinductible_types (Thm.concl_of c) ctxt)) then ["coinduction"] else []) @
+                (if not(null(Hipster_Utils.inductible_types (Thm.concl_of c) ctxt)) then ["induction"] else [])
+        val _ = Output.tracing ("Using techniques: "^String.concat sl)
       in
-        case (SINGLE (Tactic_Data.routine_tac ctxt) c) of (* Discard this, it is trivial *)
-          SOME _ =>
+        case (map (fn s => SINGLE (Tactic_Data.routine_tac s ctxt) c) sl |> filter is_some) of (* Discard this, it is trivial *)
+          SOME _::_ =>
             let val _ = Output.tracing ("Trivial proof: "^lemma_str)
             in SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
             end
-        | NONE =>
-            let val hard_ctac = Tactic_Data.hard_ctac ctxt in
-            case (CTac.SINGLE hard_ctac (ctxt,c)) of
-              SOME (ctxt1, proved_thm) =>
+        | _ =>
+            case map (fn s => (s,CTac.SINGLE (Tactic_Data.hard_ctac s ctxt) (ctxt,c))) sl |> filter (is_some o snd) of
+              (s,SOME (ctxt1, proved_thm))::_ =>
                 let
                   val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt1
-                  val proof_script = case (Tactic_Data.technique ctxt') of
+                  val proof_script = case s of
                       "induction" =>
                       proof_str ctxt'(Induction_Data.get_proof_script_ctxt ctxt') new_nm proved_thm
                       | "coinduction" =>
@@ -85,13 +87,12 @@ fun try_nxt_conj ctxt =
                           |> ThyExpl_Data.add_proof_script_ctxt (new_nm, proof_script))
                 end
             (* NONE indicates that the tactic failed to prove c, put back with open_conjs *)
-            | NONE =>
+            | _ =>
                 let val _ = Output.tracing ("Failed proving: "^lemma_str)
                 in SOME (ctxt
                           |> ThyExpl_Data.set_open_conjs_ctxt cs
                           |> ThyExpl_Data.add_failed_ctxt c)
                 end
-            end
       end
 
 

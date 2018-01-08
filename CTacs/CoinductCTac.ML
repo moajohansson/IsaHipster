@@ -43,6 +43,9 @@ fun simp_goal_ctac i (ctxt,thm) =
                         ctxt',thm'))
      (CTac.AS_CTACTIC (CHANGED (Simplifier.asm_full_simp_tac ctxt i)) (ctxt,thm))
 
+fun simp_no_goal_ctac i =
+  CTac.CORELSE(CTac.SOLVE_OR_FAIL (simp_goal_ctac i), CTac.all_ctac)
+
 fun sledgehammer_ctac i (ctxt,thm) =
   case (Hipster_Sledgehammer_Tactics.sledgehammer_get_tac ctxt []
                                         Sledgehammer_Fact.no_fact_override [] i thm) of
@@ -58,7 +61,7 @@ fun sledgehammer_ctac i (ctxt,thm) =
  | NONE => Seq.single (ctxt, thm) (* Do nothing - Sledgehammer failed. *)
 
 val simp_or_sledgehammer_ctac =
-  CTac.CTHEN_MAYBE' (simp_goal_ctac, sledgehammer_ctac)
+  CTac.CTHEN_MAYBE' (simp_no_goal_ctac, sledgehammer_ctac)
 
 fun coinduct_and_sledgehammer_ctac rule =
   CTac.SOLVE_OR_FAIL

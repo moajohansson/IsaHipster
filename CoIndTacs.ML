@@ -21,7 +21,7 @@ end
 structure Coind_Tacs : COIND_TACS =
 struct
   fun coinduct_with_arbitrary_tac ctxt vars rule goalthm =
-    let val typename = hd (Hipster_Utils.type_names (Thm.concl_of goalthm))
+    let val typename = hd (Hipster_Utils.coinductible_types (Thm.concl_of goalthm) ctxt)
         val rulename = typename ^ ".coinduct_strong"
         val rule' = case rule of SOME (_,thms) => SOME thms
                                | NONE => SOME [(Proof_Context.get_thm ctxt rulename)]
