@@ -2,7 +2,7 @@ theory Lzip_lmap
   imports Main "$HIPSTER_HOME/IsaHipster" "$HIPSTER_HOME/ObsIntTrans"
 begin
   
-setup Tactic_Data.set_coinduct_sledgehammer  
+setup Tactic_Data.set_induct_and_coinduct_sledgehammer  
 
 codatatype (lset: 'a) Llist =
     lnull: LNil
@@ -23,7 +23,7 @@ fun map_prod2 :: "('a \<Rightarrow> 'c) \<Rightarrow> ('b \<Rightarrow> 'd) \<Ri
 
 primcorec lmap :: "('a \<Rightarrow> 'b) \<Rightarrow> 'a Llist \<Rightarrow> 'b Llist" where
  "lmap f xs = (case xs of LNil \<Rightarrow> LNil | LCons x xs \<Rightarrow> LCons (f x) (lmap f xs))"  
-(*hipster lzip lmap *)
+hipster map_prod2 lzip lmap
 lemma lemma_a [thy_expl]: "lmap y (LCons z LNil) = LCons (y z) LNil"
   apply (coinduction  arbitrary: y z rule: Lzip_lmap.Llist.coinduct_strong)
   by simp

@@ -46,25 +46,6 @@ Outer_Syntax.local_theory @{command_keyword "hipster_cond"}
       (Scan.repeat1 Parse.const >> call_hipster)
 end;
 
-let
-fun call_hipster consts =
-    (fn ctxt =>
-      let
-        fun get_const_name ctxt c =
-          c |> Proof_Context.read_const {proper = true, strict = false} ctxt  (*false dummyT *)
-            |> dest_Const
-            |> fst
-
-        val const_nms = map (get_const_name ctxt) (drop 2 consts)
-      in
-        Hipster_Explore.explore_obs (SOME (take 3 consts)) ctxt const_nms;
-        ctxt
-      end);
-in
-Outer_Syntax.local_theory @{command_keyword "hipster_obs"}
-      "Theory Exploration with Hipster using observational equivalence"
-      (Scan.repeat1 Parse.const >> call_hipster)
-end;
 (*
 (* Use simp and or sledgehammer, then prints out Isar snippet using standard Isabelle tactics. *)
 method_setup hipster_induct = {*

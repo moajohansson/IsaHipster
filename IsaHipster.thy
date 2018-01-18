@@ -1,6 +1,6 @@
 theory IsaHipster
 imports Main "$ISABELLE_HOME/src/HOL/TPTP/ATP_Problem_Import"
-keywords "hipster" "hipster_cond" "hipster_obs" :: thy_decl
+keywords "hipster" "hipster_cond" :: thy_decl
 
 begin
 
