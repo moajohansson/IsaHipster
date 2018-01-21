@@ -24,6 +24,25 @@ Outer_Syntax.local_theory @{command_keyword "hipster"}
       "Theory Exploration with Hipster"
       (Scan.repeat1 Parse.const >> call_hipster)
 end;
+let
+fun call_hipster consts =
+    (fn ctxt =>
+      let
+        fun get_const_name ctxt c =
+          c |> Proof_Context.read_const {proper=true, strict = false} ctxt (*false dummyT *)
+            |> dest_Const
+            |> fst
+      in
+        consts
+          |> map (get_const_name ctxt)
+          |> Hipster_Explore.explore_obs ctxt;
+        ctxt
+      end);
+in
+Outer_Syntax.local_theory @{command_keyword "cohipster"}
+      "Theory Exploration with Hipster, using observers to explore codatatypes"
+      (Scan.repeat1 Parse.const >> call_hipster)
+end;
 
 let
 (* For now, assume predicate to be used as cond is first arg in list of consts *)

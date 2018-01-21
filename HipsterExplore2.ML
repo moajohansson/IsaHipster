@@ -190,8 +190,8 @@ fun tipspec_explore ctxt cond_opt obs_opt const_nms =
     val thy = Proof_Context.theory_of ctxt
     val thynm = Context.theory_name thy
     val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^".hs"
-    val obs_str = case obs_opt of NONE     => ""
-                               |  SOME nms => "-e " ^ (hd nms) ^ " -o " ^ (hd (tl nms)) ^ " -f " ^ (hd (tl (tl nms))) ^ " -b " ^ (hd (tl (tl nms)))
+    val obs_str = case obs_opt of false => ""
+                               |  true  => "-o "
     (*val const_nms' = map map_to_quickSpec const_nms  *)
     val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms obs_str (*hipspec_plain const_nms' outfile *)
                                      | SOME _ => raise ERROR "Conditionals not yet supported in this version."
@@ -234,11 +234,11 @@ fun explore' cond_opt obs_opt ctxt const_nms =
                     (Active.sendback_markup_command output))
   end
 
-val explore = explore' NONE NONE;
+val explore = explore' NONE false;
 (* TODO: Hook for conditionals into QuickSpec 2. Currently not available. *)
-fun explore_cond cond = explore' cond NONE;
+fun explore_cond cond = explore' cond false;
 
-fun explore_obs obs = explore' NONE obs;
+val explore_obs = explore' NONE true;
 
 
 (*-----------------------------------------------------------------------------------------*)
@@ -254,7 +254,7 @@ fun explore_goal ctxt const_nms thm =
          happen to use the same var name, you get an error. *)
       val res_ctxt =(* proof_loop_w_prio ctxt (SOME thm) *)
                        proof_loop ctxt
-                      (tipspec_explore ctxt NONE NONE const_nms)
+                      (tipspec_explore ctxt NONE false const_nms)
       val lemma_list = ThyExpl_Data.proved_of_ctxt res_ctxt
       val lemmas = Library.space_implode "\n\n"
                           (map (mk_lemma_str res_ctxt) lemma_list)
