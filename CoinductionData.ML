@@ -44,8 +44,8 @@ fun get_proof_script (Data d) ctxt =
   val subgoal_tacs = map (rev o snd) (Inttab.dest tac_table)
   val arbs = case (#arbitrary_vars d) of
                         [] => ""
-                        | arb_vs => " arbitrary: " ^ String.concatWith " " arb_vs
-  val app_coind = "apply (coinduction "
+                        | arb_vs => "arbitrary: " ^ String.concatWith " " arb_vs
+  val app_coind = "(coinduction "
   val coind_str = case (#coinduction_rule d) of
           NONE => app_coind ^ arbs ^ ")\n"
           | SOME rule => app_coind ^ arbs ^ " rule: " ^ rule ^ ")\n"
@@ -62,16 +62,47 @@ fun get_proof_script (Data d) ctxt =
               then merge_same_meths ((Induction_Data.Simp_All_Meth,f1@f2)::ms) new_m
               else merge_same_meths ((m2,f2)::ms) (new_m @ [Induction_Data.string_of_meth ctxt (m1,f1)])
 *)
- fun mk_app_str meths s =
-    case meths of
-      [] => s ^ "done"
-    | (m::ms) => mk_app_str ms (s ^ (Induction_Data.string_of_meth ctxt m) ^"\n")
-       (*if (null ms)
-       then s ^ "by " ^ m
-       else mk_app_str ms (s ^ "apply " ^ m ^"\n")*)
+ val app_strs = map (Induction_Data.string_of_meth ctxt) (flat subgoal_tacs)
+
+ fun split_longest_id_suffix [] = ([],[])
+   | split_longest_id_suffix (f::l) =
+     case split_longest_id_suffix l of
+       ([],[]) => ([],[f])
+     | (f1::l1,l2) => (f::f1::l1,l2)
+     | ([],f2::l2) => if f = f2 then ([],f::f2::l2)
+                      else ([f],f2::l2)
+
+ fun merge_app_strs aps =
+    let val (a1,a2) = split_longest_id_suffix aps
+    in if length a2 > 1 then
+           a1 @ [hd a2^"+"]
+         else
+           aps
+    end
+
+  fun split_proof_str s =
+   let val splt = String.tokens (curry op = #" ") s
+   in
+     case splt of 
+       "using"::l => 
+       let val (facts,script) = Library.take_prefix (not o curry op = "apply") l
+       in (facts,String.concatWith " " (tl script)) end
+     | "apply"::l=> ([],String.concatWith " " l)
+     | _ => raise Domain
+   end
   in
-    (*coind_str ^ (mk_app_str (merge_same_meths (flat subgoal_tacs) [])) ""*)
-    coind_str ^ (mk_app_str (flat subgoal_tacs)) ""
+    case merge_app_strs app_strs of
+      [e] => (case split_proof_str e of 
+                ([],proof) => " by "^coind_str^"    "^proof
+              | (facts,proof) =>
+                (case #coinduction_rule d |> Option.map (Proof_Context.get_thm ctxt)
+                      |> Option.map Rule_Cases.get |> Option.map fst 
+                   of SOME [((case_string,_),_)] =>
+                       "proof"^coind_str
+                      ^"  case "^case_string ^ " thus ?case\n    using "
+                      ^String.concatWith " " facts^"\n    by "^proof^"\nqed"
+                    | _  => "apply "^ coind_str ^ e ^ "\ndone"))
+    | l => "apply "^coind_str ^ String.concatWith "\n" l ^ "\ndone"
   end;
 
 structure CoIndData = Proof_Data (type T = T
