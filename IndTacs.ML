@@ -62,7 +62,7 @@ fun SOLVE_TIMEOUT mseconds tac t =
                      | ERROR message => (warning ("Error: " ^ message ^ "\n"); NONE)
   in
     case res of
-      NONE => Seq.empty  (* Output.tracing ("Timeout :(") *)
+      NONE => Seq.empty  (* Hipster_Utils.maybe_output ctxt 50 ("Timeout :(") *)
     | SOME t' => Seq.single t'
   end;
 

@@ -19,6 +19,11 @@ sig
   val type_names : Term.term -> string list
   val inductible_types : Term.term -> Proof.context -> string list
   val coinductible_types : Term.term -> Proof.context -> string list
+
+  val maybe_output : Proof.context -> int -> string -> unit
+  val maybe_print : Proof.context -> int -> string -> unit
+  val maybe_print_any : Proof.context -> int -> 'a -> unit
+  val maybe_pretty : Proof.context -> int -> Pretty.T -> unit
 end
 
 
@@ -49,6 +54,26 @@ fun frees_and_tfrees_of_thm thm =
   in
     (map fst (typ_tfrees_of (Term.fastype_of t)), map fst (frees_of t))
   end
+
+fun maybe_output ctxt verbosity_threshold =
+  if Misc_Data.verbosity ctxt >= verbosity_threshold then
+    Output.tracing
+  else K ()
+
+fun maybe_print ctxt verbosity_threshold =
+  if Misc_Data.verbosity ctxt >= verbosity_threshold then
+    Sledgehammer_Util.with_vanilla_print_mode writeln
+  else K ()
+
+fun maybe_print_any ctxt verbosity_threshold x =
+  if Misc_Data.verbosity ctxt >= verbosity_threshold then
+    let val _ = @{print} x in () end
+  else ()
+
+fun maybe_pretty ctxt verbosity_threshold =
+  if Misc_Data.verbosity ctxt >= verbosity_threshold then
+    Pretty.writeln
+  else K ()
 
 fun add_consts_of_thy (thynm, t) consts =
   case t of

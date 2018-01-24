@@ -38,7 +38,7 @@ fun try_nxt_conj ctxt =
       in
         case (SINGLE (Tactic_Data.routine_tac ctxt) c) of (* Discard this, it is trivial *)
           SOME _ => (* TODO: Include proving loop tracing as an option *)
-            let val _ = Output.tracing ("Trivial proof: "^lemma_str)
+            let val _ = Hipster_Utils.maybe_output ctxt 55 ("Trivial proof: "^lemma_str)
             in SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
             end
         | NONE => (* Only care about first proof found *)
@@ -63,7 +63,7 @@ fun try_nxt_conj ctxt =
                 end
             (* NONE indicates that the tactic failed to prove c *)
             | NONE =>
-                let val _ = Output.tracing ("Failed proving: "^lemma_str)
+                let val _ = Hipster_Utils.maybe_output ctxt 55 ("Failed proving: "^lemma_str)
                 in SOME (ctxt
                           |> ThyExpl_Data.set_open_conjs_ctxt cs
                           |> ThyExpl_Data.add_failed_ctxt c)
