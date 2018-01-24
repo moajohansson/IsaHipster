@@ -1,0 +1,8 @@
+ session Snippets = "HOL" +
+   options [
+     document = "pdf",
+     document_output = "generated"]
+   theories
+     Smap_siterate
+   document_files
+     build
