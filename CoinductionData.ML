@@ -46,9 +46,19 @@ fun get_proof_script (Data d) ctxt =
                         [] => ""
                         | arb_vs => "arbitrary: " ^ String.concatWith " " arb_vs
   val app_coind = "(coinduction "
+
+  fun dequalify ctxt s =
+    let val thystr = Context.theory_name (Proof_Context.theory_of ctxt) ^ "." in
+     if size s >= size thystr andalso thystr = String.substring(s,0,size thystr) then
+      let val newstr = String.substring(s,size thystr, size s - size thystr) in
+        if can (Proof_Context.get_thm ctxt) newstr then newstr else s
+      end
+     else s
+    end
+
   val coind_str = case (#coinduction_rule d) of
           NONE => app_coind ^ arbs ^ ")\n"
-          | SOME rule => app_coind ^ arbs ^ " rule: " ^ rule ^ ")\n"
+          | SOME rule => app_coind ^ arbs ^ " rule: " ^ dequalify ctxt rule ^ ")\n"
 
   fun is_simp m = (m = Induction_Data.Simp_All_Meth orelse
                    m = Induction_Data.Sledgehammer_Meth
