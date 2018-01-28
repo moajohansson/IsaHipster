@@ -4,5 +4,6 @@
      document_output = "generated"]
    theories
      Smap_siterate
+     Stream_applicative
    document_files
      build

@@ -1,11 +1,11 @@
 theory Stream_applicative
   imports Main "$HIPSTER_HOME/IsaHipster"
-    "types/Stream"
-    Smap
+    "../itp2018/types/Stream"
+    "../itp2018/Smap"
 begin
 setup Tactic_Data.set_coinduct_sledgehammer 
-setup Misc_Data.set_noisy
-  
+
+text_raw {*\DefineSnippet{streamapplicative}{*}  
 (* Lifting *)
 primcorec spure :: "'a \<Rightarrow> 'a Stream" where  
   "shd (spure x) = x"
@@ -15,9 +15,10 @@ primcorec spure :: "'a \<Rightarrow> 'a Stream" where
 primcorec sapp :: " ('a \<Rightarrow> 'b) Stream \<Rightarrow> 'a Stream \<Rightarrow> 'b Stream" where
   "shd (sapp fs xs) = (shd fs) (shd xs)"
 | "stl (sapp fs xs) = sapp (stl fs) (stl xs)"
-
+text_raw {*}%EndSnippet*} 
 (*cohipster smap spure sapp*)
 (* Discovered in ca 40 seconds *)
+text_raw {*\DefineSnippet{streamapplout}{*}  
 lemma lemma_ac [thy_expl]: "sapp (spure z) x2 = smap z x2"
   by (coinduction arbitrary: x2 z rule: Stream.Stream.coinduct_strong)
   auto
@@ -33,17 +34,6 @@ lemma lemma_ae [thy_expl]: "smap z (SCons y (spure x2)) = SCons (z y) (spure (z 
 lemma lemma_af [thy_expl]: "sapp (SCons y (spure z)) (spure x2) = SCons (y x2) (spure (z x2))"
   by (coinduction arbitrary: x2 y z rule: Stream.Stream.coinduct_strong)
     (simp add: Stream_applicative.lemma_ac lemma_ad)
+text_raw {*}%EndSnippet*} 
 
-(*cohipster sapp spure Fun.comp
-== Laws ==
-  1. shd (spure x) = x
-  2. stl (spure y) = spure y
-Warning: generated term of untestable type Stream (X1 -> X2)
-  3. sapp (spure f) z = sapp (spure f) z
-  4. sapp (spure f) (spure y) = spure (f y)
-  5. shd (sapp (spure f) y) = f (shd y)
-  6. stl (sapp (spure f) x2) = sapp (spure f) (stl x2)
-tip-spec: src/QuickSpec/Eval.hs, line 361: Untestable instance spure (X1 . X2) of testable schema spure (X1 . X1)
-CallStack (from HasCallStack):
-  error, called at src/QuickSpec/Eval.hs:361:12 in quickspec-2-AOUQDFNL2O4D7eGTuZ37W9:QuickSpec.Eval*)
 end
