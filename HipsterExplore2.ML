@@ -149,7 +149,8 @@ fun map_to_quickSpec isa_nm =
 fun map_to_haskell isa_nm =
   let
     val prelude_funs = [("List.rev", "Prelude.reverse"), ("List.append","Prelude.++"),
-                        ("List.list.map", "Prelude.map"), ("Fun.comp","Prelude..")];
+                        ("List.list.map", "Prelude.map"), ("Fun.comp","Prelude.."),
+                        ("Fun.id", "Prelude.id")];
     in
       case (Library.find_first (fn (nm,_) => nm = isa_nm) prelude_funs) of
         NONE => Long_Name.base_name isa_nm
