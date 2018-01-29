@@ -5,5 +5,8 @@
    theories
      Smap_siterate
      Stream_applicative
+     Smap_laws
+     Sunfold_laws
+     Smap_siterate_comp
    document_files
      build
