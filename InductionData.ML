@@ -25,7 +25,9 @@ datatype Hipster_Proof_Method =
              might not fit into an apply-style script, e.g. apply (auto some_facts) isn't allowed
              in Isabelle. It should say something like "using fact by auto" or "using fact apply auto" *)
               Sledgehammer_Proof_Methods.Auto_Method => if (null facts) then "apply auto"
-                                                        else "apply (auto simp add: "^space_implode " " facts^")"
+                                                        else(* "apply (auto simp add: "^space_implode " " facts^")"*)
+                                                             "using " ^ space_implode " " facts  ^ " apply (force simp add: "
+                                                                      ^ space_implode " " facts  ^")"
               | Sledgehammer_Proof_Methods.Blast_Method => if (null facts) then "apply blast"
                                                            else "using " ^ space_implode " " facts  ^ " apply blast"
               | Sledgehammer_Proof_Methods.Fastforce_Method => if (null facts) then "apply fastforce"

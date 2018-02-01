@@ -27,7 +27,10 @@ fun play_one_line_proof ctxt minimize timeout used_facts0 thm i (preferred_meth,
 
         fun try_methss [] [] = (used_facts, (preferred_meth, Sledgehammer_Proof_Methods.Play_Timed_Out Time.zeroTime))
           | try_methss ress [] =
-            let val _ = Hipster_Utils.maybe_print_any ctxt 65 ("Result", ress) in
+            let val _ = 
+                        if Misc_Data.verbosity ctxt >= 65 then
+                        let val _ = @{print} ("Result",ress) in () end
+                        else () in
             (used_facts,
              (case AList.lookup (op =) ress preferred_meth of
                SOME play => (preferred_meth, play)
@@ -40,14 +43,20 @@ fun play_one_line_proof ctxt minimize timeout used_facts0 thm i (preferred_meth,
 
               fun mk_step fact_names meths =
                 Sledgehammer_Isar_Proof.Prove ([], [], ("", 0), goal_t, [], ([], fact_names), meths, "")
-              val _ = Hipster_Utils.maybe_print_any ctxt 70 ("mk_step", mk_step fact_names meths)
+              val _ = if Misc_Data.verbosity ctxt >= 70 then
+                       let val _ = @{print} ("mk_step", mk_step fact_names meths) in () end
+                      else ()
               val ctxt' = Context_Position.set_visible false ctxt
             in
               (case Sledgehammer_Isar_Preplay.preplay_isar_step ctxt' [] timeout [] (mk_step fact_names meths) of
                 (* Why only picking first one? It might not make any progress! *)
                 (res as (meth, Sledgehammer_Proof_Methods.Played time)) :: more_stuff =>
-                let val _ = Hipster_Utils.maybe_print_any ctxt 70 ("All results", res::more_stuff)
-                    val _ = Hipster_Utils.maybe_print_any ctxt 70 ("All facts", fact_names)
+                let val _ = if Misc_Data.verbosity ctxt >= 70 then
+                              let val _ = @{print} ("All results", res::more_stuff) in () end
+                            else ()
+                    val _ = if Misc_Data.verbosity ctxt >= 70 then
+                              let val _ = @{print} ("All facts", fact_names) in () end
+                            else ()
                 in
                 (* if a fact is needed by an ATP, it will be needed by "metis" *)
                 if not minimize orelse is_metis_method meth then

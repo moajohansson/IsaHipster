@@ -52,15 +52,18 @@ fun try_nxt_conj ctxt =
         val sl = (if not(null(Hipster_Utils.coinductible_types (Thm.concl_of c) ctxt)) then ["coinduction"] else []) @
                 (if not(null(Hipster_Utils.inductible_types (Thm.concl_of c) ctxt)) then ["induction"] else [])
         val _ = Hipster_Utils.maybe_output ctxt 60 ("Using techniques: "^String.concatWith " " sl)
+        fun firstSome f g [] = NONE
+          | firstSome f g (x::xs) = let val fx = f x in if g fx then SOME fx else firstSome f g xs
+                                    end handle THM _ => firstSome f g xs
       in
-        case (map (fn s => SINGLE (Tactic_Data.routine_tac s ctxt) c) sl |> filter is_some) of (* Discard this, it is trivial *)
-          SOME _::_ =>
+        case (firstSome (fn s => SINGLE (Tactic_Data.routine_tac s ctxt) c) is_some sl) of (* Discard this, it is trivial *)
+          SOME _ =>
             let val _ = Hipster_Utils.maybe_output ctxt 55 ("Trivial proof: "^lemma_str)
             in SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
             end
         | _ =>
-            case map (fn s => (s,CTac.SINGLE (Tactic_Data.hard_ctac s ctxt) (ctxt,c))) sl |> filter (is_some o snd) of
-              (s,SOME (ctxt1, proved_thm))::_ =>
+            case firstSome (fn s => (s,CTac.SINGLE (Tactic_Data.hard_ctac s ctxt) (ctxt,c))) (is_some o snd) sl of
+              SOME(s,SOME (ctxt1, proved_thm)) =>
                 let
                   val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt1
                   val proof_script = case s of
@@ -264,6 +267,7 @@ fun explore_goal ctxt const_nms thm =
       val res_ctxt =(* proof_loop_w_prio ctxt (SOME thm) *)
                        proof_loop ctxt
                       (tipspec_explore ctxt NONE false const_nms)
+      val _ = Hipster_Utils.maybe_print ctxt 100 ("End of proof loop.")
       val lemma_list = ThyExpl_Data.proved_of_ctxt res_ctxt
       val lemmas = Library.space_implode "\n\n"
                           (map (mk_lemma_str res_ctxt) lemma_list)

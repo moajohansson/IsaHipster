@@ -75,6 +75,13 @@ val coinduct_sledgehammer = Data {technique = "coinduction",
                                   routine_tac_str = Coinduct_T.routine_tac_str,
                                   hard_tac_str = Coinduct_T.final_tactic_str}
 
+val sledgehammer_coinduct = Data {technique = "coinduction",
+                                  routine_tac = Coinduct_T.routine_tac,
+                                  hard_tac = Coinduct_T.hard_tac,
+                                  hard_ctac = Coinduct_CTac.thy_expl_sledge_or_coind_ctac,
+                                  routine_tac_str = Coinduct_T.routine_tac_str,
+                                  hard_tac_str = Coinduct_T.final_tactic_str}
+
 (* Routine: simp, Hard: Sledgehammer orelse Induction + Sledgehammer *)
 val simp_sledgehammer_induct_sledgehammer = Data {technique = "induction",
                                                   routine_tac = Simp_T.routine_tac,
@@ -105,5 +112,6 @@ val set_induct_simp = set_tacs [induct_simp]
 val set_induct_with_schemes = set_tacs [induct_with_schemes]
 val set_induct_sledgehammer = set_tacs [induct_sledgehammer]
 val set_coinduct_sledgehammer = set_tacs [induct_sledgehammer,coinduct_sledgehammer]
+val set_sledgehammer_coinduct = set_tacs [induct_sledgehammer,sledgehammer_coinduct]
 val set_sledge_induct_sledge = set_tacs [simp_sledgehammer_induct_sledgehammer]
 end
