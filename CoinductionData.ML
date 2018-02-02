@@ -44,33 +44,82 @@ fun get_proof_script (Data d) ctxt =
   val subgoal_tacs = map (rev o snd) (Inttab.dest tac_table)
   val arbs = case (#arbitrary_vars d) of
                         [] => ""
-                        | arb_vs => " arbitrary: " ^ String.concatWith " " arb_vs
-  val app_coind = "apply (coinduction "
-  val coind_str = case (#coinduction_rule d) of
-          NONE => app_coind ^ arbs ^ ")\n"
-          | SOME rule => app_coind ^ arbs ^ " rule: " ^ rule ^ ")\n"
+                        | arb_vs => "arbitrary: " ^ String.concatWith " " arb_vs
+  val app_coind = "(coinduction"
 
+  fun dequalify ctxt s =
+    let val thystr = Context.theory_name (Proof_Context.theory_of ctxt) ^ "." in
+     if size s >= size thystr andalso thystr = String.substring(s,0,size thystr) then
+      let val newstr = String.substring(s,size thystr, size s - size thystr) in
+        if can (Proof_Context.get_thm ctxt) newstr then newstr else s
+      end
+     else s
+    end
+
+  val coind_str = case (#coinduction_rule d) of
+          NONE => if arbs = "" then ""
+                  else String.concatWith " " ([app_coind, (arbs ^ ")\n")]
+                                              |> filter (curry op <> ""))
+          | SOME rule => String.concatWith " " ([app_coind, arbs, ("rule: " ^ dequalify ctxt rule ^ ")\n")]
+                                                |> filter (curry op <> ""))
+  val _ = @{print} coind_str
   fun is_simp m = (m = Induction_Data.Simp_All_Meth orelse
                    m = Induction_Data.Sledgehammer_Meth
                        (Sledgehammer_Proof_Methods.Simp_Method))
 
-  fun merge_same_meths ms new_m =
+(*  fun merge_same_meths ms new_m =
       case ms of [] => new_m
           | [(m,fs)] => new_m @ [Induction_Data.string_of_meth ctxt (m,fs)]
           | ((m1,f1)::(m2,f2)::ms) =>
               if (is_simp m1 andalso is_simp m2)
               then merge_same_meths ((Induction_Data.Simp_All_Meth,f1@f2)::ms) new_m
               else merge_same_meths ((m2,f2)::ms) (new_m @ [Induction_Data.string_of_meth ctxt (m1,f1)])
-
- fun mk_app_str meths s =
-    case meths of
-      [] => s
-    | (m::ms) =>
-       if (null ms)
-       then s ^ "by " ^ m
-       else mk_app_str ms (s ^ "apply " ^ m ^"\n")
+*)
+ val app_strs = map (Induction_Data.string_of_meth ctxt) (flat subgoal_tacs)
+  val _ = @{print} app_strs
+ fun split_longest_id_suffix [] = ([],[])
+   | split_longest_id_suffix (f::l) =
+     case split_longest_id_suffix l of
+       ([],[]) => ([],[f])
+     | (f1::l1,l2) => (f::f1::l1,l2)
+     | ([],f2::l2) => if f = f2 then ([],f::f2::l2)
+                      else ([f],f2::l2)
+  val _ = @{print} "done1"
+ fun merge_app_strs aps =
+    let val (a1,a2) = split_longest_id_suffix aps
+    in if length a2 > 1 then
+           a1 @ [hd a2^"+"]
+         else
+           aps
+    end
+  val _ = @{print} "done2"
+  fun split_proof_str s =
+   let val splt = String.tokens (curry op = #" ") s
+   in
+     case splt of 
+       "using"::l => 
+       let val (facts,script) = Library.take_prefix (not o curry op = "apply") l
+       in (facts,String.concatWith " " (tl script)) end
+     | "apply"::l=> ([],String.concatWith " " l)
+     | _ => raise Domain
+   end
   in
-    coind_str ^ (mk_app_str (merge_same_meths (flat subgoal_tacs) [])) ""
+    case merge_app_strs app_strs of
+      [e] => (case split_proof_str e of 
+                ([],proof) => " by"^
+                (if coind_str = "" then " "^proof
+                 else coind_str^"    "^proof)
+              | (facts,proof) =>
+                if coind_str = "" then
+                  " using "^String.concatWith " " facts^"\n by "^proof else
+                (case #coinduction_rule d |> Option.map (Proof_Context.get_thm ctxt)
+                      |> Option.map Rule_Cases.get |> Option.map fst 
+                   of SOME [((case_string,_),_)] =>
+                       "proof"^coind_str
+                      ^"  case "^case_string ^ " thus ?case\n    using "
+                      ^String.concatWith " " facts^"\n    by "^proof^"\nqed"
+                    | _  => "apply "^ coind_str ^ e ^ "\ndone"))
+    | l => "apply "^coind_str ^ String.concatWith "\n" l ^ "\ndone"
   end;
 
 structure CoIndData = Proof_Data (type T = T

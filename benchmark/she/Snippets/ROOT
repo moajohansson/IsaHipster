@@ -1,0 +1,13 @@
+ session Snippets = "HOL" +
+   options [
+     document = "pdf",
+     document_output = "generated"]
+   theories
+     Smap_siterate
+     Stream_applicative
+     Smap_laws
+     Sunfold_laws
+     Smap_siterate_comp
+     Lazy_lists
+   document_files
+     build

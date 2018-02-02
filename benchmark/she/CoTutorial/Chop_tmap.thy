@@ -35,13 +35,13 @@ primcorec lmap :: "('a \<Rightarrow> 'b) \<Rightarrow> 'a Llist \<Rightarrow> 'b
 primcorec tmap :: "('a \<Rightarrow> 'a) \<Rightarrow> 'a Tree \<Rightarrow> 'a Tree"
   where "tmap f t = (case t of Leaf \<Rightarrow> Leaf 
          | Node l x r \<Rightarrow> Node (tmap f l) (f x) (tmap f r))" 
-(*hipster chop tmap
+hipster chop tmap
 lemma unknown [thy_expl]: "left (left (left y)) = Leaf"
   oops
 why doesn't this return nicer things?
 *)  
     
-(*hipster tmap *)
+(*hipster tmap*)
 lemma lemma_a [thy_expl]: "tmap y (Node Leaf z Leaf) = Node Leaf (y z) Leaf"
   apply (coinduction  arbitrary: y z rule: Chop_tmap.Tree.coinduct_strong)
 by simp

@@ -48,20 +48,25 @@ fun try_nxt_conj ctxt =
   | (c::cs) => (* try proving next open conj *)
       let
         val lemma_str = Syntax.string_of_term ctxt (Thm.concl_of c)
-        val _ = Output.tracing ("Proving: "^lemma_str)
+        val _ = Hipster_Utils.maybe_output ctxt 50 ("Proving: "^lemma_str)
+        val sl = (if not(null(Hipster_Utils.coinductible_types (Thm.concl_of c) ctxt)) then ["coinduction"] else []) @
+                (if not(null(Hipster_Utils.inductible_types (Thm.concl_of c) ctxt)) then ["induction"] else [])
+        val _ = Hipster_Utils.maybe_output ctxt 60 ("Using techniques: "^String.concatWith " " sl)
+        fun firstSome f g [] = NONE
+          | firstSome f g (x::xs) = let val fx = f x in if g fx then SOME fx else firstSome f g xs
+                                    end handle THM _ => firstSome f g xs
       in
-        case (SINGLE (Tactic_Data.routine_tac ctxt) c) of (* Discard this, it is trivial *)
+        case (firstSome (fn s => SINGLE (Tactic_Data.routine_tac s ctxt) c) is_some sl) of (* Discard this, it is trivial *)
           SOME _ =>
-            let val _ = Output.tracing ("Trivial proof: "^lemma_str)
+            let val _ = Hipster_Utils.maybe_output ctxt 55 ("Trivial proof: "^lemma_str)
             in SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
             end
-        | NONE =>
-            let val hard_ctac = Tactic_Data.hard_ctac ctxt in
-            case (CTac.SINGLE hard_ctac (ctxt,c)) of
-              SOME (ctxt1, proved_thm) =>
+        | _ =>
+            case firstSome (fn s => (s,CTac.SINGLE (Tactic_Data.hard_ctac s ctxt) (ctxt,c))) (is_some o snd) sl of
+              SOME(s,SOME (ctxt1, proved_thm)) =>
                 let
                   val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt1
-                  val proof_script = case (Tactic_Data.technique ctxt') of
+                  val proof_script = case s of
                       "induction" =>
                       proof_str ctxt'(Induction_Data.get_proof_script_ctxt ctxt') new_nm proved_thm
                       | "coinduction" =>
@@ -74,7 +79,7 @@ fun try_nxt_conj ctxt =
 
                   (*val gen_thm = Runtime.exn_trace (fn () => Drule.generalize
                             (Hipster_Utils.frees_and_tfrees_of_thm final_thm) final_thm)*)
-                  val _ = Sledgehammer_Util.with_vanilla_print_mode writeln
+                  val _ = Hipster_Utils.maybe_print ctxt' 25
                             ("Proved: " ^ lemma_str)
                 in
                   SOME (ctxt'
@@ -85,13 +90,12 @@ fun try_nxt_conj ctxt =
                           |> ThyExpl_Data.add_proof_script_ctxt (new_nm, proof_script))
                 end
             (* NONE indicates that the tactic failed to prove c, put back with open_conjs *)
-            | NONE =>
-                let val _ = Output.tracing ("Failed proving: "^lemma_str)
+            | _ =>
+                let val _ = Hipster_Utils.maybe_output ctxt 55 ("Failed proving: "^lemma_str)
                 in SOME (ctxt
                           |> ThyExpl_Data.set_open_conjs_ctxt cs
                           |> ThyExpl_Data.add_failed_ctxt c)
                 end
-            end
       end
 
 
@@ -148,7 +152,8 @@ fun map_to_quickSpec isa_nm =
 fun map_to_haskell isa_nm =
   let
     val prelude_funs = [("List.rev", "Prelude.reverse"), ("List.append","Prelude.++"),
-                        ("List.list.map", "Prelude.map")];
+                        ("List.list.map", "Prelude.map"), ("Fun.comp","Prelude.."),
+                        ("Fun.id", "Prelude.id")];
     in
       case (Library.find_first (fn (nm,_) => nm = isa_nm) prelude_funs) of
         NONE => Long_Name.base_name isa_nm
@@ -189,18 +194,26 @@ fun tipspec_explore ctxt cond_opt obs_opt const_nms =
     val thy = Proof_Context.theory_of ctxt
     val thynm = Context.theory_name thy
     val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^".hs"
-    val obs_str = case obs_opt of NONE     => ""
-                               |  SOME nms => "-e " ^ (hd nms) ^ " -o " ^ (hd (tl nms)) ^ " -f " ^ (hd (tl (tl nms))) ^ " -b " ^ (hd (tl (tl nms)))
+    val obs_str = case obs_opt of false => ""
+                               |  true  => "-o "
     (*val const_nms' = map map_to_quickSpec const_nms  *)
     val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms obs_str (*hipspec_plain const_nms' outfile *)
                                      | SOME _ => raise ERROR "Conditionals not yet supported in this version."
                                       (*hipspec_cond c const_nms' outfile *)
     val path_opt = SOME (Path.explode Hipster_Setup.filepath);
+
+    (* Stolen from Isabelle_system, massaged to not emit warnings*)
+    fun my_bash_output s =
+    let
+      val {out, err, rc, ...} = Bash.process s;
+      val _ = Hipster_Utils.maybe_output ctxt 20 err
+    in (out, rc) end;
+
     val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
     (*val output = fst (Isabelle_System.bash_output tipspec_cmd)
     val _ =  @{print} output *)
   in
-       fst (Isabelle_System.bash_output tipspec_cmd)
+       fst (my_bash_output tipspec_cmd)
   end;
 
 (*-----------------------------------------------------------------------------------------*)
@@ -229,15 +242,15 @@ fun explore' cond_opt obs_opt ctxt const_nms =
                     ((ThyExpl_Data.proved_of_ctxt res_ctxt)
                     @ (ThyExpl_Data.failed_of_ctxt res_ctxt)))
   in
-    (res_ctxt, Sledgehammer_Util.with_vanilla_print_mode writeln
+    (res_ctxt, Hipster_Utils.maybe_print ctxt 0
                     (Active.sendback_markup_command output))
   end
 
-val explore = explore' NONE NONE;
+val explore = explore' NONE false;
 (* TODO: Hook for conditionals into QuickSpec 2. Currently not available. *)
-fun explore_cond cond = explore' cond NONE;
+fun explore_cond cond = explore' cond false;
 
-fun explore_obs obs = explore' NONE obs;
+val explore_obs = explore' NONE true;
 
 
 (*-----------------------------------------------------------------------------------------*)
@@ -253,14 +266,15 @@ fun explore_goal ctxt const_nms thm =
          happen to use the same var name, you get an error. *)
       val res_ctxt =(* proof_loop_w_prio ctxt (SOME thm) *)
                        proof_loop ctxt
-                      (tipspec_explore ctxt NONE NONE const_nms)
+                      (tipspec_explore ctxt NONE false const_nms)
+      val _ = Hipster_Utils.maybe_print ctxt 100 ("End of proof loop.")
       val lemma_list = ThyExpl_Data.proved_of_ctxt res_ctxt
       val lemmas = Library.space_implode "\n\n"
                           (map (mk_lemma_str res_ctxt) lemma_list)
   in
     case lemma_list of
       [] =>
-        let val _ = writeln ("Failed to find lemmas which will prove goal.")
+        let val _ = Hipster_Utils.maybe_print ctxt 25 ("Failed to find lemmas which will prove goal.")
         in no_tac thm end
     | _ => (* Success, provided the explored lemmas, the thm can be proved. *)
         let

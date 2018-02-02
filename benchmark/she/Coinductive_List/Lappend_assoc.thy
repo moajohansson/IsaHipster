@@ -14,7 +14,7 @@ primcorec lappend :: "'a Llist \<Rightarrow> 'a Llist \<Rightarrow> 'a Llist" wh
 | "lhd (lappend xs ys) = lhd (if lnull xs then ys else xs)"
 | "ltl (lappend xs ys) = (if lnull xs then ltl ys else lappend (ltl xs) ys)"
 
-(*hipster lappend*)
+hipster lappend
 lemma lemma_a [thy_expl]: "lappend y LNil = y"
   apply (coinduction  arbitrary: y rule: Lappend_assoc.Llist.coinduct_strong)
 by simp
@@ -39,9 +39,11 @@ by auto
 
 lemma lemma_ae [thy_expl]: "ltl (lappend y (ltl y)) = lappend (ltl y) (ltl y)"
 apply (coinduction  arbitrary: y rule: Lappend_assoc.Llist.coinduct_strong)
+sledgehammer
 apply simp
-by (fastforce Llist.collapse(1) lemma_a)
-  
+by fastforce using (Llist.collapse(1) lemma_a)
+(*How should this syntax be?*)
+
 theorem  lappend_assoc: "lappend (lappend xs ys) zs = lappend xs (lappend ys zs)"
 by (simp add: lemma_ad)
 (*by hipster_coinduct_sledgehammer works also*)    

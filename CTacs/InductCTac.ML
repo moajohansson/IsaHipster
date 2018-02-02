@@ -69,11 +69,14 @@ fun simp_goal_ctac i (ctxt,thm) =
                         ctxt',thm'))
      (CTac.AS_CTACTIC (CHANGED (Simplifier.asm_full_simp_tac ctxt i)) (ctxt,thm))
 
+fun simp_no_goal_ctac i =
+  CTac.CORELSE(CTac.SOLVE_OR_FAIL (simp_goal_ctac i), CTac.all_ctac)
+
 (* Must fail if there are any open subgoals left *)
 val simp_or_sledgehammer_ctac =
   (*   CTac.SOLVE_OR_FAIL (CTac.ALLGOALS (CTac.CTHEN_MAYBE'(
                                           simp_goal_ctac, sledgehammer_ctac))) *)
-  CTac.CTHEN_MAYBE' (simp_goal_ctac, sledgehammer_ctac)
+  CTac.CTHEN_MAYBE' (simp_no_goal_ctac, sledgehammer_ctac)
 
 
 (* Apply induction and record which rule was used, and on which variables *)

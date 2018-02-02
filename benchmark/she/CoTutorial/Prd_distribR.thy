@@ -1,5 +1,5 @@
 theory Prd_distribR
-  imports Main  "~~/src/HOL/Library/BNF_Corec" "$HIPSTER_HOME/IsaHipster" "$HIPSTER_HOME/ObsIntTrans"
+  imports Main  "~~/src/HOL/Library/BNF_Corec" "$HIPSTER_HOME/IsaHipster"
 begin
   
 setup Tactic_Data.set_coinduct_sledgehammer  

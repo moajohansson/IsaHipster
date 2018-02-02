@@ -24,11 +24,15 @@ datatype Hipster_Proof_Method =
              faulty proof script, unless we take this into account! Furthermore, the string
              might not fit into an apply-style script, e.g. apply (auto some_facts) isn't allowed
              in Isabelle. It should say something like "using fact by auto" or "using fact apply auto" *)
-              Sledgehammer_Proof_Methods.Auto_Method => if (null facts) then "auto"
-                                                        else "using " ^ space_implode " " facts  ^ " apply auto"
-              | Sledgehammer_Proof_Methods.Blast_Method => if (null facts) then "blast"
+              Sledgehammer_Proof_Methods.Auto_Method => if (null facts) then "apply auto"
+                                                        else(* "apply (auto simp add: "^space_implode " " facts^")"*)
+                                                             "using " ^ space_implode " " facts  ^ " apply (force simp add: "
+                                                                      ^ space_implode " " facts  ^")"
+              | Sledgehammer_Proof_Methods.Blast_Method => if (null facts) then "apply blast"
                                                            else "using " ^ space_implode " " facts  ^ " apply blast"
-              | _ => Sledgehammer_Proof_Methods.string_of_proof_method ctxt facts meth ^""
+              | Sledgehammer_Proof_Methods.Fastforce_Method => if (null facts) then "apply fastforce"
+                                                           else "using " ^ space_implode " " facts  ^ " apply fastforce"
+              | _ => "apply " ^ Sledgehammer_Proof_Methods.string_of_proof_method ctxt facts meth ^""
           )
            | Simp_All_Meth => "apply " ^ (if (null facts) then "simp_all"
                                          else "(simp_all add: " ^ space_implode " " facts)

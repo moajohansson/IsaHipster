@@ -1,6 +1,6 @@
 theory IsaHipster
 imports Main "$ISABELLE_HOME/src/HOL/TPTP/ATP_Problem_Import"
-keywords "hipster" "hipster_cond" "hipster_obs" :: thy_decl
+keywords "hipster" "hipster_cond" "cohipster" :: thy_decl
 
 begin
 
@@ -49,6 +49,7 @@ val thy_interesting = Attrib.setup_config_bool @{binding thy_interesting} (K tru
 
 setup {* Hipster_Rules.setup;*}
 
+ML_file "MiscData.ML"
 ML_file "HipsterUtils.ML"
 ML_file "SchemeInstances.ML"
 ML_file "InductionData.ML"
