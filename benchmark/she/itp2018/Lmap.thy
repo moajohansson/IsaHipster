@@ -8,7 +8,7 @@ setup Misc_Data.set_noisy
 primcorec lmap :: "('a \<Rightarrow> 'b) \<Rightarrow> 'a Llist \<Rightarrow> 'b Llist" where
  "lmap f xs = (case xs of LNil \<Rightarrow> LNil | LCons x xs \<Rightarrow> LCons (f x) (lmap f xs))"  
 
-cohipster lmap lhd ltl
+(*cohipster lmap lhd ltl*)
 (* Discovered and proved in ca. 20 seconds*)
 lemma lemma_a [thy_expl]: "lmap y (LCons z LNil) = LCons (y z) LNil"
   by (coinduction arbitrary: y z rule: Llist.Llist.coinduct_strong)

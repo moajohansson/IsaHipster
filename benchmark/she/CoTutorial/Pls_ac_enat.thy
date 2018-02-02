@@ -1,6 +1,6 @@
 theory Pls_ac_enat
-  imports Main  "~~/src/HOL/Library/BNF_Corec" "$HIPSTER_HOME/IsaHipster" "$HIPSTER_HOME/ObsIntTrans"
-begin
+  imports Main  "~~/src/HOL/Library/BNF_Corec" "$HIPSTER_HOME/IsaHipster" 
+begin    
   
 setup Tactic_Data.set_coinduct_sledgehammer  
 
@@ -22,7 +22,7 @@ datatype 'a Lst =
 fun obsStream :: "int \<Rightarrow> 'a Stream \<Rightarrow> 'a Lst" where
 "obsStream n s = (if (n \<le> 0) then Emp else Cons (shd s) (obsStream (n - 1) (stl s)))"
 
-hipster_obs Stream Lst obsStream pls
+(*hipster_obs Stream Lst obsStream pls*)
 lemma lemma_a [thy_expl]: "eplus x EZ = x"
   apply (coinduction  arbitrary: x rule: Pls_ac_enat.ENat.coinduct_strong)
   by simp
