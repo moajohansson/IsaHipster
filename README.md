@@ -9,8 +9,12 @@ sugar.
 
 
 Start by installing [TIP-tools][TIP]. You need to have Haskell installed, as well as [Stack][ST]: 
-    
-    git clone https://github.com/tip-org/tools.git
+
+    # We need to use the solrun fork of the tip-tools
+    # to handle coinductive theory exploration.
+    # Our changes there should be merged into the main branch soon.
+    # git clone https://github.com/tip-org/tools.git
+    git clone https://github.com/solrun/tools.git
     cd tools
     stack setup
     stack install
@@ -43,6 +47,8 @@ imports "$HIPSTER_HOME/IsaHipster"
     
 Now, you should be able to try Hipster.  
 Start up Isabelle on for example `Examples/TreeDemo.thy` and have a go.
+
+To try coinductive theory exploration, check out `Examples/StreamExample.thy`.
 
 
 _Disclaimer_: Hipster is always under development. Let us know if you run into anything too odd,
