@@ -1,3 +1,4 @@
+(* Attempting to discover laws form Hinze's stream calculus using Hipster *)
 theory Hinze_Streams
   imports Main "$HIPSTER_HOME/IsaHipster"
     "types/Stream" "types/Twople"
@@ -203,12 +204,12 @@ corec srecurse :: "('a \<Rightarrow> 'a) \<Rightarrow> 'a \<Rightarrow> 'a Strea
 (* after ca 20 seconds
    proof loop crashes with "no matching coinduction rule found" when
    proving shd (srecurse y z) = z *) 
-cohipster siterate srecurse
+(*cohipster siterate srecurse*)
 (* after ca 30 seconds
    proof loop crashes with "no matching coinduction rule found" when
    proving shd (srecurse y z) = z  
 but srecurse f y = siterate f y is discovered *)
-  
+(* see a working proof of this lemma in Srecurse_siterate.thy*)  
 
 primcorec sunfold :: "('a \<Rightarrow> 'b) \<Rightarrow> ('a \<Rightarrow> 'a) \<Rightarrow> 'a \<Rightarrow> 'b Stream" where
   "sunfold g f a = SCons (g a) (sunfold g f (f a))"
@@ -232,7 +233,7 @@ lemma lemma_au [thy_expl]: "sunfold (y \<circ> z) x2 x3 = smap y (sunfold z x2 x
   auto
 
 (* Trying to discover unfold reflection *)
-cohipster sunfold shd stl Fun.id
+(*cohipster sunfold shd stl Fun.id*)
 lemma lemma_av [thy_expl]: "sunfold id y (y z) = sunfold y y z"
   by(coinduction arbitrary: y z rule: Stream.Stream.coinduct_strong)
     auto
