@@ -10,11 +10,7 @@ sugar.
 
 Start by installing [TIP-tools][TIP]. You need to have Haskell installed, as well as [Stack][ST]: 
 
-    # We need to use the solrun fork of the tip-tools
-    # to handle coinductive theory exploration.
-    # Our changes there should be merged into the main branch soon.
-    # git clone https://github.com/tip-org/tools.git
-    git clone https://github.com/solrun/tools.git
+    git clone https://github.com/tip-org/tools.git
     cd tools
     stack setup
     stack install
