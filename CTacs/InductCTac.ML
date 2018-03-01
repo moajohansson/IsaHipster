@@ -203,9 +203,8 @@ fun hipster_induct ctxt0 thm =
       [] => Seq.empty
       | ((ctxt1,thm1)::_) => (* NOTE: Check if proved! otherwise fail *)
           (if (Thm.no_prems thm1) then  (* proved thm, no subgoals *)
-                let val _ = Sledgehammer_Util.with_vanilla_print_mode writeln
-                                     (Active.sendback_markup_command
-                                     (Induction_Data.get_proof_script_ctxt ctxt1))
+                let val _ = writeln (Active.sendback_markup_command
+                                    (Induction_Data.get_proof_script_ctxt ctxt1))
                    in Seq.single thm1 end
           else Seq.empty)
     end

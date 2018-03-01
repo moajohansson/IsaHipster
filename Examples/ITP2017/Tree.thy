@@ -19,6 +19,5 @@ where
 
 
 (* Call to Hipster: Explore tmap and mirror *)
-hipster tmap mirror
 
 end

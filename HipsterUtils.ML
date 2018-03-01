@@ -62,7 +62,7 @@ fun maybe_output ctxt verbosity_threshold =
 
 fun maybe_print ctxt verbosity_threshold =
   if Misc_Data.verbosity ctxt >= verbosity_threshold then
-    Sledgehammer_Util.with_vanilla_print_mode writeln
+     writeln
   else K ()
 
 fun maybe_print_any ctxt verbosity_threshold x =
