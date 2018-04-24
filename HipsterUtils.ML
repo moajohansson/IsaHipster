@@ -19,6 +19,7 @@ sig
   val type_names : Term.term -> string list
   val inductible_types : Term.term -> Proof.context -> string list
   val coinductible_types : Term.term -> Proof.context -> string list
+  val coinductible_goal : Thm.thm -> Proof.context -> bool
 
   val maybe_output : Proof.context -> int -> string -> unit
   val maybe_print : Proof.context -> int -> string -> unit
@@ -111,7 +112,7 @@ fun types_in_term t = case t of
    occurring in a term *)
 fun type_names t =
   let fun name_of T = [(fst o dest_Type) T]
-                        handle _ => []
+                        handle TYPE _ => []
       fun names_in (args, T) = name_of T @ (List.concat (map name_of args))
       fun sieve tn = not (String.isPrefix "Pure" tn orelse String.isPrefix "HOL" tn orelse "prop"= tn)
   in
@@ -120,12 +121,60 @@ fun type_names t =
       |> filter sieve o distinct (op =)
   end
 
+fun is_coinductible ctxt t =
+  is_some(Proof_Context.lookup_fact ctxt (t^".coinduct"))
+
+fun is_inductible ctxt t =
+  is_some(Proof_Context.lookup_fact ctxt (t^".induct"))
+
 fun inductible_types t ctxt =
-  filter (fn t => is_some(Proof_Context.lookup_fact ctxt (t^".induct")))  (type_names t)
+  filter (is_inductible ctxt)  (type_names t)
 
 fun coinductible_types t ctxt =
-  filter (fn t => is_some(Proof_Context.lookup_fact ctxt (t^".coinduct")))  (type_names t)
+  filter (is_coinductible ctxt) (type_names t)
 
+(* stolen from Library/old_recdef.ML *)
+fun dest_abs used (a as Abs(s, ty, _)) =
+     let
+       val s' = singleton (Name.variant_list used) s;
+       val v = Free(s', ty);
+     in ({Bvar = v, Body = Term.betapply (a,v)}, s'::used)
+     end
+  | dest_abs _ _ =  raise Domain;
+fun dest_forall(Const(@{const_name All},_) $ (a as Abs _)) = fst (dest_abs [] a)
+  | dest_forall _ = raise Domain;
+val is_forall = can dest_forall
+
+fun strip_forall fm =
+   if (is_forall fm)
+   then let val {Bvar,Body} = dest_forall fm
+            val (bvs,core) = strip_forall Body
+        in ((Bvar::bvs), core)
+        end
+   else ([],fm);
+(* End stolen code *)
+
+fun strip_all trm =
+  if can Logic.dest_all trm then
+    strip_all(snd(Logic.dest_all trm))
+  else trm
+
+fun strip_Trueprop trm =
+  if can HOLogic.dest_Trueprop trm then
+    HOLogic.dest_Trueprop trm
+  else trm
+
+fun strip_Prop(Const ("Pure.prop",_) $ t) = t
+  | strip_Prop t = t
+  
+fun coinductible_goal thm ctxt =
+  let (* TODO: this seems like an awful and fragile way to get at the conclusion of a goal *)
+      val g = snd(strip_forall(strip_Trueprop(Logic.strip_imp_concl(strip_all(strip_Prop(Thm.concl_of thm))))))
+  in
+    if can HOLogic.dest_eq g then
+     is_coinductible ctxt ((fst o dest_Type o type_of o snd o HOLogic.dest_eq) g)
+    else false
+  end
 end
 (*
 val yup = @{term "!! x. x=y"}
