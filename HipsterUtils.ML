@@ -19,7 +19,7 @@ sig
   val type_names : Term.term -> string list
   val inductible_types : Term.term -> Proof.context -> string list
   val coinductible_types : Term.term -> Proof.context -> string list
-  val coinductible_goal : Thm.thm -> Proof.context -> bool
+  val coinductible_goal : Thm.thm -> Proof.context -> string option
 
   val maybe_output : Proof.context -> int -> string -> unit
   val maybe_print : Proof.context -> int -> string -> unit
@@ -167,13 +167,28 @@ fun strip_Trueprop trm =
 fun strip_Prop(Const ("Pure.prop",_) $ t) = t
   | strip_Prop t = t
 
+fun lfp f a =
+  let val fa = f(a) in
+    if a = fa then
+      a
+    else
+      lfp f fa
+  end
+
 fun coinductible_goal thm ctxt =
-  let (* TODO: this seems like an awful and fragile way to get at the conclusion of a goal *)
-      val g = snd(strip_forall(strip_Trueprop(Logic.strip_imp_concl(strip_all(strip_Prop(Thm.concl_of thm))))))
+  let
+      val g = lfp (snd o strip_forall o strip_Trueprop o Logic.strip_imp_concl o
+                   strip_all o strip_Prop)
+                  (Thm.concl_of thm)
   in
     if can HOLogic.dest_eq g then
-     is_coinductible ctxt ((fst o dest_Type o type_of o snd o HOLogic.dest_eq) g)
-    else false
+     let val type_name = (fst o dest_Type o type_of o snd o HOLogic.dest_eq) g
+     in
+       if is_coinductible ctxt type_name then
+         SOME type_name
+       else NONE
+     end
+    else NONE
   end
 end
 (*
