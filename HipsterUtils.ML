@@ -111,7 +111,7 @@ fun types_in_term t = case t of
    occurring in a term *)
 fun type_names t =
   let fun name_of T = [(fst o dest_Type) T]
-                        handle _ => []
+                        handle Term.TYPE _ => []
       fun names_in (args, T) = name_of T @ (List.concat (map name_of args))
       fun sieve tn = not (String.isPrefix "Pure" tn orelse String.isPrefix "HOL" tn orelse "prop"= tn)
   in
