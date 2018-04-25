@@ -13,23 +13,28 @@ end
 structure Coinduct_CTac  : COINDUCT_CTAC   =
 struct
 (* Apply coinduction and record which rule was used, and which variables were arbitrary *)
-fun coinduct_with_arb_ctac rule vars (ctxt,thm) =
-  let val typename = hd (Hipster_Utils.type_names (Thm.concl_of thm))
-      val _ = Hipster_Utils.maybe_print ctxt 100 ("Strong coinduction on type: " ^ typename)
-      val rulename = typename ^ ".coinduct_strong"
-      val rule' = case rule of SOME (_,thms) => SOME thms
+fun coinduct_with_arb_ctac rule vars (ctxt,thm) = (
+  @{print} thm;
+  if Hipster_Utils.coinductible_goal thm ctxt then
+    let 
+        val typename = hd (Hipster_Utils.type_names (Thm.concl_of thm))
+        val _ = Hipster_Utils.maybe_print ctxt 100 ("Strong coinduction on type: " ^ typename)
+        val rulename = typename ^ ".coinduct_strong"
+        val rule' = case rule of SOME (_,thms) => SOME thms
                                | NONE => SOME [(Proof_Context.get_thm ctxt rulename)]
-      val results = HEADGOAL(Coinduction.coinduction_tac ctxt vars rule' []) thm
-      fun set_rule r  = case r of NONE =>
-                        Coinduction_Data.set_coinduction_rule_ctxt (SOME rulename)
-                                | SOME (nm,_) =>
-                        Coinduction_Data.set_coinduction_rule_ctxt (SOME nm)
-  in
-    Seq.map (fn thm' =>
-      (ctxt
-       |> Coinduction_Data.set_arbitrary_vars_ctxt (map fst (map Term.dest_Free vars))
-       |> set_rule rule, thm')) results
-  end;
+        val results = HEADGOAL(Coinduction.coinduction_tac ctxt vars rule' []) thm
+        fun set_rule r  = case r of NONE =>
+                          Coinduction_Data.set_coinduction_rule_ctxt (SOME rulename)
+                                  | SOME (nm,_) =>
+                          Coinduction_Data.set_coinduction_rule_ctxt (SOME nm)
+    in
+      Seq.map (fn thm' =>
+        (ctxt
+         |> Coinduction_Data.set_arbitrary_vars_ctxt (map fst (map Term.dest_Free vars))
+         |> set_rule rule, thm')) results
+    end
+  else
+    CTac.no_ctac (ctxt,thm));
 
 (* Apply coinduction and record which rule was used, and which variables were arbitrary *)
 fun coinduct_upto_with_arb_ctac rule vars (ctxt,thm) =
