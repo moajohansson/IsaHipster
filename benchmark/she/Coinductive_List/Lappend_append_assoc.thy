@@ -2,7 +2,7 @@
   Example with mixed induction and coinduction
  *)
 theory Lappend_append_assoc
-  imports Main "$HIPSTER_HOME/IsaHipster" "$HIPSTER_HOME/ObsIntTrans"
+  imports Main "$HIPSTER_HOME/IsaHipster"
 begin
   
 setup Tactic_Data.set_coinduct_sledgehammer  

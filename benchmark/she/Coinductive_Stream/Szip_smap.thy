@@ -1,5 +1,5 @@
 theory Szip_smap
-  imports Main "$HIPSTER_HOME/IsaHipster" "$HIPSTER_HOME/ObsIntTrans"
+  imports Main "$HIPSTER_HOME/IsaHipster"
 begin
   
 setup Tactic_Data.set_coinduct_sledgehammer  
