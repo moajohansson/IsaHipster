@@ -55,13 +55,15 @@ fun try_nxt_conj ctxt =
           | firstSome f g (x::xs) = let val fx = f x in if g fx then SOME fx else firstSome f g xs
                                     end handle THM _ => firstSome f g xs
       in
-        case (firstSome (fn s => SINGLE (Tactic_Data.routine_tac s ctxt) c) is_some sl) of (* Discard this, it is trivial *)
+      (* Added a timeout to the routine tactic, TODO: make this a param/flag *)
+        case (firstSome (fn s => SINGLE (Ind_Tacs.SOLVE_TIMEOUT 10000 (Tactic_Data.routine_tac s ctxt)) c) is_some sl) of (* Discard this, it is trivial *)
           SOME _ =>
             let val _ = Hipster_Utils.maybe_output ctxt 55 ("Trivial proof: "^lemma_str)
             in SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt)
             end
         | _ =>
-            case firstSome (fn s => (s,CTac.SINGLE (Tactic_Data.hard_ctac s ctxt) (ctxt,c))) (is_some o snd) sl of
+        (* Added a timeout to the hard tactic, TODO: make this a param/flag *)
+            case firstSome (fn s => (s,CTac.SINGLE (CTac.SOLVE_TIMEOUT 10000 (Tactic_Data.hard_ctac s ctxt)) (ctxt,c))) (is_some o snd) sl of
               SOME(s,SOME (ctxt1, proved_thm)) =>
                 let
                   val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt1

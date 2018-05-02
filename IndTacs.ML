@@ -48,6 +48,7 @@ sig
   val induct_with_schemes : Proof.context -> thm list -> tactic
   val try_induct_schemes : Proof.context -> inductionStrategy -> int -> tactic
 
+  val SOLVE_TIMEOUT : int -> tactic -> tactic
 end
 
 structure Ind_Tacs  : IND_TACS  =
