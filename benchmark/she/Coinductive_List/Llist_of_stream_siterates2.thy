@@ -1,5 +1,5 @@
 theory Llist_of_stream_siterates2
-    imports Main "$HIPSTER_HOME/IsaHipster" "$HIPSTER_HOME/ObsIntTrans"
+    imports Main "$HIPSTER_HOME/IsaHipster"
 begin
   
 setup Tactic_Data.set_coinduct_sledgehammer  
