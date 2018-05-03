@@ -179,12 +179,14 @@ fun hipspec_cond cond_name consts file =
 *)
 fun tipspec_plain file consts obs=
   let
-  val add_funs =  " -k " ^ Library.space_implode "," (map map_to_haskell consts)
+  val consts_str = Library.space_implode "," (map map_to_haskell consts)
+  val add_funs =  " -k " ^ consts_str
+  val to_explore = " -f " ^ consts_str
   (* val _ = @{print} add_funs *)
   (* ^ List.foldl (fn (nm,s) => s ^","^(map_to_haskell nm)) " " consts *)
                   (*^ (List.foldr (fn (nm,s) =>
                               (Long_Name.base_name nm) ^ "," ^ s) " " consts) *)
-  in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd ^
+  in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd ^ to_explore ^ " " ^
       obs ^ " | " ^ Hipster_Setup.tipTransl_cmd
 end
 

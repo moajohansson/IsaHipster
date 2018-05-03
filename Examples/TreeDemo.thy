@@ -2,7 +2,7 @@ theory TreeDemo
 imports "$HIPSTER_HOME/IsaHipster"
 
 begin
-
+setup Misc_Data.set_noisy
 (* setup Tactic_Data.set_induct_simp *)
 setup Tactic_Data.set_sledge_induct_sledge
 
@@ -63,11 +63,23 @@ where
 hipster leftmost rightmost mirror tmap
 lemma lemma_ad [thy_expl]: "leftmost (mirror y) = rightmost y"
   apply (induct y)
-  by simp_all
+  apply simp
+apply simp
+  done
     
-lemma lemma_ae [thy_expl]: "leftmost (tmap y z) = y (leftmost z)"
-  apply (induct z)
-  by simp_all
+lemma lemma_ae [thy_expl]: "rightmost (mirror y) = leftmost y"
+apply (metis lemma_a lemma_ad)
+done
+
+lemma lemma_af [thy_expl]: "leftmost (tmap z x2) = z (leftmost x2)"
+apply (induct x2)
+apply simp
+apply simp
+done
+
+lemma lemma_ag [thy_expl]: "rightmost (tmap z x2) = z (rightmost x2)"
+apply (metis TreeDemo.lemma_ad lemma_aa lemma_af)
+done
 
 
 
