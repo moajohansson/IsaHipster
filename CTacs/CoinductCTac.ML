@@ -8,6 +8,8 @@ sig
 val thy_expl_coind_ctac : CTac.ctactic
 val thy_expl_sledge_or_coind_ctac : CTac.ctactic
 
+val sledgehammer_ctac : Sledgehammer_Fact.fact_override -> int -> CTac.ctactic
+
 end
 
 structure Coinduct_CTac  : COINDUCT_CTAC   =
@@ -78,9 +80,9 @@ fun simp_goal_ctac i (ctxt,thm) =
 fun simp_no_goal_ctac i =
   CTac.CORELSE(CTac.SOLVE_OR_FAIL (simp_goal_ctac i), CTac.all_ctac)
 
-fun sledgehammer_ctac i (ctxt,thm) =
+fun sledgehammer_ctac fact_override i (ctxt,thm) =
   case (Hipster_Sledgehammer_Tactics.sledgehammer_get_tac ctxt []
-                                        Sledgehammer_Fact.no_fact_override [] i thm) of
+                                        fact_override [] i thm) of
   SOME (meth_tac, (meth, facts)) =>
     let
     val hipster_meth = Induction_Data.Sledgehammer_Meth meth
@@ -92,27 +94,45 @@ fun sledgehammer_ctac i (ctxt,thm) =
   end
  | NONE => Seq.single (ctxt, thm) (* Do nothing - Sledgehammer failed. *)
 
-val simp_or_sledgehammer_ctac =
-  CTac.CTHEN_MAYBE' (simp_no_goal_ctac, sledgehammer_ctac)
+fun simp_or_sledgehammer_ctac overrides =
+  CTac.CTHEN_MAYBE' (simp_no_goal_ctac, sledgehammer_ctac overrides)
 
-fun coinduct_and_sledgehammer_ctac rule =
+fun get_overrides ctxt thm = 
+ case Hipster_Utils.coinductible_goal thm ctxt of
+    SOME typename =>
+      let
+        val names = map (curry op ^ typename) [".simps",".case_eq_if"]
+        val rules = filter (can (Proof_Context.get_thms ctxt)) names
+        val override = {add=map (fn x => (Facts.named x, [])) rules,del=[],only=false}
+      in
+        override
+      end
+  | NONE => Sledgehammer_Fact.no_fact_override
+
+fun coinduct_and_sledgehammer_ctac rule (ctxt,thm) =
+  let val overrides = get_overrides ctxt thm in
+  (ctxt,thm) |>
   CTac.SOLVE_OR_FAIL
     (CTac.CTHEN
       (Seq.DETERM (coinduct_allfree_arbitrary_ctac rule),
-       CTac.ALLGOALS simp_or_sledgehammer_ctac))
+       CTac.ALLGOALS (simp_or_sledgehammer_ctac overrides)))
+  end
 
-fun coinduct_upto_and_sledgehammer_ctac rule =
+fun coinduct_upto_and_sledgehammer_ctac rule (ctxt,thm) =
+  let val overrides = get_overrides ctxt thm in
+  (ctxt,thm) |>
   CTac.SOLVE_OR_FAIL
     (CTac.CTHEN
       (Seq.DETERM (coinduct_upto_allfree_arbitrary_ctac rule),
-       CTac.ALLGOALS simp_or_sledgehammer_ctac))
+       CTac.ALLGOALS (simp_or_sledgehammer_ctac overrides)))
+  end
 
 fun thy_expl_sledge_or_coind_ctac  (ctxt0, thm) =
    let
     val ctxt = Coinduction_Data.reset_coind_proof_data_ctxt ctxt0
      in
       CTac.CORELSE
-                (CTac.SOLVE_OR_FAIL (CTac.ALLGOALS sledgehammer_ctac),
+                (CTac.SOLVE_OR_FAIL (CTac.ALLGOALS (sledgehammer_ctac Sledgehammer_Fact.no_fact_override)),
                  (CTac.CORELSE
                   (CTac.SOLVE_OR_FAIL (coinduct_upto_and_sledgehammer_ctac NONE),
                    coinduct_and_sledgehammer_ctac NONE)))
