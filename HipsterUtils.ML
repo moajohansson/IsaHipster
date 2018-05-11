@@ -181,8 +181,9 @@ fun coinductible_goal thm ctxt =
                    strip_all o strip_Prop)
                   (Thm.concl_of thm)
   in
-    if can HOLogic.dest_eq g then
-     let val type_name = (fst o dest_Type o type_of o snd o HOLogic.dest_eq) g
+    if can (dest_Type o type_of o snd o HOLogic.dest_eq) g then
+     let 
+         val type_name = (fst o dest_Type o type_of o snd o HOLogic.dest_eq) g
      in
        if is_coinductible ctxt type_name then
          SOME type_name
