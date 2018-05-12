@@ -78,7 +78,7 @@ fun simp_goal_ctac i (ctxt,thm) =
      (CTac.AS_CTACTIC (CHANGED (Simplifier.asm_full_simp_tac ctxt i)) (ctxt,thm))
 
 fun simp_no_goal_ctac i =
-  CTac.CORELSE(CTac.SOLVE_OR_FAIL (simp_goal_ctac i), CTac.all_ctac)
+  CTac.CORELSE(CTac.SOLVE_OR_FAIL (CTac.SOLVE_TIMEOUT 3000 (simp_goal_ctac i)), CTac.all_ctac)
 
 fun sledgehammer_ctac fact_override i (ctxt,thm) =
   case (Hipster_Sledgehammer_Tactics.sledgehammer_get_tac ctxt []
