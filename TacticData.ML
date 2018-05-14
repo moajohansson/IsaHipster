@@ -64,7 +64,7 @@ val induct_simp = Data {technique = "induction",
                         hard_tac = Simp_T.hard_tac,
                         hard_ctac = Induct_CTac.thy_expl_hard_ctac_simp_struct,
                         routine_tac_str = Simp_T.routine_tac_str,
-                        hard_tac_str = Simp_T.final_tactic_str,
+                        hard_tac_str = Induction_Data.get_proof_script_ctxt,
                         applies_to = ind_recognizer}
 
 (* Sledgehammer, or sledgehammer + structural induction *)
@@ -73,7 +73,7 @@ val induct_sledgehammer = Data {technique = "induction",
                                 hard_tac = Sledgehammer_T.hard_tac,
                                 hard_ctac = Induct_CTac.thy_expl_hard_ctac_struct,
                                 routine_tac_str = Sledgehammer_T.routine_tac_str,
-                                hard_tac_str = Sledgehammer_T.final_tactic_str,
+                                hard_tac_str = Induction_Data.get_proof_script_ctxt,
                                 applies_to = ind_recognizer}
 
 val coinduct_sledgehammer = Data {technique = "coinduction",
@@ -81,7 +81,7 @@ val coinduct_sledgehammer = Data {technique = "coinduction",
                                   hard_tac = Coinduct_T.hard_tac,
                                   hard_ctac = Coinduct_CTac.thy_expl_coind_ctac,
                                   routine_tac_str = Coinduct_T.routine_tac_str,
-                                  hard_tac_str = Coinduct_T.final_tactic_str,
+                                  hard_tac_str = Coinduction_Data.get_proof_script_ctxt,
                                   applies_to = coind_recognizer}
 
 val sledgehammer_coinduct = Data {technique = "coinduction",
@@ -89,7 +89,7 @@ val sledgehammer_coinduct = Data {technique = "coinduction",
                                   hard_tac = Coinduct_T.hard_tac,
                                   hard_ctac = Coinduct_CTac.thy_expl_sledge_or_coind_ctac,
                                   routine_tac_str = Coinduct_T.routine_tac_str,
-                                  hard_tac_str = Coinduct_T.final_tactic_str,
+                                  hard_tac_str = Coinduction_Data.get_proof_script_ctxt,
                                   applies_to = coind_recognizer}
 
 (* Routine: simp, Hard: Sledgehammer orelse Induction + Sledgehammer *)

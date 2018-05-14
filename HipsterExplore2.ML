@@ -51,8 +51,6 @@ fun try_nxt_conj ctxt =
         val _ = Hipster_Utils.maybe_output ctxt 50 ("Proving: "^lemma_str)
         val sl = tacs |> filter (fn tac => (Tactic_Data.get_applies_to tac) ctxt c)
                       |> map Tactic_Data.get_technique
-(*(if not(null(Hipster_Utils.coinductible_types (Thm.concl_of c) ctxt)) then ["coinduction"] else []) @
-                (if not(null(Hipster_Utils.inductible_types (Thm.concl_of c) ctxt)) then ["induction"] else [])*)
         val _ = Hipster_Utils.maybe_output ctxt 60 ("Using techniques: "^String.concatWith " " sl)
         fun firstSome f g [] = NONE
           | firstSome f g (x::xs) = let val fx = f x in if g fx then SOME fx else firstSome f g xs
@@ -68,11 +66,7 @@ fun try_nxt_conj ctxt =
               SOME(s,SOME (ctxt1, proved_thm)) =>
                 let
                   val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt1
-                  val proof_script = case s of
-                      "induction" =>
-                      proof_str ctxt'(Induction_Data.get_proof_script_ctxt ctxt') new_nm proved_thm
-                      | "coinduction" =>
-                      proof_str ctxt'(Coinduction_Data.get_proof_script_ctxt ctxt') new_nm proved_thm
+                  val proof_script = proof_str ctxt' (Tactic_Data.hard_tac_str s ctxt') new_nm proved_thm
                   val final_thm = proved_thm
                                     |> Drule.generalize
                                       (Hipster_Utils.frees_and_tfrees_of_thm proved_thm)
