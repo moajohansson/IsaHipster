@@ -47,9 +47,12 @@ fun try_nxt_conj ctxt =
   | (c::cs) => (* try proving next open conj *)
       let
         val lemma_str = Syntax.string_of_term ctxt (Thm.concl_of c)
+        val tacs = Tactic_Data.get_tacs (Proof_Context.theory_of ctxt)
         val _ = Hipster_Utils.maybe_output ctxt 50 ("Proving: "^lemma_str)
-        val sl = (if not(null(Hipster_Utils.coinductible_types (Thm.concl_of c) ctxt)) then ["coinduction"] else []) @
-                (if not(null(Hipster_Utils.inductible_types (Thm.concl_of c) ctxt)) then ["induction"] else [])
+        val sl = tacs |> filter (fn tac => (Tactic_Data.get_applies_to tac) ctxt c)
+                      |> map Tactic_Data.get_technique
+(*(if not(null(Hipster_Utils.coinductible_types (Thm.concl_of c) ctxt)) then ["coinduction"] else []) @
+                (if not(null(Hipster_Utils.inductible_types (Thm.concl_of c) ctxt)) then ["induction"] else [])*)
         val _ = Hipster_Utils.maybe_output ctxt 60 ("Using techniques: "^String.concatWith " " sl)
         fun firstSome f g [] = NONE
           | firstSome f g (x::xs) = let val fx = f x in if g fx then SOME fx else firstSome f g xs
