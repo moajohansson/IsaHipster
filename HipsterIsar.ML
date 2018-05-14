@@ -3,8 +3,8 @@
 Isar commands for Hipster theory exploration invocation.
 *)
 
-
 (* Install a Parser for HipSpec. It takes a list of constant names as input *)
+
 let
 fun call_hipster consts =
     (fn ctxt =>
@@ -22,7 +22,7 @@ fun call_hipster consts =
 in
 Outer_Syntax.local_theory @{command_keyword "hipster"}
       "Theory Exploration with Hipster"
-      (Scan.repeat1 Parse.const >> call_hipster)
+      (Scan.repeat1 Parse.const >> Hipster_Utils.maybe_time call_hipster)
 end;
 let
 fun call_hipster consts =
@@ -41,7 +41,7 @@ fun call_hipster consts =
 in
 Outer_Syntax.local_theory @{command_keyword "cohipster"}
       "Theory Exploration with Hipster, using observers to explore codatatypes"
-      (Scan.repeat1 Parse.const >> call_hipster)
+      (Scan.repeat1 Parse.const >> Hipster_Utils.maybe_time call_hipster)
 end;
 
 let
@@ -62,7 +62,7 @@ fun call_hipster consts =
 in
 Outer_Syntax.local_theory @{command_keyword "hipster_cond"}
       "Theory Exploration for conditional lemmas with Hipster"
-      (Scan.repeat1 Parse.const >> call_hipster)
+      (Scan.repeat1 Parse.const >> Hipster_Utils.maybe_time call_hipster)
 end;
 
 (*

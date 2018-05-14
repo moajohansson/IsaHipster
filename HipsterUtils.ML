@@ -25,6 +25,8 @@ sig
   val maybe_print : Proof.context -> int -> string -> unit
   val maybe_print_any : Proof.context -> int -> 'a -> unit
   val maybe_pretty : Proof.context -> int -> Pretty.T -> unit
+  val maybe_time : ('a -> Proof.context -> 'b) -> 'a -> Proof.context -> 'b
+
 end
 
 
@@ -75,6 +77,14 @@ fun maybe_pretty ctxt verbosity_threshold =
   if Misc_Data.verbosity ctxt >= verbosity_threshold then
     Pretty.writeln
   else K ()
+
+fun maybe_time f x ctxt =
+  if Misc_Data.timing ctxt then
+    let val (time,v) = Timing.timing (uncurry f) (x,ctxt) in
+     v before maybe_print ctxt 0 (Timing.message time)
+    end
+  else
+    f x ctxt;
 
 fun add_consts_of_thy (thynm, t) consts =
   case t of
