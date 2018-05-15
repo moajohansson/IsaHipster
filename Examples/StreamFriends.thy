@@ -24,37 +24,16 @@ lemma recurse_simps[simp]:
 *)
 (* Call Hipster for coinductive theory exploration *)
 cohipster srecurse siterate
-lemma lemma_a [thy_expl]: "SCons (y z) (monomap y x2) = monomap y (SCons z x2)"
-  by (metis Stream.sel(1) Stream.sel(2) monomap.friend.code)
+lemma lemma_a [thy_expl]: "monomap y (siterate y z) = siterate y (y z)"
+  by(coinduction arbitrary: y z rule: Stream.coinduct_strong)
+    auto
 
-lemma lemma_aa [thy_expl]: "shd (srecurse y z) = z"
-  by (metis Stream.sel(1) srecurse.code)
+lemma lemma_aa [thy_expl]: "monomap z (SCons y (siterate z x2)) = SCons (z y) (siterate z (z x2))"
+  by (metis Stream.sel(1) Stream.sel(2) StreamFriends.lemma_a monomap.friend.code)
 
-lemma lemma_ab [thy_expl]: "stl (srecurse y z) = srecurse y (y z)"
+lemma lemma_ab [thy_expl]: "srecurse y z = siterate y z"
   by(coinduction rule: srecurse.coinduct)
-    (smt Stream.sel(2) lemma_aa monomap.simps(1) monomap.simps(2) srecurse.code srecurse.cong_base srecurse.cong_monomap)
+    (smt Stream.sel(1) Stream.sel(2) lemma_a siterate.code srecurse.code srecurse.cong_base srecurse.cong_monomap)
 
-lemma lemma_ac [thy_expl]: "monomap y (srecurse y z) = srecurse y (y z)"
-  by (metis lemma_aa lemma_ab monomap.friend.code srecurse.code)
-    
-lemma lemma_ad [thy_expl]: "SCons z (srecurse y (y z)) = srecurse y z"
-  by (metis lemma_ac srecurse.code)
-    
-lemma lemma_ae [thy_expl]: "monomap z (SCons y (srecurse z x2)) = SCons (z y) (srecurse z (z x2))"
-  by (metis lemma_a lemma_ac)
-    
-lemma lemma_af [thy_expl]: "srecurse y z = siterate y z"
-proof(coinduction arbitrary: y z rule: Stream.coinduct_strong)
-  case Eq_Stream thus ?case
-using lemma_aa lemma_ab
-  by (force simp add: lemma_aa lemma_ab)
-qed
-  
-lemma lemma_ag [thy_expl]: "monomap y (siterate y z) = siterate y (y z)"
-  using lemma_ac lemma_af
-  by (force simp add: lemma_ac lemma_af)
-
-lemma lemma_ah [thy_expl]: "monomap z (SCons y (siterate z x2)) = SCons (z y) (siterate z (z x2))"
-  by (metis lemma_a lemma_ag)
 
 end

@@ -11,29 +11,33 @@ structure Misc_Data =
 struct
 
 datatype T = Data of
-  { verbosity : int, time : bool, be_picky : bool }
+  { verbosity : int, time : bool, hammer_timeout : string }
 
 
 fun get_verbosity (Data d) = (#verbosity d);
-fun get_picky (Data d) = (#be_picky d);
+fun get_hammer_timeout (Data d) = (#hammer_timeout d);
 fun get_timing (Data d) = (#time d);
 
 fun update_verbosity f (Data d) =
-  Data{verbosity = f (#verbosity d), time = #time d, be_picky = #be_picky d};
+  Data{verbosity = f (#verbosity d), time = #time d, hammer_timeout = #hammer_timeout d};
 fun update_time f (Data d) =
-  Data{verbosity = #verbosity d, time = f (#time d), be_picky = #be_picky d};
-fun update_picky f (Data d) =
-  Data{verbosity = #verbosity d, time = #time d, be_picky = f (#be_picky d)};
+  Data{verbosity = #verbosity d, time = f (#time d), hammer_timeout = #hammer_timeout d};
+fun update_hammer_timeout f (Data d) =
+  Data{verbosity = #verbosity d, time = #time d, hammer_timeout = f (#hammer_timeout d)};
 
 fun set_verbosity verbosity = update_verbosity (K verbosity);
-fun set_picky picky = update_picky (K picky);
+fun set_hammer_timeout timeout = update_hammer_timeout (K timeout);
 fun set_timing time = update_time (K time);
 
+val short_timeout = "10";
+val med_timeout = "20";
+val long_timeout = "30";
+
 (* Dummy data *)
-val empty = Data{verbosity = 0, time = false, be_picky = false};
+val empty = Data{verbosity = 0, time = false, hammer_timeout = short_timeout};
 
 (* val silent = empty;
-val noisy = Data{verbosity = 100, be_picky = false}; (*FIXME*)
+val noisy = Data{verbosity = 100, hammer_timeout = 10}; (*FIXME*)
 *)
 structure Data = Theory_Data
   ( type T = T
@@ -46,14 +50,15 @@ structure Data = Theory_Data
 fun set_silent thy = Data.put (set_verbosity 0 (Data.get thy)) thy;
 fun set_noisy thy = Data.put (set_verbosity 100 (Data.get thy)) thy;
 
-fun set_nitpick thy = Data.put (set_picky true (Data.get thy)) thy;
-fun set_no_nitpick thy = Data.put (set_picky false (Data.get thy)) thy; 
+fun set_hammer_timeout_short thy = Data.put (set_hammer_timeout short_timeout (Data.get thy)) thy;
+fun set_hammer_timeout_medium thy = Data.put (set_hammer_timeout med_timeout (Data.get thy)) thy;
+fun set_hammer_timeout_long thy = Data.put (set_hammer_timeout long_timeout (Data.get thy)) thy;
 
 (*fun set_time thy = Data.put (set_time true (Data.get thy)) thy;*)
 fun set_time thy = Data.put (set_timing true (Data.get thy)) thy;
 fun set_no_time thy = Data.put (set_timing false (Data.get thy)) thy;
 
 val verbosity = get_verbosity o Data.get o Proof_Context.theory_of
-val nitpick = get_picky o Data.get o Proof_Context.theory_of
+val sledgehammer_timeout = get_hammer_timeout o Data.get o Proof_Context.theory_of
 val timing = get_timing o Data.get o Proof_Context.theory_of
 end

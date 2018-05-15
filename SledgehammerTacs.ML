@@ -43,9 +43,9 @@ fun play_one_line_proof ctxt minimize timeout used_facts0 thm i (preferred_meth,
 
               fun mk_step fact_names meths =
                 Sledgehammer_Isar_Proof.Prove ([], [], ("", 0), goal_t, [], ([], fact_names), meths, "")
-              val _ = if Misc_Data.verbosity ctxt >= 70 then
+             (* val _ = if Misc_Data.verbosity ctxt >= 70 then
                        let val _ = @{print} ("mk_step", mk_step fact_names meths) in () end
-                      else ()
+                      else () *)
               val ctxt' = Context_Position.set_visible false ctxt
             in
               (case Sledgehammer_Isar_Preplay.preplay_isar_step ctxt' [] timeout [] (mk_step fact_names meths) of
@@ -138,7 +138,8 @@ fun run_prover override_params fact_override chained i n ctxt goal =
 fun sledgehammer_get_tac ctxt override_params fact_override chained i th =
   let 
     (* If no minimization of facts is desired, set ("minimize","false") *) 
-    val override_params = override_params @ [("preplay_timeout", "0.5"), ("timeout","10")] 
+    val timeout = Misc_Data.sledgehammer_timeout ctxt (* Fetch timeout value for Sledgehammer *)
+    val override_params = override_params @ [("preplay_timeout", "0.5"), ("timeout",timeout)]
   in
     (case run_prover override_params fact_override chained i i ctxt th of
       SOME (facts, meth) => 
