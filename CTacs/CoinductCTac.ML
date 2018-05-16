@@ -143,6 +143,9 @@ fun thy_expl_coind_ctac (ctxt0, thm) =
    let
     val ctxt = Coinduction_Data.reset_coind_proof_data_ctxt ctxt0
     in
-       coinduct_and_sledgehammer_ctac NONE (ctxt,thm)
+       CTac.CORELSE(
+         CTac.SOLVE_OR_FAIL (coinduct_upto_and_sledgehammer_ctac NONE),
+         coinduct_and_sledgehammer_ctac NONE)
+       (ctxt,thm)
     end;
 end
