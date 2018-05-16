@@ -91,6 +91,14 @@ val sledgehammer_coinduct = Data {technique = "coinduction",
                                   routine_tac_str = Coinduct_T.routine_tac_str,
                                   hard_tac_str = Coinduction_Data.get_proof_script_ctxt,
                                   applies_to = coind_recognizer}
+(* Dummy tactic data for theory exploration. Doens't prove anything, just outputs stuff from QuickSpec *)
+val no_proof = Data {technique = "Just explore, no proofs",
+                                  routine_tac = K no_tac,
+                                  hard_tac = K no_tac,
+                                  hard_ctac = CTac.no_ctac,
+                                  routine_tac_str = "no_tac",
+                                  hard_tac_str = K "oops",
+                                  applies_to = K o K true}
 
 (* Routine: simp, Hard: Sledgehammer orelse Induction + Sledgehammer *)
 val simp_sledgehammer_induct_sledgehammer = Data {technique = "induction",
@@ -117,6 +125,7 @@ fun routine_tac_str s = (get_routine_str o the o get_data s) o (Data.get o Proof
 val techniques = map get_technique o (Data.get o Proof_Context.theory_of)
 fun default_technique ctxt = (get_technique o hd o (Data.get o Proof_Context.theory_of)) ctxt
 
+
 val set_tacs = Data.put
 val get_tacs = Data.get
 (* val set_induct_simp_metis = set_tacs induct_simp_metis *)
@@ -126,4 +135,5 @@ val set_induct_sledgehammer = set_tacs [induct_sledgehammer]
 val set_coinduct_sledgehammer = set_tacs [induct_sledgehammer,coinduct_sledgehammer]
 val set_sledgehammer_coinduct = set_tacs [induct_sledgehammer,sledgehammer_coinduct]
 val set_sledge_induct_sledge = set_tacs [simp_sledgehammer_induct_sledgehammer]
+val set_no_proof = set_tacs [no_proof]
 end
