@@ -84,6 +84,14 @@ val coinduct_sledgehammer = Data {technique = "coinduction",
                                   hard_tac_str = Coinduction_Data.get_proof_script_ctxt,
                                   applies_to = coind_recognizer}
 
+val coinduct_sledgehammer_auto = Data {technique = "coinduction",
+                                  routine_tac = SOLVE o Clasimp.auto_tac,
+                                  hard_tac = Coinduct_T.hard_tac,
+                                  hard_ctac = Coinduct_CTac.thy_expl_coind_ctac,
+                                  routine_tac_str = Coinduct_T.routine_tac_str,
+                                  hard_tac_str = Coinduction_Data.get_proof_script_ctxt,
+                                  applies_to = coind_recognizer}
+
 val sledgehammer_coinduct = Data {technique = "coinduction",
                                   routine_tac = Coinduct_T.routine_tac,
                                   hard_tac = Coinduct_T.hard_tac,
@@ -136,4 +144,5 @@ val set_coinduct_sledgehammer = set_tacs [induct_sledgehammer,coinduct_sledgeham
 val set_sledgehammer_coinduct = set_tacs [induct_sledgehammer,sledgehammer_coinduct]
 val set_sledge_induct_sledge = set_tacs [simp_sledgehammer_induct_sledgehammer]
 val set_no_proof = set_tacs [no_proof]
+val set_coinduct_sledgehammer_auto = set_tacs [induct_sledgehammer,coinduct_sledgehammer_auto]
 end
