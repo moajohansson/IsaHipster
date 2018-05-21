@@ -11,7 +11,7 @@ setup Misc_Data.set_noisy (* Verbose output on hipster calls *)
 (* Discovering conditional lemmas *)
 
 (* Exploration with lnull as a predicate *)
-(*cohipster lnull lappend*)
+cohipster lnull lappend
 lemma lemma_bf [thy_expl]: "lnull y = True \<Longrightarrow> lnull z = True \<Longrightarrow> y = z"
   by(coinduction arbitrary: y z rule: Llist.coinduct_strong)
 simp
@@ -41,7 +41,7 @@ where
                                   )
                )"
 
-(*cohipster sameLlength lzip*)
+cohipster sameLlength lzip
 (* This call took around 450 seconds *)
 lemma lemma_bj [thy_expl]: "llength (lzip x2 z) = llength (lzip z x2)"
   by(coinduction arbitrary: x2 z rule: Lazy_List.ENat.coinduct_strong)
@@ -193,7 +193,7 @@ equal_ENat z (ESuc (ESuc (ESuc (ESuc y)))) = equal_ENat (ESuc (ESuc (ESuc (ESuc 
   oops
 
 
-(*cohipster sameLlength lappend lzip*)
+cohipster sameLlength lappend lzip
 (* Here 198 properties are discovered and the exploration and proof took about 1.5 hours *)
 (* lemma ? is lzip_lappend from Coinductive_List *)
 lemma lemma_bq [thy_expl]: "sameLlength x2 y = True \<Longrightarrow> llength (lappend z y) = llength (lappend z x2)"

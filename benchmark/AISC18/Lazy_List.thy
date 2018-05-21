@@ -18,7 +18,7 @@ primcorec lappend :: "'a Llist \<Rightarrow> 'a Llist \<Rightarrow> 'a Llist"
 where
   "lappend xs ys = (case xs of LNil \<Rightarrow> ys | LCons x xs' \<Rightarrow> LCons x (lappend xs' ys))"
 
-(*cohipster lappend*)
+cohipster lappend
 (* The lemmas and proofs below are the output of the hipster call above 
    lemma_ac is lappend_LNil2 and lemma_ab is lappend_assoc from Coinductive_List *)
 lemma lemma_a [thy_expl]: "lappend LNil y = y"
@@ -41,7 +41,7 @@ lemma lemma_ac [thy_expl]: "lappend y LNil = y"
 primcorec lmap :: "('a \<Rightarrow> 'b) \<Rightarrow> 'a Llist \<Rightarrow> 'b Llist" where
  "lmap f xs = (case xs of LNil \<Rightarrow> LNil | LCons x xs \<Rightarrow> LCons (f x) (lmap f xs))"
 
-(*cohipster lmap*)
+cohipster lmap
 (* The lemmas and proofs below are the output of the hipster call above *)
 
 lemma lemma_ad [thy_expl]: "lmap z (LCons x2 LNil) = LCons (z x2) LNil"
@@ -56,7 +56,7 @@ lemma lemma_af [thy_expl]: "LCons (z x2) (LCons (z x3) LNil) = lmap z (LCons x2 
 by(coinduction arbitrary: x2 x3 z rule: Llist.coinduct_strong)
   (simp add: lemma_ad)
 
-(*cohipster lmap lappend*)
+cohipster lmap lappend
 (* The lemmas and proofs below are the output of the hipster call above
    lemma_ag is lmap_lappend_distrib from Coinductive_List *)
 lemma lemma_ag [thy_expl]: "lappend (lmap z x2) (lmap z x3) = lmap z (lappend x2 x3)"
@@ -70,7 +70,7 @@ where
 | "llist_of (x#xs) = LCons x (llist_of xs)"
 
 
-(*cohipster llist_of lappend append*)
+cohipster llist_of lappend append
 (* The lemmas and proofs below are the output of the hipster call above
    lemma_ah is lappend_llist_of_llist_of from Coinductive_List *)
 lemma lemma_ah [thy_expl]: "lappend (llist_of y) (llist_of z) = llist_of (y @ z)"
@@ -79,7 +79,7 @@ lemma lemma_ah [thy_expl]: "lappend (llist_of y) (llist_of z) = llist_of (y @ z)
   apply (simp add: lemma_aa)
   done
 
-(*cohipster llist_of lmap map*)
+cohipster llist_of lmap map
 (* The lemmas and proofs below are the output of the hipster call above
    lemma_ai is lmap_llist_of from Coinductive_List *)
 lemma lemma_ai [thy_expl]: "lmap z (llist_of x2) = llist_of (map z x2)"
@@ -95,13 +95,13 @@ codatatype ENat = is_zero: EZ | ESuc (epred: ENat)
 primcorec llength :: "'a Llist \<Rightarrow> ENat" where
 "llength xs = (case xs of LNil \<Rightarrow> EZ | LCons y ys \<Rightarrow> ESuc (llength ys))"
 
-(*cohipster llength*)
+cohipster llength
 (* The lemmas and proofs below are the output of the hipster call above *)
 lemma lemma_aj [thy_expl]: "llength (LCons y z) = ESuc (llength z)"
   by(coinduction arbitrary: y z rule: ENat.coinduct_strong)
     simp
 
-(*cohipster llength lmap*)
+cohipster llength lmap
 (* The lemmas and proofs below are the output of the hipster call above
    lemma_ak is llength_lmap from Coinductive_List *)
 lemma lemma_ak [thy_expl]: "llength (lmap z x2) = llength x2"
@@ -112,7 +112,7 @@ lemma lemma_ak [thy_expl]: "llength (lmap z x2) = llength x2"
 primcorec eplus :: "ENat \<Rightarrow> ENat \<Rightarrow> ENat" where
 "eplus m n = (if is_zero m then n else ESuc (eplus (epred m) n))"
 
-(*cohipster eplus*)
+cohipster eplus
 (* The lemmas and proofs below are the output of the hipster call above
    lemma_am is iadd_Suc_right and lemma_an and unknown lemma in line 130
    are proved in lines 171-180 of Extended_Nat *)
@@ -131,7 +131,7 @@ auto
 lemma unknown [thy_expl]: "eplus y x = eplus x y"
   oops
 
-(*cohipster llength lappend eplus*)
+cohipster llength lappend eplus
 (* The lemmas and proofs below are the output of the hipster call above
    lemma_aq is llength_lappend from Coinductive_List *)
 lemma lemma_ao [thy_expl]: "eplus EZ (llength y) = llength y"
@@ -164,7 +164,7 @@ primcorec ltake :: "ENat \<Rightarrow> 'a Llist \<Rightarrow> 'a Llist" where
                                   )
                )"
 
-(*cohipster ltake*)
+cohipster ltake
 (* The lemmas and proofs below are the output of the hipster call above *)
 lemma lemma_at [thy_expl]: "ltake z (ltake y x2) = ltake y (ltake z x2)"
   by(coinduction arbitrary: x2 y z rule: Llist.coinduct_strong)
@@ -194,7 +194,7 @@ lemma lemma_az [thy_expl]: "ltake (ESuc y) (ltake (ESuc EZ) z) = ltake (ESuc EZ)
 by(coinduction arbitrary: y z rule: Llist.coinduct_strong)
   (smt ENat.disc(1) Lazy_List.lemma_aw Llist.collapse(2) Llist.disc(1) ltake.ctr(1))
 
-(*cohipster ltake lmap*)
+cohipster ltake lmap
 (* The lemmas and proofs below are the output of the hipster call above
    lemma_ba is ltake_lmap from Coinductive_List *)
 lemma lemma_ba [thy_expl]: "ltake x2 (lmap z x3) = lmap z (ltake x2 x3)"
@@ -209,7 +209,7 @@ lemma lemma_bb [thy_expl]: "lmap x2 (ltake z (LCons x3 LNil)) = ltake z (LCons (
 primcorec iterates :: "('a \<Rightarrow> 'a) \<Rightarrow> 'a \<Rightarrow> 'a Llist" 
 where "iterates f x = LCons x (iterates f (f x))"
 
-(*cohipster lmap iterates*)
+cohipster lmap iterates
 (* The lemmas and proofs below are the output of the hipster call above
    lemma_bc is ltake_lmap from Coinductive_List *)
 lemma lemma_bc [thy_expl]: "lmap y (iterates y z) = iterates y (y z)"
@@ -220,7 +220,7 @@ lemma lemma_bd [thy_expl]: "lmap z (LCons y (iterates z x2)) = LCons (z y) (iter
   by(coinduction arbitrary: x2 y z rule: Llist.coinduct_strong)
     (simp add: lemma_bc)
 
-(*cohipster lappend iterates*)
+cohipster lappend iterates
 (* The lemmas and proofs below are the output of the hipster call above
    lemma_be is lmap_iterates from Coinductive_List *)
 lemma lemma_be [thy_expl]: "lappend (iterates z x2) y = iterates z x2"
