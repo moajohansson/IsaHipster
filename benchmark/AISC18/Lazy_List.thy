@@ -1,7 +1,7 @@
 theory Lazy_List
   imports Main "$HIPSTER_HOME/IsaHipster"
 begin
-setup Tactic_Data.set_coinduct_sledgehammer_auto 
+setup Tactic_Data.set_coinduct_sledgehammer 
 (*setup Tactic_Data.set_no_proof*) (* For measuring exploration time *)
 setup Misc_Data.set_time (* Print out timing info *)
 setup Misc_Data.set_noisy (* Verbose output on hipster calls *)
