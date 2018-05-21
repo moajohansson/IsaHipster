@@ -4,6 +4,7 @@ imports "$HIPSTER_HOME/IsaHipster"
 begin
 setup Misc_Data.set_noisy
 setup Tactic_Data.set_sledgehammer_coinduct
+(* setup Tactic_Data.set_no_proof *)
 setup Misc_Data.set_time (* Print out timing info *)
 setup Misc_Data.set_hammer_timeout_medium (* set sledgehammer timeout to 20 s*)
 
@@ -17,24 +18,24 @@ where
 primcorec tmap :: "('a => 'b) => 'a Tree => 'b Tree"
 where
  "tmap f t = (case t of (Node l x r) \<Rightarrow> Node (tmap f l) (f x) (tmap f r))" 
-
- (*cohipster mirror tmap*)
+cohipster mirror
 lemma lemma_a [thy_expl]: "mirror (mirror y) = y"
   by(coinduction arbitrary: y rule: Tree.coinduct_strong)
     (simp add: Tree.case_eq_if)
+    
+lemma lemma_aa [thy_expl]: "Node (mirror x2) z (mirror y) = mirror (Node y z x2)"
+by (simp add: mirror.code)
+  
+lemma lemma_ab [thy_expl]: "mirror (Node x2 z (mirror y)) = Node y z (mirror x2)"
+  by (metis lemma_a lemma_aa)
 
-lemma lemma_aa [thy_expl]: "tmap z (mirror x2) = mirror (tmap z x2)"
-  by(coinduction arbitrary: x2 z rule: Tree.coinduct_strong)
-    (smt Tree.case_eq_if mirror.simps(1) mirror.simps(2) mirror.simps(3) tmap.simps(1) tmap.simps(2) tmap.simps(3))
+lemma lemma_ac [thy_expl]: "mirror (Node (mirror x2) z y) = Node (mirror y) z x2"
+  by (metis lemma_a lemma_aa)
 
-lemma lemma_ab [thy_expl]: "Node (mirror x2) z (mirror y) = mirror (Node y z x2)"
-  by (simp add: mirror.code)
-
-lemma lemma_ac [thy_expl]: "mirror (Node x2 z (mirror y)) = Node y z (mirror x2)"
-  by (metis CoBinaryTree.lemma_ab lemma_a)
-
-lemma lemma_ad [thy_expl]: "mirror (Node (mirror x2) z y) = Node (mirror y) z x2"
-  by (metis CoBinaryTree.lemma_ab lemma_a)
+cohipster mirror tmap
+lemma lemma_ad [thy_expl]: "tmap z (mirror x2) = mirror (tmap z x2)"
+by(coinduction arbitrary: x2 z rule: Tree.coinduct_strong)
+  (smt Tree.case_eq_if mirror.simps(1) mirror.simps(2) mirror.simps(3) tmap.simps(1) tmap.simps(2) tmap.simps(3))
 
 
 (*primcorec tsum :: "nat Tree \<Rightarrow> nat Tree \<Rightarrow> nat Tree"
