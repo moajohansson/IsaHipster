@@ -4,7 +4,7 @@ imports "$HIPSTER_HOME/IsaHipster"
 begin
 setup Misc_Data.set_noisy
 setup Tactic_Data.set_sledgehammer_coinduct
-(* setup Tactic_Data.set_no_proof *)
+(* setup Tactic_Data.set_no_proof *) (* If we only want to do exploration, no proofs *)
 setup Misc_Data.set_time (* Print out timing info *)
 setup Misc_Data.set_hammer_timeout_medium (* set sledgehammer timeout to 20 s*)
 
@@ -38,14 +38,10 @@ by(coinduction arbitrary: x2 z rule: Tree.coinduct_strong)
   (smt Tree.case_eq_if mirror.simps(1) mirror.simps(2) mirror.simps(3) tmap.simps(1) tmap.simps(2) tmap.simps(3))
 
 
-(*primcorec tsum :: "nat Tree \<Rightarrow> nat Tree \<Rightarrow> nat Tree"
-  where "tsum t u = Node (tsum (left t) (left u)) (lab t + lab u) (tsum (right t) (right u))" 
-*)
 primcorec tsum :: "nat Tree \<Rightarrow> nat Tree \<Rightarrow> nat Tree"
   where  "tsum t u = (case t of (Node tle tx tr) \<Rightarrow> case u of (Node ul ux ur) \<Rightarrow> Node (tsum tle ul) (tx+ux) (tsum tr ur))"
 
-(* Note: for these proofs I needed to increase the timeout in Sledgehammer from 10 to 20 s per proof.
-   The default for Sledgehammer when called interactively is 30s. *)
+
 cohipster tsum mirror
 lemma lemma_ae [thy_expl]: "tsum y x = tsum x y"
   by(coinduction arbitrary: x y rule: Tree.coinduct_strong)
