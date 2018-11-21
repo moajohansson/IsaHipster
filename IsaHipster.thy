@@ -65,7 +65,7 @@ ML_file "CoinductionData.ML"
 ML_file "CTacs/CoinductCTac.ML"
   
 ML_file "TacticData.ML"
-ML_file "HipsterExplore2.ML"
+ML_file "HipsterExplore.ML"
 ML_file "HipsterIsar.ML"
 
 

@@ -119,32 +119,9 @@ fun proof_loop ctxt cand_lemmas_str =
     recf ctxt1
   end
 
-(*-----------------------------------------------------------------------------------------*)
-
-(* FIXED: Now to be done on the tip side, see tip --hipster.
-   This is for mapping back to Isabelle constants those things that the
-   code generator renamnes in Haskell. Otherwise, Isabelle will not understand the resulting lemmas. *)
-(*
-fun map_to_quickSpec isa_nm =
-  let
-    (*
-    val haskell_consts =
-  [ ("List.rev","reverse"),("List.append","++"), ("HOL.conj", " '&&' "),
-    ("Groups.plus_class.plus", "plus_nat"), ("Groups.zero_class.zero", "Zero_nat"),
-    ("Groups.one_class.one", "one_nat"),("<="," less_eq_nat "), ("<", " less_nat ") ] *)
-    val tip_consts =
-    [ ("List.rev","reverse"),("List.append","++"), ("HOL.conj", " '&&' "),
-    ("Groups.plus_class.plus", "plusnat"), ("Groups.zero_class.zero", "Zeronat"),
-    ("Groups.one_class.one", "onenat"),("<="," lesseqnat "), ("<", " lessnat ") ]
-  in
-  case (Library.find_first (fn (nm,_) => nm = isa_nm) tip_consts) of
-    NONE => isa_nm
-  | SOME (_,qs_nm) => qs_nm
-  end;
-*)
-
-
+(*------------------------------------------------------------------------------------------------*)
 (* Get names of functions which Isabelle's code generator translates to Haskell Prelude functions *)
+(*------------------------------------------------------------------------------------------------*)
 fun map_to_haskell isa_nm =
   let
     val prelude_funs = [("List.rev", "Prelude.reverse"), ("List.append","Prelude.++"),
@@ -160,20 +137,6 @@ fun map_to_haskell isa_nm =
 (* Call QuickSpec 2 (via tip-spec command-line tool)                                       *)
 (*-----------------------------------------------------------------------------------------*)
 
-(*
-fun hipspec_plain consts file =
-  let val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^
-        (Long_Name.base_name nm)^ " "^s) " " consts
-  in Hipster_Setup.hipspec_cmd ^ "--isabelle-mode " ^ add_funs  ^ file ^ " --tests=600"
-  end
-
-fun hipspec_cond cond_name consts file =
-  let val add_funs = List.foldl (fn (nm,s) => "--extra-trans="^
-          (Long_Name.base_name nm)^ " "^s) " " consts
-  in  Hipster_Setup.hipspec_cmd ^ "--isabelle-mode " ^ add_funs  ^ file ^ " --cond-name=" ^
-      (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
-  end
-*)
 fun tipspec_plain file consts obs ctxt =
   let
   val consts_str = Library.space_implode "," (map map_to_haskell consts)
@@ -181,10 +144,6 @@ fun tipspec_plain file consts obs ctxt =
   val to_explore = " -f " ^ consts_str
   val split_bool_eqs_flag = if (Misc_Data.split_bool_eqs ctxt) (* if we want to split boolean eqs to implications. *)
                        then "--simplify-gently --split-formulas " else "";
-  (* val _ = @{print} add_funs *)
-  (* ^ List.foldl (fn (nm,s) => s ^","^(map_to_haskell nm)) " " consts *)
-                  (*^ (List.foldr (fn (nm,s) =>
-                              (Long_Name.base_name nm) ^ "," ^ s) " " consts) *)
   in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd ^ to_explore ^ " " ^
       obs ^ " | " ^ Hipster_Setup.tipTransl_cmd ^ split_bool_eqs_flag
 end
@@ -196,8 +155,8 @@ fun tipspec_explore ctxt cond_opt obs_opt const_nms =
     val outfile = Hipster_Setup.filepath^ (Context.theory_name thy) ^".hs"
     val obs_str = case obs_opt of false => ""
                                |  true  => "-o "
-    (*val const_nms' = map map_to_quickSpec const_nms  *)
-    val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms obs_str ctxt (*hipspec_plain const_nms' outfile *)
+
+    val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms obs_str ctxt
                                      | SOME _ => raise ERROR "Conditionals not yet supported in this version."
                                       (*hipspec_cond c const_nms' outfile *)
     val path_opt = SOME (Path.explode Hipster_Setup.filepath);
@@ -210,8 +169,6 @@ fun tipspec_explore ctxt cond_opt obs_opt const_nms =
     in (out, rc) end;
 
     val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
-    (*val output = fst (Isabelle_System.bash_output tipspec_cmd)
-    val _ =  @{print} output *)
   in
        fst (my_bash_output tipspec_cmd)
   end;
