@@ -174,17 +174,19 @@ fun hipspec_cond cond_name consts file =
       (Long_Name.base_name cond_name) ^ " --cond-count=2 --tests=600"
   end
 *)
-fun tipspec_plain file consts obs=
+fun tipspec_plain file consts obs ctxt =
   let
   val consts_str = Library.space_implode "," (map map_to_haskell consts)
   val add_funs =  " -k " ^ consts_str
   val to_explore = " -f " ^ consts_str
+  val split_bool_eqs_flag = if (Misc_Data.split_bool_eqs ctxt) (* if we want to split boolean eqs to implications. *)
+                       then "--simplify-gently --split-formulas " else "";
   (* val _ = @{print} add_funs *)
   (* ^ List.foldl (fn (nm,s) => s ^","^(map_to_haskell nm)) " " consts *)
                   (*^ (List.foldr (fn (nm,s) =>
                               (Long_Name.base_name nm) ^ "," ^ s) " " consts) *)
   in Hipster_Setup.tipGHC_cmd ^ file ^ add_funs ^ " | " ^ Hipster_Setup.tipSpec_cmd ^ to_explore ^ " " ^
-      obs ^ " | " ^ Hipster_Setup.tipTransl_cmd
+      obs ^ " | " ^ Hipster_Setup.tipTransl_cmd ^ split_bool_eqs_flag
 end
 
 fun tipspec_explore ctxt cond_opt obs_opt const_nms =
@@ -195,7 +197,7 @@ fun tipspec_explore ctxt cond_opt obs_opt const_nms =
     val obs_str = case obs_opt of false => ""
                                |  true  => "-o "
     (*val const_nms' = map map_to_quickSpec const_nms  *)
-    val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms obs_str (*hipspec_plain const_nms' outfile *)
+    val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms obs_str ctxt (*hipspec_plain const_nms' outfile *)
                                      | SOME _ => raise ERROR "Conditionals not yet supported in this version."
                                       (*hipspec_cond c const_nms' outfile *)
     val path_opt = SOME (Path.explode Hipster_Setup.filepath);
