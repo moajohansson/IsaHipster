@@ -9,24 +9,11 @@ where
 | "snoc (x#xs) a = x # snoc xs a"
 
 hipster snoc rev List.append
-lemma lemma_a [thy_expl]: "rev x2 @ z # rev y = rev (y @ z # x2)" 
-  by simp (* WHy is this kept? *)
-  apply (induct x2 arbitrary: y)
-  apply simp
-  apply simp
-  done
-    
-lemma lemma_aa [thy_expl]: "rev (snoc z y) = y # rev z"
+lemma lemma_a [thy_expl]: "rev (snoc z y) = y # rev z"
   apply (induct z)
   apply simp
-  apply simp
+  apply auto
   done
-  
-
-
-theorem rev_cons: "rev (x # xs) = snoc (rev xs) x"
-sledgehammer
-  by (metis lemma_aa rev_swap)
 
 end
   

@@ -158,8 +158,10 @@ fun is_present ctxt thm =
   let val crits = [(true, Find_Theorems.Solves)];
   in
     null (snd (Find_Theorems.find_theorems ctxt (SOME thm) (SOME 1) false crits))
-    andalso
-    null (snd (Find_Theorems.find_theorems ctxt (SOME (sym RS thm)) (SOME 1) false crits))
+    andalso 
+    (null (snd (Find_Theorems.find_theorems ctxt (SOME (sym RS thm)) (SOME 1) false crits))
+      handle THM _ => true) (*FIX: If not an equation a THM exception is thrown if we try to get 
+                                      the symmetric theorem. *)
   end
 
 (* from the CookBook *)
