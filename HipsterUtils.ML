@@ -202,10 +202,3 @@ fun coinductible_goal thm ctxt =
     else NONE
   end
 end
-(*
-val yup = @{term "!! x. x=y"}
-val tup = @{term "\<lambda> x . (\<lambda> y . x y) "}
-val sup = @{term "x = z (y t) (\<lambda> f. f r)"}
-
-val x1 = Term.add_frees sup []
-val x2 = Term.strip_all_vars sup*)
