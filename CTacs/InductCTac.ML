@@ -82,7 +82,7 @@ val simp_or_sledgehammer_ctac =
 (* Apply induction and record which rule was used, and on which variables *)
 fun induct_on_var_ctac rule var i (ctxt,thm) =
   let
-    val (ithings, _) = Ind_Tacs.inductable_things_in_sg ctxt i thm;
+    val ithings = Ind_Tacs.inductable_things_in_sg ctxt i thm;
     val (otherfrees, inductfrees) = Ind_Tacs.mk_induct_insts ithings var
     val insts = map (fn NONE => NONE
                         | SOME v => SOME (NONE : Binding.binding option,(Free v,false)))
@@ -141,7 +141,7 @@ fun try_induct_on_ctac rule strat vars i (ctxt,thm) =
 (* Structural Induction: Find the variables we can induct on *)
 fun structural_induction_ctac strat i (ctxt,thm) =
     let
-      val vars = map (fn (v,_) => [v]) (fst (Ind_Tacs.inductable_things_in_sg ctxt i thm))
+      val vars = map (fn (v,_) => [v]) (Ind_Tacs.inductable_things_in_sg ctxt i thm)
     in
       (try_induct_on_ctac NONE strat vars i) (ctxt,thm)
     end;
@@ -172,7 +172,7 @@ fun try_rec_induction_schemes_ctac scheme_rules strat vars i =
 
 fun recursion_induction_ctac strat i (ctxt,thm) =
   let
-      val vars = (*map (fn (v,_) => v*) (fst (Ind_Tacs.inductable_things_in_sg ctxt i thm))
+      val vars = (Ind_Tacs.inductable_things_in_sg ctxt i thm)
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val schemes =  map_filter (try (fn n => (n, Sledgehammer_Util.thms_of_name ctxt n)))
