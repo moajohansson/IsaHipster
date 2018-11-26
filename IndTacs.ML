@@ -34,7 +34,7 @@ sig
   val induct_on_var_tac : Proof.context -> (string * thm list) option -> string list option -> int -> tactic
 
   (* Get variable names to try structural induction on *)
-  val inductable_things_in_sg : Proof.context -> int -> thm -> (string * typ) list * (string * typ) list
+  val inductable_things_in_sg : Proof.context -> int -> thm -> (string * typ) list
 
   (* Context -> tactic, to be pasted into proof script. *)
   val induct_simp_tac : Proof.context -> tactic
@@ -191,28 +191,16 @@ fun mk_induct_insts ithings indnames =
                     | SOME (v, ithings') => (faux ithings' t ((SOME v) :: L)));
     in faux ithings indnames [] end;
 
-(* the free variables of a term that are of a datatype
-   (can have induction applied) *)
 fun inductable_things_in_term ctxt t =
-  let fun lookup s =
-        case (BNF_FP_Def_Sugar.fp_sugar_of ctxt s) of
-          NONE => NONE
-        | SOME di => (* SOME (di |> #fp_co_induct_sugar |> #co_inducts |> hd); *)
-                      case (#fp_co_induct_sugar di) of
-                        SOME c => SOME (#co_inducts c)
-                        | NONE => NONE
-
-      fun datatype_chk (Type(tn,_)) = Basics.is_some (lookup tn)
-        | datatype_chk _ = false;
-      (*val _ = @{print} (Term.fastype_of t,  (Term.strip_all_body t))
-      val tfs = Hipster_Utils.typ_tfrees_of (Term.fastype_of t)
-      val _ = @{print} (length tfs)*)
-      (*val _ = @{print} (Hipster_Utils.frees_of t)*)
+  let
+      fun ind_check (Type(ty,_)) = is_some (Induct.lookup_inductT ctxt ty)
+         | ind_check _ = false;
+      fun coind_check (Type(ty,_)) = is_some (Induct.lookup_coinductT ctxt ty)
+         | coind_check _ = false;
+    val frees = Hipster_Utils.frees_of t;
+    
   in
-    (* Return frees and forall quantified vars (if any) *)
-    (* Split into those we can do structural induction over, and the rest *)
-    List.partition (datatype_chk o snd)
-                   ((Hipster_Utils.frees_of t) @ (Term.strip_all_vars t))
+    filter ((fn x => (ind_check x) orelse (coind_check x)) o snd) frees
   end;
 
 fun inductable_things_in_sg ctxt i thm =
@@ -227,7 +215,7 @@ fun inductable_things_in_sg ctxt i thm =
 (* Rule can be NONE if we just want plain structural induction. *)
 (* var is the variable we want to do induction on *)
 fun induct_on_var_tac ctxt rule var i goalthm =
-  let val (ithings, _) = inductable_things_in_sg ctxt i goalthm;
+  let val ithings = inductable_things_in_sg ctxt i goalthm;
       val (otherfrees, inductfrees) = (case var of
                                         NONE => mk_induct_insts ithings []
                                       | SOME v => mk_induct_insts ithings v (*[v]*))
@@ -276,6 +264,7 @@ fun induct_and_sledgehammer ctxt rule var = (*let val _ = @{print} "induct_and_s
 
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
+(* FIXME: What about induction schemes with several variables? This is only for structural (co)induction*)
 fun try_induct_on ctxt rule strat vars i =
   case vars of
     []        => no_tac
@@ -286,7 +275,7 @@ fun try_induct_on ctxt rule strat vars i =
 
 (* Find the variables we can induct on *)
 fun try_inductable_vars ctxt strat i thm =
-  let val vars = map (fn (v,_) => [v]) (*fst*) (fst (inductable_things_in_sg ctxt i thm))
+  let val vars = map (fn (v,_) => [v]) (inductable_things_in_sg ctxt i thm)
   in (try_induct_on ctxt NONE strat vars i) thm
   end
 
@@ -327,7 +316,7 @@ fun try_induction_with ctxt (scheme_rules : (string * Thm.thm list) list) strat 
 
 
 fun try_induct_schemes ctxt strat i thm =
-  let val vars = fst (inductable_things_in_sg ctxt i thm) (* map fst ... *)
+  let val vars = inductable_things_in_sg ctxt i thm 
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val thinds = map_filter (fn n => SOME (n, (Sledgehammer_Util.thms_of_name ctxt n))
