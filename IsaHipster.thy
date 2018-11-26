@@ -27,10 +27,6 @@ val haskell_path =
           in "./" end
   | haskell_home => haskell_home;
 
-(*val hipspec_cmd = haskell_path ^ "hipster-hipspec ";
-val hipspecifyer_cmd = haskell_path ^ "HipSpecifyer "; 
-*)
-
 val tipSpec_cmd =  haskell_path ^ "tip-spec -s 5";
 val tipTransl_cmd  =  haskell_path ^ "tip --hipster ";
 val tipGHC_cmd =  haskell_path ^ "tip-ghc ";
