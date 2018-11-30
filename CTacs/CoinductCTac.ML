@@ -39,7 +39,7 @@ fun coinduct_with_arb_ctac rule vars (ctxt,thm) = (
 (* Apply coinduction and record which rule was used, and which variables were arbitrary *)
 fun coinduct_upto_with_arb_ctac rule vars (ctxt,thm) =
   let val const_names = Hipster_Utils.thy_consts_of ""(*TODO: empty string should be current theory name*) thm
-      val rulenames = map (fn x => x ^ ".coinduct") const_names |>
+      val rulenames = map (fn (x,_) => x ^ ".coinduct") const_names |>
                       filter (can (Proof_Context.get_thm ctxt))
   in case rulenames of
           [] => Seq.empty

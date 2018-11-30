@@ -147,9 +147,6 @@ fun structural_induction_ctac strat i (ctxt,thm) =
     end;
 
 (* Recursion Induction: Search over possible function we can get an induction scheme from. *)
-(* Q: Shouldn't this do just recursion induction, so we can have a separate tactic for trying
-   both this and structural? *)
-
   fun reP uu = case uu of
         Var (_,t) => t
       | (t$_) => reP t
@@ -167,7 +164,7 @@ fun try_rec_induction_schemes_ctac scheme_rules strat vars i =
         in
           CTac.CORELSE
           (try_induct_on_ctac (SOME (n,r)(*ind_scheme*)) strat (map (map fst) instt) (*vars*) i,
-          (try_rec_induction_schemes_ctac rs strat vars i))
+          (try_rec_induction_schemes_ctac rs strat vars i)) (* Try some other recursion induction *)
         end;
 
 fun recursion_induction_ctac strat i (ctxt,thm) =
@@ -176,7 +173,7 @@ fun recursion_induction_ctac strat i (ctxt,thm) =
       val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val schemes =  map_filter (try (fn n => (n, Sledgehammer_Util.thms_of_name ctxt n)))
-                            (distinct (op =) (map (fn c => (c^".induct")) consts))
+                            (distinct (op =) (map (fn (c,_) => (c^".induct")) consts))
       (* Q: Do we need to reverse this? *)
       (* val schemes = (*rev*) thinds *)
     in

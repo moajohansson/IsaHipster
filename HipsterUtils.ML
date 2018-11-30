@@ -9,7 +9,7 @@ Hipster utility functions for extracting term information.
 signature HIPSTER_UTILS =
 sig
   val typ_tfrees_of : Term.typ -> (string * sort) list
-  val thy_consts_of : string -> Thm.thm -> string list
+  val thy_consts_of : string -> Thm.thm -> (string * Term.typ) list
   val frees_of : Term.term -> (string * Term.typ) list
   val frees_and_tfrees_of_thm : Thm.thm -> string list * string list
   val add_term_frees : Term.term * Term.term list -> Term.term list
@@ -90,9 +90,9 @@ fun add_consts_of_thy (thynm, t) consts =
   case t of
     (* FIXME: for now we remove those logic theories we know will be present : need to find a way
               of having "included" "own" theories *)
-    Const (nm,_)   => if (String.isPrefix "Pure" nm orelse String.isPrefix "HOL" nm)
+    Const (nm,ty)   => if (String.isPrefix "Pure" nm orelse String.isPrefix "HOL" nm)
                         then consts
-                        else insert (op =) nm consts
+                        else insert (op =) (nm,ty) consts
   | Abs (_,_,body) => add_consts_of_thy (thynm,body) consts
   | t1$t2          => add_consts_of_thy (thynm, t1) (add_consts_of_thy (thynm,t2) consts)
   | _              => consts
@@ -132,10 +132,12 @@ fun type_names t =
   end
 
 fun is_coinductible ctxt t =
-  is_some(Proof_Context.lookup_fact ctxt (t^".coinduct"))
+   is_some (Induct.lookup_coinductT ctxt t)
+  (* is_some(Proof_Context.lookup_fact ctxt (t^".coinduct")) *)
 
 fun is_inductible ctxt t =
-  is_some(Proof_Context.lookup_fact ctxt (t^".induct"))
+  (* is_some(Proof_Context.lookup_fact ctxt (t^".induct")) *)
+   is_some (Induct.lookup_inductT ctxt t)
 
 fun inductible_types t ctxt =
   filter (is_inductible ctxt)  (type_names t)

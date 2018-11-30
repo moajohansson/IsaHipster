@@ -196,7 +196,7 @@ fun inductable_things_in_term ctxt t =
       fun ind_check (Type(ty,_)) = is_some (Induct.lookup_inductT ctxt ty)
          | ind_check _ = false;
       fun coind_check (Type(ty,_)) = is_some (Induct.lookup_coinductT ctxt ty)
-         | coind_check _ = false;
+         | coind_check _ = false; 
     val frees = Hipster_Utils.frees_of t;
     
   in
@@ -213,33 +213,25 @@ fun inductable_things_in_sg ctxt i thm =
 
 
 (* Rule can be NONE if we just want plain structural induction. *)
-(* var is the variable we want to do induction on *)
-fun induct_on_var_tac ctxt rule var i goalthm =
+(* var is the variable(s) we want to do induction on *)
+fun induct_on_var_tac ctxt rule vars i goalthm =
   let val ithings = inductable_things_in_sg ctxt i goalthm;
-      val (otherfrees, inductfrees) = (case var of
+      val (otherfrees, inductfrees) = (case vars of
                                         NONE => mk_induct_insts ithings []
-                                      | SOME v => mk_induct_insts ithings v (*[v]*))
-      (*val (tss, ctxt') = (fold_map o fold_map) infer_term [case var of NONE => [] | SOME v=> [v]] ctxt
-      val instss = map (map (fn inst => SOME (NONE, (inst, false)))) tss;*)
+                                      | SOME vs => mk_induct_insts ithings vs)
+    
       val insts = map (fn NONE => NONE
-                        | SOME v => SOME (NONE : Binding.binding option,(Free v,false)))
-                          (* Each variable paired with false: matters not in our case since we are wrapping them with 'Free' *)
+                        | SOME v => SOME (NONE : Binding.binding option, (Free v,false)))
+            (* Each variable paired with false: matters not in our case since we are wrapping them with 'Free' *)
                   inductfrees
 
-        (* Throw away Isar related stuff and only take the Thm.thm seq *)
-      (* For now remove informative tracing info until we improve it
-      val _ = Output.tracing ("induct_on: "^ (Library.space_implode " * "
-                (map (fn NONE => "; "
-                       | SOME (_, (Free (v,_),false)) => v) insts))^
-                "; otherfrees: "^ (Library.space_implode ", " (map fst otherfrees))) *)
-      val rule' = case rule of NONE => NONE | SOME (_,thms) => SOME thms
-      val nw_thms = Induction.induction_tac ctxt false
-                      [insts] [otherfrees] [] rule' [] i goalthm
-                    handle ERROR message => (warning ("Error in: " ^ message ^ "\n"); Seq.empty)
-                    handle Fail  errrrrr => (warning ("Failure in: *" ^ errrrrr ^"\n"); Seq.empty)
-      (*val _ = @{print} (goalthm, rule', var)*)
+     (*Rule is paired with its name, drop here. *)
+     val rule' = case rule of NONE => NONE | SOME (_,thms) => SOME thms
   in
-    (*Seq.cons (snd (Seq.hd nw_thms')) Seq.empty*) (*Seq.map snd*) nw_thms
+    Induction.induction_tac ctxt false
+                      [insts] [otherfrees] [] rule' [] i goalthm
+                    handle ERROR msg => (warning ("Error in: " ^ msg ^ "\n"); Seq.empty)
+                    handle Fail  msg => (warning ("Failure in: *" ^ msg ^"\n"); Seq.empty)
   end;
 
 
@@ -264,7 +256,7 @@ fun induct_and_sledgehammer ctxt rule var = (*let val _ = @{print} "induct_and_s
 
 
 (* Try induction on each variable in vars until we find one that allows a proof. *)
-(* FIXME: What about induction schemes with several variables? This is only for structural (co)induction*)
+(* Note: vars :: string list list so could be schemes with many vars*)
 fun try_induct_on ctxt rule strat vars i =
   case vars of
     []        => no_tac
@@ -321,7 +313,7 @@ fun try_induct_schemes ctxt strat i thm =
       val consts = Hipster_Utils.thy_consts_of thynm thm
       val thinds = map_filter (fn n => SOME (n, (Sledgehammer_Util.thms_of_name ctxt n))
                         handle ERROR m  => (warning ("Error try: " ^ m ^ "\n"); NONE))
-                    (distinct (op =) (map (fn c => (c^".induct")) consts))
+                    (distinct (op =) (map (fn (c,_) => (c^".induct")) consts))
 
                     (* map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
                         handle ERROR m  => (warning ("Error: " ^ m ^ "\n"); (n, NONE)))
@@ -352,10 +344,9 @@ fun induct_simp_metis ctxt facts thm =
     ALLGOALS(try_inductable_vars ctxt (induct_simp_or_metis (facts,lemmas))) thm
   end;
 
-fun induct_with_schemes ctxt facts thm =
+(* TODO: Put new rec ind tactic in here instead *)
+ fun induct_with_schemes ctxt facts thm =
   let val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-      (*val thinds' = map (fn n => (n,  (Attrib.thms n))
-                         handle _ => (n, NONE) ) (map (fn c => (c^".induct")) consts)*)
   in
     ALLGOALS(try_induct_schemes ctxt (induct_simp_or_metis (facts,lemmas))) thm
   end;
@@ -440,7 +431,7 @@ end;
 
 
 (* Induction with schemes! *)
-structure Ind_Schemes_T : EXPL_TACS =
+ structure Ind_Schemes_T : EXPL_TACS =
 struct
 
 fun routine_tac ctxt = DEPTH_SOLVE (
