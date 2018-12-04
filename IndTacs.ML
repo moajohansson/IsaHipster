@@ -1,8 +1,7 @@
 (*  Author:     Moa Johansson, Chalmers University of Technology
     Author:     Irene Lobo Valbuena, Chalmers University of Technology
 
-Hipster induction tactics and predifined routine-hard reasoning pairs
-parameterising theory exploration.
+Hipster induction tactics.
 *)
 
 (* Various tactics for Hipster. Induction, simplification and metis. *)
@@ -43,11 +42,11 @@ sig
   val induct_simp_metis : Proof.context -> thm list -> tactic
   (* Context -> tactic, to be pasted into proof script. *)
   val induct_sledgehammer_tac :  Proof.context -> tactic
-
+(*
   (* Context -> list of induct rules (schemes) -> tactic *)
   val induct_with_schemes : Proof.context -> thm list -> tactic
   val try_induct_schemes : Proof.context -> inductionStrategy -> int -> tactic
-
+*)
   val SOLVE_TIMEOUT : int -> tactic -> tactic
 end
 
@@ -272,61 +271,6 @@ fun try_inductable_vars ctxt strat i thm =
   end
 
 
-  fun reP uu = case uu of
-        Var (_,t) => t
-      | (t$_) => reP t
-      | (Abs (_, t, _)) => t
-      | (Free (_, t)) => t; (* TODO: Bound, Const *)
-
-
-(* Proof.context -> thm list list -> inductionStrategy -> vars -> int -> tactic *)
-fun try_induction_with ctxt (scheme_rules : (string * Thm.thm list) list) strat vars i =
-  (* let val vars = map fst (fst (inductable_things_in_sg i thm)) *)
-  let val struct_tac = try_induct_on ctxt NONE strat (map (fn (v,_) => [v]) (*fst*) vars) i
-          (* Output.tracing "Rule: none" *)
-      fun rec_ind_tac rules =
-        case rules of
-          []            => no_tac
-        | ((n,r) :: rs) =>
-            let (*val _ = Output.tracing ("Rule: "^n)*)
-                val argTyps =  binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of (hd r))))
-                            (* binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of ((hd o the) r)))) *)
-
-                val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
-              (*val instances = Scheme_Instances.flatten_instances true all_instances(* (Scheme_Instances.instances_for_with argTyps vars)*)*)
-                val instt = hd all_instances
-              (*val _ = @{print} instances   val _ = @{print} instt*)
-              (* FIXME: vars types filter *)
-            in
-              try_induct_on ctxt (SOME (n,r)) strat (map (map fst) instt) i
-              ORELSE
-              rec_ind_tac rs (*ctxt rs strat vars i*)
-            end
-  in
-    struct_tac ORELSE rec_ind_tac scheme_rules (* let val _ = @{print} "no struct!" in rec_ind_tac scheme_rules end *)
-  end;
-
-
-fun try_induct_schemes ctxt strat i thm =
-  let val vars = inductable_things_in_sg ctxt i thm 
-      val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
-      val consts = Hipster_Utils.thy_consts_of thynm thm
-      val thinds = map_filter (fn n => SOME (n, (Sledgehammer_Util.thms_of_name ctxt n))
-                        handle ERROR m  => (warning ("Error try: " ^ m ^ "\n"); NONE))
-                    (distinct (op =) (map (fn (c,_) => (c^".induct")) consts))
-
-                    (* map (fn n => (n, SOME (Sledgehammer_Util.thms_of_name ctxt n))
-                        handle ERROR m  => (warning ("Error: " ^ m ^ "\n"); (n, NONE)))
-                    (distinct (op =) (map (fn c => (c^".induct")) consts))
-                    *)
-      val schemes = rev thinds (* (filter (Basics.is_some (*o snd*)) thinds) *)
-      val _ = warning ("For thm: " ^ (@{make_string} thm))
-      (* FIXME: distinct ... *)
-  in
-    (try_induction_with ctxt schemes strat (distinct (op =) vars) i) thm
-  end;
-
-
 (* QUESTION: Should these tactics really add the lemma-list to the simplifier?
 The tactics used by Hipster don't, they only pass them to Metis, looking them up from the ctxt.
 However, if these tactics are used outside of theory exploration, they might not have all the
@@ -336,6 +280,7 @@ Maybe need all separate tactics for outside Theory Exploration? Or data for indu
 Or add to TacticData?
 *)
 
+
 (* An induction tactic to paste into the proof-script afterwards *)
 fun induct_simp_metis ctxt facts thm =
   let val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
@@ -344,12 +289,6 @@ fun induct_simp_metis ctxt facts thm =
     ALLGOALS(try_inductable_vars ctxt (induct_simp_or_metis (facts,lemmas))) thm
   end;
 
-(* TODO: Put new rec ind tactic in here instead *)
- fun induct_with_schemes ctxt facts thm =
-  let val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
-  in
-    ALLGOALS(try_induct_schemes ctxt (induct_simp_or_metis (facts,lemmas))) thm
-  end;
 
 (* An induction tactic to paste into the proof-script afterwards *)
 fun induct_simp_tac ctxt thm =
@@ -368,7 +307,7 @@ end
 (*-----------------------------------------------------------------------------------------*)
 (* Structures for pre-defined combinations of routine/hard reasoning in Hipster            *)
 (*-----------------------------------------------------------------------------------------*)
-
+(*
 signature EXPL_TACS =
 sig
   val routine_tac : Proof.context -> tactic
@@ -431,7 +370,7 @@ end;
 
 
 (* Induction with schemes! *)
- structure Ind_Schemes_T : EXPL_TACS =
+(* structure Ind_Schemes_T : EXPL_TACS =
 struct
 
 fun routine_tac ctxt = DEPTH_SOLVE (
@@ -454,7 +393,7 @@ fun final_tactic_str ctxt =
     "by (hipster_induct_schemes " ^ facts_str ^")"
   end;
 end
-
+*)
 
 structure Simp_T : EXPL_TACS =
 struct
@@ -477,3 +416,4 @@ fun hard_tac ctxt =
 fun final_tactic_str _ = "by hipster_induct_simp"
 
 end
+*)

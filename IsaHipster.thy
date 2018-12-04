@@ -47,7 +47,7 @@ setup {* Hipster_Rules.setup;*}
 
 ML_file "MiscData.ML"
 ML_file "HipsterUtils.ML"
-ML_file "SchemeInstances.ML"
+(* ML_file "SchemeInstances.ML" *)
 ML_file "InductionData.ML"
 ML_file "CTacs/CTac.ML"
 
@@ -55,6 +55,7 @@ ML_file "SledgehammerTacs.ML"
 ML_file "HipTacOps.ML"
 ML_file "ThyExplData.ML"
 ML_file "IndTacs.ML"
+ML_file "RecIndTacs.ML"
 ML_file "CTacs/InductCTac.ML"
 ML_file "CoIndTacs.ML"
 ML_file "CoinductionData.ML"
@@ -83,11 +84,18 @@ method_setup hipster_induct_sledgehammer = {*
       (Ind_Tacs.induct_sledgehammer_tac ctxt)))
    *}
 
-method_setup hipster_induct_schemes = {*
-  Attrib.thms >> (fn thms => fn ctxt =>
-    SIMPLE_METHOD 
-      (Ind_Tacs.induct_with_schemes ctxt thms))
- *}
+method_setup hipster_recind_simp = {*
+  Scan.lift (Scan.succeed 
+    (fn ctxt => SIMPLE_METHOD 
+      ((Rec_Ind_Tacs.recinduct_simp ctxt))))
+   *}
+
+method_setup hipster_recind = {*
+  Scan.lift (Scan.succeed 
+    (fn ctxt => SIMPLE_METHOD 
+      ((Rec_Ind_Tacs.recinduct_simp_or_sledgehammer ctxt))))
+   *}
+
 
 (* Use simp and or sledgehammer, then prints out Isar snippet using standard Isabelle tactics. *)
 method_setup hipster_induct = {*

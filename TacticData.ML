@@ -34,14 +34,13 @@ fun ind_recognizer ctxt c = not(null(Hipster_Utils.inductible_types (Thm.concl_o
 (*val empty = Data{routine_tac = K FAIL, hard_tac = K FAIL,
                 routine_tac_str = "FAIL", hard_tac_str = fn _ => K "FAIL"}; *)
 
-(* Work in progress: Remove old hard_tac field etc: no longer in use *)
 
 (* Routine: simplification and FO reasoning. Hard: Induction, then routine. *)
- val induct_with_schemes = Data {technique = "induction",
+ (*val induct_with_schemes = Data {technique = "induction",
                                 routine_tac = Ind_Schemes_T.routine_tac,
                                 hard_ctac = Induct_CTac.thy_expl_hard_ctac_rec,
                                 hard_tac_str = Ind_Schemes_T.final_tactic_str, 
-                                applies_to = ind_recognizer}
+                                applies_to = ind_recognizer} *)
 
 (* Routine: simplification and FO reasoning. Hard: Induction, then routine. *)
 (* val induct_simp_metis = Data {technique = "induction",
@@ -51,23 +50,33 @@ fun ind_recognizer ctxt c = not(null(Hipster_Utils.inductible_types (Thm.concl_o
                                  routine_tac_str = Simp_Metis_T.routine_tac_str,
                                  hard_tac_str = Simp_Metis_T.final_tactic_str,
                                  applies_to = ind_recognizer} *)
-
+(*
 val recursion_induction =  Data {technique = "recursion induction",
-                                 routine_tac = Ind_Schemes_T.routine_tac,
+                                 routine_tac = Rec_Ind_T.routine_tac,
                                 hard_ctac = Induct_CTac.thy_expl_hard_ctac_rec,
-                                hard_tac_str = Ind_Schemes_T.final_tactic_str, 
+                                hard_tac_str = Rec_Ind_T.final_tactic_str, 
                                 applies_to = ind_recognizer}
-
+*)
 (* Routine: simplification. Hard: Structural Induction, then simp. *)
 val induct_simp = Data {technique = "induction",
-                        routine_tac = Simp_T.routine_tac,
+                        routine_tac = fn ctxt =>
+                          let val lemmas = (ThyExpl_Data.proved_of_ctxt ctxt) @ (Hipster_Rules.get ctxt)
+                          in
+                            SOLVE (Ind_Tacs.prove_by_simp ctxt lemmas)
+                          end,
                         hard_ctac = Induct_CTac.thy_expl_hard_ctac_simp_struct,
                         hard_tac_str = Induction_Data.get_proof_script_ctxt, 
                         applies_to = ind_recognizer}
 
 (* Sledgehammer, or sledgehammer + structural induction *)
 val induct_sledgehammer = Data {technique = "induction",
-                                routine_tac = Sledgehammer_T.routine_tac,
+                                routine_tac = (fn ctxt => fn thm =>
+                                  let
+                                    val proved = ThyExpl_Data.proved_of_ctxt ctxt
+                                    in
+                                      ALLGOALS (Hipster_Sledgehammer_Tactics.just_sledgehammer ctxt []
+                                        Sledgehammer_Fact.no_fact_override proved) thm
+                                    end),                          
                                 hard_ctac = Induct_CTac.thy_expl_hard_ctac_struct,
                                 hard_tac_str = Induction_Data.get_proof_script_ctxt,
                                 applies_to = ind_recognizer}
@@ -97,12 +106,12 @@ val no_proof = Data {technique = "Just explore, no proofs",
                                   applies_to = K o K true}
 
 (* Routine: simp, Hard: Sledgehammer orelse Induction + Sledgehammer *)
-val simp_sledgehammer_induct_sledgehammer = Data {technique = "induction",
+(*val simp_sledgehammer_induct_sledgehammer = Data {technique = "induction",
                                                   routine_tac = Simp_T.routine_tac,
                                                   hard_ctac = Induct_CTac.thy_expl_hard_sledge_or_struct,
                                                   hard_tac_str = Sledgehammer_T.final_tactic_str,
                                                   applies_to = ind_recognizer}  (* Redundant *)
-
+*)
 (* Data stored in an Isabelle context, default to induct_with_schemes tactics.
    THINK: Maybe this should be stored in the theory instead? *)
 structure Data = Theory_Data
@@ -121,11 +130,11 @@ fun default_technique ctxt = (get_technique o hd o (Data.get o Proof_Context.the
 val set_tacs = Data.put
 val get_tacs = Data.get
 val set_induct_simp = set_tacs [induct_simp]
-val set_recursion_induction = set_tacs [induct_with_schemes]
+(*val set_recursion_induction = set_tacs [induct_with_schemes] *)
 val set_induct_sledgehammer = set_tacs [induct_sledgehammer]
 val set_coinduct_sledgehammer = set_tacs [induct_sledgehammer,coinduct_sledgehammer]
 val set_sledgehammer_coinduct = set_tacs [induct_sledgehammer,sledgehammer_coinduct]
-val set_sledge_induct_sledge = set_tacs [simp_sledgehammer_induct_sledgehammer]
+(* val set_sledge_induct_sledge = set_tacs [simp_sledgehammer_induct_sledgehammer] *)
 val set_no_proof = set_tacs [no_proof]
 val set_coinduct_sledgehammer_auto = set_tacs [induct_sledgehammer,coinduct_sledgehammer_auto]
 end

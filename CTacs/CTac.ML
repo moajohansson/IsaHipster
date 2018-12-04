@@ -24,6 +24,7 @@ val CORELSE': ('a -> ctactic) * ('a -> ctactic) -> 'a -> ctactic
 val CHANGED_PROP : ctactic -> ctactic;
 val COND: (Proof.context * Thm.thm -> bool) -> ctactic -> ctactic -> ctactic
 
+val FIRST: ctactic list -> ctactic 
 val CTHEN_MAYBE: ctactic * ctactic -> ctactic
 val CTHEN_MAYBE': ('a -> ctactic) * ('a -> ctactic) -> 'a -> ctactic
 
@@ -102,6 +103,10 @@ fun (ctac1 CTHEN_MAYBE ctac2) (ctxt,thm) =
   (ctac1 CTHEN COND (has_fewer_prems (Thm.nprems_of thm) o snd) all_ctac ctac2) (ctxt,thm);
 
 fun (ctac1 CTHEN_MAYBE' ctac2) x = ctac1 x CTHEN_MAYBE ctac2 x;
+
+
+(* FIRST [tac1,...,tacn]   equals    tac1 ORELSE ... ORELSE tacn   *)
+fun FIRST ctacs = fold_rev (curry op CORELSE) ctacs no_ctac;
 
 (* ------------------------------------------------------------------------------------------ *)
 (*Accept only next states that change the theorem somehow*)

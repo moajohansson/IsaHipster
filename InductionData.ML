@@ -84,7 +84,7 @@ fun get_proof_script (Data d) ctxt =
   let
   val simp_meth = Sledgehammer_Meth (Sledgehammer_Proof_Methods.Simp_Method)
 
-  fun is_simp m = (m=Simp_All_Meth orelse m=simp_meth)
+(*  fun is_simp m = (m=Simp_All_Meth orelse m=simp_meth) *)
 
   (* If the same subgoal has several consecutive application of e.g. simp, then them and merge facts added *)
    fun merge_same_meths_sg i ms new_m =
@@ -98,19 +98,14 @@ fun get_proof_script (Data d) ctxt =
   (* FIXME: Only do if EACH subgoal has Simp as first tactic *)
   (* FIXME 2: For methods like auto/blast which work on all goals by default, also check this,
       otherwise include some subgoal-specific stuff *)
-  fun merge_same_meths ms new_m =
+(*  fun merge_same_meths ms new_m =
       case ms of [] => new_m
           | [(m,fs)] => new_m @ [string_of_meth ctxt (m,fs)]
           | ((m1,f1)::(m2,f2)::ms) =>
               if (is_simp m1 andalso is_simp m2)
               then merge_same_meths ((Simp_All_Meth, distinct (op =)(f1@f2))::ms) new_m
               else merge_same_meths ((m2,f2)::ms) (new_m @ [string_of_meth ctxt (m1,f1)])
-
-  val tac_table = (#subgoal_tacs_strs d)
-                   |> Inttab.map (fn sg_meths => merge_same_meths_sg sg_meths [])
-  (* For each subgoal, tactic applications is stored in reversed order, due to how Inttab works.*)
-  val subgoal_tacs =  map (rev o snd) (Inttab.dest tac_table)
-
+*)
   fun mk_ind_str [] = ""
     | mk_ind_str vars_list =
       let
@@ -127,13 +122,19 @@ fun get_proof_script (Data d) ctxt =
 
  fun mk_app_str meths s =
     case meths of
-      [] => s ^ "done"
+      [] => s
+    | [m] => (s ^ (string_of_meth ctxt m) ^"\n") ^ "done"
     | (m::ms) => mk_app_str ms (s ^ (string_of_meth ctxt m) ^"\n")
        (*let val meth_str = string_of_meth ctxt m
        in *)
        (*if (null ms)
           then s ^ "by " ^ m
           else mk_app_str ms (s ^ "apply " ^ m ^"\n") *)
+
+   val tac_table = (#subgoal_tacs_strs d)
+                   |> Inttab.map (fn sg_meths => merge_same_meths_sg sg_meths [])
+  (* For each subgoal, tactic applications is stored in reversed order, due to how Inttab works.*)
+  val subgoal_tacs =  map (rev o snd) (Inttab.dest tac_table)
   in
      (* mk_ind_str (#induction_vars d) ^ (mk_app_str (merge_same_meths (flat subgoal_tacs) []) "") *)
       mk_ind_str (#induction_vars d) ^ (mk_app_str (flat subgoal_tacs)) ""

@@ -131,10 +131,10 @@ fun try_induct_on_ctac rule strat vars i (ctxt,thm) =
   in
   (case vars of
     []        => CTac.no_ctac
-  | (v :: vs) =>
+  | (vs :: vss) =>
     CTac.CORELSE (* Commits to first if that return non-empty sequence *)
-      (strat rule v,
-      try_induct_on_ctac rule strat vs i)
+      (strat rule vs,
+      try_induct_on_ctac rule strat vss i)
    ) (ctxt2,thm)
   end;
 
@@ -146,39 +146,20 @@ fun structural_induction_ctac strat i (ctxt,thm) =
       (try_induct_on_ctac NONE strat vars i) (ctxt,thm)
     end;
 
-(* Recursion Induction: Search over possible function we can get an induction scheme from. *)
-  fun reP uu = case uu of
-        Var (_,t) => t
-      | (t$_) => reP t
-      | (Abs (_, t, _)) => t
-      | (Free (_, t)) => t; (* TODO: Bound, Const *)
-
-fun try_rec_induction_schemes_ctac scheme_rules strat vars i =
-  case scheme_rules of
-        [] => CTac.no_ctac (* try_induct_on_ctac NONE strat vars i *)
-      | ((n,r)(*ind_scheme*) :: rs) =>
-        let
-          val argTyps = binder_types (reP (HOLogic.dest_Trueprop (Thm.concl_of (hd r))))
-          val all_instances = (Scheme_Instances.instances_for_with argTyps vars)
-          val instt = hd all_instances
-        in
-          CTac.CORELSE
-          (try_induct_on_ctac (SOME (n,r)(*ind_scheme*)) strat (map (map fst) instt) (*vars*) i,
-          (try_rec_induction_schemes_ctac rs strat vars i)) (* Try some other recursion induction *)
-        end;
-
+(* Recursion induction: Find functions and vars we can induct on *)  
 fun recursion_induction_ctac strat i (ctxt,thm) =
-  let
-      val vars = (Ind_Tacs.inductable_things_in_sg ctxt i thm)
-      val thynm = Context.theory_name (Proof_Context.theory_of ctxt)
-      val consts = Hipster_Utils.thy_consts_of thynm thm
-      val schemes =  map_filter (try (fn n => (n, Sledgehammer_Util.thms_of_name ctxt n)))
-                            (distinct (op =) (map (fn (c,_) => (c^".induct")) consts))
-      (* Q: Do we need to reverse this? *)
-      (* val schemes = (*rev*) thinds *)
-    in
-      try_rec_induction_schemes_ctac schemes strat vars i (ctxt,thm)
-    end;
+  let 
+    val rec_inds =  Rec_Ind_Tacs.inductable_pos_of_funs ctxt thm
+    val poss_inds = 
+            map (fn(_, varz, recind_thm) => 
+                      let 
+                        val vars = map (fn z => Zipper.trm z |> Term.dest_Free |> fst) varz
+                      in  
+                        try_induct_on_ctac (SOME recind_thm) strat [vars] i
+                      end) rec_inds 
+  in
+    CTac.FIRST poss_inds (ctxt,thm)
+  end;
 
 (* A tactic for automated induction to be called from Isar method hipster_induct, see IsaHipster.thy
   It does the search over which variables one could do structural induction, or else which functions
@@ -189,8 +170,7 @@ fun recursion_induction_ctac strat i (ctxt,thm) =
 fun hipster_induct ctxt0 thm =
   let
     val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
-    val result = (* CTac.ALLGOALS (structural_induction_ctac induct_and_simp_ctac) (ctxt,thm) *)
-                 (* CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm) *)
+    val result = 
                  (CTac.CORELSE
                   ( CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac),
                     CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac)))
@@ -214,13 +194,9 @@ fun thy_expl_hard_ctac_struct (ctxt0, thm) =
     val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
     in
        CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac) (ctxt,thm)
-     (* (CTac.CORELSE
-                  ( CTac.ALLGOALS (structural_induction_ctac induct_and_sledgehammer_ctac),
-                    CTac.ALLGOALS (recursion_induction_ctac induct_and_sledgehammer_ctac)))
-                 (ctxt,thm) *)
     end;
 
-(* Structural induction follwed by Sledgehammer *)
+(* Structural induction follwed by simp *)
 fun thy_expl_hard_ctac_simp_struct (ctxt0, thm) =
    let
     val ctxt = Induction_Data.reset_ind_proof_data_ctxt ctxt0
