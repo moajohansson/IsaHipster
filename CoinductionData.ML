@@ -98,7 +98,8 @@ fun get_proof_script (Data d) ctxt =
    in
      case splt of 
        "using"::l => 
-       let val (facts,script) = Library.take_prefix (not o curry op = "apply") l
+       let val (facts,script) = (*Library.take_prefix *)
+                                  Library.chop_prefix (not o curry op = "apply") l
        in (facts,String.concatWith " " (tl script)) end
      | "apply"::l=> ([],String.concatWith " " l)
      | _ => raise Domain
