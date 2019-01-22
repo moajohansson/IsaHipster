@@ -141,6 +141,7 @@ fun try_induct_on_ctac rule strat vars i (ctxt,thm) =
 (* Structural Induction: Find the variables we can induct on *)
 fun structural_induction_ctac strat i (ctxt,thm) =
     let
+     (* Note: could improve by sorting variables in order of likely struct ind success. *)
       val vars = map (fn (v,_) => [v]) (Ind_Tacs.inductable_things_in_sg ctxt i thm)
     in
       (try_induct_on_ctac NONE strat vars i) (ctxt,thm)
@@ -151,11 +152,11 @@ fun recursion_induction_ctac strat i (ctxt,thm) =
   let 
     val rec_inds =  Rec_Ind_Tacs.inductable_pos_of_funs ctxt thm
     val poss_inds = 
-            map (fn(_, varz, recind_thm) => 
+            map (fn(_, vars, recind_thm) => 
                       let 
-                        val vars = map (fn z => Zipper.trm z |> Term.dest_Free |> fst) varz
+                        val vars' = map (fn z => Zipper.trm z |> Term.dest_Free |> fst) vars
                       in  
-                        try_induct_on_ctac (SOME recind_thm) strat [vars] i
+                        try_induct_on_ctac (SOME recind_thm) strat [vars'] i
                       end) rec_inds 
   in
     CTac.FIRST poss_inds (ctxt,thm)
