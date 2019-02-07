@@ -49,6 +49,7 @@ ML_file "MiscData.ML"
 ML_file "HipsterUtils.ML"
 (* ML_file "SchemeInstances.ML" *)
 ML_file "InductionData.ML"
+ML_file "LemmaData.ML"
 ML_file "CTacs/CTac.ML"
 
 ML_file "SledgehammerTacs.ML"
@@ -56,6 +57,7 @@ ML_file "HipTacOps.ML"
 ML_file "ThyExplData.ML"
 ML_file "IndTacs.ML"
 ML_file "RecIndTacs.ML"
+ML_file "RecIndLemmaSpecTacs.ML"
 ML_file "CTacs/InductCTac.ML"
 ML_file "CoIndTacs.ML"
 ML_file "CoinductionData.ML"
@@ -96,6 +98,11 @@ method_setup hipster_recind = {*
       ((Rec_Ind_Tacs.recinduct_simp_or_sledgehammer ctxt))))
    *}
 
+method_setup recind_lemmaspec = {*
+  Scan.lift (Scan.succeed 
+    (fn ctxt => SIMPLE_METHOD 
+      ((Rec_Ind_Lemma_Spec_Tacs.koen_induct ctxt))))
+   *}
 
 (* Use simp and or sledgehammer, then prints out Isar snippet using standard Isabelle tactics. *)
 method_setup hipster_induct = {*

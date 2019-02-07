@@ -7,7 +7,6 @@ Recursion induction should be considered when:
 There is a suitable function with a recursion induction theorem,
 and the arguments of the functions are variables.
 
-Otherwise, the Koen-critic should speculate a suitable lemma. (To be implented.)
 
 *)
 

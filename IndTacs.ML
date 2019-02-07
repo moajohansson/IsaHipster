@@ -138,7 +138,7 @@ fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (prett
 fun sledgehammer_goals ctxt =
   let
     val proved = ThyExpl_Data.proved_of_ctxt ctxt
-    val _ = @{print} proved
+    (* val _ = @{print} proved *)
   in
     ALLGOALS (Sledgehammer_Tactics.sledgehammer_with_metis_tac ctxt []
               Sledgehammer_Fact.no_fact_override proved)
@@ -147,10 +147,10 @@ fun sledgehammer_goals ctxt =
 
 
 (* Must fail if there are any open subgoals left *)
-fun simp_or_sledgehammer_tac ctxt = let val _ = @{print} "simp or" in
+fun simp_or_sledgehammer_tac ctxt = (*let val _ = @{print} "simp or" in *)
    SOLVE_OR_FAIL ((simp_all ctxt []) THEN IF_UNSOLVED (sledgehammer_goals ctxt))
       handle Fail msg => (warning ("Failure in: *" ^ msg ^"\n"); fn _ =>  Seq.empty)
-end
+(*end*)
 
 (*
 fun sledgehammer_goals_explore ctxt =

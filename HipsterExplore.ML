@@ -21,7 +21,7 @@ fun proof_str ctxt proof_script name thm =
     (* Print variables without ? *)
     val ctxt' = Config.put show_question_marks false ctxt
     val str_of_term =  Syntax.string_of_term ctxt'
-    val lemma_str = Library.quote (str_of_term (Thm.concl_of thm))
+    val lemma_str = Library.quote (str_of_term (Thm.prop_of thm))
     (*val name = Long_Name.base_name (Thm.get_name_hint thm)
     val _ = @{print} name *)
   in
