@@ -145,11 +145,12 @@ fun sledgehammer_goals ctxt =
   end;
 
 
-
+(*** FIXME: Think this is slightly wrong, should simp before passing to sledgehammer. ***)
 (* Must fail if there are any open subgoals left *)
 fun simp_or_sledgehammer_tac ctxt = (*let val _ = @{print} "simp or" in *)
-   SOLVE_OR_FAIL ((simp_all ctxt []) THEN IF_UNSOLVED (sledgehammer_goals ctxt))
-      handle Fail msg => (warning ("Failure in: *" ^ msg ^"\n"); fn _ =>  Seq.empty)
+  (simp_all ctxt []) THEN (sledgehammer_goals ctxt)
+ (*  SOLVE_OR_FAIL ((simp_all ctxt []) THEN IF_UNSOLVED (sledgehammer_goals ctxt))
+      handle Fail msg => (warning ("Failure in: *" ^ msg ^"\n"); fn _ =>  Seq.empty) *)
 (*end*)
 
 (*

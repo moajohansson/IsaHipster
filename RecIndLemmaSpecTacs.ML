@@ -101,7 +101,6 @@ fun solve_goal_by_lemma_ctac lemma i (ctxt0,thm) =
     (* Generalise lemma to get version with meta-variables instead. *)
     val gen_lemma = Drule.generalize (Hipster_Utils.frees_and_tfrees_of_thm lemma) lemma
     val ctxt = Simplifier.add_simp gen_lemma ctxt0
-    val _ = @{print}gen_lemma
   in  
   Seq.map
     (fn (ctxt',thm') => ((Lemma_Data.set_lemma_ctxt (SOME lemma) ctxt')

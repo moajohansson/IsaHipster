@@ -27,29 +27,67 @@ where
   "qrev Emp a = a"
 | "qrev (Cons x xs) a = qrev xs (Cons x a)"
 
-lemma lemma_a [thy_expl]: "app x2 Emp = x2"
+hipster app
+lemma lemma_a [thy_expl]: "app y Emp = y"
+  apply (induct y)
+  apply simp
+  apply simp
+  done
+
+lemma lemma_aa [thy_expl]: "app (app y z) x2 = app y (app z x2)"
+  apply (induct y arbitrary: x2 z)
+  apply simp
+  apply simp
+  done
+(*lemma lemma_a [thy_expl]: "app x2 Emp = x2"
 by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.rev.simps ListDemo.app.simps thy_expl} *})
 
 lemma lemma_aa [thy_expl]: "app (app x2 y2) z2 = app x2 (app y2 z2)"
 by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.rev.simps ListDemo.app.simps thy_expl} *})
+*)
 
-lemma lemma_ab [thy_expl]: "app (ListDemo.rev x5) (ListDemo.rev y5) = ListDemo.rev (app y5 x5)"
+hipster rev
+lemma lemma_ab [thy_expl]: "app (ListDemo.rev z) (ListDemo.rev y) = ListDemo.rev (app y z)"
+apply (induct y arbitrary: z)
+apply (simp add: lemma_a)
+apply (metis ListDemo.rev.simps(2) app.simps(2) lemma_aa)
+done
+
+lemma lemma_ac [thy_expl]: "ListDemo.rev (Lst.Cons z (ListDemo.rev y)) = app y (Lst.Cons z Emp)"
+apply (induct y)
+  apply simp
+  apply (metis ListDemo.rev.simps(2) Lst.distinct(1) Lst.inject app.elims app.simps(1) lemma_ab rev.elims)
+  done
+    
+lemma lemma_ad [thy_expl]: "ListDemo.rev (app z (ListDemo.rev y)) = app y (ListDemo.rev z)"
+  apply (induct y arbitrary: z)
+  apply (metis ListDemo.rev.simps(1) lemma_ab)
+  apply (metis ListDemo.rev.simps(1) ListDemo.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
+  done
+(*lemma lemma_ab [thy_expl]: "app (ListDemo.rev x5) (ListDemo.rev y5) = ListDemo.rev (app y5 x5)"
 apply (induct y5)
 sledgehammer
 apply (metis ListDemo.rev.simps(1) app.simps(1) lemma_a)
 sledgehammer
 by (metis ListDemo.rev.simps(2) app.simps(2) lemma_aa)
-
+*)
 
 theorem rev_rev : "rev(rev xs) = xs "
-apply (induct xs)
+(* by hipster_induct*)
+  apply (induct xs)
+  apply simp
+  apply (metis ListDemo.rev.simps(1) ListDemo.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
+  done
+ (* sledgehammer
+  by (metis ListDemo.rev.simps(1) lemma_a lemma_ad)*)
+(*apply (induct xs)
 sledgehammer
 (* apply (tactic {* Hipster_Explore.explore_goal @{context} ["ListDemo.rev", "ListDemo.app"] *}) *)
 apply (metis ListDemo.rev.simps(1))
 apply simp
 sledgehammer
 by (metis ListDemo.rev.simps(1) ListDemo.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
-
+*)
 (*
 Try first proving lemmas:
 

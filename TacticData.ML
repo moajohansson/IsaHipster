@@ -28,6 +28,7 @@ fun get_applies_to (Data d) = (#applies_to d)
 fun has_technique s dl = exists (curry op = s o get_technique) dl
 fun get_data s dl = find_first (curry op = s o get_technique) dl
 
+(* FIXME: Please move this to the relevant tactic.*)
 fun coind_recognizer ctxt c = not(null(Hipster_Utils.coinductible_types (Thm.concl_of c) ctxt))
 fun ind_recognizer ctxt c = not(null(Hipster_Utils.inductible_types (Thm.concl_of c) ctxt))
 (* Dummy data *)
@@ -77,7 +78,7 @@ val induct_sledgehammer = Data {technique = "induction",
                                       ALLGOALS (Hipster_Sledgehammer_Tactics.just_sledgehammer ctxt []
                                         Sledgehammer_Fact.no_fact_override proved) thm
                                     end),                          
-                                hard_ctac = Induct_CTac.thy_expl_hard_ctac_struct,
+                                hard_ctac = Induct_CTac.thy_expl_hard_ctac_rec,
                                 hard_tac_str = Induction_Data.get_proof_script_ctxt,
                                 applies_to = ind_recognizer}
 
@@ -115,26 +116,29 @@ val no_proof = Data {technique = "Just explore, no proofs",
 (* Data stored in an Isabelle context, default to induct_with_schemes tactics.
    THINK: Maybe this should be stored in the theory instead? *)
 structure Data = Theory_Data
-  ( type T = T list
-    val empty = [induct_sledgehammer](* induct_with_schemes *)(* Default tactics *)
+  ( type T = T
+    val empty = induct_sledgehammer (* induct_with_schemes *)(* Default tactics *)
     val extend = I
     val merge = fst )
 
-fun routine_tac s ctxt = ((get_routine_tac o the o get_data s) (Data.get (Proof_Context.theory_of ctxt))) ctxt
-fun hard_ctac s ctxt = (get_hard_ctac o the o get_data s) (Data.get (Proof_Context.theory_of ctxt))
-fun hard_tac_str s ctxt = ((get_hard_str o the o get_data s) (Data.get (Proof_Context.theory_of ctxt))) ctxt 
-val techniques = map get_technique o (Data.get o Proof_Context.theory_of)
-fun default_technique ctxt = (get_technique o hd o (Data.get o Proof_Context.theory_of)) ctxt
+fun routine_tac ctxt = (get_routine_tac) (Data.get (Proof_Context.theory_of ctxt)) ctxt
+fun hard_ctac ctxt = (get_hard_ctac) (Data.get (Proof_Context.theory_of ctxt))
+fun hard_tac_str ctxt = (get_hard_str) (Data.get (Proof_Context.theory_of ctxt)) ctxt 
 
+(*val techniques = map get_technique o (Data.get o Proof_Context.theory_of)
+fun default_technique ctxt = (get_technique o hd o (Data.get o Proof_Context.theory_of)) ctxt
+*)
 
 val set_tacs = Data.put
 val get_tacs = Data.get
-val set_induct_simp = set_tacs [induct_simp]
+val set_induct_simp = set_tacs induct_simp
 (*val set_recursion_induction = set_tacs [induct_with_schemes] *)
-val set_induct_sledgehammer = set_tacs [induct_sledgehammer]
-val set_coinduct_sledgehammer = set_tacs [induct_sledgehammer,coinduct_sledgehammer]
-val set_sledgehammer_coinduct = set_tacs [induct_sledgehammer,sledgehammer_coinduct]
+val set_induct_sledgehammer = set_tacs induct_sledgehammer
+(*val set_coinduct_sledgehammer = set_tacs [induct_sledgehammer,coinduct_sledgehammer]
+val set_sledgehammer_coinduct = set_tacs [induct_sledgehammer,sledgehammer_coinduct]*)
+
 (* val set_sledge_induct_sledge = set_tacs [simp_sledgehammer_induct_sledgehammer] *)
-val set_no_proof = set_tacs [no_proof]
-val set_coinduct_sledgehammer_auto = set_tacs [induct_sledgehammer,coinduct_sledgehammer_auto]
+val set_no_proof = set_tacs no_proof
+(* val set_coinduct_sledgehammer_auto = set_tacs [induct_sledgehammer,coinduct_sledgehammer_auto] *)
+
 end

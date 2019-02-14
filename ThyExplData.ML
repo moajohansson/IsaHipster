@@ -173,14 +173,14 @@ fun goal_prop str ctxt =
 (* Assume get list of strings from HipSpec, which can be directly parsed as Isabelle terms *)
 fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
   let
-      fun total_vs t =
+    (*  fun total_vs t =
         let val (frs,als) = Hipster_Utils.dangling_vars t
-        in length frs + length als end
-      fun term_var_ord (t1, t2) =
+        in length frs + length als end *)
+  (*    fun term_var_ord (t1, t2) =
         let val freedom1 = total_vs t1
             val freedom2 = total_vs t2
         in bool_ord (freedom2 < freedom1, freedom1 < freedom2)
-        end
+        end *)
 
       val conjs = lemma_strs
                     |> map (Syntax.read_prop ctxt)
