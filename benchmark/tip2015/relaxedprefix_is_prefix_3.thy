@@ -47,6 +47,6 @@ fun append :: "It list => It list => It list" where
 theorem x0 :
   "!! (x :: It) (xs :: It list) (ys :: It list) .
      isRelaxedPrefix (append xs (Cons2 x (Nil2))) (append xs ys)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

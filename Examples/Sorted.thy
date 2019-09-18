@@ -42,10 +42,10 @@ thm ins.induct
 
 (*hipster sorted ins*)
 lemma lemma_ac [thy_expl]: "leq x2 x2 = True"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Sorted.sorted.simps Sorted.ins.simps thy_expl} *})
+by (tactic \<open>Hipster_Tacs.induct_simp_metis @{context} @{thms Sorted.sorted.simps Sorted.ins.simps thy_expl}\<close>)
 
 lemma lemma_ad [thy_expl]: "Sorted.sorted (ins Z x2) = Sorted.sorted x2"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Sorted.sorted.simps Sorted.ins.simps thy_expl} *})
+by (tactic \<open>Hipster_Tacs.induct_simp_metis @{context} @{thms Sorted.sorted.simps Sorted.ins.simps thy_expl}\<close>)
 
 lemma unknown [thy_expl]: "ins Z (ins x y) = ins x (ins Z y)"
 oops
@@ -66,9 +66,9 @@ oops
 
 (*hipster sorted ins isort*)
 (*hipster_cond sorted isort*)
-ML {*
+ML \<open>
   val _ = Proof_Context.init_global
-*}
+\<close>
 (*hipster_cond sorted isort leq sorted ins*)
 lemma lemma_ae [thy_expl]: "ins Z (isort x2) = isort (ins Z x2)"
 by (hipster_induct_simp_metis Sorted.sorted.simps Sorted.isort.simps Sorted.leq.simps Sorted.sorted.simps Sorted.ins.simps)

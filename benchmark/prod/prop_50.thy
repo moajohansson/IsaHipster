@@ -139,5 +139,5 @@ oops
   theorem x0 :
     "(count x (isort y)) = (count x y)"
     by (hipster_induct_schemes count.simps isort.simps insert2.simps le.simps equal2.simps)
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

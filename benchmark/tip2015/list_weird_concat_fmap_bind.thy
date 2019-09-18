@@ -59,6 +59,6 @@ show "(weirdconcat (fmap f xs)) = (bind xs f)"
      (*apply(metis (full_types) thy_expl weirdconcat.psimps fmap.simps bind.simps)*)
 (*by (hipster_induct_schemes fmap.simps append.simps bind.simps list.exhaust weirdconcat.psimps)   Unification loop! *)
 
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

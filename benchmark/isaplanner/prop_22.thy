@@ -66,8 +66,8 @@ apply (simp_all add:lemma_aa lemma_a lemma_ab lemma_ac lemma_ad dd triv_a)
 lemma aa: "max2 (max2 a b) c = max2 a (max2 b c) \<Longrightarrow> max2 (max2 a b) (S c) = max2 a (max2 b (S c))"
 apply hipster_induct_schemes*)
 
-setup{* Hip_Tac_Ops.set_metis_to @{context} 15000*}
-setup{* Hip_Tac_Ops.set_metis_filter @{context} (K false)*}
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 15000\<close>
+setup\<open>Hip_Tac_Ops.set_metis_filter @{context} (K false)\<close>
 
   theorem x0 :
     "(max2 (max2 a b) c) = (max2 a (max2 b c))"

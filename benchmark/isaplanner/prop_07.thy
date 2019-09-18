@@ -35,5 +35,5 @@ by (hipster_induct_schemes minus.simps)
 
   theorem x0 :
     "(minus (plus n m) n) = m"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

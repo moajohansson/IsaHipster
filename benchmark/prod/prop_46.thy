@@ -61,5 +61,5 @@ hipster_cond elem equal2*)
 
   theorem x0 :
     "(x = y) ==> (elem x (insert2 y z))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

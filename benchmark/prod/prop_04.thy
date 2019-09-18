@@ -54,5 +54,5 @@ by(hipster_induct_schemes)
     "(length (append x x)) = (double (length x))"
     by (hipster_induct_schemes append.simps double.simps length.simps list.exhaust Nat.exhaust)
 
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

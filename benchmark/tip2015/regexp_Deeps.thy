@@ -119,12 +119,12 @@ by (hipster_induct_schemes plus.simps or2.simps eqA.simps and2.simps)
 lemma lemma_ai [thy_expl]: "and2 (eqA x16 y16) (eqA z16 x16) = and2 (eqA z16 x16) (eqA z16 y16)"
 by (hipster_induct_schemes plus.simps or2.simps eqA.simps and2.simps)
 
-setup{*Hip_Tac_Ops.set_metis_to @{context} 1000*}
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 1000\<close>
 
 lemma lemma_aj [thy_expl]: "and2 (eqA x16 y16) (eqA z16 z16) = and2 (eqA z16 x16) (eqA z16 y16)"
 by (hipster_induct_schemes plus.simps or2.simps eqA.simps and2.simps)
 
-setup{*Hip_Tac_Ops.set_metis_to @{context} 400*}
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 400\<close>
 
 lemma lemma_ak [thy_expl]: "and2 (eqA x2 x2) (eqA y2 z2) = and2 (eqA x2 y2) (eqA x2 z2)"
 by (hipster_induct_schemes plus.simps or2.simps eqA.simps and2.simps)
@@ -397,6 +397,6 @@ hipster seq plus
 theorem x0 :
   "!! (p :: Rr) (s :: Aa list) .
      (recognise (Star p) s) = (recognise (Star (deeps p)) s)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

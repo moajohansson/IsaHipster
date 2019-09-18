@@ -10,6 +10,6 @@ fun m :: "int => int" where
 
 theorem x0 :
   "!! (n :: int) . (n >= 101) ==> ((m n) = (n - 10))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

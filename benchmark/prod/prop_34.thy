@@ -81,5 +81,5 @@ by (hipster_induct_schemes mult.simps plus.simps)
   theorem x0 :
     "(mult x y) = (mult2 x y Z)"
     apply(hipster_induct_schemes mult.simps mult2.simps Nat.exhaust)
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

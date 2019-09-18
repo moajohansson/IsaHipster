@@ -20,6 +20,6 @@ fun bind :: "'a list => ('a => 'b list) => 'b list" where
 
 theorem x0 :
   "!! (xs :: 'a list) . (bind xs (% (x :: 'a) => return x)) = xs"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

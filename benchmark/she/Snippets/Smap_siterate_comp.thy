@@ -15,11 +15,11 @@ lemma lemma_ad [thy_expl]: "smap z (SCons y (siterate z x2)) = SCons (z y) (site
     (simp add: lemma_ac)
 (*cohipster smap siterate Fun.comp \<comment> "Explore smap, siterate, and function composition"
 *)
-text_raw {*\DefineSnippet{siteratefusion}{*}
+text_raw \<open>\DefineSnippet{siteratefusion}{\<close>
 lemma lemma_ae [thy_expl]: "smap z (siterate (y \<circ> z) x2) = siterate (z \<circ> y) (z x2)"
  by (coinduction arbitrary: x2 y z rule: Stream.Stream.coinduct_strong)
     auto
-text_raw {*}%EndSnippet*}
+text_raw \<open>}%EndSnippet\<close>
       
 
 end

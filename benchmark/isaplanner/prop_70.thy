@@ -10,5 +10,5 @@ begin
   (*hipster le *)
   theorem x0 :
     "(le m n) ==> (le m (S n))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

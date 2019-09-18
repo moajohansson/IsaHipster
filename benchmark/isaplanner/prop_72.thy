@@ -138,7 +138,7 @@ lemma lemma_droprev [thy_expl]: "drop (len x) (rev x) = Nil2"
 by (hipster_induct_schemes drop.simps len.simps rev.simps)
 (*hipster len append rev drop take minus*)
 
-setup{* Hip_Tac_Ops.set_metis_to @{context} 800*}
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 800\<close>
 
 lemma unknown [thy_expl]: "minus (minus x y) z = minus (minus x z) y"
 oops
@@ -182,5 +182,5 @@ oops
     "(rev (drop i xs)) = (take (minus (len xs) i) (rev xs))"
 by (hipster_induct_schemes rev.simps append.simps take.simps drop.simps len.simps minus.simps Nat.exhaust list.exhaust)
 
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

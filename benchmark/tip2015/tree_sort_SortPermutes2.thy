@@ -1,4 +1,4 @@
-theory tree_sort_SortPermutes'
+theory tree_sort_SortPermutes2
 imports Main
         "$HIPSTER_HOME/IsaHipster"
 begin
@@ -77,6 +77,6 @@ fun tsort :: "Nat list => Nat list" where
 
 theorem x0 :
   "!! (x :: Nat list) . isPermutation (tsort x) x"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

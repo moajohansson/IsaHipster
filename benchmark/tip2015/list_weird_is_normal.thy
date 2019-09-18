@@ -24,6 +24,6 @@ fun concat2 :: "('a list) list => 'a list" where
 
 theorem x0 :
   "!! (x :: ('a list) list) . (concat2 x) = (weirdconcat x)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

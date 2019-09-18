@@ -70,13 +70,13 @@ by (hipster_induct_schemes sorted.simps isort.simps insert2.simps le.simps)
 lemma lemma_ak [thy_expl]: "isort (isort x19) = isort x19"
 by (hipster_induct_schemes sorted.simps isort.simps insert2.simps le.simps)
 
-setup {* Hip_Tac_Ops.set_full_types @{context} true *}
-setup {* Hip_Tac_Ops.set_metis_to @{context} 700 *}
+setup \<open>Hip_Tac_Ops.set_full_types @{context} true\<close>
+setup \<open>Hip_Tac_Ops.set_metis_to @{context} 700\<close>
 
 lemma lemma_al [thy_expl]: "sorted x \<Longrightarrow> isort x = x"
 by (hipster_induct_schemes sorted.simps isort.simps insert2.simps le.simps)
 
-setup {* Hip_Tac_Ops.set_metis_to @{context} 1000 *}
+setup \<open>Hip_Tac_Ops.set_metis_to @{context} 1000\<close>
 
 lemma lemma_am [thy_expl]: "sorted y \<Longrightarrow> sorted (insert2 x y) = True"
 by (hipster_induct_schemes sorted.simps isort.simps insert2.simps nole)
@@ -93,5 +93,5 @@ by (hipster_induct_schemes sorted.simps isort.simps insert2.simps le.simps Nat.e
 
   theorem x0 :
     "sorted (isort x)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

@@ -13,5 +13,5 @@ begin
   (*hipster plus minus *)
   theorem x0 :
     "(minus (minus i j) k) = (minus i (plus j k))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

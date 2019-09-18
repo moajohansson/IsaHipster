@@ -40,14 +40,14 @@ where
    let half = length xs div 2 in
    merge (msort (take half xs)) (msort (drop half xs))
  )"
-ML{* 
+ML\<open>
 @{term "(Orderings.ord_class.less :: nat \<Rightarrow> nat \<Rightarrow> bool) x y"};
 
 @{term "(x<(Groups.zero_class.zero :: nat)) = (False)"}
-*}
-setup{*Hip_Tac_Ops.toggle_full_types @{context} *}
+\<close>
+setup\<open>Hip_Tac_Ops.toggle_full_types @{context}\<close>
 
-setup{*Hip_Tac_Ops.set_metis_to @{context} 1000 *}
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 1000\<close>
 hipster_cond leqnat le leqnat
 
 

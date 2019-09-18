@@ -1,4 +1,4 @@
-theory heap_SortPermutes'
+theory heap_SortPermutes2
 imports Main
         "$HIPSTER_HOME/IsaHipster"
 begin
@@ -104,6 +104,6 @@ fun isPermutation :: "Nat list => Nat list => bool" where
 
 theorem x0 :
   "!! (x :: Nat list) . isPermutation (hsort x) x"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

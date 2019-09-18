@@ -65,18 +65,18 @@ lemma dropTake : "ts = app (take n ts) (drop n ts)"
   apply simp
   done
   (* by hipster_induct_schemes *)
-ML{* 
+ML\<open>
 fun SOLVE_OR_FAIL tac st =
   let fun solved st = has_fewer_prems 1 st;
   in Seq.filter solved (tac st) end;
 
 fun mytac ctxt = (SOLVE_OR_FAIL (Rec_Ind_Tacs.recinduct_simp ctxt)) ORELSE (Rec_Ind_Lemma_Spec_Tacs.koen_induct ctxt)
-*}
-method_setup recind_lemma = {*
+\<close>
+method_setup recind_lemma = \<open>
   Scan.lift (Scan.succeed 
     (fn ctxt => SIMPLE_METHOD 
       (mytac ctxt)))
-   *}
+\<close>
 
 
 (* Similarly for the more complex in expression yet not conditional similar proposition to the above *)

@@ -59,9 +59,9 @@ lemma lemma_af [thy_expl]: "lappend (LCons y z) x2 = LCons y (lappend z x2)"
 
  by (simp add: lappend.code)
 (* lappend_assoc *)
-text_raw {*\DefineSnippet{lappendassoc}{*}
+text_raw \<open>\DefineSnippet{lappendassoc}{\<close>
 lemma lemma_ag [thy_expl]: "lappend (lappend y z) x2 = lappend y (lappend z x2)"
-text_raw {*}%EndSnippet*}  
+text_raw \<open>}%EndSnippet\<close>  
   by(coinduction arbitrary: x2 y z rule: Llist.coinduct_strong)
     auto
 
@@ -73,16 +73,16 @@ lemma lemma_ah [thy_expl]: "ltl (lappend y (ltl y)) = lappend (ltl y) (ltl y)"
 lemma lemma_ai [thy_expl]: "lmap y (LCons z LNil) = LCons (y z) LNil"
  by(coinduction arbitrary: y z rule: Llist.coinduct_strong)
     simp
-text_raw {*\DefineSnippet{lemmaaj}{*} 
+text_raw \<open>\DefineSnippet{lemmaaj}{\<close> 
 lemma lemma_aj [thy_expl]: "LCons (y z) (lmap y x2) = lmap y (LCons z x2)"
-text_raw {*}%EndSnippet*}  
+text_raw \<open>}%EndSnippet\<close>  
   by(coinduction arbitrary: x2 y z rule: Llist.coinduct_strong)
     simp
 (*cohipster lmap lappend *)
 (*ca 80 seconds*)
-text_raw {*\DefineSnippet{lemmaak}{*}  
+text_raw \<open>\DefineSnippet{lemmaak}{\<close>  
 lemma lemma_ak [thy_expl]: "ltl (lmap y z) = lmap y (ltl z)"
-text_raw {*}%EndSnippet*}  
+text_raw \<open>}%EndSnippet\<close>  
  by(coinduction arbitrary: y z rule: Llist.coinduct_strong)
     (smt Llist.case_eq_if Llist.collapse(2) Llist.inject lemma_aj lmap.disc_iff(2) lnull_def ltl_def)
 
@@ -99,11 +99,11 @@ lemma lemma_an [thy_expl]: "ltl (lappend (lmap y z) (ltl z)) = lappend (lmap y (
     (smt Llist.sel(2) lappend.ctr(1) lappend.simps(4) lemma_ak lmap.ctr(1) lmap.disc_iff(2))
 
 (*lmap_lappend_distrib*)
-text_raw {*\DefineSnippet{lappendlmap}{*}  
+text_raw \<open>\DefineSnippet{lappendlmap}{\<close>  
 lemma lemma_ao [thy_expl]: "lappend (lmap y z) (lmap y x2) = lmap y (lappend z x2)"
  by(coinduction arbitrary: x2 y z rule: Llist.coinduct_strong)
     (smt Llist.collapse(2) Llist.sel(1) lappend.disc_iff(1) lappend.simps(3) lappend.simps(4) lemma_aj lemma_ak lmap.disc_iff(2))
-text_raw {*}%EndSnippet*}  
+text_raw \<open>}%EndSnippet\<close>  
 (*cohipster literate *)
 (*Discovers nothing interesting - 3 seconds ish*)
 (*cohipster llength *)
@@ -193,9 +193,9 @@ qed
 (*cohipster llength lmap*)
 (* 18 seconds *)
 (* llength_lmap *)
-text_raw {*\DefineSnippet{llengthlmap}{*}
+text_raw \<open>\DefineSnippet{llengthlmap}{\<close>
 lemma lemma_bg [thy_expl]: "llength (lmap y z) = llength z"
-text_raw {*}%EndSnippet*}  
+text_raw \<open>}%EndSnippet\<close>  
  by(coinduction arbitrary: y z rule: ENat.coinduct_strong)
     (metis lemma_ak llength.disc_iff(2) llength.sel lmap.disc_iff(2))
 
@@ -243,9 +243,9 @@ lemma lemma_bq [thy_expl]: "ltake (ESuc EZ) (ltake (ESuc y) z) = ltake (ESuc EZ)
 (*cohipster ltake lmap*)
 (* 32 seconds *)
 (* ltake_lmap *)
-text_raw {*\DefineSnippet{ltakelmap}{*}
+text_raw \<open>\DefineSnippet{ltakelmap}{\<close>
 lemma lemma_br [thy_expl]: "ltake z (lmap y x2) = lmap y (ltake z x2)"
-text_raw {*}%EndSnippet*}
+text_raw \<open>}%EndSnippet\<close>
  by(coinduction arbitrary: x2 y z rule: Llist.coinduct_strong)
     (smt ENat.collapse(2) Llist.case_eq_if Llist.sel(1) lemma_ak lemma_bi lmap.disc_iff(2) lmap.sel(1) ltake.ctr(2) ltake.disc_iff(2))
 
@@ -285,11 +285,11 @@ apply (simp add: lappend.code)
 (*cohipster to_llist lmap map *)
 (* 65 seconds *)
 (*lmap_llist_of*)
-text_raw {*\DefineSnippet{tollistmap}{*} 
+text_raw \<open>\DefineSnippet{tollistmap}{\<close> 
 lemma lemma_cc [thy_expl]: "to_llist (map y z) = lmap y (to_llist z)"
 apply (induct z)
 apply (simp add: lmap.ctr(1))
 apply (simp add: lemma_aj)
   done
-text_raw {*}%EndSnippet*}  
+text_raw \<open>}%EndSnippet\<close>  
 end

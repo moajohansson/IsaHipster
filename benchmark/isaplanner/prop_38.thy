@@ -28,5 +28,5 @@ by (hipster_induct_schemes equal2.simps)
 
   theorem x0 :
     "(count n (append xs (Cons2 n (Nil2)))) = (S (count n xs))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

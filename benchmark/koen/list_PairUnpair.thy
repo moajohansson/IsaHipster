@@ -33,6 +33,6 @@ fun even :: "Nat => bool" where
 theorem x0 :
   "!! (xs :: 't list) .
      (even (length xs)) ==> ((unpair (pairs xs)) = xs)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

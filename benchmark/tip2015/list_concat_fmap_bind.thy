@@ -40,6 +40,6 @@ by (hipster_induct_schemes fmap.simps append.simps bind.simps concat2.simps)
 theorem x0 :
   "!! (f :: ('a => 'b list)) (xs :: 'a list) .
      (concat2 (fmap f xs)) = (bind xs f)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

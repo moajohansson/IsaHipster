@@ -58,7 +58,7 @@ by (hipster_induct_schemes s.simps plus.simps)
 lemma lemma_aj [thy_expl]: "plus x1 y1 = plus y1 x1"
 by (hipster_induct_schemes s.simps plus.simps)
 
-ML {*
+ML \<open>
 val has_tvar = exists_type (exists_subtype (fn TVar _ => true | _ => false)) o prop_of
 
 fun metis_method ((override_type_encs, lam_trans), ths) ctxt facts =
@@ -91,11 +91,11 @@ fun simp_or_metis ctxt (facts, lemmas) thm = (*let val _ = Pretty.writeln (prett
     THEN_ALL_NEW
     ((REPEAT_ALL_NEW (metis_method ((NONE,NONE), lemmas) ctxt facts)))))thm (* vs: HEADGOAL in metis_methos and REPEAT here; ALLGOALS feels safer *)
   end
-*}
+\<close>
 
 lemma lemma_ak [thy_expl]: "plus x2 (plus y2 z2) = plus y2 (plus x2 z2)"
 apply(induct y2 arbitrary: x2 z2)
-by (tactic {* simp_or_metis @{context} (@{thms plus.simps s.simps Bin.exhaust}, @{thms thy_expl}) *})
+by (tactic \<open>simp_or_metis @{context} (@{thms plus.simps s.simps Bin.exhaust}, @{thms thy_expl})\<close>)
 
 lemma lemma_al [thy_expl]: "plus (plus x2 y2) (plus z2 y2) = plus (plus x2 z2) (plus y2 y2)"
 by (hipster_induct_schemes s.simps plus.simps)
@@ -107,6 +107,6 @@ by (hipster_induct_schemes s.simps plus.simps)
 theorem x0 :
   "!! (x :: Bin) (y :: Bin) (z :: Bin) .
      (times x (plus y z)) = (plus (times x y) (times x z))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

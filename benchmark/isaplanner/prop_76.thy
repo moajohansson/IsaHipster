@@ -20,5 +20,5 @@ begin
   theorem x0 :
     "(~ (equal2 n m)) ==>
        ((count n (append xs (Cons2 m (Nil2)))) = (count n xs))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

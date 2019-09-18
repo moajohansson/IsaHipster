@@ -108,7 +108,7 @@ apply (induction n ts rule: drop.induct)
 apply simp_all
 oops
 
-ML {*
+ML \<open>
 fun inductable_things_in_term thry t =
     let val _ = @{print} (Hipster_Utils.frees_of t)
         val _ = @{print} (Term.strip_all_vars t)
@@ -140,9 +140,9 @@ fun inductable_things_in_term thry t =
   hd (tl ump) = tumf;
   fastype_of1 ([],@{term "Cons Z Nil"});
   Type.could_match(hd (tl ump), tumf);
-*}
+\<close>
 
-ML {*
+ML \<open>
   val rdrop = @{thm "drop.induct"}
   val eg2 = @{term "leq (S n) (len ts) \<Longrightarrow> (drop n ts) \<noteq> Nil"}
   val th2 = (Goal.init o (Thm.cterm_of @{theory})) ((Syntax.read_prop @{context}) "leq (S n) (len ts) \<Longrightarrow> (drop n ts) \<noteq> Nil")
@@ -217,7 +217,7 @@ ML {*
   length (nth tesz 0);
   val tesm = fix_nth_arg (argTyps @{thm "maps.induct"}) (vars) [[[]]];
 
-*}
+\<close>
 
 end
 

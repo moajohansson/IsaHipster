@@ -35,6 +35,6 @@ theorem x0 :
      apply(induction xs rule: evens_odds.pinduct)
      apply(simp_all add:odds.psimps evens.psimps evens.pelims odds.pelims)
      
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

@@ -41,6 +41,6 @@ theorem x0 :
      (~ (equal2 x y)) ==>
        ((count y (flatten (add x t) (Nil2))) =
           (count y (flatten t (Nil2))))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

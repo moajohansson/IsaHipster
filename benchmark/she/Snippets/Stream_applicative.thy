@@ -5,7 +5,7 @@ theory Stream_applicative
 begin
 setup Tactic_Data.set_coinduct_sledgehammer 
 
-text_raw {*\DefineSnippet{streamapplicative}{*}  
+text_raw \<open>\DefineSnippet{streamapplicative}{\<close>  
 (* Lifting *)
 primcorec spure :: "'a \<Rightarrow> 'a Stream" where  
   "shd (spure x) = x"
@@ -15,15 +15,15 @@ primcorec spure :: "'a \<Rightarrow> 'a Stream" where
 primcorec sapp :: " ('a \<Rightarrow> 'b) Stream \<Rightarrow> 'a Stream \<Rightarrow> 'b Stream" where
   "shd (sapp fs xs) = (shd fs) (shd xs)"
 | "stl (sapp fs xs) = sapp (stl fs) (stl xs)"
-text_raw {*}%EndSnippet*} 
+text_raw \<open>}%EndSnippet\<close> 
 (*cohipster smap spure sapp*)
 (* Discovered in ca 40 seconds *)
-text_raw {*\DefineSnippet{streamapplout}{*}  
+text_raw \<open>\DefineSnippet{streamapplout}{\<close>  
 lemma lemma_ac [thy_expl]: "sapp (spure z) x2 = smap z x2"
   by (coinduction arbitrary: x2 z rule: Stream.Stream.coinduct_strong)
   auto
 
-text_raw {*}%EndSnippet*} 
+text_raw \<open>}%EndSnippet\<close> 
   
 lemma lemma_ad [thy_expl]: "smap y (spure z) = spure (y z)"
   by (coinduction arbitrary: y z rule: Stream.Stream.coinduct_strong)

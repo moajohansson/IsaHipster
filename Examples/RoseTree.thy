@@ -65,7 +65,7 @@ lemma lemma_ab [thy_expl]: "tmap z (mirror x2) = mirror (tmap z x2)"
 
 (* This is obviously false, but if we call normal hipster it is suggested. Cause error in 
 coinduction tactic, but counter-example easily found by nitpick *)
-ML{*
+ML\<open>
 val t = @{term "Trueprop(sub z @ sub y = sub y @ sub z)"};
 val t = @{term "Product_Type.Pair 1 2"};
 
@@ -94,6 +94,6 @@ val state = Proof.init @{context};
 val (answer, mystery_list) = Nitpick.pick_nits_in_term state def_params Nitpick.Normal 0 0 0 [] [] [] t;
 
  val genuine = (Nitpick.genuineN = answer); *)
- *}
+\<close>
 
 end

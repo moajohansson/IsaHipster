@@ -4,7 +4,7 @@ begin
   
 setup Tactic_Data.set_coinduct_sledgehammer  
   
-text_raw {*\DefineSnippet{streamdefs}{*}
+text_raw \<open>\DefineSnippet{streamdefs}{\<close>
 codatatype (sset: 'a) Stream =
   SCons (shd: 'a) (stl: "'a Stream")
 
@@ -16,9 +16,9 @@ primcorec siterate :: "('a \<Rightarrow> 'a) \<Rightarrow> 'a \<Rightarrow> 'a S
 
 cohipster smap siterate \<comment> "tell Hipster to explore these functions"
 
-text_raw {*}%EndSnippet*}  
+text_raw \<open>}%EndSnippet\<close>  
 
-text_raw {*\DefineSnippet{streamoutput}{*}  
+text_raw \<open>\DefineSnippet{streamoutput}{\<close>  
 lemma lemma_a [thy_expl]: "SCons (y z) (smap y x2) = smap y (SCons z x2)"
   by(coinduction arbitrary: x2 y z rule: Stream.coinduct_strong)
 simp
@@ -30,6 +30,6 @@ auto
 lemma lemma_ab [thy_expl]: "smap z (SCons y (siterate z x2)) = SCons (z y) (siterate z (z x2))"
   by(coinduction arbitrary: x2 y z rule: Stream.coinduct_strong)
     (simp add: Smap_siterate.lemma_aa)
-text_raw {*}%EndSnippet*}    
+text_raw \<open>}%EndSnippet\<close>    
 
 end

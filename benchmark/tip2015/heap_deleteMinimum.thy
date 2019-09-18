@@ -172,6 +172,6 @@ hipster merge
 theorem x0 :
   "!! (h :: Heap) .
      (listDeleteMinimum (toList2 h)) = (maybeToList (deleteMinimum h))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

@@ -1,4 +1,4 @@
-theory sort_NStoogeSortPermutes'
+theory sort_NStoogeSort2Permutes'
 imports Main
         "$HIPSTER_HOME/IsaHipster"
 begin
@@ -8,6 +8,12 @@ datatype 'a list = Nil2 | Cons2 "'a" "'a list"
 datatype ('a, 'b) Pair2 = Pair "'a" "'b"
 
 datatype Nat = Z | S "Nat"
+
+fun twoThirds :: "Nat => Nat" where
+"twoThirds (Z) = Z"
+| "twoThirds (S (Z)) = S Z"
+| "twoThirds (S (S (Z))) = S Z"
+| "twoThirds (S (S (S n))) = S (S (twoThirds n))"
 
 fun third :: "Nat => Nat" where
 "third (Z) = Z"
@@ -59,31 +65,27 @@ fun append :: "'a list => 'a list => 'a list" where
 "append (Nil2) y = y"
 | "append (Cons2 z xs) y = Cons2 z (append xs y)"
 
-fun reverse :: "'t list => 't list" where
-"reverse (Nil2) = Nil2"
-| "reverse (Cons2 y xs) = append (reverse xs) (Cons2 y (Nil2))"
-
-function nstooge1sort2 :: "int list => int list"
-         and nstoogesort :: "int list => int list"
-         and nstooge1sort1 :: "int list => int list" where
-"nstooge1sort2 x =
-   case splitAt (third (length x)) (reverse x) of
+function nstooge2sort2 :: "int list => int list"
+         and nstoogesort2 :: "int list => int list"
+         and nstooge2sort1 :: "int list => int list" where
+"nstooge2sort2 x =
+   case splitAt (twoThirds (length x)) x of
      | Pair ys zs =>
-         case splitAt (third (length x)) (reverse x) of
-           | Pair xs zs2 => append (nstoogesort zs) (reverse xs)
+         case splitAt (twoThirds (length x)) x of
+           | Pair xs zs2 => append (nstoogesort2 ys) zs2
          end
    end"
-| "nstoogesort (Nil2) = Nil2"
-| "nstoogesort (Cons2 y (Nil2)) = Cons2 y (Nil2)"
-| "nstoogesort (Cons2 y (Cons2 y2 (Nil2))) = sort2 y y2"
-| "nstoogesort (Cons2 y (Cons2 y2 (Cons2 x3 x4))) =
-     nstooge1sort2
-       (nstooge1sort1 (nstooge1sort2 (Cons2 y (Cons2 y2 (Cons2 x3 x4)))))"
-| "nstooge1sort1 x =
+| "nstoogesort2 (Nil2) = Nil2"
+| "nstoogesort2 (Cons2 y (Nil2)) = Cons2 y (Nil2)"
+| "nstoogesort2 (Cons2 y (Cons2 y2 (Nil2))) = sort2 y y2"
+| "nstoogesort2 (Cons2 y (Cons2 y2 (Cons2 x3 x4))) =
+     nstooge2sort2
+       (nstooge2sort1 (nstooge2sort2 (Cons2 y (Cons2 y2 (Cons2 x3 x4)))))"
+| "nstooge2sort1 x =
      case splitAt (third (length x)) x of
        | Pair ys zs =>
            case splitAt (third (length x)) x of
-             | Pair xs zs2 => append ys (nstoogesort zs2)
+             | Pair xs zs2 => append ys (nstoogesort2 zs2)
            end
      end"
 by pat_completeness auto
@@ -97,7 +99,8 @@ fun isPermutation :: "int list => int list => bool" where
 | "isPermutation (Cons2 z xs) y =
      and2 (elem z y) (isPermutation xs (delete z y))"
 
-(*hipster third
+(*hipster twoThirds
+          third
           take
           sort2
           or2
@@ -108,15 +111,14 @@ fun isPermutation :: "int list => int list => bool" where
           splitAt
           delete
           append
-          reverse
-          nstooge1sort2
-          nstoogesort
-          nstooge1sort1
+          nstooge2sort2
+          nstoogesort2
+          nstooge2sort1
           and2
           isPermutation *)
 
 theorem x0 :
-  "!! (x :: int list) . isPermutation (nstoogesort x) x"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  "!! (x :: int list) . isPermutation (nstoogesort2 x) x"
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

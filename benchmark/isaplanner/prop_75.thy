@@ -57,5 +57,5 @@ by (hipster_induct_schemes Nat.exhaust)
 
   theorem x0 :
     "(plus (count n xs) (count n (Cons2 m (Nil2)))) = (count n (Cons2 m xs))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

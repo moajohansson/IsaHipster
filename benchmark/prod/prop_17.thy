@@ -26,5 +26,5 @@ by (hipster_induct_schemes append.simps rev.simps)
 
   theorem x0 :
     "(rev (rev (append x y))) = (append (rev (rev x)) (rev (rev y)))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

@@ -89,6 +89,6 @@ fun recognise :: "R => A list => bool" where
 
 theorem x0 :
   "!! (s :: A list) . (recognise Eps s) = (null s)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

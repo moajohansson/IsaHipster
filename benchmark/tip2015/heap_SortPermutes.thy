@@ -78,6 +78,6 @@ fun count :: "Nat => Nat list => Nat" where
 
 theorem x0 :
   "!! (x :: Nat) (y :: Nat list) . (count x (hsort y)) = (count x y)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

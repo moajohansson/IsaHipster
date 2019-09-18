@@ -50,9 +50,9 @@ thm List.induct
 thm last.induct
 thm head.induct
 
-ML {*
+ML \<open>
   val t = Induct.find_inductT @{context} @{typ "Nat \<Rightarrow> 'a List \<Rightarrow> 'a List"}
-*}
+\<close>
 
 lemma lemma_ac2 []: "leq x2 Z = lez x2" (* NB: used to be problematic *)
 (*by (metis leq.elims(2) leq.simps(1) leq.simps(2) lez.simps)*)

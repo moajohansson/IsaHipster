@@ -16,6 +16,6 @@ fun op :: "Nat => Nat => Nat => Nat => Nat" where
 theorem x0 :
   "!! (x :: Nat) (a :: Nat) (b :: Nat) (c :: Nat) (d :: Nat) .
      (op (op x a a a) b c d) = (op a (op b x b b) c d)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

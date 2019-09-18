@@ -33,6 +33,6 @@ fun flatten0 :: "'a Tree => 'a list" where
 theorem x0 :
   "!! (ps :: ('a Tree) list) .
      (flatten1 ps) = (concatMap (% (x :: 'a Tree) => flatten0 x) ps)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

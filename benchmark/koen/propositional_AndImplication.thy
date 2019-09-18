@@ -114,6 +114,6 @@ fun valid :: "Form => bool" where
 
 theorem x0 :
   "!! (p :: Form) (q :: Form) . (valid ( p q)) ==> (valid q)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

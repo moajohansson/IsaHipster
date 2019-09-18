@@ -25,6 +25,6 @@ fun append :: "'a list => 'a list => 'a list" where
 theorem x0 :
   "!! (n :: Nat) (xs :: 'a list) .
      (rotate n (append xs xs)) = (append (rotate n xs) (rotate n xs))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

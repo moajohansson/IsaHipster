@@ -33,5 +33,5 @@ by(hipster_induct_schemes)
   theorem x0 :
     "(half (length (append x y))) = (half (length (append y x)))"
     by (hipster_induct_schemes length.simps append.simps half.simps list.exhaust Nat.exhaust)
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

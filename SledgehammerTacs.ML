@@ -120,7 +120,7 @@ fun run_prover override_params fact_override chained i n ctxt goal =
       |> hd |> snd
 
     (* Check if the prover should minimize (remove redundant facts) or not*)
-    val learn = mash_learn_proof ctxt params (Thm.prop_of goal) facts
+    val learn = mash_learn_proof ctxt params (Thm.prop_of goal) (* (facts) *)
     val prover =  if minimize then get_minimizing_prover ctxt mode learn name params
                  else get_prover ctxt mode name params
     

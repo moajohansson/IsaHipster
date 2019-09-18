@@ -18,5 +18,5 @@ by (hipster_induct_schemes zip2.simps)
   
   theorem x0 :
     "(zip2 (Cons2 x xs) (Cons2 y ys)) = (Cons2 (Pair x y) (zip2 xs ys))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

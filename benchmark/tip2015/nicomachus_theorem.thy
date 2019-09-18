@@ -154,6 +154,6 @@ done
 *)
 theorem x0 :
   "!! (n :: Nat) . (cubes n) = (mult (sum n) (sum n))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

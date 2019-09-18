@@ -20,6 +20,6 @@ fun add3 :: "Nat => Nat => Nat => Nat" where
 theorem x0 :
   "!! (x :: Nat) (y :: Nat) (z :: Nat) .
      (add3 x y z) = (add3acc x y z)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

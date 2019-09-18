@@ -73,6 +73,6 @@ by (hipster_induct_schemes s.simps plus2.simps)
 theorem x0 :
   "!! (x :: Bin) (y :: Bin) .
      (toNat (plus2 x y)) = (plus (toNat x) (toNat y))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

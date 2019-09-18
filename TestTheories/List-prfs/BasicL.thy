@@ -12,8 +12,8 @@ begin
 
 (*print_rules
 print_induct_rules*)
-ML {* Outer_Syntax.improper_command *}
-ML {* Datatype.get_info *}
+ML \<open>Outer_Syntax.improper_command\<close>
+ML \<open>Datatype.get_info\<close>
 
 (*hipster_cond notNil maps tail init len*)
 lemma lemma_a [thy_expl]: "tail (maps x2 y2) = maps x2 (tail y2)"
@@ -161,7 +161,7 @@ by hipster_induct_simp_metis (* just metis *)
 apply(simp_all)
 done*)
 
-setup{* Hip_Tac_Ops.set_full_types @{context} true *}
+setup\<open>Hip_Tac_Ops.set_full_types @{context} true\<close>
 (* internally goes into conditional which Hipster cannot solve right now *)
 (* FIXME: we rev the list so that it doesn't get stuck in maps.induct BUT we should control this
   behaviour! \<Rightarrow> limit simp_or_metis... *)
@@ -221,7 +221,7 @@ lemma lastDef: "\<not> notNil ts \<Longrightarrow> last (Cons t ts) = t"
 by (hipster_induct_simp_metis Listing.notNil.simps Listing.last.simps)
 
 lemma lastDef' : "last (Cons t Nil) = t"
-by(tactic {* Tactic_Data.routine_tac @{context} *})
+by(tactic \<open>Tactic_Data.routine_tac @{context}\<close>)
 
 (* auxiliary *)
 lemma noElems: "count t Nil = Z"
@@ -287,7 +287,7 @@ by (hipster_induct_simp_metis)*)
 lemma countInc: "eqN r t \<Longrightarrow> count r (Cons t ts) = S (count r ts)"
 by (hipster_induct_simp_metis)
 
-ML {*
+ML \<open>
    fun infer_term x ctxt =
      let val (T, ctxt') = Proof_Context.inferred_param x ctxt
      in (Free (x, T), ctxt') end;
@@ -297,7 +297,7 @@ ML {*
        val (tss, ctxt') = (fold_map o fold_map) infer_term xss ctxt
        val instss = map (map (fn inst => SOME (NONE, (inst, false)))) tss;
      in Seq.map snd o Induct.induct_tac ctxt' false instss [] [] NONE (*SOME rule*) [] i end;
-*}
+\<close>
 fun drop' :: "nat \<Rightarrow> 'a list \<Rightarrow> 'a list" where
   "drop' _ [] = []"
 | "drop' 0 xs = xs"
@@ -305,7 +305,7 @@ fun drop' :: "nat \<Rightarrow> 'a list \<Rightarrow> 'a list" where
 (* XXX: mailing list!  But hipster_induct_simp_metis (or schemes) never work with this, regular
   List.drop which is implemented like ours or ours *)
 lemma drop'Nil: "drop' n [] = []"
-apply(raw_tactic {* ALLGOALS(induct_for_me @{context} [["n"]] []) *})
+apply(raw_tactic \<open>ALLGOALS(induct_for_me @{context} [["n"]] [])\<close>)
 apply(simp_all)
 done
 (*by(tactic {* Tactic_Data.routine_tac @{context} *}) works too *)
@@ -322,7 +322,7 @@ lemma dropNil: "drop n Nil = Nil" (* XXX: check why this solves our problem... w
 (*by (metis drop.simps Nat.exhaust)*)
 by hipster_induct_simp_metis
 
-ML {*
+ML \<open>
   @{thm "drop.induct"};
   (Thm.concl_of @{thm "drop.induct"});
   (HOLogic.dest_Trueprop (Thm.concl_of @{thm "drop.induct"}));
@@ -342,7 +342,7 @@ ML {*
 (*typ list * term -> typ
 
   hd (tl ump) = Type ( *)
-*}
+\<close>
 
 thm drop.induct
 (*thm List.rel_induct[case_names Nil Cons, {* @{thm "List.induct"} *}]*)

@@ -35,7 +35,7 @@ oops *)
 lemma lemma_ae [thy_expl]: "le y x \<and> le x y \<Longrightarrow> x = y"
 by (hipster_induct_schemes le.simps Nat.exhaust)
 
-ML {*
+ML \<open>
 fun rprems_tac ctxt = Goal.norm_hhf_tac ctxt THEN' CSUBGOAL (fn (goal, i) =>
       let
         fun non_atomic (Const ("==>", _) $ _ $ _) = true
@@ -53,7 +53,7 @@ fun rprems_tac ctxt = Goal.norm_hhf_tac ctxt THEN' CSUBGOAL (fn (goal, i) =>
         val ethms = Rs |> map (fn R =>
           (Raw_Simplifier.norm_hhf ctxt' (Thm.trivial R)));
       in eresolve_tac ethms i end
-  ); *}
+  );\<close>
 
 lemma le_trans [thy_expl]: "le z y \<and> le x z \<Longrightarrow> le x y = True"
 by (hipster_induct_schemes le.simps Nat.exhaust)

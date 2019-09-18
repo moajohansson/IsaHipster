@@ -79,8 +79,8 @@ by (hipster_induct_schemes ptake.simps ntake.simps pzip.simps)
 lemma lemma_an [thy_expl]: "ptake (S x2) (ptake x2 y2) = ptake x2 y2"
 by (hipster_induct_schemes ptake.simps ntake.simps pzip.simps)
 
-setup{*Hip_Tac_Ops.set_metis_to @{context} 10000*}
-setup{*Hip_Tac_Ops.set_metis_filter @{context} (K false)*}
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 10000\<close>
+setup\<open>Hip_Tac_Ops.set_metis_filter @{context} (K false)\<close>
 
 lemma lemma_ao [thy_expl]: "ptake x (pzip y z) = pzip y (ntake x z)"
 by (hipster_induct_schemes PList.exhaust Nat.exhaust Nlist.exhaust ntake.simps ptake.simps pzip.simps)
@@ -103,7 +103,7 @@ done*)
 
 *)
 
-setup{*Hip_Tac_Ops.set_metis_to @{context} 5000*}
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 5000\<close>
 
 lemma lemma_ap [thy_expl]: "ntake x (ntake y z) = ntake y (ntake x z)"
 by (hipster_induct_schemes PList.exhaust Nat.exhaust Nlist.exhaust ntake.simps ptake.simps pzip.simps)
@@ -149,8 +149,8 @@ oops
 lemma unknown [thy_expl]: "pzip (ntake x y) (ntake z y) = pzip (ntake z y) (ntake x y)"
 oops
 
-setup{*Hip_Tac_Ops.set_metis_filter @{context} (K true)*}
-setup{*Hip_Tac_Ops.set_metis_to @{context} 400*}
+setup\<open>Hip_Tac_Ops.set_metis_filter @{context} (K true)\<close>
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 400\<close>
 
   theorem x0 :
     "(ptake n (pzip xs ys)) = (pzip (ntake n xs) (ntake n ys))"
@@ -260,6 +260,6 @@ oops
 sledgehammer
        (*apply(metis pzip.simps prev.simps pappend.simps append.simps rev.simps)*)
 
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

@@ -1,29 +1,9 @@
-theory sort_MSortTDPermutes'
+theory sort_MSortBUPermutes'
 imports Main
         "$HIPSTER_HOME/IsaHipster"
 begin
 
 datatype 'a list = Nil2 | Cons2 "'a" "'a list"
-
-fun ztake :: "int => 'a list => 'a list" where
-"ztake x y =
-   (if x = 0 then Nil2 else
-      case y of
-        | Nil2 => y
-        | Cons2 z xs => Cons2 z (ztake (x - 1) xs)
-      end)"
-
-fun zlength :: "'a list => int" where
-"zlength (Nil2) = 0"
-| "zlength (Cons2 y xs) = 1 + (zlength xs)"
-
-fun zdrop :: "int => 'a list => 'a list" where
-"zdrop x y =
-   (if x = 0 then y else
-      case y of
-        | Nil2 => y
-        | Cons2 z xs => zdrop (x - 1) xs
-      end)"
 
 fun or2 :: "bool => bool => bool" where
 "or2 True y = True"
@@ -33,6 +13,10 @@ fun null :: "'t list => bool" where
 "null (Nil2) = True"
 | "null (Cons2 y z) = False"
 
+fun map2 :: "('t2 => 't) => 't2 list => 't list" where
+"map2 f (Nil2) = Nil2"
+| "map2 f (Cons2 y z) = Cons2 (f y) (map2 f z)"
+
 fun lmerge :: "int list => int list => int list" where
 "lmerge (Nil2) y = y"
 | "lmerge (Cons2 z x2) (Nil2) = Cons2 z x2"
@@ -40,22 +24,30 @@ fun lmerge :: "int list => int list => int list" where
      (if z <= x3 then Cons2 z (lmerge x2 (Cons2 x3 x4)) else
         Cons2 x3 (lmerge (Cons2 z x2) x4))"
 
-fun msorttd :: "int list => int list" where
-"msorttd (Nil2) = Nil2"
-| "msorttd (Cons2 y (Nil2)) = Cons2 y (Nil2)"
-| "msorttd (Cons2 y (Cons2 x2 x3)) =
-     lmerge
-       (msorttd
-          (ztake
-             (div (zlength (Cons2 y (Cons2 x2 x3))) 2) (Cons2 y (Cons2 x2 x3))))
-       (msorttd
-          (zdrop
-             (div (zlength (Cons2 y (Cons2 x2 x3))) 2)
-             (Cons2 y (Cons2 x2 x3))))"
+fun pairwise :: "(int list) list => (int list) list" where
+"pairwise (Nil2) = Nil2"
+| "pairwise (Cons2 xs (Nil2)) = Cons2 xs (Nil2)"
+| "pairwise (Cons2 xs (Cons2 ys xss)) =
+     Cons2 (lmerge xs ys) (pairwise xss)"
+
+fun mergingbu :: "(int list) list => int list" where
+"mergingbu (Nil2) = Nil2"
+| "mergingbu (Cons2 xs (Nil2)) = xs"
+| "mergingbu (Cons2 xs (Cons2 z x2)) =
+     mergingbu (pairwise (Cons2 xs (Cons2 z x2)))"
 
 fun elem :: "int => int list => bool" where
 "elem x (Nil2) = False"
 | "elem x (Cons2 z ys) = or2 (x = z) (elem x ys)"
+
+fun dot :: "('b => 'c) => ('a => 'b) => 'a => 'c" where
+"dot x y z = x (y z)"
+
+fun msortbu :: "int list => int list" where
+"msortbu x =
+   dot
+     (% (y :: (int list) list) => mergingbu y)
+     (% (z :: int list) => map2 (% (x2 :: int) => Cons2 x2 (Nil2)) z) x"
 
 fun delete :: "int => int list => int list" where
 "delete x (Nil2) = Nil2"
@@ -71,20 +63,21 @@ fun isPermutation :: "int list => int list => bool" where
 | "isPermutation (Cons2 z xs) y =
      and2 (elem z y) (isPermutation xs (delete z y))"
 
-(*hipster ztake
-          zlength
-          zdrop
-          or2
+(*hipster or2
           null
+          map2
           lmerge
-          msorttd
+          pairwise
+          mergingbu
           elem
+          dot
+          msortbu
           delete
           and2
           isPermutation *)
 
 theorem x0 :
-  "!! (x :: int list) . isPermutation (msorttd x) x"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  "!! (x :: int list) . isPermutation (msortbu x) x"
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

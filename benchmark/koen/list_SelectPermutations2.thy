@@ -64,6 +64,6 @@ theorem x0 :
             (% (y :: Nat) => eq (count z xs) y)
             (% (x2 :: int list) => count z x2) x)
        (propSelectPermutations (select xs))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

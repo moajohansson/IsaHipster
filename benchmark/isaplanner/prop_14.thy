@@ -13,5 +13,5 @@ begin
   (*hipster filter append *)
   theorem x0 :
     "(filter p (append xs ys)) = (append (filter p xs) (filter p ys))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

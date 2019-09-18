@@ -23,5 +23,5 @@ begin
   (*hipster lt ins equal2 elem *)
   theorem x0 :
     "(~ (equal2 x y)) ==> ((elem x (ins y xs)) = (elem x xs))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

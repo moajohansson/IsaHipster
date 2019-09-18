@@ -25,5 +25,5 @@ lemma lemma_ab [thy_expl]: "equal2 x2 (S x2) = False"
 by (hipster_induct_schemes prop_04.equal2.simps)
   theorem x0 :
     "(S (count n xs)) = (count n (Cons2 n xs))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

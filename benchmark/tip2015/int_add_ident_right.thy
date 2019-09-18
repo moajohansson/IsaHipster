@@ -30,6 +30,6 @@ fun plus :: "Z => Z => Z" where
 
 theorem x0 :
   "!! (x :: Z) . x = (plus x zero)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

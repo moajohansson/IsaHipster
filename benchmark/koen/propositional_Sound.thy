@@ -121,6 +121,6 @@ fun 2 :: "((int, bool) Pair2) list => Form => bool" where
 theorem x0 :
   "!! (p :: Form) .
      all (% (x :: ((int, bool) Pair2) list) => 2 x p) (models p (Nil2))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

@@ -154,5 +154,5 @@ by (hipster_induct_schemes prop_35.mult.simps prop_35.plus.simps prop_35.one_def
   theorem x0 :
     "(exp x y) = (qexp x y one)"
 
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

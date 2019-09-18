@@ -59,6 +59,6 @@ theorem x0 :
        ((elem
            y (append (filter (% (z :: int) => z ~= x) (free a)) (free e))) =
           (elem y (free (subst x e a))))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

@@ -29,5 +29,5 @@ by (hipster_induct_schemes prop_24.equal2.simps)
 
   theorem x0 :
     "(equal2 (max2 a b) a) = (le b a)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end
