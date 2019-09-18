@@ -51,9 +51,5 @@ and we'll try to fix it.
 
 
 [TIP]: https://github.com/tip-org/tools
-<<<<<<< HEAD
-[Isa18]: http://isabelle.in.tum.de/installation.html
-=======
 [Isa19]: http://isabelle.in.tum.de/installation.html
->>>>>>> Isabelle2019
 [ST]: https://www.haskell.org/downloads
