@@ -29,7 +29,7 @@ where
   "isTasty (SwedishPiece slice) = like slice"
  |"isTasty (BigPiece slice cake) = (like slice \<and> isTasty cake)"
 
-ML{*Syntax.read_prop @{context} "HOL.conj a b = HOL.conj b a"*}
+ML\<open>Syntax.read_prop @{context} "HOL.conj a b = HOL.conj b a"\<close>
 
 hipster merge isTasty HOL.conj
 lemma lemma_aa [thy_expl]: "dummyAnd (isTasty x2) (isTasty y2) = isTasty (merge x2 y2)"

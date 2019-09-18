@@ -40,12 +40,12 @@ lemma blah: "valbool b env = valif (bool2if b) env" (* It doesn't produce this f
 apply (induction b)
 apply simp_all
 
-ML {* val consts = ["BExp.value", "BExp.valif", "BExp.bool2if" ] ; *}
+ML \<open>val consts = ["BExp.value", "BExp.valif", "BExp.bool2if" ] ;\<close>
 
-ML {* 
+ML \<open>
 val lemma_strs = Hipster_Explore.hipspec_explore @{theory} consts;
-*}
-ML{*
+\<close>
+ML\<open>
 (* This fails because in Haskell, the constructor IF has been renamed If, so
 when conjectures are read back in, it goes wrong, and Isabelle thinks it refers to
 an actual if-statement. *)
@@ -55,10 +55,10 @@ val [c1,c2,c3,c4,c5,c6,c7] =  (Library.split_lines (Library.trim_line lemma_strs
 (*
 val conjs = map (Goal.init o (Thm.cterm_of @{theory}) o (Syntax.read_prop @{context})) conjs1;
 *)
-*}
+\<close>
 
-ML {*
+ML \<open>
 map Pretty.writeln (map ((Syntax.pretty_term @{context}) o prop_of) thms);
-*}
+\<close>
 
 end

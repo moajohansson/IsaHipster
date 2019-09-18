@@ -1,16 +1,30 @@
-theory ListDemo
+theory ListDemoLemmaExpl
 imports "$HIPSTER_HOME/IsaHipster"
 begin
+ML\<open>
+Goal.prove; Variable.auto_fixes
+
+\<close>
+
+ML Thm.assume
+
+ML\<open>
+
+val t = Thm.assume @{cprop "x = x"};
+
+(* Handle binding stuff in context for just proof *)
+fun f ctxt = Goal.prove ctxt ["x"] [@{prop True}] @{prop "x = x"}
+  (fn args => no_tac) handle ERROR _ => TrueI
+
+val r = f @{context}
+
+\<close>
 
 datatype 'a Lst = 
   Emp
   | Cons "'a" "'a Lst"
 
-(*
-primrec hd :: "'a Lst \<Rightarrow> 'a"
-where
-  "hd (Cons x xs) = x"
-*)
+
 fun app :: "'a Lst \<Rightarrow> 'a Lst \<Rightarrow> 'a Lst" 
 where 
   "app Emp xs = xs"
@@ -27,9 +41,10 @@ where
   "qrev Emp a = a"
 | "qrev (Cons x xs) a = qrev xs (Cons x a)"
 
-hipster app
-lemma lemma_a [thy_expl]: "app y Emp = y"
-  apply (induct y)
+ hipster app
+lemma lemma_a [thy_expl]: "app a Emp = a"
+  apply lemma_explore
+  apply (induct a)
   apply simp
   apply simp
   done
@@ -39,31 +54,32 @@ lemma lemma_aa [thy_expl]: "app (app y z) x2 = app y (app z x2)"
   apply simp
   apply simp
   done
-(*lemma lemma_a [thy_expl]: "app x2 Emp = x2"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.rev.simps ListDemo.app.simps thy_expl} *})
 
-lemma lemma_aa [thy_expl]: "app (app x2 y2) z2 = app x2 (app y2 z2)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms ListDemo.rev.simps ListDemo.app.simps thy_expl} *})
-*)
 
-hipster rev
-lemma lemma_ab [thy_expl]: "app (ListDemo.rev z) (ListDemo.rev y) = ListDemo.rev (app y z)"
-apply (induct y arbitrary: z)
-apply (simp add: lemma_a)
-apply (metis ListDemo.rev.simps(2) app.simps(2) lemma_aa)
-done
-
-lemma lemma_ac [thy_expl]: "ListDemo.rev (Lst.Cons z (ListDemo.rev y)) = app y (Lst.Cons z Emp)"
-apply (induct y)
+ hipster rev app
+lemma lemma_ab [thy_expl]: "app (ListDemoLemmaExpl.rev z) (ListDemoLemmaExpl.rev y) = ListDemoLemmaExpl.rev (app y z)"
+  apply (induct y arbitrary: z)
   apply simp
-  apply (metis ListDemo.rev.simps(2) Lst.distinct(1) Lst.inject app.elims app.simps(1) lemma_ab rev.elims)
+  apply (simp add: lemma_a)
+  apply simp
+apply (metis lemma_aa)
   done
     
-lemma lemma_ad [thy_expl]: "ListDemo.rev (app z (ListDemo.rev y)) = app y (ListDemo.rev z)"
-  apply (induct y arbitrary: z)
-  apply (metis ListDemo.rev.simps(1) lemma_ab)
-  apply (metis ListDemo.rev.simps(1) ListDemo.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
+lemma lemma_ac [thy_expl]: "ListDemoLemmaExpl.rev (Lst.Cons z (ListDemoLemmaExpl.rev y)) = app y (Lst.Cons z Emp)"
+  apply (induct y)
+  apply simp
+apply simp
+  apply (metis ListDemoLemmaExpl.rev.simps(1) ListDemoLemmaExpl.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
   done
+    
+lemma lemma_ad [thy_expl]: "ListDemoLemmaExpl.rev (app z (ListDemoLemmaExpl.rev y)) = app y (ListDemoLemmaExpl.rev z)"
+  apply (induct y arbitrary: z)
+  apply simp
+apply (simp add: lemma_a)
+apply simp
+apply (metis ListDemoLemmaExpl.rev.simps(1) ListDemoLemmaExpl.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
+done 
+
 (*lemma lemma_ab [thy_expl]: "app (ListDemo.rev x5) (ListDemo.rev y5) = ListDemo.rev (app y5 x5)"
 apply (induct y5)
 sledgehammer
@@ -73,11 +89,12 @@ by (metis ListDemo.rev.simps(2) app.simps(2) lemma_aa)
 *)
 
 theorem rev_rev : "rev(rev xs) = xs "
-(* by hipster_induct*)
   apply (induct xs)
   apply simp
-  apply (metis ListDemo.rev.simps(1) ListDemo.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
+  apply simp
+  apply (metis ListDemoLemmaExpl.rev.simps(1) ListDemoLemmaExpl.rev.simps(2) app.simps(1) app.simps(2) lemma_ab)
   done
+
  (* sledgehammer
   by (metis ListDemo.rev.simps(1) lemma_a lemma_ad)*)
 (*apply (induct xs)

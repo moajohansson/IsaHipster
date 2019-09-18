@@ -9,7 +9,7 @@ datatype 'a Tree =
   Leaf 'a 
   | Node "'a Tree""'a Tree"
 
-ML{*
+ML\<open>
 
 Sledgehammer.run_sledgehammer;
 Toplevel.proof_of;
@@ -28,7 +28,7 @@ fun my_sledgehammer state minimiser =
     minimiser
     state
   end; 
-*}
+\<close>
 fun mirror :: "'a Tree => 'a Tree"
 where
   "mirror (Leaf x) = Leaf x"

@@ -97,8 +97,8 @@ by (hipster_induct_schemes notle.simps Nat.exhaust)
 (* If we now revisit one of the lemmas discovered about _sorted_ and _insert_, we will be able
     to prove after prior modification of the options: using full_types in metis and increasing
     the timeout for proof search (namely that for metis) *)
-setup{* Hip_Tac_Ops.toggle_full_types @{context} ;*}
-setup{* Hip_Tac_Ops.set_metis_to @{context} 3500;*}
+setup\<open>Hip_Tac_Ops.toggle_full_types @{context} ;\<close>
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 3500;\<close>
 
 (*hipster_cond sorted (*sort*) insert le notle*)
 lemma lemma_ak [thy_expl]: "insert x30 (insert y30 z30) = insert y30 (insert x30 z30)"

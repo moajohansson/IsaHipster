@@ -18,12 +18,12 @@ where
 | "tmap f (Node l r) = Node (tmap f l) (tmap f r)" 
 
 
-ML{* Hipster_Explore.explore  @{context} ["Tree.tmap", "Tree.mirror"]; *}
+ML\<open>Hipster_Explore.explore  @{context} ["Tree.tmap", "Tree.mirror"];\<close>
 lemma lemma_a [thy_expl]: "mirror (tmap x2 y2) = tmap x2 (mirror y2)"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.tmap.simps Tree.mirror.simps thy_expl} *})
+by (tactic \<open>Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.tmap.simps Tree.mirror.simps thy_expl}\<close>)
 
 lemma lemma_aa [thy_expl]: "mirror (mirror x2) = x2"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.tmap.simps Tree.mirror.simps thy_expl} *})
+by (tactic \<open>Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.tmap.simps Tree.mirror.simps thy_expl}\<close>)
 
 
 fun rigthmost :: "'a Tree \<Rightarrow> 'a"
@@ -36,9 +36,9 @@ where
   "leftmost (Leaf x) = x"
 |  "leftmost (Node l r) = leftmost l"
 
-ML{* Hipster_Explore.explore  @{context} ["Tree.mirror","Tree.tmap", "Tree.rigthmost", "Tree.leftmost"]; *}
+ML\<open>Hipster_Explore.explore  @{context} ["Tree.mirror","Tree.tmap", "Tree.rigthmost", "Tree.leftmost"];\<close>
 lemma lemma_ab [thy_expl]: "leftmost (mirror x2) = rigthmost x2"
-by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.mirror.simps Tree.tmap.simps Tree.rigthmost.simps Tree.leftmost.simps thy_expl} *})
+by (tactic \<open>Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.mirror.simps Tree.tmap.simps Tree.rigthmost.simps Tree.leftmost.simps thy_expl}\<close>)
 
 
 fun flat_tree :: "'a Tree => 'a list"
@@ -47,7 +47,7 @@ where
 | "flat_tree (Node l r) = (flat_tree l) @ (flat_tree r)"
 
 
-ML{*Hipster_Explore.explore  @{context} ["Tree.flat_tree", "Tree.mirror", "Tree.tmap", "Tree.leftmost", "Tree.rigthmost","List.rev", "List.map", "List.hd", "List.append"]; *}
+ML\<open>Hipster_Explore.explore  @{context} ["Tree.flat_tree", "Tree.mirror", "Tree.tmap", "Tree.leftmost", "Tree.rigthmost","List.rev", "List.map", "List.hd", "List.append"];\<close>
 lemma lemma_ac [thy_expl]: "flat_tree (tmap x2 y2) = map x2 (flat_tree y2)"
 by hipster_induct_simp_metis
 (*by (tactic {* Hipster_Tacs.induct_simp_metis @{context} @{thms Tree.flat_tree.simps Tree.mirror.simps Tree.tmap.simps Tree.leftmost.simps Tree.rigthmost.simps List.rev.simps List.map.simps List.hd.simps List.append.simps thy_expl} *})
