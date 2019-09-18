@@ -19,5 +19,5 @@ begin
   (*hipster equal2 elem delete *)
   theorem x0 :
     "~ (elem x (delete x xs))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

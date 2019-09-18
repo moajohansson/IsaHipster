@@ -11,5 +11,5 @@ begin
   (*hipster last *)
   theorem x0 :
     "(xs = (Nil2)) ==> ((last (Cons2 x xs)) = x)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

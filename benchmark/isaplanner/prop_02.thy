@@ -23,5 +23,5 @@ thm append.induct
   (*hipster plus equal2 count append *)
   theorem x0 :
     "(plus (count n xs) (count n ys)) = (count n (append xs ys))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

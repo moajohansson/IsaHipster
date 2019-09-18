@@ -11,5 +11,5 @@ begin
   (*hipster zip *)
   theorem x0 :
     "(zip (Nil2) xs) = (Nil2)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

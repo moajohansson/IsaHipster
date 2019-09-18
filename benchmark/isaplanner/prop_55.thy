@@ -22,5 +22,5 @@ begin
   theorem x0 :
     "(drop n (append xs ys)) =
        (append (drop n xs) (drop (minus n (len xs)) ys))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

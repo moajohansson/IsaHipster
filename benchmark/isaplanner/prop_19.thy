@@ -39,10 +39,10 @@ by (hipster_induct_schemes minus.simps)
 lemma lemma_af [thy_expl]: "minus (minus x4 y4) x4 = Z"
 by (hipster_induct_schemes minus.simps)
 
-setup{* Hip_Tac_Ops.set_metis_to @{context} 600 *}
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 600\<close>
 lemma woop []: "minus (minus x y) z = minus (minus x z) y"
 by (hipster_induct_schemes minus.simps Nat.exhaust)
-setup{* Hip_Tac_Ops.set_metis_to @{context} 400 *}
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 400\<close>
 
 lemma unknown [thy_expl]: "minus x (minus x y) = minus y (minus y x)"
 oops
@@ -71,5 +71,5 @@ minus (S y) (minus y x)"
 oops
   theorem x0 :
     "(len (drop n xs)) = (minus (len xs) n)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

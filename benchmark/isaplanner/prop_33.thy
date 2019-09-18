@@ -19,5 +19,5 @@ begin
   (*hipster min2 le equal2 *)
   theorem x0 :
     "(equal2 (min2 a b) a) = (le a b)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

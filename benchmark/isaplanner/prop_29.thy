@@ -28,5 +28,5 @@ by (hipster_induct_schemes equal2.simps)
 
   theorem x0 :
     "elem x (ins1 x xs)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

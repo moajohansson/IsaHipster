@@ -14,5 +14,5 @@ begin
   (*hipster take map2 *)
   theorem x0 :
     "(take n (map2 f xs)) = (map2 f (take n xs))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

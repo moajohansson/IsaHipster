@@ -35,8 +35,8 @@ hipster butlast butlastConcat append
 *)
 (*hipster butlastConcat butlast append*)
 
-setup{* Hip_Tac_Ops.set_metis_to @{context} 3000 *}
-setup{* Hip_Tac_Ops.set_metis_filter @{context} (K false)*}
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 3000\<close>
+setup\<open>Hip_Tac_Ops.set_metis_filter @{context} (K false)\<close>
 
   theorem x0 :
     "(butlast (append xs ys)) = (butlastConcat xs ys)"

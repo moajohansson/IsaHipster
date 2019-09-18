@@ -18,5 +18,5 @@ begin
   (*hipster equal2 elem append *)
   theorem x0 :
     "(elem x xs) ==> (elem x (append xs ys))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

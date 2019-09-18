@@ -45,5 +45,5 @@ by (hipster_induct_schemes max2.simps)
 (*hipster height*)
   theorem x0 :
     "(height (mirror b)) = (height b)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

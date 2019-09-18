@@ -14,5 +14,5 @@ begin
   (*hipster last append *)
   theorem x0 :
     "(last (append xs (Cons2 x (Nil2)))) = x"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end
