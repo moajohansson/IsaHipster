@@ -91,6 +91,6 @@ theorem x0 :
   "!! (p :: R) (s :: A list) .
      (recognise (Star p) s) =
        (or2 (null s) (recognise (Seq p (Star p)) s))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

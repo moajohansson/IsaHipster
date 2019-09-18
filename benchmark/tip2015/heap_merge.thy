@@ -50,6 +50,6 @@ fun toList2 :: "Heap => Nat list" where
 theorem x0 :
   "!! (x :: Heap) (y :: Heap) .
      (toList2 (merge x y)) = (mergeLists (toList2 x) (toList2 y))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

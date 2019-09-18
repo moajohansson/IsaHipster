@@ -22,6 +22,6 @@ fun pow :: "Nat => Nat => Nat" where
 theorem x0 :
   "!! (x :: Nat) (y :: Nat) (z :: Nat) .
      (pow x (plus y z)) = (mult (pow x y) (pow x z))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

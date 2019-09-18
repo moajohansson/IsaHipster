@@ -24,6 +24,6 @@ theorem x0 :
      ((plus (pow (S x) (S (S (S n)))) (pow (S y) (S (S (S n))))) =
         (pow (S z) (S (S (S n))))) ==>
        False"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

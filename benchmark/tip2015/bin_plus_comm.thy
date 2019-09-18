@@ -23,6 +23,6 @@ fun plus :: "Bin => Bin => Bin" where
 
 theorem x0 :
   "!! (x :: Bin) (y :: Bin) . (plus x y) = (plus y x)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

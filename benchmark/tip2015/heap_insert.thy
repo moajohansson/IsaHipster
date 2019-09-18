@@ -59,6 +59,6 @@ fun toList2 :: "Heap => Nat list" where
 theorem x0 :
   "!! (x :: Nat) (h :: Heap) .
      (toList2 (insert2 x h)) = (listInsert x (toList2 h))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

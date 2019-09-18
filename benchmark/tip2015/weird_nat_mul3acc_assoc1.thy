@@ -44,6 +44,6 @@ theorem x0 :
      (x1 :: Nat) (x2 :: Nat) (x3acc :: Nat) (x4 :: Nat) (x5 :: Nat) .
      (mul3acc (mul3acc x1 x2 x3acc) x4 x5) =
        (mul3acc x1 x2 (mul3acc x3acc x4 x5))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

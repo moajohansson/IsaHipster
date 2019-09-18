@@ -70,6 +70,6 @@ fun isRelaxedPrefix :: "It list => It list => bool" where
 theorem x0 :
   "!! (xs :: It list) (ys :: It list) .
      (isRelaxedPrefix xs ys) = (spec xs ys)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

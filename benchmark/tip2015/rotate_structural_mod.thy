@@ -53,6 +53,6 @@ theorem x0 :
      (rotate n xs) =
        (append
           (drop (mod3 n (length xs)) xs) (take (mod3 n (length xs)) xs))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

@@ -40,6 +40,6 @@ theorem x0 :
   "!! (x :: Nat) (t :: Nat Tree) .
      (count x (flatten (add x t) (Nil2))) =
        (S (count x (flatten t (Nil2))))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

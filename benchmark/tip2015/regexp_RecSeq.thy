@@ -117,6 +117,6 @@ fun recognisePair :: "R => R =>
 theorem x0 :
   "!! (p :: R) (q :: R) (s :: A list) .
      (recognise (Seq p q) s) = (recognisePair p q (split s))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

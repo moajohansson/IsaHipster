@@ -28,6 +28,6 @@ by (hipster_induct_schemes append.simps bind.simps)
 theorem x0 :
   "!! (m :: 'a list) (f :: ('a => 'b list)) (g :: ('b => 'c list)) .
      (bind (bind m f) g) = (bind m (% (x :: 'a) => bind (f x) g))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

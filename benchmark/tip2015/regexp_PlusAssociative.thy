@@ -87,6 +87,6 @@ theorem x0 :
   "!! (p :: R) (q :: R) (r :: R) (s :: A list) .
      (recognise (Plus p (Plus q r)) s) =
        (recognise (Plus (Plus p q) r) s)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

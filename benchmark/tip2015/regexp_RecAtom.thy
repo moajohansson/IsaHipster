@@ -93,6 +93,6 @@ fun eqList :: "A list => A list => bool" where
 theorem x0 :
   "!! (a :: A) (s :: A list) .
      (recognise (Atom a) s) = (eqList s (Cons2 a (Nil2)))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

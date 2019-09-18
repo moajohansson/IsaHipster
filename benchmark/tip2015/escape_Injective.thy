@@ -66,6 +66,6 @@ theorem x0 :"
      (*
      apply(metis thy_expl escape.simps isSpecial.simps code.simps list.exhaust Token.exhaust)*)
      (*apply(hipster_induct_schemes escape.simps isSpecial.simps code.simps Token.exhaust list.exhaust)*)
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

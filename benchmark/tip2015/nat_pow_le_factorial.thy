@@ -31,6 +31,6 @@ fun factorial :: "Nat => Nat" where
 theorem x0 :
   "!! (n :: Nat) .
      lt (pow (S (S Z)) (S (S (S (S n))))) (factorial (S (S (S (S n)))))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

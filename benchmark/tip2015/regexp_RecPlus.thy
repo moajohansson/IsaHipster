@@ -86,6 +86,6 @@ fun recognise :: "R => A list => bool" where
 theorem x0 :
   "!! (p :: R) (q :: R) (s :: A list) .
      (recognise (Plus p q) s) = (or2 (recognise p s) (recognise q s))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end
