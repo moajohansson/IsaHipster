@@ -21,7 +21,7 @@ fun proof_str ctxt proof_script name thm =
     (* Print variables without ? *)
     val ctxt' = Config.put show_question_marks false ctxt
     val str_of_term =  Syntax.string_of_term ctxt'
-    val lemma_str = Library.quote (str_of_term (Thm.prop_of thm))
+    val lemma_str = Library.quote (str_of_term (Thm.concl_of thm))
     (*val name = Long_Name.base_name (Thm.get_name_hint thm)
     val _ = @{print} name *)
   in
@@ -34,55 +34,71 @@ fun proof_str ctxt proof_script name thm =
 (* FIXME: Change so there is a hierarchy of tactics of increasing power (not just two),
    so each conjecture is tried with a weaker tactic before trying the harder tactics. *)
 (*-----------------------------------------------------------------------------------------*)
-fun try_nxt_conj ctxt =
-  case (ThyExpl_Data.open_conjs_of_ctxt ctxt) of
+
+(* outer_ctxt is the context in which we call hipster. Each proof is then conducted in its
+   own inner_ctxt which handles fixing of variables etc. The theorem is the exported back into
+   the updated outer context, which is returned. *)
+fun try_nxt_conj outer_ctxt =
+  case (ThyExpl_Data.open_conjs_of_ctxt outer_ctxt) of
     [] => (*retry open_conjs if we have some new proved since last time.*)
-      if (ThyExpl_Data.progress_of_ctxt ctxt)
-        then SOME (ctxt
-                    |> ThyExpl_Data.set_open_conjs_ctxt (ThyExpl_Data.failed_of_ctxt ctxt)
+      if (ThyExpl_Data.progress_of_ctxt outer_ctxt)
+        then SOME (outer_ctxt
+                    |> ThyExpl_Data.set_open_conjs_ctxt (ThyExpl_Data.failed_of_ctxt outer_ctxt)
                     |> ThyExpl_Data.set_failed_ctxt []
                     |> ThyExpl_Data.set_progress_ctxt false)
         else NONE 
   | (c::cs) => (* try proving next open conj *)
       let
-        val lemma_str = Syntax.string_of_term ctxt (Thm.concl_of c)
+        val lemma_str = Syntax.string_of_term outer_ctxt (Thm.concl_of c)
         (* NOTE: To avoid strange bugs with tactics trying to bind variables twice.
             This is done by Isar in regular proofs. *)
-        val  ctxt = Variable.auto_fixes (Thm.concl_of c) ctxt 
-        val _ = Hipster_Utils.maybe_output ctxt 50 ("Proving: "^lemma_str)
+        (* inner_ctxt is a local context in which we'll do the upcoming proof, and handles
+            fixing variables in the correct way.*)
+        val inner_ctxt = Variable.auto_fixes (Thm.prop_of c) outer_ctxt 
+        val _ = Hipster_Utils.maybe_output inner_ctxt 50 ("Proving: "^lemma_str)
       in
-        case SINGLE (Tactic_Data.routine_tac ctxt) c of (* Discard this, it is trivial *)
+        case SINGLE (Tactic_Data.routine_tac inner_ctxt) c of (* Discard this, it is trivial *)
           SOME _ =>
-            let val _ = Hipster_Utils.maybe_output ctxt 55 ("Trivial proof: "^lemma_str)
-            in SOME (ThyExpl_Data.set_open_conjs_ctxt cs ctxt) 
+            let val _ = Hipster_Utils.maybe_output inner_ctxt 55 ("Trivial proof: "^lemma_str)
+            in SOME (ThyExpl_Data.set_open_conjs_ctxt cs outer_ctxt) 
             end
             
         | NONE =>
-            case CTac.SINGLE (Tactic_Data.hard_ctac ctxt) (ctxt,c) of
-              SOME(ctxt1, proved_thm) =>
-                let
-                  val (new_nm, ctxt') = ThyExpl_Data.fresh_name ctxt1 
-                  val proof_script = proof_str ctxt' (Tactic_Data.hard_tac_str ctxt') new_nm proved_thm
-                  val final_thm = proved_thm
-                                    |> Drule.generalize
-                                      (Hipster_Utils.frees_and_tfrees_of_thm proved_thm) 
+            case CTac.SINGLE (Tactic_Data.hard_ctac inner_ctxt) (inner_ctxt,c) of
+              SOME(res_ctxt, proved_thm) =>
+                let 
+                  (*val final_thm = proved_thm
+                                     
                                     |> Goal.finish ctxt'
-                                    |> Thm.put_name_hint new_nm 
-                    
-                  val _ = Hipster_Utils.maybe_print ctxt' 25
-                            ("Proved: " ^ lemma_str)
+                                    |> Thm.put_name_hint new_nm *)
+                  val final_thm = proved_thm 
+                                    |> Goal.finish res_ctxt
+                                     |> (fn thm => hd (Variable.export res_ctxt outer_ctxt [thm]))
+                                   (* |> @{print} *)
+                                   (*  |> Drule.generalize
+                                      (Hipster_Utils.frees_and_tfrees_of_thm proved_thm) *)
+                                (*    |> Thm.put_name_hint new_nm  *)
+
+                  val _ = Hipster_Utils.maybe_print outer_ctxt 25
+                            ("Proved: " ^ lemma_str)              
+
+                  val (new_nm, outer_ctxt') = ThyExpl_Data.fresh_name outer_ctxt (* Get name from outer context *) 
+                  val proof_script = proof_str res_ctxt (Tactic_Data.hard_tac_str res_ctxt) new_nm proved_thm
+                  val named_thm = Thm.put_name_hint new_nm final_thm
+                  
                 in
-                  SOME (ctxt'
-                          |> snd o Local_Theory.note ((Binding.name new_nm,[]), [final_thm]) 
+                  SOME (outer_ctxt' (* FIXME: The next line goes wrong if there are fixed variables or from a proof attempt.*)
+                          |> snd o Local_Theory.note ((Binding.name new_nm,[]), [named_thm]) 
                           |> ThyExpl_Data.set_open_conjs_ctxt cs
-                          |> ThyExpl_Data.add_proved_ctxt final_thm
+                          |> ThyExpl_Data.add_proved_ctxt named_thm
                           |> ThyExpl_Data.set_progress_ctxt true
                           |> ThyExpl_Data.add_proof_script_ctxt (new_nm, proof_script))
+                      
                 end 
             (* NONE indicates that the tactic failed to prove c, put back with open_conjs *)
             | _ =>
-                let val _ = Hipster_Utils.maybe_output ctxt 55 ("Failed proving: "^lemma_str)
-                in SOME (ctxt
+                let val _ = Hipster_Utils.maybe_output outer_ctxt 55 ("Failed proving: "^lemma_str)
+                in SOME (outer_ctxt
                           |> ThyExpl_Data.set_open_conjs_ctxt cs
                           |> ThyExpl_Data.add_failed_ctxt c)
                 end 
@@ -205,36 +221,5 @@ fun explore_cond cond = explore' cond false;
 
 val explore_obs = explore' NONE true;
 
-
-(*-----------------------------------------------------------------------------------------*)
-(* Theory exporation from an ongoing proof: Find lemmas to solve this subgoal              *)
-(*-----------------------------------------------------------------------------------------*)
-
-(* A tactic which picks up the constants from a subgoal, and applies theory exploration on these
-   The aim is to find lemma(s) which allows for the goal to be proved. *)
-fun explore_goal ctxt const_nms thm =
-  let
-      val res_ctxt =(* proof_loop_w_prio ctxt (SOME thm) *)
-                       proof_loop ctxt
-                      (tipspec_explore ctxt NONE false const_nms)
-      val _ = Hipster_Utils.maybe_print ctxt 100 ("End of proof loop.")
-      val lemma_list = ThyExpl_Data.proved_of_ctxt res_ctxt
-      val lemmas = Library.space_implode "\n\n"
-                          (map (mk_lemma_str res_ctxt) lemma_list)
-  in
-    case lemma_list of
-      [] =>
-        let val _ = Hipster_Utils.maybe_print ctxt 25 ("Failed to find lemmas which will prove goal.")
-        in no_tac thm end
-    | _ => (* Success, provided the explored lemmas, the thm can be proved. *)
-        let
-          (* val _ = writeln ("Try first proving lemmas:\n\n" ^ lemmas ^ "\n\n" ^
-                             "Use these prove the open goal "^ (@{make_string} thm) ^ " " ^
-                             (Tactic_Data.routine_tac_str res_ctxt))
-          *)
-        in
-          Seq.single thm
-        end
-  end
 
 end;

@@ -80,20 +80,6 @@ fun inductable_pos_of_funs ctxt trm  =
     inductable_pos  
   end;
 
-(* FIXME: Use Pretty to make sure indentations are done properly instead of spaces... *)
-(* Maybe move to LemmaData.ML*)
- fun mk_proof_str_w_lemma ctxt  = 
-   let
-    val lemma = the (Lemma_Data.lemma_of_ctxt ctxt);
-    val vars_n_types = Hipster_Utils.frees_of (Thm.prop_of lemma)
-    val lemma_str = Library.quote (Syntax.string_of_term ctxt (Thm.prop_of lemma))
-    val vars_str = String.concatWith " " (map fst vars_n_types);
-    val tactic_str = Lemma_Data.lemma_tac_of_ctxt ctxt 
-    val other_tac_str = Lemma_Data.goal_tac_of_ctxt ctxt   
-  in
-    "proof- \n  have " ^ lemma_str ^ " for " ^ vars_str ^ 
-    "\n    by " ^ tactic_str  ^"\n" ^ "  then show ?thesis by " ^ other_tac_str ^"\nqed"
-  end
 
 (* Tactic to check if a goal is solvable by the given lemma. *)
 fun solve_goal_by_lemma_ctac lemma i (ctxt0,thm) =
@@ -129,21 +115,23 @@ fun try_mk_lemma_ctac i (ctxt, thm)  =
 
     val all_inductable_funs = map_filter inductable_fun_in_zipper all_leaves;
     val cand_lemmas = (map_filter conj_lemma all_inductable_funs)
-    
+
     fun init_and_prove_by tac ctxt trm = 
       case (SINGLE (tac ctxt) (Goal.init (Thm.cterm_of ctxt trm))) of
             NONE => NONE
           | SOME thm => if (Thm.no_prems thm) then SOME (Goal.finish ctxt thm) else NONE (* Check proved i.e. no open subgoals *)
               
     val proved_lemmas =  map_filter (init_and_prove_by (Rec_Ind_Tacs.recinduct_simp) ctxt) cand_lemmas
+
     val ctxt1 =  Lemma_Data.set_lemma_tac_ctxt "hipster_recind_simp" ctxt
     (* val gen_lemmas = map (fn lemma => Drule.generalize (Hipster_Utils.frees_and_tfrees_of_thm lemma) lemma) proved_lemmas *)
     (* val try_lemma_tac = FIRST (map (fn l => Ind_Tacs.prove_by_simp ctxt [l]) gen_lemmas);*)
     val try_lemma_ctac = CTac.FIRST (map (fn l => solve_goal_by_lemma_ctac l i) proved_lemmas);
   in
-  case inductable_pos_of_funs ctxt1 trm of
+    try_lemma_ctac (ctxt1,thm)
+  (*case inductable_pos_of_funs ctxt1 trm of
     [] => try_lemma_ctac (ctxt1,thm)
-  | (_::_) => Seq.empty (* If you can do normal recursion induction, try that instead first. *)
+  | (_::_) => Seq.empty *) (* FIXME: Could be that we tried another rec-ind that didn't work, so this might be wrong, but reduces the search space...  *)
  end;
 
 
@@ -152,14 +140,14 @@ fun koen_induct ctxt0 thm =
   let
     val ctxt = ctxt0 |> Lemma_Data.reset_lemma_data_ctxt
                      |> Config.put show_types true
-    val result = CTac.SINGLE (CTac.HEADGOAL try_mk_lemma_ctac) (ctxt,thm)            
+    val result = CTac.SINGLE (CTac.HEADGOAL try_mk_lemma_ctac) (ctxt,thm)
     in
       case result of 
         NONE => Seq.empty
       | SOME (ctxt1, thm1) => 
           if (Thm.no_prems thm1) then  (* proved thm, no subgoals *)
             let val _ = writeln (Active.sendback_markup_command
-                                       (mk_proof_str_w_lemma ctxt1))
+                                       (Lemma_Data.mk_proof_str_w_lemma ctxt1))
              in Seq.single thm1 end
           else Seq.empty
     end

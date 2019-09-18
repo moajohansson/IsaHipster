@@ -69,8 +69,20 @@ val induct_simp = Data {technique = "induction",
                         hard_tac_str = Induction_Data.get_proof_script_ctxt, 
                         applies_to = ind_recognizer}
 
-(* Sledgehammer, or sledgehammer + structural induction *)
+(* Sledgehammer, or sledgehammer + structural induction or recursion induction *)
 val induct_sledgehammer = Data {technique = "induction",
+                                routine_tac = (fn ctxt => fn thm =>
+                                  let
+                                    val proved = ThyExpl_Data.proved_of_ctxt ctxt
+                                    in
+                                      ALLGOALS (Hipster_Sledgehammer_Tactics.just_sledgehammer ctxt []
+                                        Sledgehammer_Fact.no_fact_override proved) thm
+                                    end),                          
+                                hard_ctac = Induct_CTac.thy_expl_hard_ctac_struct_or_rec,
+                                hard_tac_str = Induction_Data.get_proof_script_ctxt,
+                                applies_to = ind_recognizer}
+
+val recinduct_sledgehammer = Data {technique = "induction",
                                 routine_tac = (fn ctxt => fn thm =>
                                   let
                                     val proved = ThyExpl_Data.proved_of_ctxt ctxt
@@ -113,8 +125,7 @@ val no_proof = Data {technique = "Just explore, no proofs",
                                                   hard_tac_str = Sledgehammer_T.final_tactic_str,
                                                   applies_to = ind_recognizer}  (* Redundant *)
 *)
-(* Data stored in an Isabelle context, default to induct_with_schemes tactics.
-   THINK: Maybe this should be stored in the theory instead? *)
+
 structure Data = Theory_Data
   ( type T = T
     val empty = induct_sledgehammer (* induct_with_schemes *)(* Default tactics *)
@@ -132,8 +143,8 @@ fun default_technique ctxt = (get_technique o hd o (Data.get o Proof_Context.the
 val set_tacs = Data.put
 val get_tacs = Data.get
 val set_induct_simp = set_tacs induct_simp
-(*val set_recursion_induction = set_tacs [induct_with_schemes] *)
 val set_induct_sledgehammer = set_tacs induct_sledgehammer
+val set_recinduct_sledgehammer =  set_tacs recinduct_sledgehammer
 (*val set_coinduct_sledgehammer = set_tacs [induct_sledgehammer,coinduct_sledgehammer]
 val set_sledgehammer_coinduct = set_tacs [induct_sledgehammer,sledgehammer_coinduct]*)
 

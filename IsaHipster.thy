@@ -26,8 +26,8 @@ val haskell_path =
                          "\n  Using current directory.")
           in "./" end
   | haskell_home => haskell_home;
-
-val tipSpec_cmd =  haskell_path ^ "tip-spec -s 5";
+val max_term_size = "5";
+val tipSpec_cmd =  haskell_path ^ "tip-spec -s " ^ max_term_size;
 val tipTransl_cmd  =  haskell_path ^ "tip --hipster ";
 val tipGHC_cmd =  haskell_path ^ "tip-ghc ";
 end
@@ -58,6 +58,7 @@ ML_file "ThyExplData.ML"
 ML_file "IndTacs.ML"
 ML_file "RecIndTacs.ML"
 ML_file "RecIndLemmaSpecTacs.ML"
+
 ML_file "CTacs/InductCTac.ML"
 ML_file "CoIndTacs.ML"
 ML_file "CoinductionData.ML"
@@ -65,6 +66,8 @@ ML_file "CTacs/CoinductCTac.ML"
   
 ML_file "TacticData.ML" 
 ML_file "HipsterExplore.ML"
+ML_file "ExplLemmaTac.ML"
+
 ML_file "HipsterIsar.ML"
 
 
@@ -117,6 +120,11 @@ method_setup hipster_coinduct_sledgehammer = {*
       (Coind_Tacs.coinduct_and_sledgehammer ctxt)))
 *}
 
+method_setup lemma_explore = {*
+  Scan.lift (Scan.succeed
+    (fn ctxt => SIMPLE_METHOD
+      (Expl_Lemma_Tac.expl_goal_tac ctxt)))
+*}
 (*
 ML{*
 Method.setup;

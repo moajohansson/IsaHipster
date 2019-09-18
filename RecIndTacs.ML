@@ -88,14 +88,12 @@ fun try_recinduct subgoal_tac ctxt thm =
     val poss_inds = map (fn(_, varz, recind_thm) => 
                           let 
                             val vars = map (fn z => Zipper.trm z |> Term.dest_Free |> fst) varz
-                            (*val _ = @{print} vars*) (* just for testing during dev.*)
                           in
                             DEPTH_SOLVE (
                               (Seq.DETERM 
                                 (HEADGOAL  
                                   (Ind_Tacs.induct_on_var_tac ctxt (SOME recind_thm) (SOME vars))))
                                THEN 
-                             (*  (Ind_Tacs.simp_or_sledgehammer_tac ctxt)) *)
                                subgoal_tac ctxt)
                           end) rec_inds 
   in

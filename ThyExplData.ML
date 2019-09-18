@@ -173,24 +173,15 @@ fun goal_prop str ctxt =
 (* Assume get list of strings from HipSpec, which can be directly parsed as Isabelle terms *)
 fun init_expl ctxt facts fact_names prio_goal_opt lemma_strs =
   let
-    (*  fun total_vs t =
-        let val (frs,als) = Hipster_Utils.dangling_vars t
-        in length frs + length als end *)
-  (*    fun term_var_ord (t1, t2) =
-        let val freedom1 = total_vs t1
-            val freedom2 = total_vs t2
-        in bool_ord (freedom2 < freedom1, freedom1 < freedom2)
-        end *)
-
       val conjs = lemma_strs
                     |> map (Syntax.read_prop ctxt)
-                    (*|> sort term_var_ord*)
                     |> map (Goal.init o (Thm.cterm_of ctxt))
                     |> filter (is_present ctxt);
   in
     ExplData.put
       (Data{open_conjs = conjs, failed = [], proved = [], facts = facts, fact_names = fact_names,
-            proof_scripts = Symtab.empty, used_thm_names = Name.make_context
+            proof_scripts = Symtab.empty, 
+            used_thm_names = Name.make_context
                                 (map (fn thm => Long_Name.base_name(Thm.get_name_hint thm))
                                      (Hipster_Rules.get ctxt)),
             priority_goal = prio_goal_opt, progress = false})

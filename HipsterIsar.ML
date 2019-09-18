@@ -65,6 +65,8 @@ Outer_Syntax.local_theory @{command_keyword "hipster_cond"}
       (Scan.repeat1 Parse.const >> Hipster_Utils.maybe_time call_hipster)
 end;
 
+
+
 (*
 (* Use simp and or sledgehammer, then prints out Isar snippet using standard Isabelle tactics. *)
 method_setup hipster_induct = {*

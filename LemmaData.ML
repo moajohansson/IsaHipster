@@ -45,5 +45,19 @@ fun set_goal_tac_ctxt tac ctxt =
 
 fun reset_lemma_data_ctxt ctxt = LemmaData.put empty ctxt;
 
+(* FIXME: Use Pretty to make sure indentations are done properly instead of spaces... *)
+ fun mk_proof_str_w_lemma ctxt  = 
+   let
+    val lemma = the (lemma_of_ctxt ctxt);
+    val vars_n_types = Hipster_Utils.frees_of (Thm.prop_of lemma)
+    val lemma_str = Library.quote (Syntax.string_of_term ctxt (Thm.prop_of lemma))
+    val vars_str = String.concatWith " " (map fst vars_n_types);
+    val tactic_str = lemma_tac_of_ctxt ctxt 
+    val other_tac_str = goal_tac_of_ctxt ctxt   
+  in
+    "proof- \n  have " ^ lemma_str ^ " for " ^ vars_str ^ 
+    "\n    by " ^ tactic_str  ^"\n" ^ "  then show ?thesis by " ^ other_tac_str ^"\nqed"
+  end
+
 end
 
