@@ -96,7 +96,7 @@ by (metis app.simps len.simps List.exhaust Nat.distinct)*)
 
 
 lemma auxRev : "rev (rev (Cons a Nil)) = Cons a Nil"
-by (tactic {* Tactic_Data.routine_tac @{context} *})
+by (tactic \<open>Tactic_Data.routine_tac @{context}\<close>)
 
 lemma revA : "rev (app xs (Cons x Nil)) = app (rev (Cons x Nil)) (rev xs)"
 by hipster_induct_simp_metis
@@ -141,7 +141,7 @@ by (hipster_induct_simp_metis appAssoc app.simps)
 (* immediately follows *)
 lemma s : "t = rev t \<Longrightarrow> rev (app t t) = app t t"
 (*apply(hipster_induct_schemes revA appNil appAssoc)*)
-by (tactic {* Tactic_Data.routine_tac @{context} *})
+by (tactic \<open>Tactic_Data.routine_tac @{context}\<close>)
 
 lemma revCons: "rev (Cons t ts) = app (rev ts) (Cons t Nil)"
 by simp

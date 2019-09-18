@@ -36,11 +36,11 @@ by (hipster_induct_simp_metis)
 (* alternative: apply(case_tac ts) apply(simp_all) done *)
 
 
-setup{* Hip_Tac_Ops.toggle_full_types @{context} ;*}
-setup{* Hip_Tac_Ops.set_metis_to @{context} 1000;*}
-ML{*
+setup\<open>Hip_Tac_Ops.toggle_full_types @{context} ;\<close>
+setup\<open>Hip_Tac_Ops.set_metis_to @{context} 1000;\<close>
+ML\<open>
 Hip_Tac_Ops.metis_to @{context} ;
-Hip_Tac_Ops.use_full_types @{context}; *}
+Hip_Tac_Ops.use_full_types @{context};\<close>
 
 lemma insSortInvar : "sorted ts \<Longrightarrow> sorted (insert t ts)"
 by (hipster_induct_schemes sorted.simps insert.simps Nat.exhaust leqRev list.exhaust)

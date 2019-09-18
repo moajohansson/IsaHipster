@@ -171,7 +171,7 @@ by (simp_all add: subId) (* from ProofN *) *)
 
 
 lemma zipNil: "rs = Nil \<Longrightarrow> zip rs ts = Nil" (* "\<not> notNil rs *)  (* does not require condition "format" *)
-by (tactic {* Simp_T.routine_tac @{context} *})
+by (tactic \<open>Simp_T.routine_tac @{context}\<close>)
 (*by (hipster_induct_simp_metis)*)
 
 (* XXX: we should do something about our conclusions in the induction? type of the Nil has a 
