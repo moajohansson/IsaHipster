@@ -45,6 +45,6 @@ theorem x0 :
      (even (length xs)) ==>
        ((map2 (% (x :: ('b, 'b) Pair2) => fst x) (pairs xs)) =
           (evens xs))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

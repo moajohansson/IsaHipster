@@ -11,6 +11,6 @@ by pat_completeness auto
 
 theorem x0 :
   "!! (n :: int) . (n <= 100) ==> ((m n) = 91)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

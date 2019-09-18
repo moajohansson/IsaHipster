@@ -57,6 +57,6 @@ theorem x0 :
   "!! (x :: int) (e :: Expr) (a :: Expr) (y :: int) .
      (~ (elem x (free a))) ==>
        ((elem y (free a)) = (elem y (free (subst x e a))))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

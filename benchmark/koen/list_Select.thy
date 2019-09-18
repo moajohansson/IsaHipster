@@ -29,6 +29,6 @@ fun fst :: "('a, 'b) Pair2 => 'a" where
 theorem x0 :
   "!! (xs :: 't list) .
      (map2 (% (x :: ('t, ('t list)) Pair2) => fst x) (select xs)) = xs"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

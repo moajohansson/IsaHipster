@@ -42,6 +42,6 @@ theorem x0 :
      (and2 (elem a (flatten0 p)) (elem b (flatten0 p))) ==>
        (and2
           (elem a (flatten0 (swap a b p))) (elem b (flatten0 (swap a b p))))"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

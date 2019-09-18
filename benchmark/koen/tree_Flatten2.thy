@@ -24,6 +24,6 @@ fun flatten0 :: "'a Tree => 'a list" where
 
 theorem x0 :
   "!! (p :: 'a Tree) . (flatten2 p (Nil2)) = (flatten0 p)"
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end

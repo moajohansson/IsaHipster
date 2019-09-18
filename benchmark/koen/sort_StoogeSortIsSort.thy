@@ -94,6 +94,6 @@ theorem x0 :
       apply(induction x rule:isort.induct)
       apply(simp_all)
       apply(metis isort.simps list.exhaust stoogesort.simps)
-  by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+  by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 end
