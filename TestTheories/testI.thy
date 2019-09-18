@@ -4,7 +4,7 @@ imports Main
 
 begin
 
-ML {* 
+ML \<open>
    fun infer_term x ctxt = 
      let val (T, ctxt') = Proof_Context.inferred_param x ctxt 
      in (Free (x, T), ctxt') end; 
@@ -19,7 +19,7 @@ ML {*
        val _ = @{print} (Seq.list_of ress)
      in ab end; 
 NO_CASES
-*}
+\<close>
 
 
 datatype 'a T1 = A1 "'a T2" | B1 
@@ -40,7 +40,7 @@ lemma
 lemma 
    "foo1 (a::'a T1) = B1" 
    "foo2 (b::'a T2) = B1" 
-   apply (raw_tactic {* induct_tac @{context} [["a"], ["b"]] @{thms foo1_foo2.induct} *})
+   apply (raw_tactic \<open>induct_tac @{context} [["a"], ["b"]] @{thms foo1_foo2.induct}\<close>)
      apply simp_all 
    done
 
