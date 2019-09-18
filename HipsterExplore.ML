@@ -170,17 +170,17 @@ fun tipspec_explore ctxt cond_opt obs_opt const_nms =
 
     val tipspec_cmd = case cond_opt of NONE => tipspec_plain outfile const_nms obs_str ctxt
                                      | SOME _ => raise ERROR "Conditionals not yet supported in this version."
-                                      (*hipspec_cond c const_nms' outfile *)
-    val path_opt = SOME (Path.explode Hipster_Setup.filepath);
 
+    val path_opt = SOME ({physical = true}, (Path.explode Hipster_Setup.filepath, Position.start))
+    
     (* Stolen from Isabelle_system, massaged to not emit warnings*)
     fun my_bash_output s =
     let
       val {out, err, rc, ...} = Bash.process s;
       val _ = Hipster_Utils.maybe_output ctxt 20 err
     in (out, rc) end;
-
-    val _ = Code_Target.export_code ctxt false const_nms [((("Haskell",thynm), path_opt), [])];
+   
+    val _ = Code_Target.export_code false const_nms [((("Haskell", thynm), path_opt), [])] ctxt; 
   in
        fst (my_bash_output tipspec_cmd)
   end;
