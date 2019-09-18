@@ -56,5 +56,5 @@ oops
   theorem x0 :
     "(rotate (length x) x) = x"
     by (hipster_induct_schemes rotate.simps length.simps)
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

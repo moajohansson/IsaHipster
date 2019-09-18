@@ -40,5 +40,5 @@ by (hipster_induct_schemes qrevflat.simps revflat.simps append.simps rev.simps)
     "(revflat x) = (qrevflat x (Nil2))"
     by (hipster_induct_schemes qrevflat.simps revflat.simps append.simps)
 
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

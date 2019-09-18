@@ -35,5 +35,5 @@ by (hipster_induct_schemes qrev.simps append.simps rev.simps)
 
   theorem x0 :
     "(rev x) = (qrev x (Nil2))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

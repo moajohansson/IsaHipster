@@ -171,5 +171,5 @@ by (hipster_induct_schemes mult.simps plus.simps)
     apply(metis thy_expl fac.simps qfac.simps mult.simps plus.simps)
     apply (hipster_induct_schemes mult.simps plus.simps fac.simps qfac.simps Nat.exhaust one_def)
 
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

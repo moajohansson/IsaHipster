@@ -58,5 +58,5 @@ by (hipster_induct_schemes length.simps le.simps insert2.simps isort.simps)*)
 
   theorem x0 :
     "(length (isort x)) = (length x)"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

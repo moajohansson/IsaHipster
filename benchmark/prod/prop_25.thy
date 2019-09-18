@@ -67,5 +67,5 @@ by (hipster_induct_schemes plus.simps length.simps even.simps append.simps)
   theorem x0 :
     "(even (length (append x y))) =
        (even (plus (length y) (length x)))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 end

@@ -65,7 +65,7 @@ hipster length append plus
 
   theorem x0 [thy_expl]:
     "(length (append x y)) = (plus (length y) (length x))"
-    by (tactic {* Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1 *})
+    by (tactic \<open>Subgoal.FOCUS_PARAMS (K (Tactic_Data.hard_tac @{context})) @{context} 1\<close>)
 
 lemma unknown [thy_expl]: "length (append x y) = length (append y x)"
 by (metis thy_expl)
