@@ -42,7 +42,15 @@ fun play_one_line_proof ctxt minimize timeout used_facts0 thm i (preferred_meth,
                 | is_metis_method _ = false
 
               fun mk_step fact_names meths =
-                Sledgehammer_Isar_Proof.Prove ([], [], ("", 0), goal_t, [], ([], fact_names), meths, "")
+                Sledgehammer_Isar_Proof.Prove {
+                 qualifiers = [],
+                 obtains = [],
+                 label = ("", 0),
+                 goal = goal_t,
+                 subproofs = [],
+                 facts = ([], fact_names),
+                 proof_methods = meths,
+                 comment = ""}
              (* val _ = if Misc_Data.verbosity ctxt >= 70 then
                        let val _ = @{print} ("mk_step", mk_step fact_names meths) in () end
                       else () *)

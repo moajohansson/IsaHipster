@@ -54,7 +54,7 @@ fun try_nxt_conj outer_ctxt =
             This is done by Isar in regular proofs. *)
         (* inner_ctxt is a local context in which we'll do the upcoming proof, and handles
             fixing variables in the correct way.*)
-        val inner_ctxt = Variable.auto_fixes (Thm.prop_of c) outer_ctxt 
+        val inner_ctxt = Variable.add_fixes_implicit (Thm.prop_of c) outer_ctxt 
         val _ = Hipster_Utils.maybe_output inner_ctxt 50 ("Proving: "^lemma_str)
       in
         case SINGLE (Tactic_Data.routine_tac inner_ctxt) c of (* Discard this, it is trivial *)

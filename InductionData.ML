@@ -32,7 +32,7 @@ datatype Hipster_Proof_Method =
                                                            else "using " ^ space_implode " " facts  ^ " apply blast"
               | Sledgehammer_Proof_Methods.Fastforce_Method => if (null facts) then "apply fastforce"
                                                            else "using " ^ space_implode " " facts  ^ " apply fastforce"
-              | _ => "apply " ^ Sledgehammer_Proof_Methods.string_of_proof_method ctxt facts meth ^""
+              | _ => "apply " ^ Sledgehammer_Proof_Methods.string_of_proof_method facts meth ^""
           )
            | Simp_All_Meth => "apply " ^ (if (null facts) then "simp_all"
                                          else "(simp_all add: " ^ space_implode " " facts)
