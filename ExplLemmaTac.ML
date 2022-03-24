@@ -49,7 +49,7 @@ fun explore_goal ctxt const_nms i thm =
 
 fun expl_goal_tac ctxt thm = 
   let
-    val consts1 = map fst (Hipster_Utils.thy_consts_of "dummy" thm)
+    (*val consts1 = map fst (Hipster_Utils.thy_consts_of "dummy" thm)*)
     val consts = ["app"] (* Note strip names of functions in this theory *)
     fun get_const_name ctxt c =
           c |> Proof_Context.read_const {proper = true, strict = false} ctxt  (*false dummyT *)

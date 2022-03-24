@@ -16,7 +16,7 @@ datatype Hipster_Proof_Method =
       Sledgehammer_Meth of Sledgehammer_Proof_Methods.proof_method
    |  Simp_All_Meth
 
- fun string_of_meth ctxt (m,facts) =
+ fun string_of_meth (m,facts) =
       case m of Sledgehammer_Meth meth =>
           (
             case meth of
@@ -80,7 +80,7 @@ fun add_subgoal_tac (sg_number, tac) =
 val empty = Data{induction_rule = NONE, induction_vars = [],
                   arbitrary_vars = [], subgoal_tacs_strs = Inttab.empty}
 
-fun get_proof_script (Data d) ctxt =
+fun get_proof_script (Data d) =
   let
   val simp_meth = Sledgehammer_Meth (Sledgehammer_Proof_Methods.Simp_Method)
 
@@ -123,8 +123,8 @@ fun get_proof_script (Data d) ctxt =
  fun mk_app_str meths s =
     case meths of
       [] => s
-    | [m] => (s ^ (string_of_meth ctxt m) ^"\n") ^ "done"
-    | (m::ms) => mk_app_str ms (s ^ (string_of_meth ctxt m) ^"\n")
+    | [m] => (s ^ (string_of_meth m) ^"\n") ^ "done"
+    | (m::ms) => mk_app_str ms (s ^ (string_of_meth m) ^"\n")
        (*let val meth_str = string_of_meth ctxt m
        in *)
        (*if (null ms)
@@ -162,6 +162,6 @@ fun add_subgoal_tac_ctxt tac ctxt =
 
 val reset_ind_proof_data_ctxt = IndData.put empty
 
-fun get_proof_script_ctxt ctxt = get_proof_script (IndData.get ctxt) ctxt
+fun get_proof_script_ctxt ctxt = get_proof_script (IndData.get ctxt)
 
 end

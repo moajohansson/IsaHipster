@@ -62,20 +62,8 @@ fun get_proof_script (Data d) ctxt =
                                               |> filter (curry op <> ""))
           | SOME rule => String.concatWith " " ([app_coind, arbs, ("rule: " ^ dequalify ctxt rule ^ ")\n")]
                                                 |> filter (curry op <> ""))
-  (*val _ = @{print} coind_str*)
-  fun is_simp m = (m = Induction_Data.Simp_All_Meth orelse
-                   m = Induction_Data.Sledgehammer_Meth
-                       (Sledgehammer_Proof_Methods.Simp_Method))
 
-(*  fun merge_same_meths ms new_m =
-      case ms of [] => new_m
-          | [(m,fs)] => new_m @ [Induction_Data.string_of_meth ctxt (m,fs)]
-          | ((m1,f1)::(m2,f2)::ms) =>
-              if (is_simp m1 andalso is_simp m2)
-              then merge_same_meths ((Induction_Data.Simp_All_Meth,f1@f2)::ms) new_m
-              else merge_same_meths ((m2,f2)::ms) (new_m @ [Induction_Data.string_of_meth ctxt (m1,f1)])
-*)
- val app_strs = map (Induction_Data.string_of_meth ctxt) (flat subgoal_tacs)
+ val app_strs = map Induction_Data.string_of_meth (flat subgoal_tacs)
   (*val _ = @{print} app_strs*)
  fun split_longest_id_suffix [] = ([],[])
    | split_longest_id_suffix (f::l) =

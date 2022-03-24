@@ -145,11 +145,9 @@ val get_tacs = Data.get
 val set_induct_simp = set_tacs induct_simp
 val set_induct_sledgehammer = set_tacs induct_sledgehammer
 val set_recinduct_sledgehammer =  set_tacs recinduct_sledgehammer
-(*val set_coinduct_sledgehammer = set_tacs [induct_sledgehammer,coinduct_sledgehammer]
-val set_sledgehammer_coinduct = set_tacs [induct_sledgehammer,sledgehammer_coinduct]*)
-
-(* val set_sledge_induct_sledge = set_tacs [simp_sledgehammer_induct_sledgehammer] *)
+val set_coinduct_sledgehammer = set_tacs coinduct_sledgehammer
+val set_sledgehammer_coinduct = set_tacs sledgehammer_coinduct
 val set_no_proof = set_tacs no_proof
-(* val set_coinduct_sledgehammer_auto = set_tacs [induct_sledgehammer,coinduct_sledgehammer_auto] *)
+(* FIXME: define tactic that combines induction and coinduction*)
 
 end

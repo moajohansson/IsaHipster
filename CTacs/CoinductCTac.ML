@@ -37,7 +37,7 @@ fun coinduct_with_arb_ctac rule vars (ctxt,thm) = (
  |  NONE => CTac.no_ctac (ctxt,thm));
 
 (* Apply coinduction and record which rule was used, and which variables were arbitrary *)
-fun coinduct_upto_with_arb_ctac rule vars (ctxt,thm) =
+fun coinduct_upto_with_arb_ctac (ctxt,thm) =
   let val const_names = Hipster_Utils.thy_consts_of ""(*TODO: empty string should be current theory name*) thm
       val rulenames = map (fn (x,_) => x ^ ".coinduct") const_names |>
                       filter (can (Proof_Context.get_thm ctxt))
@@ -61,13 +61,6 @@ fun coinduct_allfree_arbitrary_ctac rule (ctxt,thm) =
       val fvs = Hipster_Utils.add_term_frees(t, [])
   in
     coinduct_with_arb_ctac rule fvs (ctxt,thm)
-  end;
-
-fun coinduct_upto_allfree_arbitrary_ctac rule (ctxt,thm) =
-  let val t = Thm.concl_of thm
-      val fvs = Hipster_Utils.add_term_frees(t, [])
-  in
-    coinduct_upto_with_arb_ctac rule fvs (ctxt,thm)
   end;
 
 fun simp_goal_ctac i (ctxt,thm) =
@@ -118,12 +111,12 @@ fun coinduct_and_sledgehammer_ctac rule (ctxt,thm) =
        CTac.ALLGOALS (simp_or_sledgehammer_ctac overrides)))
   end
 
-fun coinduct_upto_and_sledgehammer_ctac rule (ctxt,thm) =
+fun coinduct_upto_and_sledgehammer_ctac (ctxt,thm) =
   let val overrides = get_overrides ctxt thm in
   (ctxt,thm) |>
   CTac.SOLVE_OR_FAIL
     (CTac.CTHEN
-      (Seq.DETERM (coinduct_upto_allfree_arbitrary_ctac rule),
+      (Seq.DETERM coinduct_upto_with_arb_ctac,
        CTac.ALLGOALS (simp_or_sledgehammer_ctac overrides)))
   end
 
@@ -134,7 +127,7 @@ fun thy_expl_sledge_or_coind_ctac  (ctxt0, thm) =
       CTac.CORELSE
                 (CTac.SOLVE_OR_FAIL (CTac.ALLGOALS (sledgehammer_ctac Sledgehammer_Fact.no_fact_override)),
                  (CTac.CORELSE
-                  (CTac.SOLVE_OR_FAIL (coinduct_upto_and_sledgehammer_ctac NONE),
+                  (CTac.SOLVE_OR_FAIL coinduct_upto_and_sledgehammer_ctac,
                    coinduct_and_sledgehammer_ctac NONE)))
         (ctxt,thm)
       end
@@ -144,7 +137,7 @@ fun thy_expl_coind_ctac (ctxt0, thm) =
     val ctxt = Coinduction_Data.reset_coind_proof_data_ctxt ctxt0
     in
        CTac.CORELSE(
-         CTac.SOLVE_OR_FAIL (coinduct_upto_and_sledgehammer_ctac NONE),
+         CTac.SOLVE_OR_FAIL coinduct_upto_and_sledgehammer_ctac,
          coinduct_and_sledgehammer_ctac NONE)
        (ctxt,thm)
     end;
