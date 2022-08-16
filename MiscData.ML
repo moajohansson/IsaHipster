@@ -57,7 +57,7 @@ structure Data = Theory_Data
 
 fun set_silent thy = Data.put (set_verbosity 0 (Data.get thy)) thy;
 fun set_noisy thy = Data.put (set_verbosity 100 (Data.get thy)) thy;
-fun set_mediumverbo thy = Data.put (set_verbosity 55 (Data.get thy)) thy;
+fun set_mediumverbose thy = Data.put (set_verbosity 55 (Data.get thy)) thy;
 
 fun set_hammer_timeout_short thy = Data.put (set_hammer_timeout short_timeout (Data.get thy)) thy;
 fun set_hammer_timeout_medium thy = Data.put (set_hammer_timeout med_timeout (Data.get thy)) thy;
